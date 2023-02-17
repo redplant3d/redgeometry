@@ -1,4 +1,4 @@
-import { World } from "./World";
+import { World } from "./world";
 
 // Entity
 export type EntityId = number;
