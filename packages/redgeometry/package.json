@@ -1,0 +1,20 @@
+{
+    "name": "redgeometry",
+    "version": "0.1.0",
+    "license": "MIT",
+    "files": [
+        "dist",
+        "src",
+        "LICENSE"
+    ],
+    "type": "module",
+    "module": "./dist/index.js",
+    "main": "./dist/index.cjs",
+    "types": "./dist/index.d.ts",
+    "engines": {
+        "node": ">=14.0.0"
+    },
+    "scripts": {
+        "build": "vite-node ./scripts/build.ts"
+    }
+}

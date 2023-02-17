@@ -1,0 +1,8 @@
+{
+    "name": "redgeometry-app",
+    "version": "0.1.0",
+    "scripts": {
+        "build": "vite-node ./scripts/build.ts",
+        "serve": "vite-node ./scripts/serve.ts"
+    }
+}
