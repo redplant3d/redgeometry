@@ -91,6 +91,11 @@ export class StrokeState {
         }
     }
 
+    public finalizePoint(p: Point2): void {
+        this.insertMoveStroke(p, Vector2.unitX);
+        this.finalizeOpen();
+    }
+
     public initialize(output: Path2, options: PathStrokeOptions): void {
         if (options.dashArray.length > 0) {
             this.initializeDashStroke(output, options);
@@ -143,6 +148,7 @@ export class StrokeState {
             this.right = this.rightMain;
         } else if (this.currentPhase) {
             combineStroke(this.output, this.leftMain, this.rightMain, this.dashCaps.start, this.dashCaps.end);
+
             this.resetStroke();
         }
 
@@ -158,8 +164,8 @@ export class StrokeState {
                 this.leftFirst.close();
                 this.rightFirst.close();
 
-                this.output.addPath(this.leftFirst);
-                this.output.addPathReversed(this.rightFirst);
+                this.output.addPath(this.leftFirst, false);
+                this.output.addPathReversed(this.rightFirst, false);
             } else {
                 // Last and first dash are connected
                 this.leftMain.addPath(this.leftFirst, true);
@@ -436,9 +442,11 @@ export function insertStrokeCap(path: Path2, p1: Point2, cap: CapType | CustomCa
         }
         case CapType.Square: {
             const p0 = path.getLastPoint();
+
             if (p0 === undefined) {
                 break;
             }
+
             const v = p1.sub(p0).mul(0.5).normal;
             path.lineTo(p0.add(v));
             path.lineTo(p1.add(v));
@@ -448,9 +456,11 @@ export function insertStrokeCap(path: Path2, p1: Point2, cap: CapType | CustomCa
         }
         case CapType.Round: {
             const p0 = path.getLastPoint();
+
             if (p0 === undefined) {
                 break;
             }
+
             const v = p1.sub(p0).mul(0.5).normal;
             path.arcTo(p0.add(v), p0.add(v.sub(v.normal)));
             path.arcTo(p1.add(v), p1);

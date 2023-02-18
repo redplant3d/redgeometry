@@ -58,6 +58,7 @@ export class PathStrokeIncremental2 implements PathStroke2 {
         let ps = Point2.zero;
         let p0 = Point2.zero;
         let m0 = Vector2.zero;
+        let adv = false;
 
         this.state.initialize(output, options);
 
@@ -67,12 +68,14 @@ export class PathStrokeIncremental2 implements PathStroke2 {
                 case PathCommandType.Move: {
                     if (!m0.isZero()) {
                         this.state.finalizeOpen();
+                    } else if (adv) {
+                        this.state.finalizePoint(ps);
                     }
 
-                    p0 = points[pIdx++];
+                    ps = points[pIdx++];
+                    p0 = ps;
                     m0 = Vector2.zero;
-
-                    ps = p0;
+                    adv = false;
                     break;
                 }
                 case PathCommandType.Linear: {
@@ -87,6 +90,7 @@ export class PathStrokeIncremental2 implements PathStroke2 {
                         m0 = m;
                     }
 
+                    adv = true;
                     break;
                 }
                 case PathCommandType.Quadratic: {
@@ -101,6 +105,7 @@ export class PathStrokeIncremental2 implements PathStroke2 {
                         m0 = c.getTangentEnd();
                     }
 
+                    adv = true;
                     break;
                 }
                 case PathCommandType.Cubic: {
@@ -115,6 +120,7 @@ export class PathStrokeIncremental2 implements PathStroke2 {
                         m0 = c.getTangentEnd();
                     }
 
+                    adv = true;
                     break;
                 }
                 case PathCommandType.Conic: {
@@ -129,6 +135,7 @@ export class PathStrokeIncremental2 implements PathStroke2 {
                         m0 = c.getTangentEnd();
                     }
 
+                    adv = true;
                     break;
                 }
                 case PathCommandType.Close: {
@@ -145,11 +152,13 @@ export class PathStrokeIncremental2 implements PathStroke2 {
                     if (!m0.isZero()) {
                         this.state.strokeFirstOrJoin(ps, m0, this.state.ms);
                         this.state.finalizeClosed();
+                    } else if (adv) {
+                        this.state.finalizePoint(ps);
                     }
 
                     p0 = ps;
                     m0 = Vector2.zero;
-
+                    adv = false;
                     break;
                 }
                 default: {
@@ -161,6 +170,8 @@ export class PathStrokeIncremental2 implements PathStroke2 {
         // Finalize last shape
         if (!m0.isZero()) {
             this.state.finalizeOpen();
+        } else if (adv) {
+            this.state.finalizePoint(ps);
         }
     }
 
@@ -304,6 +315,7 @@ export class PathStrokeRecursive2 implements PathStroke2 {
         let ps = Point2.zero;
         let p0 = Point2.zero;
         let m0 = Vector2.zero;
+        let adv = false;
 
         this.state.initialize(output, options);
 
@@ -313,12 +325,14 @@ export class PathStrokeRecursive2 implements PathStroke2 {
                 case PathCommandType.Move: {
                     if (!m0.isZero()) {
                         this.state.finalizeOpen();
+                    } else if (adv) {
+                        this.state.finalizePoint(ps);
                     }
 
-                    p0 = points[pIdx++];
+                    ps = points[pIdx++];
+                    p0 = ps;
                     m0 = Vector2.zero;
-
-                    ps = p0;
+                    adv = false;
                     break;
                 }
                 case PathCommandType.Linear: {
@@ -333,6 +347,7 @@ export class PathStrokeRecursive2 implements PathStroke2 {
                         m0 = m;
                     }
 
+                    adv = true;
                     break;
                 }
                 case PathCommandType.Quadratic: {
@@ -347,6 +362,7 @@ export class PathStrokeRecursive2 implements PathStroke2 {
                         m0 = c.getTangentEnd();
                     }
 
+                    adv = true;
                     break;
                 }
                 case PathCommandType.Cubic: {
@@ -361,6 +377,7 @@ export class PathStrokeRecursive2 implements PathStroke2 {
                         m0 = c.getTangentEnd();
                     }
 
+                    adv = true;
                     break;
                 }
                 case PathCommandType.Conic: {
@@ -375,6 +392,7 @@ export class PathStrokeRecursive2 implements PathStroke2 {
                         m0 = c.getTangentEnd();
                     }
 
+                    adv = true;
                     break;
                 }
                 case PathCommandType.Close: {
@@ -391,11 +409,13 @@ export class PathStrokeRecursive2 implements PathStroke2 {
                     if (!m0.isZero()) {
                         this.state.strokeFirstOrJoin(ps, m0, this.state.ms);
                         this.state.finalizeClosed();
+                    } else if (adv) {
+                        this.state.finalizePoint(ps);
                     }
 
                     p0 = ps;
                     m0 = Vector2.zero;
-
+                    adv = false;
                     break;
                 }
                 default: {
@@ -407,6 +427,8 @@ export class PathStrokeRecursive2 implements PathStroke2 {
         // Finalize last shape
         if (!m0.isZero()) {
             this.state.finalizeOpen();
+        } else if (adv) {
+            this.state.finalizePoint(ps);
         }
     }
 
