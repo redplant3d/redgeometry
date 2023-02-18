@@ -1,6 +1,7 @@
 export * from "./bezier";
 export * from "./iterator";
 export * from "./matrix";
+export * from "./path";
 export * from "./path-dash";
 export * from "./path-offset";
 export * from "./path-overlay";

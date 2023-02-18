@@ -1,4 +1,4 @@
-import { Path2CurveIterator } from "../internal";
+import { copyCommandsReversed, Path2CurveIterator } from "../internal";
 import { BezierCurve2, Box2, CurveType, Matrix3x2, Matrix3x3, Point2, Polygon2, Vector2 } from "../primitives";
 import { copyArray, copyArrayReversed, Debug } from "../utility";
 import { Mesh2 } from "./mesh";
@@ -151,10 +151,6 @@ export class Path2 implements PathSink2 {
     }
 
     public addPath(input: Path2, append = false): void {
-        if (input.commands.length === 0) {
-            return;
-        }
-
         if (append && input.isValid()) {
             copyArray(input.commands, 1, this.commands, this.commands.length, input.commands.length - 1);
             copyArray(input.points, 1, this.points, this.points.length, input.points.length - 1);
@@ -165,12 +161,11 @@ export class Path2 implements PathSink2 {
     }
 
     public addPathReversed(input: Path2, append = false): void {
-        this.addCommandsReversed(input, append);
-
-        if (append) {
-            // Leaves out the last point which would have been the first `Move`
+        if (append && input.isValid()) {
+            copyCommandsReversed(input.commands, 1, this.commands, this.commands.length, input.commands.length - 1);
             copyArrayReversed(input.points, 0, this.points, this.points.length, input.points.length - 1);
         } else {
+            copyCommandsReversed(input.commands, 0, this.commands, this.commands.length, input.commands.length);
             copyArrayReversed(input.points, 0, this.points, this.points.length, input.points.length);
         }
     }
@@ -705,52 +700,6 @@ export class Path2 implements PathSink2 {
         const points = this.points;
         for (let i = 0; i < points.length; i++) {
             points[i] = mat.mapPoint(points[i]);
-        }
-    }
-
-    private addCommandsReversed(input: Path2, append: boolean): void {
-        const srcData = input.commands;
-        const destData = this.commands;
-
-        let srcIdx = srcData.length - 1;
-        let destIdx = destData.length;
-
-        let length = destData.length + srcData.length;
-        let needsClose = false;
-
-        if (append) {
-            length -= 1;
-        } else {
-            destData[destIdx++] = { type: PathCommandType.Move };
-        }
-
-        destData.length = length;
-
-        if (srcData[srcIdx].type === PathCommandType.Close) {
-            srcIdx -= 1;
-            needsClose = true;
-        }
-
-        do {
-            const cmd = srcData[srcIdx--];
-
-            if (cmd.type === PathCommandType.Move) {
-                if (needsClose) {
-                    destData[destIdx++] = { type: PathCommandType.Close };
-                }
-
-                destData[destIdx++] = { type: PathCommandType.Move };
-                needsClose = false;
-            } else if (cmd.type === PathCommandType.Close) {
-                destData[destIdx++] = { type: PathCommandType.Move };
-                needsClose = true;
-            } else {
-                destData[destIdx++] = cmd;
-            }
-        } while (srcIdx > 0);
-
-        if (needsClose) {
-            destData[destIdx++] = { type: PathCommandType.Close };
         }
     }
 }
