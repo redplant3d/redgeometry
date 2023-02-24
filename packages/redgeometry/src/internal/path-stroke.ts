@@ -97,11 +97,20 @@ export class StrokeState {
     }
 
     public initialize(output: Path2, options: PathStrokeOptions): void {
+        this.output = output;
+
         if (options.dashArray.length > 0) {
-            this.initializeDashStroke(output, options);
+            this.initializeStroke(options);
+            this.initializeDashStroke(options);
+            this.resetDash();
+
             this.isDash = true;
         } else {
-            this.initializeStroke(output, options);
+            this.initializeStroke(options);
+            this.resetStroke();
+
+            this.left = this.leftMain;
+            this.right = this.rightMain;
             this.isDash = false;
         }
     }
@@ -216,9 +225,7 @@ export class StrokeState {
         return this.dashArray[this.currentIndex];
     }
 
-    private initializeDashStroke(output: Path2, options: PathStrokeOptions): void {
-        this.initializeStroke(output, options);
-
+    private initializeDashStroke(options: PathStrokeOptions): void {
         this.dashArray = options.dashArray;
         this.dashCaps = options.dashCaps;
 
@@ -227,12 +234,9 @@ export class StrokeState {
         this.startAdvancedLength = length;
         this.startIndex = index;
         this.startPhase = phase;
-
-        this.resetDash();
     }
 
-    private initializeStroke(output: Path2, options: PathStrokeOptions): void {
-        this.output = output;
+    private initializeStroke(options: PathStrokeOptions): void {
         this.caps = options.caps;
         this.distance = 0.5 * options.width;
         this.join = options.join;
@@ -385,7 +389,10 @@ export class StrokeState {
     }
 
     private resetDash(): void {
-        this.resetStroke();
+        this.leftFirst.clear();
+        this.rightFirst.clear();
+        this.leftMain.clear();
+        this.rightMain.clear();
 
         this.currentIndex = this.startIndex;
         this.currentLength = this.startAdvancedLength;
