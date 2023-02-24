@@ -55,27 +55,29 @@ export class PathStrokeIncremental2 implements PathStroke2 {
         let cIdx = 0;
         let pIdx = 0;
 
+        let ct0 = PathCommandType.Move;
+
         let ps = Point2.zero;
         let p0 = Point2.zero;
         let m0 = Vector2.zero;
-        let adv = false;
 
         this.state.initialize(output, options);
 
         while (cIdx < commands.length) {
-            const command = commands[cIdx++];
-            switch (command.type) {
+            const cmd = commands[cIdx++];
+            const ct1 = cmd.type;
+
+            switch (ct1) {
                 case PathCommandType.Move: {
                     if (!m0.isZero()) {
                         this.state.finalizeOpen();
-                    } else if (adv) {
+                    } else if (ct0 !== PathCommandType.Move && ct0 !== PathCommandType.Close) {
                         this.state.finalizePoint(ps);
                     }
 
                     ps = points[pIdx++];
                     p0 = ps;
                     m0 = Vector2.zero;
-                    adv = false;
                     break;
                 }
                 case PathCommandType.Linear: {
@@ -90,7 +92,6 @@ export class PathStrokeIncremental2 implements PathStroke2 {
                         m0 = m;
                     }
 
-                    adv = true;
                     break;
                 }
                 case PathCommandType.Quadratic: {
@@ -105,7 +106,6 @@ export class PathStrokeIncremental2 implements PathStroke2 {
                         m0 = c.getTangentEnd();
                     }
 
-                    adv = true;
                     break;
                 }
                 case PathCommandType.Cubic: {
@@ -120,11 +120,10 @@ export class PathStrokeIncremental2 implements PathStroke2 {
                         m0 = c.getTangentEnd();
                     }
 
-                    adv = true;
                     break;
                 }
                 case PathCommandType.Conic: {
-                    const c = new BezierRCurve2(p0, points[pIdx++], points[pIdx++], command.w);
+                    const c = new BezierRCurve2(p0, points[pIdx++], points[pIdx++], cmd.w);
                     const m = c.getTangentStart();
 
                     if (!m.isZero()) {
@@ -135,7 +134,6 @@ export class PathStrokeIncremental2 implements PathStroke2 {
                         m0 = c.getTangentEnd();
                     }
 
-                    adv = true;
                     break;
                 }
                 case PathCommandType.Close: {
@@ -152,25 +150,26 @@ export class PathStrokeIncremental2 implements PathStroke2 {
                     if (!m0.isZero()) {
                         this.state.strokeFirstOrJoin(ps, m0, this.state.ms);
                         this.state.finalizeClosed();
-                    } else if (adv) {
+                    } else if (ct0 !== PathCommandType.Close) {
                         this.state.finalizePoint(ps);
                     }
 
                     p0 = ps;
                     m0 = Vector2.zero;
-                    adv = false;
                     break;
                 }
                 default: {
-                    Debug.assertUnreachable(command);
+                    Debug.assertUnreachable(cmd);
                 }
             }
+
+            ct0 = ct1;
         }
 
         // Finalize last shape
         if (!m0.isZero()) {
             this.state.finalizeOpen();
-        } else if (adv) {
+        } else if (ct0 !== PathCommandType.Move && ct0 !== PathCommandType.Close) {
             this.state.finalizePoint(ps);
         }
     }
@@ -309,30 +308,32 @@ export class PathStrokeRecursive2 implements PathStroke2 {
         const commands = input.getCommands();
         const points = input.getPoints();
 
+        let ct0 = PathCommandType.Move;
+
         let cIdx = 0;
         let pIdx = 0;
 
         let ps = Point2.zero;
         let p0 = Point2.zero;
         let m0 = Vector2.zero;
-        let adv = false;
 
         this.state.initialize(output, options);
 
         while (cIdx < commands.length) {
-            const command = commands[cIdx++];
-            switch (command.type) {
+            const cmd = commands[cIdx++];
+            const ct1 = cmd.type;
+
+            switch (cmd.type) {
                 case PathCommandType.Move: {
                     if (!m0.isZero()) {
                         this.state.finalizeOpen();
-                    } else if (adv) {
+                    } else if (ct0 !== PathCommandType.Move && ct0 !== PathCommandType.Close) {
                         this.state.finalizePoint(ps);
                     }
 
                     ps = points[pIdx++];
                     p0 = ps;
                     m0 = Vector2.zero;
-                    adv = false;
                     break;
                 }
                 case PathCommandType.Linear: {
@@ -347,7 +348,6 @@ export class PathStrokeRecursive2 implements PathStroke2 {
                         m0 = m;
                     }
 
-                    adv = true;
                     break;
                 }
                 case PathCommandType.Quadratic: {
@@ -362,7 +362,6 @@ export class PathStrokeRecursive2 implements PathStroke2 {
                         m0 = c.getTangentEnd();
                     }
 
-                    adv = true;
                     break;
                 }
                 case PathCommandType.Cubic: {
@@ -377,11 +376,10 @@ export class PathStrokeRecursive2 implements PathStroke2 {
                         m0 = c.getTangentEnd();
                     }
 
-                    adv = true;
                     break;
                 }
                 case PathCommandType.Conic: {
-                    const c = new BezierRCurve2(p0, points[pIdx++], points[pIdx++], command.w);
+                    const c = new BezierRCurve2(p0, points[pIdx++], points[pIdx++], cmd.w);
                     const m = c.getTangentStart();
 
                     if (!m.isZero()) {
@@ -392,7 +390,6 @@ export class PathStrokeRecursive2 implements PathStroke2 {
                         m0 = c.getTangentEnd();
                     }
 
-                    adv = true;
                     break;
                 }
                 case PathCommandType.Close: {
@@ -409,25 +406,26 @@ export class PathStrokeRecursive2 implements PathStroke2 {
                     if (!m0.isZero()) {
                         this.state.strokeFirstOrJoin(ps, m0, this.state.ms);
                         this.state.finalizeClosed();
-                    } else if (adv) {
+                    } else if (ct0 !== PathCommandType.Close) {
                         this.state.finalizePoint(ps);
                     }
 
                     p0 = ps;
                     m0 = Vector2.zero;
-                    adv = false;
                     break;
                 }
                 default: {
-                    Debug.assertUnreachable(command);
+                    Debug.assertUnreachable(cmd);
                 }
             }
+
+            ct0 = ct1;
         }
 
         // Finalize last shape
         if (!m0.isZero()) {
             this.state.finalizeOpen();
-        } else if (adv) {
+        } else if (ct0 !== PathCommandType.Move && ct0 !== PathCommandType.Close) {
             this.state.finalizePoint(ps);
         }
     }
