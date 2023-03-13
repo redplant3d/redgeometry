@@ -1,83 +1,98 @@
-import { deserializePrimitiveObject, serializePrimitiveObject } from "../internal";
-import { Debug } from "../utility";
-import { hasComponentTypes } from "./helper";
 import {
+    addComponent,
+    createComponent,
+    DEFAULT_SERIALIZATION_MAPPING,
+    deleteComponent,
+    EntityEntryChangedIterator,
+    EntityEntryIterator,
+    SerializationMap,
+    SystemEntry,
+    updateComponent,
+} from "../internal";
+import { Debug } from "../utility";
+import {
+    Changeset,
     Component,
+    ComponentIdOf,
     Components,
-    ComponentsTypeOf,
-    ComponentTypeOf,
-    Entities,
+    ComponentsIdsOf,
+    EntityEntry,
     EntityId,
+    Serializable,
+    SerializableConstructor,
     System,
     SystemParams,
-    TypedComponents,
     TypedEntityEntry,
     WorldData,
     WorldDataId,
-    WorldDataTypeOf,
+    WorldDataIdOf,
     WorldEvent,
     WorldEventId,
-    WorldEventTypeOf,
+    WorldEventIdOf,
+    WorldPlugin,
 } from "./types";
-
-/**
- * Entry of a system with its entities and dependencies.
- */
-type SystemEntry = {
-    fn: System;
-    args?: unknown[] | undefined;
-};
 
 /**
  * Represents an instance context for entities and systems.
  */
 export class World {
-    private data: Map<WorldDataId, WorldData>;
-    private entities: Entities;
+    private data: Map<WorldDataId, WorldData | undefined>;
+    private entityEntries: Map<EntityId, EntityEntry>;
+    private entityEntriesChanged: Map<EntityId, EntityEntry>;
+    private entityId: number;
     private events: Map<WorldEventId, WorldEvent[]>;
+    private serializationMap: SerializationMap;
     private startupSystemEntries: SystemEntry[];
     private systemEntries: SystemEntry[];
-    private updateQueue: Set<EntityId>;
 
     constructor() {
-        this.entities = new Map();
+        this.serializationMap = new SerializationMap([...DEFAULT_SERIALIZATION_MAPPING]);
+
         this.data = new Map();
+        this.entityEntries = new Map();
+        this.entityEntriesChanged = new Map();
         this.events = new Map();
-        this.systemEntries = [];
+
         this.startupSystemEntries = [];
-        this.updateQueue = new Set();
+        this.systemEntries = [];
+
+        this.entityId = 0;
     }
 
     /**
      * Adds a `component` to `entity` (if it exists).
-     *
-     * Note: This does not immediately register the new component to the systems.
      */
     public addComponent<T extends Component>(entity: EntityId, component: T): void {
-        const entityComponents = this.getComponents(entity);
+        const entry = this.entityEntries.get(entity);
 
-        if (entityComponents !== undefined) {
-            this.updateQueue.add(entity);
-
-            entityComponents[component.componentId] = component;
+        if (entry === undefined) {
+            return;
         }
+
+        addComponent(entry.components, entry.changeset, component);
+
+        this.entityEntriesChanged.set(entry.entity, entry);
     }
 
     /**
      * Adds `components` to `entity` (if it exists).
-     *
-     * Note: This does not immediately register the new component to the systems.
      */
     public addComponents<T extends Component[]>(entity: EntityId, ...components: T): void {
-        const entityComponents = this.getComponents(entity);
+        const entry = this.entityEntries.get(entity);
 
-        if (entityComponents !== undefined) {
-            this.updateQueue.add(entity);
-
-            for (const component of components) {
-                entityComponents[component.componentId] = component;
-            }
+        if (entry === undefined) {
+            return;
         }
+
+        for (const component of components) {
+            addComponent(entry.components, entry.changeset, component);
+        }
+
+        this.entityEntriesChanged.set(entry.entity, entry);
+    }
+
+    public addPlugin<T extends WorldPlugin>(fn: T): void {
+        fn(this);
     }
 
     /**
@@ -95,23 +110,23 @@ export class World {
      * Clears all entities from this world.
      */
     public clearEntities(): void {
-        this.entities.clear();
+        this.entityEntries.clear();
     }
 
     /**
      * Creates a new entity.
      */
-    public createEntity<T extends Component[]>(...params: T): EntityId {
-        // TODO: Proper id generation (with version).
-        const entity = this.entities.size;
-        const components: Components = {};
+    public createEntity<T extends Component[]>(...components: T): EntityId {
+        const entity = this.getNewEntityId();
 
-        for (const c of params) {
-            components[c.componentId] = c;
+        const entry = { entity, components: {}, changeset: {} };
+
+        for (const component of components) {
+            createComponent(entry.components, entry.changeset, component);
         }
 
-        this.entities.set(entity, components);
-        this.updateQueue.add(entity);
+        this.entityEntries.set(entity, entry);
+        this.entityEntriesChanged.set(entity, entry);
 
         return entity;
     }
@@ -120,83 +135,81 @@ export class World {
      * Destroys `entity` from the world and returns if it was sucessful.
      */
     public destroyEntity(entity: EntityId): boolean {
-        // Queue `entity` for deletion in systems
-        this.updateQueue.delete(entity);
+        // Get entry and delete
+        const entry = this.entityEntries.get(entity);
 
-        // Delete from global list
-        return this.entities.delete(entity);
+        if (entry === undefined) {
+            return false;
+        }
+
+        this.entityEntries.delete(entity);
+
+        // Mark components as deleted
+        for (const componentId in entry.components) {
+            deleteComponent(entry.changeset, componentId);
+        }
+
+        entry.components = {};
+
+        this.entityEntriesChanged.set(entry.entity, entry);
+
+        return true;
+    }
+
+    public getChangeset(entity: EntityId): Changeset | undefined {
+        return this.entityEntriesChanged.get(entity)?.changeset;
     }
 
     /**
      * Returns the component `type` of `entity`.
      */
-    public getComponent<T extends Component>(entity: EntityId, type: ComponentTypeOf<T>): T | undefined {
-        const components = this.getComponents(entity);
+    public getComponent<T extends Component>(entity: EntityId, componentId: ComponentIdOf<T>): T | undefined {
+        const entry = this.entityEntries.get(entity);
 
-        if (components !== undefined) {
-            return components[type] as T | undefined;
-        } else {
+        if (entry === undefined) {
             return undefined;
         }
+
+        const component = entry.components[componentId] as T | undefined;
+
+        if (component !== undefined) {
+            updateComponent(entry.changeset, componentId);
+            this.entityEntriesChanged.set(entry.entity, entry);
+        }
+
+        return component;
     }
 
-    /**
-     * Returns all components of `entity`.
-     */
     public getComponents(entity: EntityId): Components | undefined {
-        return this.entities.get(entity);
-    }
-
-    /**
-     * Returns components of `entity` that satisfy `types`.
-     */
-    public getTypedComponents<T extends Component[]>(
-        entity: EntityId,
-        types: ComponentsTypeOf<T>
-    ): TypedComponents<T> | undefined {
-        const components = this.getComponents(entity);
-
-        if (components !== undefined && hasComponentTypes(components, types)) {
-            return components;
-        } else {
-            return undefined;
-        }
+        return this.entityEntries.get(entity)?.components;
     }
 
     public loadEntities(text: string): void {
         this.clearEntities();
 
-        this.entities = deserializePrimitiveObject(text) as Entities;
-    }
+        const entries = this.serializationMap.deserialize(text) as EntityEntry[];
 
-    public queryEntities<T extends Component[]>(types: ComponentsTypeOf<T>): TypedEntityEntry<T>[] {
-        const result: TypedEntityEntry<T>[] = [];
-
-        for (const [entity, components] of this.entities) {
-            if (hasComponentTypes(components, types)) {
-                result.push({ entity, components });
-            }
+        for (const entry of entries) {
+            this.entityEntries.set(entry.entity, entry);
         }
-
-        return result;
     }
 
-    public queryEntitiesMatch<T extends Component[]>(
-        types: ComponentsTypeOf<T>,
-        match: (components: TypedComponents<T>) => boolean
-    ): TypedEntityEntry<T>[] {
-        const result: TypedEntityEntry<T>[] = [];
-
-        for (const [entity, components] of this.entities.entries()) {
-            if (hasComponentTypes(components, types) && match(components)) {
-                result.push({ entity, components });
-            }
-        }
-
-        return result;
+    public queryEntities<T extends Component[]>(
+        componentIds: ComponentsIdsOf<T>
+    ): IterableIterator<TypedEntityEntry<T, Component[]>> {
+        return new EntityEntryIterator(this.entityEntries, componentIds);
     }
 
-    public readData<T extends WorldData>(type: WorldDataTypeOf<T>): T {
+    /**
+     * Query entities that have changed recently.
+     */
+    public queryEntitiesChanged<U extends Component[]>(
+        componentIds: ComponentsIdsOf<U>
+    ): IterableIterator<TypedEntityEntry<Component[], U>> {
+        return new EntityEntryChangedIterator(this.entityEntriesChanged, componentIds);
+    }
+
+    public readData<T extends WorldData>(type: WorldDataIdOf<T>): T {
         const data = this.data.get(type);
 
         if (data === undefined) {
@@ -206,7 +219,7 @@ export class World {
         return data as T;
     }
 
-    public readEvents<T extends WorldEvent>(type: WorldEventTypeOf<T>): T[] {
+    public readEvents<T extends WorldEvent>(type: WorldEventIdOf<T>): T[] {
         const events = this.events.get(type);
 
         if (events === undefined) {
@@ -216,34 +229,76 @@ export class World {
         return events as T[];
     }
 
-    public registerData<T extends WorldData>(data: T): void {
-        if (this.data.has(data.dataId)) {
-            Debug.warn("World already has data type '{}' and will be overwritten", data.dataId);
+    public registerData<T extends WorldData>(dataId: WorldDataIdOf<T>): void {
+        if (this.data.has(dataId)) {
+            Debug.warn("World already has dataId '{}' and will be overwritten", dataId);
         }
 
-        this.data.set(data.dataId, data);
+        this.data.set(dataId, undefined);
     }
 
-    public registerEvent<T extends WorldEvent>(type: WorldEventTypeOf<T>): void {
-        if (this.events.has(type)) {
-            Debug.warn("World already has event type '{}' and will be overwritten", type);
+    public registerEvent<T extends WorldEvent>(eventId: WorldEventIdOf<T>): void {
+        if (this.events.has(eventId)) {
+            Debug.warn("World already has eventId '{}' and will be overwritten", eventId);
         }
 
-        this.events.set(type, []);
+        this.events.set(eventId, []);
+    }
+
+    public registerSerializable<T extends Serializable>(ClassType: SerializableConstructor<T>): void {
+        this.serializationMap.add(
+            ClassType,
+            (obj: T) => obj.toArray(),
+            (data: number[]) => ClassType.fromArray(data)
+        );
     }
 
     /**
-     * Removes component `type` from `entity` and returns if it was sucessful.
+     * Removes `componentId` from `entity` and returns if it was sucessful.
      */
-    public removeComponent<T extends Component>(entity: EntityId, type: ComponentTypeOf<T>): boolean {
-        const components = this.getComponents(entity);
+    public removeComponent<T extends Component>(entity: EntityId, componentId: ComponentIdOf<T>): boolean {
+        const entry = this.entityEntries.get(entity);
 
-        if (components !== undefined) {
-            this.updateQueue.add(entity);
-            return delete components[type];
-        } else {
+        if (entry === undefined) {
             return false;
         }
+
+        const success = delete entry.components[componentId];
+
+        if (success) {
+            deleteComponent(entry.changeset, componentId);
+            this.entityEntriesChanged.set(entry.entity, entry);
+        }
+
+        return success;
+    }
+
+    /**
+     * Removes `componentIds` from `entity` and returns how many components were updated.
+     */
+    public removeComponents<T extends Component[]>(entity: EntityId, componentIds: ComponentsIdsOf<T>): number {
+        const entry = this.entityEntries.get(entity);
+
+        if (entry === undefined) {
+            return 0;
+        }
+
+        let count = 0;
+
+        for (const componentId of componentIds) {
+            const success = delete entry.components[componentId];
+
+            if (success) {
+                deleteComponent(entry.changeset, componentId);
+                count += 1;
+            }
+        }
+
+        if (count > 0) {
+            this.entityEntriesChanged.set(entry.entity, entry);
+        }
+
+        return count;
     }
 
     /**
@@ -261,50 +316,91 @@ export class World {
     }
 
     public saveEntities(): string {
-        return serializePrimitiveObject(this.entities);
-    }
-
-    public start(): void {
-        for (const { fn, args } of this.startupSystemEntries) {
-            if (args !== undefined) {
-                fn(this, ...args);
-            } else {
-                fn(this);
-            }
-        }
+        return this.serializationMap.serialize([...this.entityEntries.values()]);
     }
 
     /**
-     * Updates all entities.
+     * Runs startup systems.
+     */
+    public start(): void {
+        this.runSchedule(this.startupSystemEntries);
+        this.validate();
+    }
+
+    /**
+     * Updates the world by running all systems.
      */
     public update(): void {
-        for (const { fn, args } of this.systemEntries) {
-            if (args !== undefined) {
-                fn(this, ...args);
-            } else {
-                fn(this);
-            }
-        }
-
-        this.updateQueue.clear();
-
-        for (const eventId of this.events.keys()) {
-            this.events.set(eventId, []);
-        }
+        this.runSchedule(this.systemEntries);
+        this.cleanup();
     }
 
     /**
-     * Marks an entity for update.
+     * Marks `componentId` of `entity` for update.
      */
-    public updateEntity(entity: EntityId): void {
-        this.updateQueue.add(entity);
+    public updateComponent<T extends Component>(entity: EntityId, componentId: ComponentIdOf<T>): boolean {
+        const entry = this.entityEntries.get(entity);
+
+        if (entry === undefined) {
+            return false;
+        }
+
+        let success = false;
+
+        if (componentId in entry.components) {
+            updateComponent(entry.changeset, componentId);
+            this.entityEntriesChanged.set(entry.entity, entry);
+            success = true;
+        }
+
+        return success;
+    }
+
+    /**
+     * Marks `componentIds` of `entity` for update.
+     */
+    public updateComponents<T extends Component[]>(entity: EntityId, componentIds: ComponentsIdsOf<T>): number {
+        const entry = this.entityEntries.get(entity);
+
+        if (entry === undefined) {
+            return 0;
+        }
+
+        let count = 0;
+
+        for (const componentId of componentIds) {
+            if (componentId in entry.components) {
+                updateComponent(entry.changeset, componentId);
+                count += 1;
+            }
+        }
+
+        if (count > 0) {
+            this.entityEntriesChanged.set(entry.entity, entry);
+        }
+
+        return count;
+    }
+
+    public validate(): boolean {
+        let success = true;
+
+        // World data
+        for (const [id, data] of this.data) {
+            if (data === undefined) {
+                Debug.warn("World data '{}' has not been initialized", id);
+                success = false;
+            }
+        }
+
+        return success;
     }
 
     public writeData<T extends WorldData>(data: T): void {
         if (this.data.has(data.dataId)) {
             this.data.set(data.dataId, data);
         } else {
-            throw new Error(`Data '${data.dataId}' not registered`);
+            throw new Error(`World data '${data.dataId}' is not registered`);
         }
     }
 
@@ -314,7 +410,38 @@ export class World {
         if (events !== undefined) {
             events.push(event);
         } else {
-            throw new Error(`Event '${event.eventId}' not registered`);
+            throw new Error(`World event '${event.eventId}' is not registered`);
+        }
+    }
+
+    private cleanup(): void {
+        // Reset entity entries
+        for (const entry of this.entityEntriesChanged.values()) {
+            entry.changeset = {};
+        }
+
+        this.entityEntriesChanged.clear();
+
+        // Reset events
+        for (const eventId of this.events.keys()) {
+            this.events.set(eventId, []);
+        }
+    }
+
+    private getNewEntityId(): EntityId {
+        // TODO: Proper id generation
+        const entityId = this.entityId;
+        this.entityId += 1;
+        return entityId;
+    }
+
+    private runSchedule(schedule: SystemEntry[]): void {
+        for (const { fn, args } of schedule) {
+            if (args !== undefined) {
+                fn(this, ...args);
+            } else {
+                fn(this);
+            }
         }
     }
 }

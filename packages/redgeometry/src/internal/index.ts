@@ -1,4 +1,5 @@
 export * from "./bezier";
+export * from "./ecs";
 export * from "./iterator";
 export * from "./matrix";
 export * from "./path";

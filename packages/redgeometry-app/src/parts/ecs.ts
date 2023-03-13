@@ -1,9 +1,9 @@
 import { Path2 } from "redgeometry/src/core";
-import { System, World } from "redgeometry/src/ecs";
+import { ChangeFlags, hasChangeFlag, System, TimeData, timePlugin, World } from "redgeometry/src/ecs";
 import { Point2, Vector2 } from "redgeometry/src/primitives";
-import { Debug, RandomXSR128 } from "redgeometry/src/utility";
+import { Debug, Random, RandomXSR128 } from "redgeometry/src/utility";
 import { AppContext2D } from "../context";
-import { ButtonInputElement, TextBoxInputElement } from "../input";
+import { ButtonInputElement, RangeInputElement } from "../input";
 import { AppLauncher, AppPart } from "../launcher";
 
 export class EcsAppPart implements AppPart {
@@ -11,7 +11,7 @@ export class EcsAppPart implements AppPart {
     private json: string | undefined;
     private world: World;
 
-    public inputCount: TextBoxInputElement;
+    public inputCount: RangeInputElement;
     public inputLoad: ButtonInputElement;
     public inputSave: ButtonInputElement;
     public launcher: AppLauncher;
@@ -20,8 +20,9 @@ export class EcsAppPart implements AppPart {
         this.launcher = launcher;
         this.context = context;
 
-        this.inputCount = new TextBoxInputElement("count", "10");
-        this.inputCount.setStyle("width: 80px");
+        this.inputCount = new RangeInputElement("count", "0", "10000", "10");
+        this.inputCount.addEventListener("input", () => this.launcher.requestUpdate());
+        this.inputCount.setStyle("width: 200px");
 
         this.inputSave = new ButtonInputElement("save", "save");
         this.inputSave.addEventListener("click", () => this.onSaveClick());
@@ -30,14 +31,18 @@ export class EcsAppPart implements AppPart {
         this.inputLoad.addEventListener("click", () => this.onLoadClick());
 
         this.world = new World();
-        this.world.addSystem({ fn: initializeSystem, startup: true, args: [this] });
+        this.world.addPlugin(timePlugin);
+        this.world.registerSerializable(Vector2);
+        this.world.registerSerializable(Point2);
+        this.world.registerData<AppContextData>("appContext");
+        this.world.registerEvent<HelloEvent>("hello");
+        this.world.addSystem({ fn: initializeSystem, startup: true, args: [this, this.context] });
+        this.world.addSystem({ fn: spawnSystem });
         this.world.addSystem({ fn: movementSystem });
+        this.world.addSystem({ fn: clearRenderSystem });
         this.world.addSystem({ fn: circleRenderSystem });
         this.world.addSystem({ fn: rectangleRenderSystem });
-        this.world.addSystem({ fn: helloSystem });
-        this.world.registerData<AppContextData>({ dataId: "appContext", context });
-        this.world.registerData<TimeData>({ dataId: "time", delta: 0 });
-        this.world.registerEvent<HelloEvent>("hello");
+        this.world.addSystem({ fn: notificationSystem });
     }
 
     public create(): void {
@@ -54,11 +59,8 @@ export class EcsAppPart implements AppPart {
         this.world.clearEntities();
     }
 
-    public update(delta: number): void {
-        this.context.clear();
-
-        this.world.writeData<TimeData>({ dataId: "time", delta });
-        this.world.update();
+    public update(_delta: number): void {
+        return;
     }
 
     public updateLayout(): void {
@@ -75,6 +77,7 @@ export class EcsAppPart implements AppPart {
         console.time("loadEntities");
         this.world.loadEntities(this.json);
         console.timeEnd("loadEntities");
+
         Debug.log("World loaded ({} bytes)", this.json.length);
     }
 
@@ -82,6 +85,7 @@ export class EcsAppPart implements AppPart {
         console.time("saveEntities");
         this.json = this.world.saveEntities();
         console.timeEnd("saveEntities");
+
         Debug.log("World saved ({} bytes)", this.json.length);
     }
 }
@@ -89,36 +93,14 @@ export class EcsAppPart implements AppPart {
 interface AppContextData {
     context: AppContext2D;
     dataId: "appContext";
-}
-
-interface TimeData {
-    dataId: "time";
-    delta: number;
+    part: EcsAppPart;
+    random: Random;
+    count: number;
 }
 
 interface HelloEvent {
     eventId: "hello";
     sender: System;
-}
-
-interface PositionComponent {
-    componentId: "position";
-    value: Point2;
-}
-
-interface VelocityComponent {
-    componentId: "velocity";
-    value: Vector2;
-}
-
-interface SizeComponent {
-    componentId: "size";
-    value: number;
-}
-
-interface ColorComponent {
-    componentId: "color";
-    value: string;
 }
 
 interface CircleComponent {
@@ -129,38 +111,57 @@ interface RectangleComponent {
     componentId: "rectangle";
 }
 
-function initializeSystem(world: World, appPart: EcsAppPart): void {
-    const seed = appPart.launcher.inputSeed.getInt();
-    const count = appPart.inputCount.getInt();
+interface ObjectComponent {
+    componentId: "object";
+    size: number;
+    color: string;
+    position: Point2;
+    velocity: Vector2;
+}
 
+function initializeSystem(world: World, part: EcsAppPart, context: AppContext2D): void {
+    const seed = part.launcher.inputSeed.getInt();
     const random = RandomXSR128.fromSeedLcg(seed);
 
-    const { context } = world.readData<AppContextData>("appContext");
-
-    const [width, height] = context.getSize(true);
+    world.writeData<AppContextData>({ dataId: "appContext", part, context, random, count: 0 });
 
     world.writeEvent<HelloEvent>({ eventId: "hello", sender: initializeSystem });
+}
 
-    for (let i = 0; i < count; i++) {
-        const entity = world.createEntity();
+function spawnSystem(world: World): void {
+    const appContext = world.readData<AppContextData>("appContext");
+    const { part, context, count, random } = appContext;
 
-        const shape = random.nextFloat() < 0.8 ? "circle" : "rectangle";
-        const pos = new Point2(random.nextFloatBetween(0, width), random.nextFloatBetween(0, height));
-        const vel = new Vector2(random.nextFloatBetween(-1, 1), random.nextFloatBetween(-1, 1));
-        const size = random.nextFloatBetween(10, 100);
-        const color = random.nextFloat() < 0.5 ? "red" : "blue";
+    const newCount = part.inputCount.getInt();
+    const [width, height] = context.getSize(true);
 
-        world.addComponents<
-            [CircleComponent | RectangleComponent, PositionComponent, VelocityComponent, SizeComponent, ColorComponent]
-        >(
-            entity,
-            { componentId: shape },
-            { componentId: "position", value: pos },
-            { componentId: "velocity", value: vel },
-            { componentId: "size", value: size },
-            { componentId: "color", value: color }
-        );
+    if (count <= newCount) {
+        for (let i = count; i < newCount; i++) {
+            const shape = random.nextFloat() < 0.8 ? "rectangle" : "circle";
+            const size = random.nextFloatBetween(10, 100);
+            const color = random.nextFloat() < 0.5 ? "red" : "blue";
+            const position = new Point2(random.nextFloatBetween(0, width), random.nextFloatBetween(0, height));
+            const velocity = new Vector2(random.nextFloatBetween(-1, 1), random.nextFloatBetween(-1, 1));
+
+            world.createEntity<[CircleComponent | RectangleComponent, ObjectComponent]>(
+                { componentId: shape },
+                { componentId: "object", size, color, position, velocity }
+            );
+        }
+    } else {
+        const query = world.queryEntities<[ObjectComponent]>(["object"]);
+
+        let i = newCount;
+
+        for (const entry of query) {
+            if (i < count) {
+                world.destroyEntity(entry.entity);
+                i += 1;
+            }
+        }
     }
+
+    appContext.count = newCount;
 }
 
 function movementSystem(world: World): void {
@@ -169,16 +170,12 @@ function movementSystem(world: World): void {
 
     const [width, height] = context.getSize(true);
 
-    const query = world.queryEntities<[PositionComponent, VelocityComponent, SizeComponent]>([
-        "position",
-        "velocity",
-        "size",
-    ]);
+    const query = world.queryEntities<[ObjectComponent]>(["object"]);
 
-    for (const { components } of query) {
-        const p = components.position.value;
-        const v = components.velocity.value;
-        const d = 0.5 * components.size.value;
+    for (const { entity, components } of query) {
+        const p = components.object.position;
+        const v = components.object.velocity;
+        const d = 0.5 * components.object.size;
 
         let vx = v.x;
         let vy = v.y;
@@ -201,27 +198,30 @@ function movementSystem(world: World): void {
             vy = -vy;
         }
 
-        components.position.value = new Point2(px, py);
-        components.velocity.value = new Vector2(vx, vy);
+        components.object.position = new Point2(px, py);
+        components.object.velocity = new Vector2(vx, vy);
+
+        world.updateComponent<ObjectComponent>(entity, "object");
     }
+}
+
+function clearRenderSystem(world: World): void {
+    const { context } = world.readData<AppContextData>("appContext");
+
+    context.clear();
 }
 
 function circleRenderSystem(world: World): void {
     const { context } = world.readData<AppContextData>("appContext");
-    const query = world.queryEntities<[CircleComponent, PositionComponent, SizeComponent, ColorComponent]>([
-        "circle",
-        "position",
-        "size",
-        "color",
-    ]);
+    const query = world.queryEntities<[CircleComponent, ObjectComponent]>(["circle", "object"]);
 
     const red = new Path2();
     const blue = new Path2();
 
     for (const { components } of query) {
-        const p = components.position.value;
-        const d = components.size.value;
-        const c = components.color.value;
+        const p = components.object.position;
+        const d = components.object.size;
+        const c = components.object.color;
 
         if (c === "red") {
             red.addCircle(p, 0.5 * d);
@@ -236,20 +236,15 @@ function circleRenderSystem(world: World): void {
 
 function rectangleRenderSystem(world: World): void {
     const { context } = world.readData<AppContextData>("appContext");
-    const query = world.queryEntities<[RectangleComponent, PositionComponent, SizeComponent, ColorComponent]>([
-        "rectangle",
-        "position",
-        "size",
-        "color",
-    ]);
+    const query = world.queryEntities<[RectangleComponent, ObjectComponent]>(["rectangle", "object"]);
 
     const red = new Path2();
     const blue = new Path2();
 
     for (const { components } of query) {
-        const p = components.position.value;
-        const d = components.size.value;
-        const c = components.color.value;
+        const p = components.object.position;
+        const d = components.object.size;
+        const c = components.object.color;
 
         const x0 = p.x - 0.5 * d;
         const y0 = p.y - 0.5 * d;
@@ -267,10 +262,27 @@ function rectangleRenderSystem(world: World): void {
     context.fillPath(blue, "blue");
 }
 
-function helloSystem(world: World): void {
+function notificationSystem(world: World): void {
     const events = world.readEvents<HelloEvent>("hello");
 
     for (const e of events) {
         console.log("Hello from", e.sender.name);
+    }
+
+    const changed = world.queryEntitiesChanged<[ObjectComponent]>(["object"]);
+
+    let createdCount = 0;
+    let deletedCount = 0;
+
+    for (const { changeset } of changed) {
+        if (hasChangeFlag(changeset.object, ChangeFlags.Created)) {
+            createdCount += 1;
+        } else if (hasChangeFlag(changeset.object, ChangeFlags.Deleted)) {
+            deletedCount += 1;
+        }
+    }
+
+    if (createdCount > 0 || deletedCount > 0) {
+        console.log(`created = ${createdCount}, deleted = ${deletedCount}`);
     }
 }

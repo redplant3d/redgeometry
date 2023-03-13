@@ -418,7 +418,7 @@ export class AppContext2D {
 }
 
 export class AppContextGPU {
-    private canvas: HTMLCanvasElement;
+    public canvas: HTMLCanvasElement;
 
     public readonly adapter: GPUAdapter;
     public readonly context: GPUCanvasContext;
