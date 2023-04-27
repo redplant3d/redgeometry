@@ -1,11 +1,11 @@
 import { deserializePrimitiveObject, serializePrimitiveObject } from "../internal";
-import { log } from "../utility";
+import { log, throwError } from "../utility";
 import { hasComponentTypes } from "./helper";
 import {
     Component,
+    ComponentTypeOf,
     Components,
     ComponentsTypeOf,
-    ComponentTypeOf,
     Entities,
     EntityId,
     System,
@@ -200,7 +200,7 @@ export class World {
         const data = this.data.get(type);
 
         if (data === undefined) {
-            throw new Error(`Cannot read data '${type}'`);
+            throwError("Cannot read data '{}'", type);
         }
 
         return data as T;
@@ -210,7 +210,7 @@ export class World {
         const events = this.events.get(type);
 
         if (events === undefined) {
-            throw new Error(`Cannot get events '${type}'`);
+            throwError("Cannot get events '{}'", type);
         }
 
         return events as T[];
@@ -304,7 +304,7 @@ export class World {
         if (this.data.has(data.dataId)) {
             this.data.set(data.dataId, data);
         } else {
-            throw new Error(`Data '${data.dataId}' not registered`);
+            throwError("Data '{}' not registered", data.dataId);
         }
     }
 
@@ -314,7 +314,7 @@ export class World {
         if (events !== undefined) {
             events.push(event);
         } else {
-            throw new Error(`Event '${event.eventId}' not registered`);
+            throwError("Event '{}' not registered", event.eventId);
         }
     }
 }

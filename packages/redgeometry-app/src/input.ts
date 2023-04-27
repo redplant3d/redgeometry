@@ -1,3 +1,5 @@
+import { throwError } from "redgeometry/src/utility";
+
 type InputElementEvent = {
     type: string;
     listener: EventListenerOrEventListenerObject;
@@ -24,7 +26,7 @@ export abstract class AppInputElement {
         if (!this.isBound) {
             this.events.push({ type, listener });
         } else {
-            throw new Error("Cannot add event listener on bound input element");
+            throwError("Cannot add event listener on bound input element");
         }
     }
 
@@ -55,7 +57,7 @@ export abstract class AppInputElement {
             parent.appendChild(this.element);
             parent.append("\n");
         } else {
-            throw new Error("Already bound");
+            throwError("Already bound");
         }
     }
 
