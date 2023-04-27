@@ -1,6 +1,6 @@
 import { DEFAULT_PATH_QUALITY_OPTIONS, Mesh2, Path2, PathClip2 } from "redgeometry/src/core";
 import { Polygon2 } from "redgeometry/src/primitives";
-import { log, RandomXSR128 } from "redgeometry/src/utility";
+import { RandomXSR128, log } from "redgeometry/src/utility";
 import { AppContext2D } from "../context";
 import { createPolygonPair } from "../data";
 import { ComboBoxInputElement, RangeInputElement } from "../input";

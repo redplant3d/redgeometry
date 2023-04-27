@@ -1,5 +1,5 @@
 import { Bezier1Curve2, Bezier2Curve2, Bezier3Curve2, BezierCurve2, BezierRCurve2, Box2, Point2 } from "../primitives";
-import { Interval, lerp, log, RootType, solveQuadratic } from "../utility";
+import { Interval, RootType, lerp, log, solveQuadratic } from "../utility";
 
 export function encloseCurveAt(c: BezierCurve2, box: Box2, t: number): void {
     if (t > 0 && t < 1) {

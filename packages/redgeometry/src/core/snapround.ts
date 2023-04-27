@@ -1,5 +1,5 @@
 import { BezierCurve2, CurveType, Edge2, Point2 } from "../primitives";
-import { ArrayMultiSet, assertDebug, Float128, log, solveLinear } from "../utility";
+import { ArrayMultiSet, Float128, assertDebug, log, solveLinear } from "../utility";
 
 enum PixelType {
     Magnet,

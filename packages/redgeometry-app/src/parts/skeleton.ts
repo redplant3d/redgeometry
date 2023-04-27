@@ -10,13 +10,13 @@ import {
 } from "redgeometry/src/core";
 import { Box2, Edge2, Point2, Vector2 } from "redgeometry/src/primitives";
 import {
-    assertDebug,
-    log,
     Random,
     RandomXSR128,
     Root1,
     Root2,
     RootType,
+    assertDebug,
+    log,
     solveLinear,
     solveQuadratic,
 } from "redgeometry/src/utility";

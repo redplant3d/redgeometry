@@ -1,6 +1,6 @@
 import { DEFAULT_PATH_QUALITY_OPTIONS, Mesh2, MeshFace2, Path2, PathOverlay2 } from "redgeometry/src/core";
 import { ColorRgba, Edge2, Polygon2 } from "redgeometry/src/primitives";
-import { arrayEquals, assertDebug, RandomXSR128 } from "redgeometry/src/utility";
+import { RandomXSR128, arrayEquals, assertDebug } from "redgeometry/src/utility";
 import { AppContext2D } from "../context";
 import { createPolygonPair } from "../data";
 import { ComboBoxInputElement, RangeInputElement } from "../input";

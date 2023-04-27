@@ -1,7 +1,7 @@
 import { Path2 } from "redgeometry/src/core";
 import { System, World } from "redgeometry/src/ecs";
 import { Point2, Vector2 } from "redgeometry/src/primitives";
-import { log, RandomXSR128 } from "redgeometry/src/utility";
+import { RandomXSR128, log } from "redgeometry/src/utility";
 import { AppContext2D } from "../context";
 import { ButtonInputElement, TextBoxInputElement } from "../input";
 import { AppLauncher, AppPart } from "../launcher";
