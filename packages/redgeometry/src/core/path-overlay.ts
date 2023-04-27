@@ -1,6 +1,6 @@
 import { createSweepEventQueue, PathOverlayState2, PathSweepEvent2 } from "../internal";
 import { Bezier1Curve2, BezierCurve2, Edge2 } from "../primitives";
-import { arrayEquals, ArrayMultiSet, Debug } from "../utility";
+import { arrayEquals, ArrayMultiSet, assertDebug, log } from "../utility";
 import { Mesh2, MeshChain2, MeshEdge2 } from "./mesh";
 import { Path2 } from "./path";
 import {
@@ -70,7 +70,7 @@ export class PathOverlay2 {
                 const index = this.status.findIndexBy((sev) => sev.seg === qev.seg);
 
                 if (index < 0) {
-                    Debug.error("PathOverlay2: Status event segment {} not found", qev.seg);
+                    log.error("PathOverlay2: Status event segment {} not found", qev.seg);
                     continue;
                 }
 
@@ -199,12 +199,12 @@ export class PathOverlay2 {
         const chainSym = edgeSym.lnext.chain;
 
         if (chain === undefined || chainSym === undefined) {
-            Debug.error("PathOverlay: No chain");
+            log.error("PathOverlay: No chain");
             return;
         }
 
         if (chain === chainSym) {
-            Debug.error("PathOverlay: Chain would need splitting");
+            log.error("PathOverlay: Chain would need splitting");
             return;
         }
 
@@ -222,7 +222,7 @@ export class PathOverlay2 {
                 edge.chain.tail = chain.tail;
 
                 const success = output.destroyChain(chain);
-                Debug.assert(success, "Unable to destroy chain");
+                assertDebug(success, "Unable to destroy chain");
             }
         }
 
@@ -237,7 +237,7 @@ export class PathOverlay2 {
                 edgeSym.chain.head = chainSym.head;
 
                 const success = output.destroyChain(chainSym);
-                Debug.assert(success, "Unable to destroy chain");
+                assertDebug(success, "Unable to destroy chain");
             }
         }
     }

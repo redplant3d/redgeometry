@@ -1,6 +1,6 @@
 import { DEFAULT_PATH_QUALITY_OPTIONS, Mesh2, Path2, PathClip2 } from "redgeometry/src/core";
 import { Polygon2 } from "redgeometry/src/primitives";
-import { Debug, RandomXSR128 } from "redgeometry/src/utility";
+import { log, RandomXSR128 } from "redgeometry/src/utility";
 import { AppContext2D } from "../context";
 import { createPolygonPair } from "../data";
 import { ComboBoxInputElement, RangeInputElement } from "../input";
@@ -128,12 +128,12 @@ export class TriangulateAppPart implements AppPart {
             const orientation = face.getSignedArea();
 
             if (orientation <= 0) {
-                Debug.warn("Negative path area: {}", orientation);
+                log.warn("Negative path area: {}", orientation);
             }
 
             if (!face.isMonotoneInX()) {
                 face.writeToPath(this.error);
-                Debug.error("Face not monotone");
+                log.error("Face not monotone");
             }
         }
     }

@@ -13,7 +13,7 @@ import {
     simplifyParameterStepQuad,
 } from "../internal";
 import { Bezier1Curve2, Bezier2Curve2, Bezier3Curve2, BezierRCurve2, Point2, Vector2 } from "../primitives";
-import { Debug } from "../utility";
+import { assertUnreachable } from "../utility";
 import { Path2, PathCommandType } from "./path";
 import { JoinType, MAX_PARAMETER, PathOffsetOptions, PathQualityOptions } from "./path-options";
 
@@ -171,7 +171,7 @@ export class PathOffsetIncremental2 implements PathOffset2 {
                     break;
                 }
                 default: {
-                    Debug.assertUnreachable(command);
+                    assertUnreachable(command);
                 }
             }
         }
@@ -463,7 +463,7 @@ export class PathOffsetRecursive2 implements PathOffset2 {
                     break;
                 }
                 default: {
-                    Debug.assertUnreachable(command);
+                    assertUnreachable(command);
                 }
             }
         }

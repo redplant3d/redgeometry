@@ -1,4 +1,4 @@
-import { Debug } from "./debug";
+import { assert } from "../utility";
 import { betweenFloat, betweenInt } from "./scalar";
 
 export interface Random {
@@ -23,7 +23,7 @@ export class RandomXSR128 implements Random {
     private state: Int32Array;
 
     constructor(state: Int32Array) {
-        Debug.assert(state.length === 4, "Array length of 'state' must be equal to 4");
+        assert(state.length === 4, "Array length of 'state' must be equal to 4");
 
         this.state = state;
     }

@@ -1,4 +1,4 @@
-import { Debug } from "redgeometry/src/utility";
+import { assertUnreachable } from "redgeometry/src/utility";
 import { AnimationFrameContext } from "./animationframe";
 import { AppContext2D, AppContextGPU } from "./context";
 import {
@@ -316,7 +316,7 @@ export class AppLauncher {
                 break;
             }
             default: {
-                Debug.assertUnreachable(entry.contextId);
+                assertUnreachable(entry.contextId);
             }
         }
 
@@ -330,7 +330,7 @@ export class AppLauncher {
                 break;
             }
             default: {
-                Debug.assertUnreachable(entry.animationMode);
+                assertUnreachable(entry.animationMode);
             }
         }
     }

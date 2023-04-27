@@ -1,6 +1,6 @@
 import { createSweepEventQueue, isIncOutBoolean, isInWinding, PathSweepEvent2 } from "../internal";
 import { Bezier1Curve2, BezierCurve2, Edge2 } from "../primitives";
-import { ArrayMultiSet, Debug } from "../utility";
+import { ArrayMultiSet, log } from "../utility";
 import { Mesh2 } from "./mesh";
 import { Path2 } from "./path";
 import {
@@ -89,7 +89,7 @@ export class PathClip2 {
                 const index = this.status.findIndexBy((sev) => sev.seg === qev.seg);
 
                 if (index < 0) {
-                    Debug.error("PathClip2: Status event segment {} not found", qev.seg);
+                    log.error("PathClip2: Status event segment {} not found", qev.seg);
                     continue;
                 }
 

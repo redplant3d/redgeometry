@@ -1,6 +1,6 @@
 import { Path2, WindingOperator } from "redgeometry/src/core";
 import { Box2, Point2 } from "redgeometry/src/primitives";
-import { RandomXSR128 } from "redgeometry/src/utility";
+import { log, RandomXSR128 } from "redgeometry/src/utility";
 import { AppContext2D } from "../context";
 import { createPath } from "../data";
 import { TextBoxInputElement } from "../input";
@@ -62,7 +62,7 @@ export class PathAreaAppPart implements AppPart {
         this.input = path;
         this.bounds = path.getBounds();
 
-        console.log(`Path area = ${path.getSignedArea()}`);
+        log.info(`Path area = ${path.getSignedArea()}`);
     }
 
     public updateLayout(): void {

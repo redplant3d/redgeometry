@@ -1,6 +1,6 @@
 import { EdgeSegment2, SnapRound2 } from "redgeometry/src/core";
 import { Bezier1Curve2, Box2, Edge2, Point2 } from "redgeometry/src/primitives";
-import { Debug, RandomXSR128 } from "redgeometry/src/utility";
+import { log, RandomXSR128 } from "redgeometry/src/utility";
 import { AppContext2D } from "../context";
 import { RangeInputElement } from "../input";
 import { AppLauncher, AppPart } from "../launcher";
@@ -74,7 +74,7 @@ export class SnapRoundingAppPart implements AppPart {
         snapRound.process();
         const end = performance.now();
 
-        Debug.log(`Snap round time: ${(end - start).toFixed(1)} ms`);
+        log.info(`Snap round time: ${(end - start).toFixed(1)} ms`);
 
         this.inputSegments = this.transformSegments(snapRound.debugGetInputSegments(), scale);
         this.outputSegments = this.transformSegments(snapRound.debugGetOutputSegments(), scale);
@@ -83,15 +83,15 @@ export class SnapRoundingAppPart implements AppPart {
         this.pins = this.transformPoints(snapRound.debugGetPins(), scale);
         this.errors = this.transformBox(this.transformPoints(snapRound.debugGetErrors(), 1), scale);
 
-        Debug.log(`Got ${this.inputSegments.length} input edges`);
-        Debug.log(
+        log.info(`Got ${this.inputSegments.length} input edges`);
+        log.info(
             `Found ${this.intersections.length} intersections, ` +
                 `${this.magnets.length} magnets and ${this.pins.length} pins`
         );
-        Debug.log(`Created ${this.outputSegments.length} output edges`);
+        log.info(`Created ${this.outputSegments.length} output edges`);
 
         if (this.errors.length > 0) {
-            Debug.error(`*** ${this.errors.length} errors ***`);
+            log.error(`*** ${this.errors.length} errors ***`);
         }
     }
 

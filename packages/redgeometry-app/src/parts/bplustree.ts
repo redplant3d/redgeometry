@@ -1,5 +1,5 @@
 import { Box2 } from "redgeometry/src/primitives";
-import { Debug, Immutable, RandomXSR128 } from "redgeometry/src/utility";
+import { Immutable, log, RandomXSR128 } from "redgeometry/src/utility";
 import { AppContext2D } from "../context";
 import { RangeInputElement, TextBoxInputElement } from "../input";
 import { AppLauncher, AppPart } from "../launcher";
@@ -89,8 +89,8 @@ export class BPlusTreeAppPart implements AppPart {
             }
         }
 
-        // Debug.log("Values: {}", bptree.toArray());
-        Debug.assertFn(() => bptree.validate(comp), "Validation failed");
+        // log.infoDebug("Values: {}", bptree.toArray());
+        log.assertFn(() => bptree.validate(comp), "Validation failed");
 
         this.bPlusTree = bptree;
     }

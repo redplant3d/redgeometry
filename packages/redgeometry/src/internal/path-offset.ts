@@ -1,6 +1,6 @@
 import { COS_ACUTE, COS_OBTUSE, JoinType, Path2 } from "../core";
 import { Bezier2Curve2, BezierRCurve2, Point2, Vector2 } from "../primitives";
-import { Debug } from "../utility";
+import { assertUnreachable } from "../utility";
 
 export function offsetQuadraticSimple(path: Path2, c: Bezier2Curve2, d: number): void {
     // Possible null vector (curve is a point)
@@ -154,7 +154,7 @@ export function insertOuterJoin(
             break;
         }
         default: {
-            Debug.assertUnreachable(join);
+            assertUnreachable(join);
         }
     }
 }

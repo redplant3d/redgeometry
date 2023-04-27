@@ -1,6 +1,6 @@
 import { BooleanOperator, CustomWindingOperator, EdgeSegment2, SnapRound2, WindingOperator } from "../core";
 import { Point2 } from "../primitives";
-import { Debug } from "../utility";
+import { log } from "../utility";
 
 export class PathSweepEvent2 {
     public left: boolean;
@@ -65,7 +65,7 @@ export class PathSweepEvent2 {
     }
 
     public printDebug(): void {
-        Debug.log(
+        log.infoDebug(
             "{} -> {} ({}, id = {}, winding = {})",
             this.p0,
             this.p1,
@@ -79,7 +79,7 @@ export class PathSweepEvent2 {
 export function createSweepEventQueue(snapRound: SnapRound2): PathSweepEvent2[] {
     snapRound.process();
 
-    Debug.assertFn(() => snapRound.validate(), "PathClip2: Validation failed");
+    log.assertFn(() => snapRound.validate(), "PathClip2: Validation failed");
 
     const edgeSegments: EdgeSegment2[] = [];
     snapRound.writeEdgeSegmentsTo(edgeSegments);

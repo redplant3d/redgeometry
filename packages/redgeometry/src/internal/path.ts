@@ -1,5 +1,5 @@
 import { PathCommand, PathCommandType } from "../core";
-import { Debug } from "../utility";
+import { assertDebug } from "../utility";
 
 export function copyCommandsReversed(
     src: PathCommand[],
@@ -8,7 +8,7 @@ export function copyCommandsReversed(
     destStart: number,
     length: number
 ): void {
-    Debug.assert(
+    assertDebug(
         length <= src.length - srcStart,
         "Parameter 'length' must be smaller or equal to length of 'src' to avoid over-read"
     );

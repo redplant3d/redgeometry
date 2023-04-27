@@ -1,6 +1,6 @@
 import { DEFAULT_PATH_QUALITY_OPTIONS, Mesh2, MeshFace2, Path2, PathOverlay2 } from "redgeometry/src/core";
 import { ColorRgba, Edge2, Polygon2 } from "redgeometry/src/primitives";
-import { arrayEquals, Debug, RandomXSR128 } from "redgeometry/src/utility";
+import { arrayEquals, assertDebug, RandomXSR128 } from "redgeometry/src/utility";
 import { AppContext2D } from "../context";
 import { createPolygonPair } from "../data";
 import { ComboBoxInputElement, RangeInputElement } from "../input";
@@ -130,7 +130,7 @@ export class PathOverlayAppPart implements AppPart {
         const entries: PathOverlayTagEntry[] = [];
 
         for (const face of mesh.getFaces()) {
-            Debug.assert(face.data !== undefined, "Face data must not be undefined");
+            assertDebug(face.data !== undefined, "Face data must not be undefined");
 
             const tag = face.data as number[];
             const entry = entries.find((e) => arrayEquals(e.tag, tag));

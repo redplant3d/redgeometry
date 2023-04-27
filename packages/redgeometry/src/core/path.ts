@@ -1,6 +1,6 @@
 import { copyCommandsReversed, Path2CurveIterator } from "../internal";
 import { BezierCurve2, Box2, CurveType, Matrix3x2, Matrix3x3, Point2, Polygon2, Vector2 } from "../primitives";
-import { copyArray, copyArrayReversed, Debug } from "../utility";
+import { assertUnreachable, copyArray, copyArrayReversed } from "../utility";
 import { Mesh2 } from "./mesh";
 import { PathClip2 } from "./path-clip";
 import {
@@ -120,7 +120,7 @@ export class Path2 implements PathSink2 {
                     break;
                 }
                 default: {
-                    Debug.assertUnreachable(c);
+                    assertUnreachable(c);
                 }
             }
         }
@@ -427,7 +427,7 @@ export class Path2 implements PathSink2 {
                     break;
                 }
                 default: {
-                    Debug.assertUnreachable(command);
+                    assertUnreachable(command);
                 }
             }
         }

@@ -3,6 +3,7 @@ export * from "./debug";
 export * from "./float128";
 export * from "./hash";
 export * from "./interval";
+export * from "./log";
 export * from "./random";
 export * from "./scalar";
 export * from "./solve";

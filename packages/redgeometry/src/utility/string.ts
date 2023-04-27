@@ -1,4 +1,3 @@
-import { Debug } from "./debug";
 import { ValueRef } from "./types";
 
 const OPEN_SYMBOL = "{";
@@ -52,7 +51,7 @@ export function formatString(fmt: string, ...params: unknown[]): string {
 
     if (error || open) {
         // Syntax error
-        Debug.throw("Invalid format string");
+        throw new Error("Invalid format string");
     }
 
     // Flush remaining `fmt`

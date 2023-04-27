@@ -1,4 +1,4 @@
-import { Debug, RandomXSR128 } from "redgeometry/src/utility";
+import { log, RandomXSR128 } from "redgeometry/src/utility";
 import { AppContext2D } from "../context";
 import { RangeInputElement } from "../input";
 import { AppLauncher, AppPart } from "../launcher";
@@ -45,7 +45,7 @@ export class PlaygroundAppPart implements AppPart {
 
         const random = RandomXSR128.fromSeedLcg(seed);
 
-        Debug.log("param1 = {}, param2 = {}, random = {}", param1, param2, random.nextInt());
+        log.infoDebug("param1 = {}, param2 = {}, random = {}", param1, param2, random.nextInt());
     }
 
     public updateLayout(): void {

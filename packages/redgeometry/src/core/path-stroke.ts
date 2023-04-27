@@ -11,7 +11,7 @@ import {
     StrokeState,
 } from "../internal";
 import { Bezier1Curve2, Bezier2Curve2, Bezier3Curve2, BezierRCurve2, Point2, Vector2 } from "../primitives";
-import { Debug } from "../utility";
+import { assertUnreachable } from "../utility";
 import { Path2, PathCommandType } from "./path";
 import { MAX_PARAMETER, PathQualityOptions, PathStrokeOptions } from "./path-options";
 
@@ -159,7 +159,7 @@ export class PathStrokeIncremental2 implements PathStroke2 {
                     break;
                 }
                 default: {
-                    Debug.assertUnreachable(cmd);
+                    assertUnreachable(cmd);
                 }
             }
 
@@ -415,7 +415,7 @@ export class PathStrokeRecursive2 implements PathStroke2 {
                     break;
                 }
                 default: {
-                    Debug.assertUnreachable(cmd);
+                    assertUnreachable(cmd);
                 }
             }
 

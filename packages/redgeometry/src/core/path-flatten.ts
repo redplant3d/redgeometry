@@ -5,7 +5,7 @@ import {
     simplifyParameterStepCubic,
 } from "../internal";
 import { Bezier2Curve2, Bezier3Curve2, BezierRCurve2, Point2 } from "../primitives";
-import { Debug } from "../utility";
+import { assertUnreachable } from "../utility";
 import { Path2, PathCommandType } from "./path";
 import { PathQualityOptions } from "./path-options";
 
@@ -90,7 +90,7 @@ export class PathFlattenIncremental2 implements PathFlatten2 {
                     break;
                 }
                 default: {
-                    Debug.assertUnreachable(command);
+                    assertUnreachable(command);
                 }
             }
         }
@@ -223,7 +223,7 @@ export class PathFlattenRecursive2 implements PathFlatten2 {
                     break;
                 }
                 default: {
-                    Debug.assertUnreachable(command);
+                    assertUnreachable(command);
                 }
             }
         }

@@ -1,7 +1,7 @@
 import { Path2 } from "redgeometry/src/core";
 import { System, World } from "redgeometry/src/ecs";
 import { Point2, Vector2 } from "redgeometry/src/primitives";
-import { Debug, RandomXSR128 } from "redgeometry/src/utility";
+import { log, RandomXSR128 } from "redgeometry/src/utility";
 import { AppContext2D } from "../context";
 import { ButtonInputElement, TextBoxInputElement } from "../input";
 import { AppLauncher, AppPart } from "../launcher";
@@ -75,14 +75,14 @@ export class EcsAppPart implements AppPart {
         console.time("loadEntities");
         this.world.loadEntities(this.json);
         console.timeEnd("loadEntities");
-        Debug.log("World loaded ({} bytes)", this.json.length);
+        log.info("World loaded ({} bytes)", this.json.length);
     }
 
     private onSaveClick(): void {
         console.time("saveEntities");
         this.json = this.world.saveEntities();
         console.timeEnd("saveEntities");
-        Debug.log("World saved ({} bytes)", this.json.length);
+        log.info("World saved ({} bytes)", this.json.length);
     }
 }
 
@@ -271,6 +271,6 @@ function helloSystem(world: World): void {
     const events = world.readEvents<HelloEvent>("hello");
 
     for (const e of events) {
-        console.log("Hello from", e.sender.name);
+        log.info("Hello from", e.sender.name);
     }
 }

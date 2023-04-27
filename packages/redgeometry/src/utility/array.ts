@@ -1,4 +1,4 @@
-import { Debug } from "./debug";
+import { assertDebug } from "../utility";
 import { KeyValue } from "./types";
 
 /**
@@ -344,7 +344,7 @@ export class ArrayMultiMap<K, V> {
 }
 
 export function copyArray<T>(src: T[], srcStart: number, dest: T[], destStart: number, length: number): void {
-    Debug.assert(
+    assertDebug(
         length <= src.length - srcStart,
         "Parameter 'length' must be smaller or equal to length of 'src' to avoid over-read"
     );
@@ -365,7 +365,7 @@ export function copyArray<T>(src: T[], srcStart: number, dest: T[], destStart: n
 }
 
 export function copyArrayReversed<T>(src: T[], srcStart: number, dest: T[], destStart: number, length: number): void {
-    Debug.assert(
+    assertDebug(
         length <= src.length - srcStart,
         "Parameter 'length' must be smaller or equal to length of 'src' to avoid over-read"
     );

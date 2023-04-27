@@ -1,6 +1,6 @@
 import { Mesh2LnextIterator, Mesh2OnextIterator } from "../internal";
 import { Bezier1Curve2, BezierCurve2, Point2, Vector2 } from "../primitives";
-import { ArrayMultiMap, Debug } from "../utility";
+import { ArrayMultiMap, assertDebug, log } from "../utility";
 import { Path2 } from "./path";
 
 type MeshStatus2 = {
@@ -174,7 +174,7 @@ export class MeshEdge2 {
             curr = next;
         } while (curr !== e);
 
-        Debug.error("Mesh2: Cannot find connecting edge (Fallback)");
+        log.error("Mesh2: Cannot find connecting edge (Fallback)");
 
         return e;
     }
@@ -338,13 +338,13 @@ export class MeshEdge2 {
     }
 
     public validate(): void {
-        Debug.assert(this.sym !== this);
-        Debug.assert(this.sym.sym === this);
+        assertDebug(this.sym !== this);
+        assertDebug(this.sym.sym === this);
 
-        Debug.assert(this.lnext.onext.sym === this);
-        Debug.assert(this.onext.sym.lnext === this);
+        assertDebug(this.lnext.onext.sym === this);
+        assertDebug(this.onext.sym.lnext === this);
 
-        Debug.assert((this.seg !== undefined) === (this.face !== undefined));
+        assertDebug((this.seg !== undefined) === (this.face !== undefined));
 
         let curr = this.onext;
 
@@ -353,8 +353,8 @@ export class MeshEdge2 {
             const next = curr.onext;
 
             if (prev !== next) {
-                Debug.assert(curr.p0.eq(prev.p0) && curr.p0.eq(next.p0));
-                Debug.assert(Vector2.isBetweenCcw(curr.vector, prev.vector, next.vector));
+                assertDebug(curr.p0.eq(prev.p0) && curr.p0.eq(next.p0));
+                assertDebug(Vector2.isBetweenCcw(curr.vector, prev.vector, next.vector));
             }
 
             curr = curr.onext;
@@ -400,7 +400,7 @@ export class MeshChain2 {
         }
         message += "}";
 
-        Debug.log("{}", message);
+        log.infoDebug("{}", message);
     }
 
     public writeToPath(path: Path2): void {
@@ -530,7 +530,7 @@ export class MeshFace2 {
 
         message += "}";
 
-        Debug.log("{}", message);
+        log.infoDebug("{}", message);
     }
 
     public writeToPath(path: Path2): void {
@@ -767,7 +767,7 @@ export class Mesh2 {
 
         // Both faces must be set
         if (e1.face === undefined || e2.face === undefined) {
-            Debug.error("Mesh2: At least one face is undefined");
+            log.error("Mesh2: At least one face is undefined");
             return;
         }
 
@@ -800,7 +800,7 @@ export class Mesh2 {
             MeshFace2.updateEdgeFaces(f, e1.face);
 
             const success = this.destroyFace(f);
-            Debug.assert(success, "Unable to destroy face");
+            assertDebug(success, "Unable to destroy face");
         }
 
         // e1.validate();
@@ -841,7 +841,7 @@ export class Mesh2 {
         const success = this.destroyEdge(e);
         const successSym = this.destroyEdge(e.sym);
 
-        Debug.assert(success && successSym, "Unable to destroy edges");
+        assertDebug(success && successSym, "Unable to destroy edges");
     }
 
     /**
@@ -867,7 +867,7 @@ export class Mesh2 {
         } while (e0 !== es);
 
         const success = this.destroyFace(f);
-        Debug.assert(success, "Unable to destroy face");
+        assertDebug(success, "Unable to destroy face");
     }
 
     /**
@@ -920,7 +920,7 @@ export class Mesh2 {
         face.data = ch.data;
 
         const success = this.destroyChain(ch);
-        Debug.assert(success, "Unable to destroy chain");
+        assertDebug(success, "Unable to destroy chain");
 
         // Update edges
         for (const e of face.getEdgeIterator()) {
@@ -1014,7 +1014,7 @@ export class Mesh2 {
         }
         message += "}";
 
-        Debug.log("{}", message);
+        log.infoDebug("{}", message);
     }
 
     public triangulate(optimize = false): void {
@@ -1144,7 +1144,7 @@ export class Mesh2 {
 
                 // Remove dangling chain
                 const success = this.destroyChain(chain);
-                Debug.assert(success, "Unable to destroy chain");
+                assertDebug(success, "Unable to destroy chain");
 
                 if (refChain.isClosed()) {
                     MeshEdge2.join(refChain.head, refChain.tail);
@@ -1166,7 +1166,7 @@ export class Mesh2 {
 
                 // Remove dangling chain
                 const success = this.destroyChain(chain);
-                Debug.assert(success, "Unable to destroy chain");
+                assertDebug(success, "Unable to destroy chain");
 
                 if (refChain.isClosed()) {
                     MeshEdge2.join(refChain.head, refChain.tail);
@@ -1182,7 +1182,7 @@ export class Mesh2 {
         const idx = status.findIndex(e0);
 
         if (idx < 0) {
-            Debug.error("Mesh2: Unable to delete status");
+            log.error("Mesh2: Unable to delete status");
             return;
         }
 
@@ -1208,7 +1208,7 @@ export class Mesh2 {
             const e1 = event;
 
             if (e1.seg === undefined) {
-                Debug.error("Mesh2: Unable to get segment");
+                log.error("Mesh2: Unable to get segment");
                 continue;
             }
 
@@ -1222,26 +1222,26 @@ export class Mesh2 {
 
             if (cross > 0) {
                 if (p0.x >= p1.x && p1.x < p2.x) {
-                    // Debug.log("{} -> Start", p1);
+                    // log.infoDebug("{} -> Start", p1);
                     this.monotoneInsert(status, e1);
                     continue;
                 }
 
                 if (p0.x <= p1.x && p1.x > p2.x) {
-                    // Debug.log("{} -> End", p1);
+                    // log.infoDebug("{} -> End", p1);
                     this.monotoneDelete(status, e0, e1);
                     continue;
                 }
             } else if (cross < 0) {
                 if (p0.x > p1.x && p1.x <= p2.x) {
-                    // Debug.log("{} -> Split", p1);
+                    // log.infoDebug("{} -> Split", p1);
                     this.monotoneUpdate(status, e1, false, true);
                     this.monotoneInsert(status, e1);
                     continue;
                 }
 
                 if (p0.x < p1.x && p1.x >= p2.x) {
-                    // Debug.log("{} -> Merge", p1);
+                    // log.infoDebug("{} -> Merge", p1);
                     this.monotoneDelete(status, e0, e1);
                     this.monotoneUpdate(status, e1, true, false);
                     continue;
@@ -1249,11 +1249,11 @@ export class Mesh2 {
             }
 
             if (p1.lt(p2)) {
-                // Debug.log("{} -> Regular (Interior Above)", p1);
+                // log.infoDebug("{} -> Regular (Interior Above)", p1);
                 this.monotoneDelete(status, e0, e1);
                 this.monotoneInsert(status, e1);
             } else {
-                // Debug.log("{} -> Regular (Interior Below)", p1);
+                // log.infoDebug("{} -> Regular (Interior Below)", p1);
                 this.monotoneUpdate(status, e1, false, false);
             }
         }
@@ -1269,7 +1269,7 @@ export class Mesh2 {
         const idx = status.findIndexNearestEnd(e1);
 
         if (idx < 0) {
-            Debug.error("Mesh2: Unable to update status");
+            log.error("Mesh2: Unable to update status");
             return;
         }
 

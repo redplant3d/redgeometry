@@ -1,6 +1,6 @@
 import { Box2 } from "redgeometry/src/primitives";
 import { Image2 } from "redgeometry/src/render";
-import { clamp, Debug, Random, RandomXSR128 } from "redgeometry/src/utility";
+import { assertUnreachable, clamp, Random, RandomXSR128 } from "redgeometry/src/utility";
 import { AppContext2D } from "../context";
 import { ComboBoxInputElement, RangeInputElement } from "../input";
 import { AppLauncher, AppPart } from "../launcher";
@@ -177,7 +177,7 @@ export class SamplingAppPart implements AppPart {
                 return new Image2(d, d, arr.buffer);
             }
             default: {
-                Debug.assertUnreachable(format);
+                assertUnreachable(format);
             }
         }
     }

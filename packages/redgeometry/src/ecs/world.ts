@@ -1,5 +1,5 @@
 import { deserializePrimitiveObject, serializePrimitiveObject } from "../internal";
-import { Debug } from "../utility";
+import { log } from "../utility";
 import { hasComponentTypes } from "./helper";
 import {
     Component,
@@ -218,7 +218,7 @@ export class World {
 
     public registerData<T extends WorldData>(data: T): void {
         if (this.data.has(data.dataId)) {
-            Debug.warn("World already has data type '{}' and will be overwritten", data.dataId);
+            log.warn("World already has data type '{}' and will be overwritten", data.dataId);
         }
 
         this.data.set(data.dataId, data);
@@ -226,7 +226,7 @@ export class World {
 
     public registerEvent<T extends WorldEvent>(type: WorldEventTypeOf<T>): void {
         if (this.events.has(type)) {
-            Debug.warn("World already has event type '{}' and will be overwritten", type);
+            log.warn("World already has event type '{}' and will be overwritten", type);
         }
 
         this.events.set(type, []);

@@ -1,5 +1,5 @@
 import { Bezier1Curve2, Bezier2Curve2, Bezier3Curve2, BezierCurve2, BezierRCurve2, Box2, Point2 } from "../primitives";
-import { Debug, Interval, lerp, RootType, solveQuadratic } from "../utility";
+import { Interval, lerp, log, RootType, solveQuadratic } from "../utility";
 
 export function encloseCurveAt(c: BezierCurve2, box: Box2, t: number): void {
     if (t > 0 && t < 1) {
@@ -112,11 +112,11 @@ export function checkIntervalQuadQuad(
 
     ii = ii.clamp(i1.a, i1.b);
 
-    Debug.log("Intersection candidate: [{}, {}]", ii.a, ii.b);
+    log.infoDebug("Intersection candidate: [{}, {}]", ii.a, ii.b);
 
     if (ii.diameter < eps) {
         const mid = ii.mid;
-        Debug.log("Intersection found at t = {} (Diam: {})", mid, ii.diameter);
+        log.infoDebug("Intersection found at t = {} (Diam: {})", mid, ii.diameter);
         output.push(c1.getValueAt(ii.mid));
     } else {
         getIntersectionQuadQuad(c2, i2, c1, ii, output);

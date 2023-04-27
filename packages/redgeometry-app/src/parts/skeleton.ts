@@ -10,7 +10,8 @@ import {
 } from "redgeometry/src/core";
 import { Box2, Edge2, Point2, Vector2 } from "redgeometry/src/primitives";
 import {
-    Debug,
+    assertDebug,
+    log,
     Random,
     RandomXSR128,
     Root1,
@@ -123,7 +124,7 @@ export class SkeletonAppPart implements AppPart {
 
             const ev = faces[0].data as KineticEvent;
 
-            Debug.assert(ev.t1 >= 0, "Parameter must be positve (t = {})", ev.t1);
+            assertDebug(ev.t1 >= 0, "Parameter must be positve (t = {})", ev.t1);
 
             this.printEvents(faces, tmax);
 
@@ -475,9 +476,9 @@ export class SkeletonAppPart implements AppPart {
         const vtx1 = e1.data as KineticVertex;
         const vtx2 = e2.data as KineticVertex;
 
-        Debug.assert(e0.sym.face !== undefined);
-        Debug.assert(e1.sym.face === undefined);
-        Debug.assert(e2.sym.face !== undefined);
+        assertDebug(e0.sym.face !== undefined);
+        assertDebug(e1.sym.face === undefined);
+        assertDebug(e2.sym.face !== undefined);
 
         const tv = this.getEdgeCrashParameter(vtx0, vtx1, vtx2);
         const te = this.getEdgeCollapseParameter(vtx1, vtx2);
@@ -558,7 +559,7 @@ export class SkeletonAppPart implements AppPart {
             let curr = edge;
 
             do {
-                Debug.assert(curr.data === undefined);
+                assertDebug(curr.data === undefined);
 
                 curr.data = vtx;
                 curr = curr.onext;
@@ -571,12 +572,12 @@ export class SkeletonAppPart implements AppPart {
     }
 
     private printEdgesLnext(edge: MeshEdge2, validate: boolean): void {
-        Debug.log("lnext");
+        log.infoDebug("lnext");
         let i = 0;
 
         for (const e of edge.getLnextIterator()) {
-            Debug.log("  [{}] p0: {}", i, e.p0);
-            Debug.log("      p1: {}", e.p1);
+            log.infoDebug("  [{}] p0: {}", i, e.p0);
+            log.infoDebug("      p1: {}", e.p1);
 
             if (validate) {
                 e.validate();
@@ -586,16 +587,16 @@ export class SkeletonAppPart implements AppPart {
     }
 
     private printEdgesOnext(edge: MeshEdge2, validate: boolean): void {
-        Debug.log("onext");
+        log.infoDebug("onext");
         let i = 0;
 
         for (const e of edge.getOnextIterator()) {
-            Debug.log("  [{}] p0: {}", i, e.p0);
-            Debug.log("      p1: {}", e.p1);
-            Debug.log("      angle: {}", (e.p1.sub(e.p0).angle * 180) / Math.PI);
+            log.infoDebug("  [{}] p0: {}", i, e.p0);
+            log.infoDebug("      p1: {}", e.p1);
+            log.infoDebug("      angle: {}", (e.p1.sub(e.p0).angle * 180) / Math.PI);
 
             if (validate) {
-                Debug.assert(e.data === edge.data);
+                assertDebug(e.data === edge.data);
                 e.validate();
             }
 
@@ -604,36 +605,36 @@ export class SkeletonAppPart implements AppPart {
     }
 
     private printEvents(faces: MeshFace2[], t: number): void {
-        Debug.log("******************************************************************");
-        Debug.log("Parameter = {}", t);
-        Debug.log("******************************************************************");
+        log.infoDebug("******************************************************************");
+        log.infoDebug("Parameter = {}", t);
+        log.infoDebug("******************************************************************");
         for (let i = 0; i < faces.length; i++) {
             const face = faces[i];
             const event = face.data as KineticEvent;
-            Debug.log("[{}] type = {}", i, this.getKineticEventTypeName(event.type));
-            Debug.log("    t = {}", event.t1);
-            Debug.log("    edge = {}", event.e.p0);
-            Debug.log("           {}", event.e.p1);
+            log.infoDebug("[{}] type = {}", i, this.getKineticEventTypeName(event.type));
+            log.infoDebug("    t = {}", event.t1);
+            log.infoDebug("    edge = {}", event.e.p0);
+            log.infoDebug("           {}", event.e.p1);
         }
     }
 
     private printFace(face: MeshFace2): void {
-        Debug.log("******************************************************************");
+        log.infoDebug("******************************************************************");
 
         const e0 = face.start;
         const e1 = e0.lnext;
         const e2 = e1.lnext;
 
-        Debug.log("Face: e0 = {}", e0.p0);
-        Debug.log("           {}", e0.p1);
-        Debug.log("      e1 = {}", e1.p0);
-        Debug.log("           {}", e1.p1);
-        Debug.log("      e2 = {}", e2.p0);
-        Debug.log("           {}", e2.p1);
+        log.infoDebug("Face: e0 = {}", e0.p0);
+        log.infoDebug("           {}", e0.p1);
+        log.infoDebug("      e1 = {}", e1.p0);
+        log.infoDebug("           {}", e1.p1);
+        log.infoDebug("      e2 = {}", e2.p0);
+        log.infoDebug("           {}", e2.p1);
     }
 
     private printVerticesAt(face: MeshFace2, t: number): void {
-        Debug.log("******************************************************************");
+        log.infoDebug("******************************************************************");
 
         const e0 = face.start;
         const e1 = e0.lnext;
@@ -643,18 +644,18 @@ export class SkeletonAppPart implements AppPart {
         const vtx1 = e1.data as KineticVertex;
         const vtx2 = e2.data as KineticVertex;
 
-        Debug.log("vtx0: pos = {}", vtx0.getPositionAt(t));
-        Debug.log("      vel = {}", vtx0.vel);
-        Debug.log("       n1 = {}", vtx0.n1);
-        Debug.log("       n2 = {}", vtx0.n2);
-        Debug.log("vtx1: pos = {}", vtx1.getPositionAt(t));
-        Debug.log("      vel = {}", vtx1.vel);
-        Debug.log("       n1 = {}", vtx1.n1);
-        Debug.log("       n2 = {}", vtx1.n2);
-        Debug.log("vtx2: pos = {}", vtx2.getPositionAt(t));
-        Debug.log("      vel = {}", vtx2.vel);
-        Debug.log("       n1 = {}", vtx2.n1);
-        Debug.log("       n2 = {}", vtx2.n2);
+        log.infoDebug("vtx0: pos = {}", vtx0.getPositionAt(t));
+        log.infoDebug("      vel = {}", vtx0.vel);
+        log.infoDebug("       n1 = {}", vtx0.n1);
+        log.infoDebug("       n2 = {}", vtx0.n2);
+        log.infoDebug("vtx1: pos = {}", vtx1.getPositionAt(t));
+        log.infoDebug("      vel = {}", vtx1.vel);
+        log.infoDebug("       n1 = {}", vtx1.n1);
+        log.infoDebug("       n2 = {}", vtx1.n2);
+        log.infoDebug("vtx2: pos = {}", vtx2.getPositionAt(t));
+        log.infoDebug("      vel = {}", vtx2.vel);
+        log.infoDebug("       n1 = {}", vtx2.n1);
+        log.infoDebug("       n2 = {}", vtx2.n2);
     }
 
     private stopVertexAt(vtx: KineticVertex, t: number): void {
@@ -791,7 +792,7 @@ class KineticVertex {
             curr = curr.onext;
         } while (curr !== e);
 
-        Debug.error("Fallback (ccw)");
+        log.error("Fallback (ccw)");
 
         return e;
     }
@@ -807,7 +808,7 @@ class KineticVertex {
             curr = curr.oprev;
         } while (curr !== e);
 
-        Debug.error("Fallback (cw)");
+        log.error("Fallback (cw)");
 
         return e;
     }

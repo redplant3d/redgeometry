@@ -81,9 +81,9 @@ export class MatrixAppPart implements AppPart {
 
         this.edges = this.transformEdges(edges, pvm);
 
-        // Debug.log("*********");
+        // log.infoDebug("*********");
         // for (const e of this.edges) {
-        //     Debug.log("{}", e);
+        //     log.infoDebug("{}", e);
         // }
     }
 

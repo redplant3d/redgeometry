@@ -1,5 +1,5 @@
 import { FillRule } from "../render";
-import { Debug } from "../utility";
+import { assertDebug } from "../utility";
 import { Compositor } from "./compositor";
 
 const A8_SHIFT = 8;
@@ -50,10 +50,10 @@ export class RasterizerAliased {
     }
 
     public addLine(xx0: number, yy0: number, xx1: number, yy1: number): void {
-        Debug.assert(xx0 >= 0, "Coordinate must not be NaN");
-        Debug.assert(yy0 >= 0, "Coordinate must not be NaN");
-        Debug.assert(xx1 <= this.width, "Coordinate must not be NaN");
-        Debug.assert(yy1 <= this.height, "Coordinate must not be NaN");
+        assertDebug(xx0 >= 0, "Coordinate must not be NaN");
+        assertDebug(yy0 >= 0, "Coordinate must not be NaN");
+        assertDebug(xx1 <= this.width, "Coordinate must not be NaN");
+        assertDebug(yy1 <= this.height, "Coordinate must not be NaN");
 
         const y0 = (yy0 * 256) >>> 0;
         const y1 = (yy1 * 256) >>> 0;

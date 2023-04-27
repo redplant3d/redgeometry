@@ -1,5 +1,5 @@
 import { BezierCurve2, CurveType, Edge2, Point2 } from "../primitives";
-import { ArrayMultiSet, Debug, Float128, solveLinear } from "../utility";
+import { ArrayMultiSet, assertDebug, Float128, log, solveLinear } from "../utility";
 
 enum PixelType {
     Magnet,
@@ -154,10 +154,10 @@ export class SnapRound2 {
     }
 
     public addSegment(c: BezierCurve2, set: number, weight: number, snap: boolean, data: unknown): void {
-        Debug.assertFn(() => c.isFinite(), "SnapRound2: BezierCurve2 is not finite");
+        log.assertFn(() => c.isFinite(), "SnapRound2: BezierCurve2 is not finite");
 
         if (c.type !== CurveType.Bezier1) {
-            Debug.warn("SnapRound2: Not implemented yet");
+            log.warn("SnapRound2: Not implemented yet");
         }
 
         const k = this.precision;
@@ -330,7 +330,7 @@ export class SnapRound2 {
                 // Remove from sweepline
                 const success = status.remove(qe);
 
-                Debug.assert(success, "SnapRound2: Status event not found\n{}", qe.seg);
+                assertDebug(success, "SnapRound2: Status event not found\n{}", qe.seg);
             }
         }
 
@@ -421,7 +421,7 @@ export class SnapRound2 {
                 return i1.min - i2.min;
             } else {
                 if (i1.max === i2.max) {
-                    Debug.error("Max parameter values are equal");
+                    log.error("Max parameter values are equal");
                 }
                 return i1.max - i2.max;
             }
