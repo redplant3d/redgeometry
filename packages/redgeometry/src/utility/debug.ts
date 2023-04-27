@@ -1,5 +1,5 @@
 import { Log } from "./log";
-import { formatString } from "./string";
+import { FormatParameters, formatString } from "./string";
 
 // Global log object
 export const log = new Log({
@@ -8,14 +8,14 @@ export const log = new Log({
     infoFn: console.info,
 });
 
-export function assert(value: boolean, fmt?: string, ...params: unknown[]): asserts value {
+export function assert(value: boolean, fmt?: string, ...params: FormatParameters): asserts value {
     if (!value) {
         const message = formatString(fmt ?? "Assertion failed", ...params);
         throw new Error(message);
     }
 }
 
-export function assertDebug(value: boolean, fmt?: string, ...params: unknown[]): asserts value {
+export function assertDebug(value: boolean, fmt?: string, ...params: FormatParameters): asserts value {
     if (process.env.NODE_ENV === "development" && !value) {
         const message = formatString(fmt ?? "Assertion failed", ...params);
         throw new Error(message);
@@ -27,7 +27,7 @@ export function assertUnreachable(value: never): never {
     throw new Error(message);
 }
 
-export function throwError(fmt: string, ...params: unknown[]): never {
+export function throwError(fmt: string, ...params: FormatParameters): never {
     const message = formatString(fmt, ...params);
     throw new Error(message);
 }

@@ -1,9 +1,11 @@
 import { ValueRef } from "./types";
 
+export type FormatParameters = unknown[];
+
 const OPEN_SYMBOL = "{";
 const CLOSE_SYMBOL = "}";
 
-export function formatString(fmt: string, ...params: unknown[]): string {
+export function formatString(fmt: string, ...params: FormatParameters): string {
     // Running index for unspecified accessors
     const idxRef = { value: 0 };
 
@@ -60,7 +62,7 @@ export function formatString(fmt: string, ...params: unknown[]): string {
     return output;
 }
 
-function formatData(params: unknown[], idxRef: ValueRef<number>, data: string): string {
+function formatData(params: FormatParameters, idxRef: ValueRef<number>, data: string): string {
     // Interpret as array index only (for now)
     let idx = parseInt(data);
 

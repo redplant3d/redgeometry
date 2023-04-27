@@ -1,4 +1,4 @@
-import { formatString } from "./string";
+import { FormatParameters, formatString } from "./string";
 
 export type AssertFn = () => boolean;
 export type LogFn = (message: string) => void;
@@ -21,75 +21,75 @@ export class Log {
     }
 
     public static getStackTrace(error: Error): string | undefined {
-        if (error.stack !== undefined) {
-            // Skip first line
-            const stack = error.stack;
-            const start = stack.indexOf("\n");
+        const stack = error.stack;
 
+        if (stack !== undefined) {
+            // Skip first line
+            const start = stack.indexOf("\n");
             return stack.substring(start);
         } else {
             return undefined;
         }
     }
 
-    public assert(value: boolean, fmt: string, ...params: unknown[]): void {
+    public assert(value: boolean, fmt: string, ...params: FormatParameters): void {
         if (!value) {
             const message = formatString(fmt, ...params);
             this.errorFn(message);
         }
     }
 
-    public assertFn(valueFn: AssertFn, fmt: string, ...params: unknown[]): void {
-        if (!valueFn()) {
-            const message = formatString(fmt, ...params);
-            this.errorFn(message);
-        }
-    }
-
-    public assertFnDebug(valueFn: AssertFn, fmt: string, ...params: unknown[]): void {
-        if (process.env.NODE_ENV === "development" && !valueFn()) {
-            const message = formatString(fmt, ...params);
-            this.errorFn(message);
-        }
-    }
-
-    public assertDebug(value: boolean, fmt: string, ...params: unknown[]): void {
+    public assertDebug(value: boolean, fmt: string, ...params: FormatParameters): void {
         if (process.env.NODE_ENV === "development" && !value) {
             const message = formatString(fmt, ...params);
             this.errorFn(message);
         }
     }
 
-    public error(fmt: string, ...params: unknown[]): void {
+    public assertFn(valueFn: AssertFn, fmt: string, ...params: FormatParameters): void {
+        if (!valueFn()) {
+            const message = formatString(fmt, ...params);
+            this.errorFn(message);
+        }
+    }
+
+    public assertFnDebug(valueFn: AssertFn, fmt: string, ...params: FormatParameters): void {
+        if (process.env.NODE_ENV === "development" && !valueFn()) {
+            const message = formatString(fmt, ...params);
+            this.errorFn(message);
+        }
+    }
+
+    public error(fmt: string, ...params: FormatParameters): void {
         const message = formatString(fmt, ...params);
         this.errorFn(message);
     }
 
-    public errorDebug(fmt: string, ...params: unknown[]): void {
+    public errorDebug(fmt: string, ...params: FormatParameters): void {
         if (process.env.NODE_ENV === "development") {
             const message = formatString(fmt, ...params);
             this.errorFn(message);
         }
     }
 
-    public info(fmt: string, ...params: unknown[]): void {
+    public info(fmt: string, ...params: FormatParameters): void {
         const message = formatString(fmt, ...params);
         this.infoFn(message);
     }
 
-    public infoDebug(fmt: string, ...params: unknown[]): void {
+    public infoDebug(fmt: string, ...params: FormatParameters): void {
         if (process.env.NODE_ENV === "development") {
             const message = formatString(fmt, ...params);
             this.infoFn(message);
         }
     }
 
-    public warn(fmt: string, ...params: unknown[]): void {
+    public warn(fmt: string, ...params: FormatParameters): void {
         const message = formatString(fmt, ...params);
         this.warnFn(message);
     }
 
-    public warnDebug(fmt: string, ...params: unknown[]): void {
+    public warnDebug(fmt: string, ...params: FormatParameters): void {
         if (process.env.NODE_ENV === "development") {
             const message = formatString(fmt, ...params);
             this.warnFn(message);
