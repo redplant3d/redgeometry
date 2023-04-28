@@ -1,6 +1,7 @@
 import { assertUnreachable } from "redgeometry/src/utility";
 import { AnimationFrameContext } from "./animationframe";
-import { AppContext2D, AppContextGPU } from "./context";
+import { AppContext2D } from "./context";
+import { createRandomSeed } from "./data";
 import {
     AppInputElement,
     AppValueInputElement,
@@ -21,16 +22,10 @@ export type AppLauncherContext = {
     canvas2DContext?: AppContext2D;
     canvas2DElement: HTMLCanvasElement;
     canvasContainerElement: HTMLElement;
-    canvasWebGPUElement: HTMLCanvasElement;
-    webGPUContext?: AppContextGPU;
 };
 
 export type Canvas2DPartType<T extends AppPart> = {
     new (appLauncher: AppLauncher, context: AppContext2D): T;
-};
-
-export type WebGPUPartType<T extends AppPart> = {
-    new (appLauncher: AppLauncher, context: AppContextGPU): T;
 };
 
 export enum AnimationMode {
@@ -40,7 +35,6 @@ export enum AnimationMode {
 
 export enum ContextType {
     Canvas2D,
-    CanvasWebGPU,
 }
 
 type AppEntry = {
@@ -77,7 +71,7 @@ export class AppLauncher {
         this.inputRandomize = new ButtonInputElement("randomize", "randomize");
         this.inputRandomize.addEventListener("click", () => this.onRandomizeClick());
 
-        this.inputSeed = new TextBoxInputElement("seed", this.getRandomSeed());
+        this.inputSeed = new TextBoxInputElement("seed", createRandomSeed().toString());
         this.inputSeed.setStyle("width: 80px");
 
         this.inputGenerator = new TextBoxInputElement("generator", "0");
@@ -102,23 +96,15 @@ export class AppLauncher {
             style: "border: 1px solid black",
         });
 
-        const canvasWebGPUElement = AppLauncher.createElement("canvas", {
-            id: "canvasWebGPU",
-            style: "border: 1px solid black",
-        });
-
         document.body.appendChild(paramsElement);
         document.body.appendChild(canvasContainerElement);
 
         const canvas2DContext = AppContext2D.fromCanvas(canvas2DElement);
-        const webGPUContext = await AppContextGPU.fromCanvas(canvasWebGPUElement);
 
         return {
             canvasContainerElement,
             canvas2DContext,
             canvas2DElement,
-            canvasWebGPUElement,
-            webGPUContext,
         };
     }
 
@@ -152,28 +138,6 @@ export class AppLauncher {
             animationMode,
             part: new PartType(this, this.options.canvas2DContext),
             contextId: ContextType.Canvas2D,
-        });
-    }
-
-    public addCanvasWebGPU<T extends AppPart>(
-        appId: string,
-        animationMode: AnimationMode,
-        PartType: WebGPUPartType<T>
-    ): void {
-        if (this.options.webGPUContext === undefined) {
-            return;
-        }
-
-        const prevEntry = this.parts.get(appId);
-
-        if (prevEntry !== undefined) {
-            prevEntry.part.reset();
-        }
-
-        this.parts.set(appId, {
-            part: new PartType(this, this.options.webGPUContext),
-            animationMode,
-            contextId: ContextType.CanvasWebGPU,
         });
     }
 
@@ -243,10 +207,6 @@ export class AppLauncher {
         return element;
     }
 
-    private getRandomSeed(): string {
-        return ((0xffffff * Math.random()) | 0).toString();
-    }
-
     private onAppInput(): void {
         const appId = this.inputAppPart.getValue();
         const nextPart = this.parts.get(appId);
@@ -262,7 +222,7 @@ export class AppLauncher {
     }
 
     private onRandomizeClick(): void {
-        this.inputSeed.setValue(this.getRandomSeed());
+        this.inputSeed.setValue(createRandomSeed().toString());
         this.run(true, true);
     }
 
@@ -280,7 +240,6 @@ export class AppLauncher {
         const height = window.innerHeight - 50;
 
         this.options.canvas2DContext?.resize(width, height);
-        this.options.webGPUContext?.resize(width, height);
     }
 
     private run(create: boolean, writeParams: boolean): void {
@@ -309,10 +268,6 @@ export class AppLauncher {
         switch (entry.contextId) {
             case ContextType.Canvas2D: {
                 canvasContainer.appendChild(this.options.canvas2DElement);
-                break;
-            }
-            case ContextType.CanvasWebGPU: {
-                canvasContainer.appendChild(this.options.canvasWebGPUElement);
                 break;
             }
             default: {

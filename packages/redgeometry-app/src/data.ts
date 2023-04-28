@@ -200,6 +200,10 @@ export function createRandomColor(random: Random, s: number, v: number, a: numbe
     return ColorRgba.fromHsv(random.nextFloat(), s, v, a);
 }
 
+export function createRandomSeed(): number {
+    return (0xffffff * Math.random()) | 0;
+}
+
 export function nextFloatBetweenInterval(random: Random, i: Interval): number {
     return random.nextFloatBetween(i.a, i.b);
 }
