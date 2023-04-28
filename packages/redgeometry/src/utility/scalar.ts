@@ -18,8 +18,8 @@ export function betweenInt(x: number, a: number, b: number): number {
     let x1 = Math.max(a, b);
     x0 = Math.ceil(x0);
     x1 = Math.floor(x1);
-    const xd = x1 - x0 + 1;
-    return Math.floor(x0 + x * xd);
+    const xd = x1 - x0;
+    return Math.ceil(x0 + x * xd);
 }
 
 /**
