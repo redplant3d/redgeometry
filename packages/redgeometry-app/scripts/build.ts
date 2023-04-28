@@ -13,7 +13,7 @@ await buildHelper({
         { in: "./public/index.html", out: "index" },
     ],
     format: "esm",
-    loader: { ".html": "copy" },
+    loader: { ".html": "copy", ".wgsl": "text" },
     minify: true,
     outdir: "./dist",
     target: "ESNext",

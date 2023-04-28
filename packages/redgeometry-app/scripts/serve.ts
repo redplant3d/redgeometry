@@ -14,7 +14,7 @@ serveHelper(
             { in: "./public/index.html", out: "index" },
         ],
         format: "esm",
-        loader: { ".html": "copy" },
+        loader: { ".html": "copy", ".wgsl": "text" },
         outdir: "./dist",
         sourcemap: true,
         sourcesContent: false,

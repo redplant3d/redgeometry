@@ -11,6 +11,7 @@ await buildHelper(
         bundle: true,
         define: { "process.env.NODE_ENV": '"production"' },
         entryPoints: ["./src/index.ts"],
+        loader: { ".wgsl": "text" },
         metafile: true,
         minify: true,
         sourcemap: true,
