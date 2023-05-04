@@ -2,24 +2,23 @@
  * Returns a floating point number between `min(a, b)` and `max(a, b)` (exclusive) for
  * input `x` within the range [0, 1).
  */
-export function betweenFloat(x: number, a: number, b: number): number {
+export function betweenFloat(a: number, b: number, t: number): number {
     const x0 = Math.min(a, b);
     const x1 = Math.max(a, b);
-    const xd = x1 - x0;
-    return x0 + x * xd;
+    return lerp(x0, x1, t);
 }
 
 /**
  * Returns an integer number between `min(a, b)` and `max(a, b)` (inclusive) for
  * input `x` within the range [0, 1).
  */
-export function betweenInt(x: number, a: number, b: number): number {
+export function betweenInt(a: number, b: number, t: number): number {
     let x0 = Math.min(a, b);
     let x1 = Math.max(a, b);
     x0 = Math.ceil(x0);
     x1 = Math.floor(x1);
-    const xd = x1 - x0;
-    return Math.ceil(x0 + x * xd);
+    const x = lerp(x0, x1, t);
+    return Math.ceil(x);
 }
 
 /**

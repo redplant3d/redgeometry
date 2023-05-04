@@ -47,19 +47,19 @@ export class RandomXSR128 implements Random {
 
         // Fill high part with full 32 bits of `x1` and low part with high 21 bits of `x2`
         // which gives a full mantissa without loss of precision (parts are continuous)
-        return (x1 >>> 0) * FLOAT_LSB_32 + (x2 >>> 11) * FLOAT_LSB_53;
+        return FLOAT_LSB_32 * (x1 >>> 0) + FLOAT_LSB_53 * (x2 >>> 11);
     }
 
     /**
      * Returns a pseudorandom floating point number in the range [min(a, b), max(a, b)).
      */
     public nextFloatBetween(a: number, b: number): number {
-        const x = this.nextFloat();
-        return betweenFloat(x, a, b);
+        const t = this.nextFloat();
+        return betweenFloat(a, b, t);
     }
 
     /**
-     * Returns a pseudorandom 32-bit signed integer in the range [0, 2147483647].
+     * Returns a pseudorandom 32-bit signed integer in the range [-2147483648, 2147483647].
      */
     public nextInt(): number {
         const x = scrambleXSR128StarStar(this.state);
@@ -71,9 +71,11 @@ export class RandomXSR128 implements Random {
      * Returns a pseudorandom 32-bit signed integer in the range [min(a, b), max(a, b)].
      */
     public nextIntBetween(a: number, b: number): number {
+        const x = this.nextInt();
+
         // Construct a floating number with 32 bit of precision
-        const x = this.nextInt() >>> 0;
-        return betweenInt(x * FLOAT_LSB_32, a | 0, b | 0);
+        const t = FLOAT_LSB_32 * (x >>> 0);
+        return betweenInt(a, b, t);
     }
 }
 
