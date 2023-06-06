@@ -276,7 +276,7 @@ export class Bezier2Curve2 {
         const p01 = this.p0.lerp(this.p1, t);
         const p12 = this.p1.lerp(this.p2, t);
 
-        return p01.sub(p12).mul(2);
+        return p12.sub(p01).mul(2);
     }
 
     public getDerivativeCoefficients(): [Vector2, Vector2] {
@@ -589,7 +589,7 @@ export class Bezier3Curve2 {
         const p012 = p01.lerp(p12, t);
         const p123 = p12.lerp(p23, t);
 
-        return p012.sub(p123).mul(3);
+        return p123.sub(p012).mul(3);
     }
 
     public getDerivativeCoefficients(): [Vector2, Vector2, Vector2] {

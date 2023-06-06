@@ -259,7 +259,7 @@ export function getParameterAtLengthQuadratic(c: Bezier2Curve2, length: number):
 
 function gaussLegendreQuadratic(wz: number, xz: number, qqa: Vector2, qqb: Vector2): number {
     // wz * (qqb + xz * qqa)
-    return qqa.mul(xz).add(qqb).mul(wz).length;
+    return wz * qqa.mul(xz).add(qqb).length;
 }
 
 function getDashLength(dashArray: number[]): number {
