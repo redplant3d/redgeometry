@@ -28,7 +28,8 @@ export class PathAreaAppPart implements AppPart {
     }
 
     public create(): void {
-        return;
+        const canvas = document.getElementById("canvas2D");
+        canvas?.addEventListener("mousemove", (e) => this.onMouseMove(e));
     }
 
     public render(): void {
@@ -45,9 +46,6 @@ export class PathAreaAppPart implements AppPart {
 
     public update(_delta: number): void {
         this.reset();
-
-        const canvas = document.getElementById("canvas2D");
-        canvas?.addEventListener("mousemove", (e) => this.onMouseMove(e));
 
         const seed = this.launcher.inputSeed.getInt();
         const generator = this.launcher.inputGenerator.getInt();

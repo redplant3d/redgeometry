@@ -261,8 +261,6 @@ export class AppLauncher {
             for (const child of canvasContainer.childNodes) {
                 canvasContainer.removeChild(child);
             }
-
-            entry.part.create();
         }
 
         switch (entry.contextId) {
@@ -273,6 +271,10 @@ export class AppLauncher {
             default: {
                 assertUnreachable(entry.contextId);
             }
+        }
+
+        if (create) {
+            entry.part.create();
         }
 
         switch (entry.animationMode) {
