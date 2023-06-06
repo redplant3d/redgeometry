@@ -1,14 +1,9 @@
-import { copyCommandsReversed, Path2CurveIterator } from "../internal";
+import { Path2CurveIterator, copyCommandsReversed, windingIsInside as isWindingInside } from "../internal";
 import { BezierCurve2, Box2, CurveType, Matrix3x2, Matrix3x3, Point2, Polygon2, Vector2 } from "../primitives";
 import { assertUnreachable, copyArray, copyArrayReversed } from "../utility";
 import { Mesh2 } from "./mesh";
 import { PathClip2 } from "./path-clip";
 import {
-    createPathDash,
-    createPathFlatten,
-    createPathOffset,
-    createPathSimplify,
-    createPathStroke,
     CustomWindingOperator,
     DEFAULT_PATH_CLIP_OPTIONS,
     DEFAULT_PATH_DASH_OPTIONS,
@@ -21,6 +16,11 @@ import {
     PathQualityOptions,
     PathStrokeOptions,
     WindingOperator,
+    createPathDash,
+    createPathFlatten,
+    createPathOffset,
+    createPathSimplify,
+    createPathStroke,
 } from "./path-options";
 
 export interface PathSink2 {
@@ -453,18 +453,31 @@ export class Path2 implements PathSink2 {
             wind += c.getWindingAt(p);
         }
 
-        switch (windingOperator) {
-            case WindingOperator.NonZero:
-                return wind !== 0;
-            case WindingOperator.EvenOdd:
-                return (wind & 1) !== 0;
-            case WindingOperator.Positive:
-                return wind > 0;
-            case WindingOperator.Negative:
-                return wind < 0;
-            default:
-                return windingOperator(wind);
+        return isWindingInside(wind, windingOperator);
+    }
+
+    public hasPointInsideFrac(
+        p: Point2,
+        windingOperator: WindingOperator | CustomWindingOperator,
+        stepSize?: number
+    ): boolean {
+        if (!this.isValid()) {
+            return false;
         }
+
+        const step = stepSize ?? 2 ** -8;
+
+        let wind = 0;
+
+        for (const c of this.getCurveIterator()) {
+            wind += c.getWindingFracAt(p, step);
+        }
+
+        // TODO: Improve snapping
+        wind = wind / (2 * Math.PI);
+        wind = Math.round(wind);
+
+        return isWindingInside(wind, windingOperator);
     }
 
     public isClosed(): boolean {

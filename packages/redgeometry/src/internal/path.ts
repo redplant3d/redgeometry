@@ -1,4 +1,4 @@
-import { PathCommand, PathCommandType } from "../core";
+import { CustomWindingOperator, PathCommand, PathCommandType, WindingOperator } from "../core";
 import { assertDebug } from "../utility";
 
 export function copyCommandsReversed(
@@ -48,5 +48,20 @@ export function copyCommandsReversed(
 
     if (needsClose) {
         dest[destIdx++] = { type: PathCommandType.Close };
+    }
+}
+
+export function windingIsInside(wind: number, windingOperator: WindingOperator | CustomWindingOperator): boolean {
+    switch (windingOperator) {
+        case WindingOperator.NonZero:
+            return wind !== 0;
+        case WindingOperator.EvenOdd:
+            return (wind & 1) !== 0;
+        case WindingOperator.Positive:
+            return wind > 0;
+        case WindingOperator.Negative:
+            return wind < 0;
+        default:
+            return windingOperator(wind);
     }
 }

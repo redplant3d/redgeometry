@@ -109,6 +109,20 @@ export class Bezier1Curve2 {
         return getWindingAtParameterLinear(this, x, p.x);
     }
 
+    public getWindingFracAt(p: Point2, step: number): number {
+        const vv = this.getDerivative();
+
+        let sum = 0;
+
+        for (let t = 0; t < 1; t += step) {
+            const v = this.getValueAt(t).sub(p);
+
+            sum += v.cross(vv) / v.dot(v);
+        }
+
+        return step * sum;
+    }
+
     public isFinite(): boolean {
         return this.p0.isFinite() && this.p1.isFinite();
     }
@@ -384,6 +398,19 @@ export class Bezier2Curve2 {
         }
 
         return wind;
+    }
+
+    public getWindingFracAt(p: Point2, step: number): number {
+        let sum = 0;
+
+        for (let t = 0; t < 1; t += step) {
+            const v = this.getValueAt(t).sub(p);
+            const vv = this.getDerivativeAt(t);
+
+            sum += v.cross(vv) / v.dot(v);
+        }
+
+        return step * sum;
     }
 
     public intersectLine(c: Bezier1Curve2, output: number[]): void {
@@ -722,6 +749,19 @@ export class Bezier3Curve2 {
         return wind;
     }
 
+    public getWindingFracAt(p: Point2, step: number): number {
+        let sum = 0;
+
+        for (let t = 0; t < 1; t += step) {
+            const v = this.getValueAt(t).sub(p);
+            const vv = this.getDerivativeAt(t);
+
+            sum += v.cross(vv) / v.dot(v);
+        }
+
+        return step * sum;
+    }
+
     public isCollinear(): boolean {
         return this.getCurvatureMetric() === 0;
     }
@@ -901,6 +941,19 @@ export class BezierRCurve2 {
         return box;
     }
 
+    public getDerivativeAt(t: number): Vector2 {
+        const [p0, p1, p2] = this.getProjectivePoints();
+
+        const p01 = p0.lerp(p1, t);
+        const p12 = p1.lerp(p2, t);
+
+        // TODO: Could this be improved?
+        const pp0 = Point2.fromXYW(p01.x, p01.y, p01.z);
+        const pp1 = Point2.fromXYW(p12.x, p12.y, p12.z);
+
+        return pp1.sub(pp0).mul(2);
+    }
+
     public getDerivativeCoefficients(): [Vector2, Vector2, Vector2] {
         // Note: These coefficients are missing magnitude (of the denominator)
         const v1 = this.p1.sub(this.p0);
@@ -1019,6 +1072,19 @@ export class BezierRCurve2 {
         }
 
         return wind;
+    }
+
+    public getWindingFracAt(p: Point2, step: number): number {
+        let sum = 0;
+
+        for (let t = 0; t < 1; t += step) {
+            const v = this.getValueAt(t).sub(p);
+            const vv = this.getDerivativeAt(t);
+
+            sum += v.cross(vv) / v.dot(v);
+        }
+
+        return step * sum;
     }
 
     public isFinite(): boolean {
