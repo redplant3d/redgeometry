@@ -2,9 +2,9 @@
     "compilerOptions": {
         "esModuleInterop": true,
         "isolatedModules": true,
-        "noEmit": true,
         "module": "ESNext",
         "moduleResolution": "Node",
+        "noEmit": true,
         "strict": true,
         "target": "ESNext",
         "typeRoots": ["./node_modules/@types", "./node_modules/@webgpu/types"]

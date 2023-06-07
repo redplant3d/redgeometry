@@ -1,4 +1,11 @@
 {
     "name": "build-helper",
-    "version": "0.1.0"
+    "version": "0.1.0",
+    "peerDependencies": {
+        "esbuild": ">=0.17",
+        "typescript": ">=5.0"
+    },
+    "devDependencies": {
+        "@types/node": "^20.2.5"
+    }
 }
