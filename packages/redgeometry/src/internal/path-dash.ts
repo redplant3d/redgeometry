@@ -1,4 +1,4 @@
-import { Path2, PathDashOptions } from "../core";
+import { Path2, type PathDashOptions } from "../core";
 import { Bezier1Curve2, Bezier2Curve2, Point2, Vector2 } from "../primitives";
 import { RootType, solveQuadratic } from "../utility";
 

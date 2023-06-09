@@ -1,5 +1,5 @@
 import { Mesh2LnextIterator, Mesh2OnextIterator } from "../internal";
-import { Bezier1Curve2, BezierCurve2, Point2, Vector2 } from "../primitives";
+import { Bezier1Curve2, Point2, Vector2, type BezierCurve2 } from "../primitives";
 import { ArrayMultiMap, assertDebug, log } from "../utility";
 import { Path2 } from "./path";
 

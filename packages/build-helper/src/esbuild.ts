@@ -1,4 +1,12 @@
-import { build, BuildContext, BuildOptions, BuildResult, context, ServeOptions, WatchOptions } from "esbuild";
+import {
+    build,
+    context,
+    type BuildContext,
+    type BuildOptions,
+    type BuildResult,
+    type ServeOptions,
+    type WatchOptions,
+} from "esbuild";
 import { createDir, joinPaths, writeFile } from "./file";
 
 const FOOTER_LIVE_RELOAD_DEFAULT = `

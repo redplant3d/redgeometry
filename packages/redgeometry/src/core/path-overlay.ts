@@ -1,16 +1,16 @@
 import { createSweepEventQueue, PathOverlayState2, PathSweepEvent2 } from "../internal";
-import { Bezier1Curve2, BezierCurve2, Edge2 } from "../primitives";
+import { Bezier1Curve2, Edge2, type BezierCurve2 } from "../primitives";
 import { arrayEquals, ArrayMultiSet, assertDebug, log } from "../utility";
 import { Mesh2, MeshChain2, MeshEdge2 } from "./mesh";
 import { Path2 } from "./path";
 import {
     ApproximationMode,
-    CustomWindingOperator,
     DEFAULT_PATH_CLIP_OPTIONS,
-    PathQualityOptions,
     WindingOperator,
+    type CustomWindingOperator,
+    type PathQualityOptions,
 } from "./path-options";
-import { EdgeSegmentRef2, SnapRound2 } from "./snapround";
+import { SnapRound2, type EdgeSegmentRef2 } from "./snapround";
 
 export type PathOverlayData2 = {
     tag: number[];

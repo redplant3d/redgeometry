@@ -1,10 +1,10 @@
 import {
-    CompilerOptions,
     createProgram,
     findConfigFile,
     parseJsonConfigFileContent,
     readConfigFile,
     sys,
+    type CompilerOptions,
 } from "typescript";
 
 export interface ConfigOptions {

@@ -1,4 +1,4 @@
-import { CustomWindingOperator, EdgeSegmentRef2, PathOverlayData2, WindingOperator } from "../core";
+import { WindingOperator, type CustomWindingOperator, type EdgeSegmentRef2, type PathOverlayData2 } from "../core";
 import { isInWinding } from "./path-sweep";
 
 export type PathOverlayEntry2 = {

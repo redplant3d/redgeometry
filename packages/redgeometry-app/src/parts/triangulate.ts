@@ -4,7 +4,7 @@ import { RandomXSR128, log } from "redgeometry/src/utility";
 import { AppContext2D } from "../context";
 import { createPolygonPair } from "../data";
 import { ComboBoxInputElement, RangeInputElement } from "../input";
-import { AppLauncher, AppPart } from "../launcher";
+import { AppLauncher, type AppPart } from "../launcher";
 import { getBooleanOperator, getWindingRule } from "../utility";
 
 export class TriangulateAppPart implements AppPart {

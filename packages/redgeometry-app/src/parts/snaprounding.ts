@@ -1,9 +1,9 @@
-import { EdgeSegment2, SnapRound2 } from "redgeometry/src/core";
+import { SnapRound2, type EdgeSegment2 } from "redgeometry/src/core";
 import { Bezier1Curve2, Box2, Edge2, Point2 } from "redgeometry/src/primitives";
 import { RandomXSR128, log } from "redgeometry/src/utility";
 import { AppContext2D } from "../context";
 import { RangeInputElement } from "../input";
-import { AppLauncher, AppPart } from "../launcher";
+import { AppLauncher, type AppPart } from "../launcher";
 
 export class SnapRoundingAppPart implements AppPart {
     private context: AppContext2D;

@@ -1,7 +1,7 @@
 import { deserializePrimitiveObject, serializePrimitiveObject } from "../internal";
 import { log, throwError } from "../utility";
 import { hasComponentTypes } from "./helper";
-import {
+import type {
     Component,
     ComponentTypeOf,
     Components,

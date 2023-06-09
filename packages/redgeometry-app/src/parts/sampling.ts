@@ -1,9 +1,9 @@
 import { Box2 } from "redgeometry/src/primitives";
 import { Image2 } from "redgeometry/src/render";
-import { assertUnreachable, clamp, Random, RandomXSR128 } from "redgeometry/src/utility";
+import { RandomXSR128, assertUnreachable, clamp, type Random } from "redgeometry/src/utility";
 import { AppContext2D } from "../context";
 import { ComboBoxInputElement, RangeInputElement } from "../input";
-import { AppLauncher, AppPart } from "../launcher";
+import { AppLauncher, type AppPart } from "../launcher";
 
 const SOBOL_XOR_1 = [
     0x00000000, 0x00000001, 0x00000001, 0x00000007, 0x00000001, 0x00000013, 0x00000015, 0x0000007f, 0x00000001,

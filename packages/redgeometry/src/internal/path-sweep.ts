@@ -1,4 +1,4 @@
-import { BooleanOperator, CustomWindingOperator, EdgeSegment2, SnapRound2, WindingOperator } from "../core";
+import { BooleanOperator, SnapRound2, WindingOperator, type CustomWindingOperator, type EdgeSegment2 } from "../core";
 import { Point2 } from "../primitives";
 import { log } from "../utility";
 

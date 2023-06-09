@@ -1,16 +1,16 @@
 import { createSweepEventQueue, isIncOutBoolean, isInWinding, PathSweepEvent2 } from "../internal";
-import { Bezier1Curve2, BezierCurve2, Edge2 } from "../primitives";
+import { Bezier1Curve2, Edge2, type BezierCurve2 } from "../primitives";
 import { ArrayMultiSet, log } from "../utility";
 import { Mesh2 } from "./mesh";
 import { Path2 } from "./path";
 import {
     ApproximationMode,
     BooleanOperator,
-    CustomWindingOperator,
     DEFAULT_PATH_CLIP_OPTIONS,
-    PathClipOptions,
-    PathQualityOptions,
     WindingOperator,
+    type CustomWindingOperator,
+    type PathClipOptions,
+    type PathQualityOptions,
 } from "./path-options";
 import { SnapRound2 } from "./snapround";
 

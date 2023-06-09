@@ -1,4 +1,4 @@
-import { BezierCurve2, CurveType, Edge2, Point2 } from "../primitives";
+import { CurveType, Edge2, Point2, type BezierCurve2 } from "../primitives";
 import { ArrayMultiSet, Float128, assertDebug, log, solveLinear } from "../utility";
 
 enum PixelType {

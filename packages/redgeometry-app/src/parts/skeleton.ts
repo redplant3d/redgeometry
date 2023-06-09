@@ -10,20 +10,20 @@ import {
 } from "redgeometry/src/core";
 import { Box2, Edge2, Point2, Vector2 } from "redgeometry/src/primitives";
 import {
-    Random,
     RandomXSR128,
-    Root1,
-    Root2,
     RootType,
     assertDebug,
     log,
     solveLinear,
     solveQuadratic,
+    type Random,
+    type Root1,
+    type Root2,
 } from "redgeometry/src/utility";
 import { AppContext2D } from "../context";
 import { createPolygonPair, createSimplePolygon } from "../data";
 import { RangeInputElement } from "../input";
-import { AppLauncher, AppPart } from "../launcher";
+import { AppLauncher, type AppPart } from "../launcher";
 
 enum KineticEventType {
     EdgeEvent,

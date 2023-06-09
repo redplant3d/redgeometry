@@ -1,5 +1,13 @@
-import { MeshEdge2, PathCommand, PathCommandType } from "../core";
-import { Bezier1Curve2, Bezier2Curve2, Bezier3Curve2, BezierCurve2, BezierRCurve2, Edge2, Point2 } from "../primitives";
+import { MeshEdge2, PathCommandType, type PathCommand } from "../core";
+import {
+    Bezier1Curve2,
+    Bezier2Curve2,
+    Bezier3Curve2,
+    BezierRCurve2,
+    Edge2,
+    Point2,
+    type BezierCurve2,
+} from "../primitives";
 import { assertUnreachable } from "../utility";
 
 export class Mesh2LnextIterator implements IterableIterator<MeshEdge2> {

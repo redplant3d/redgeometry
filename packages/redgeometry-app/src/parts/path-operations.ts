@@ -3,7 +3,7 @@ import { RandomXSR128 } from "redgeometry/src/utility";
 import { AppContext2D } from "../context";
 import { createPath } from "../data";
 import { ComboBoxInputElement, RangeInputElement, TextBoxInputElement } from "../input";
-import { AppLauncher, AppPart } from "../launcher";
+import { AppLauncher, type AppPart } from "../launcher";
 import { getJoin } from "../utility";
 
 export class PathOperationsAppPart implements AppPart {

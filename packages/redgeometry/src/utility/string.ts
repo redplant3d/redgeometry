@@ -1,4 +1,4 @@
-import { ValueRef } from "./types";
+import type { ValueRef } from "./types";
 
 export type FormatParameters = unknown[];
 

@@ -1,4 +1,4 @@
-import { BooleanOperator, CustomWindingOperator, JoinType, WindingOperator } from "redgeometry/src/core";
+import { BooleanOperator, JoinType, WindingOperator, type CustomWindingOperator } from "redgeometry/src/core";
 import { Polygon2 } from "redgeometry/src/primitives";
 
 export function getBooleanOperator(value: string): BooleanOperator {

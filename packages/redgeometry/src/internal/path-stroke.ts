@@ -1,12 +1,12 @@
 import {
-    CapType,
     COS_OBTUSE,
-    CustomCap,
+    CapType,
     DEFAULT_PATH_STROKE_OPTIONS,
     JoinType,
     Path2,
-    PathStrokeOptions,
-    StrokeCaps,
+    type CustomCap,
+    type PathStrokeOptions,
+    type StrokeCaps,
 } from "../core";
 import { Bezier1Curve2, Bezier2Curve2, Point2, Vector2 } from "../primitives";
 import {

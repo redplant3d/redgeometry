@@ -1,8 +1,8 @@
 import { Box2 } from "redgeometry/src/primitives";
-import { Immutable, log, RandomXSR128 } from "redgeometry/src/utility";
+import { RandomXSR128, log, type Immutable } from "redgeometry/src/utility";
 import { AppContext2D } from "../context";
 import { RangeInputElement, TextBoxInputElement } from "../input";
-import { AppLauncher, AppPart } from "../launcher";
+import { AppLauncher, type AppPart } from "../launcher";
 
 enum NodeType {
     Internal,

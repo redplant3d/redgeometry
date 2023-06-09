@@ -4,7 +4,7 @@ import { RandomXSR128 } from "redgeometry/src/utility";
 import { AppContext2D } from "../context";
 import { createPath } from "../data";
 import { RangeInputElement, TextBoxInputElement } from "../input";
-import { AppLauncher, AppPart } from "../launcher";
+import { AppLauncher, type AppPart } from "../launcher";
 
 export class ImageAppPart implements AppPart {
     private context: AppContext2D;

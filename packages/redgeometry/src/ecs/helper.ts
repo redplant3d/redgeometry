@@ -1,4 +1,4 @@
-import { Component, Components, ComponentsTypeOf, TypedComponents } from "./types";
+import type { Component, Components, ComponentsTypeOf, TypedComponents } from "./types";
 
 /**
  * Helper function to validate component types.

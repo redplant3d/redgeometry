@@ -4,7 +4,7 @@ import { RandomXSR128, log } from "redgeometry/src/utility";
 import { AppContext2D } from "../context";
 import { createPath } from "../data";
 import { TextBoxInputElement } from "../input";
-import { AppLauncher, AppPart } from "../launcher";
+import { AppLauncher, type AppPart } from "../launcher";
 
 export class PathAreaAppPart implements AppPart {
     private bounds: Box2;

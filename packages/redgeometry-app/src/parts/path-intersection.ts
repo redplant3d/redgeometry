@@ -2,7 +2,7 @@ import { Path2 } from "redgeometry/src/core";
 import { Bezier2Curve2, Point2 } from "redgeometry/src/primitives";
 import { AppContext2D } from "../context";
 import { RangeInputElement } from "../input";
-import { AppLauncher, AppPart } from "../launcher";
+import { AppLauncher, type AppPart } from "../launcher";
 
 export class PathIntersectionAppPart implements AppPart {
     private context: AppContext2D;

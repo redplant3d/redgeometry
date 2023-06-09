@@ -1,5 +1,5 @@
 import { Log } from "./log";
-import { FormatParameters, formatString } from "./string";
+import { formatString, type FormatParameters } from "./string";
 
 // Global log object
 export const log = new Log({

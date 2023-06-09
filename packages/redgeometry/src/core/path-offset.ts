@@ -15,7 +15,7 @@ import {
 import { Bezier1Curve2, Bezier2Curve2, Bezier3Curve2, BezierRCurve2, Point2, Vector2 } from "../primitives";
 import { assertUnreachable } from "../utility";
 import { Path2, PathCommandType } from "./path";
-import { JoinType, MAX_PARAMETER, PathOffsetOptions, PathQualityOptions } from "./path-options";
+import { JoinType, MAX_PARAMETER, type PathOffsetOptions, type PathQualityOptions } from "./path-options";
 
 export interface PathOffset2 {
     process(input: Path2, output: Path2, options: PathOffsetOptions): void;

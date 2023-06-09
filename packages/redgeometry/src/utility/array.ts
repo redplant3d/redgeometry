@@ -1,5 +1,5 @@
 import { assertDebug } from "../utility";
-import { KeyValue } from "./types";
+import type { KeyValue } from "./types";
 
 /**
  * Multi set (multiple values) backed by an array.

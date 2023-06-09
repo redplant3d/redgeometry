@@ -13,7 +13,7 @@ import {
 import { Bezier1Curve2, Bezier2Curve2, Bezier3Curve2, BezierRCurve2, Point2, Vector2 } from "../primitives";
 import { assertUnreachable } from "../utility";
 import { Path2, PathCommandType } from "./path";
-import { MAX_PARAMETER, PathQualityOptions, PathStrokeOptions } from "./path-options";
+import { MAX_PARAMETER, type PathQualityOptions, type PathStrokeOptions } from "./path-options";
 
 export interface PathStroke2 {
     process(input: Path2, output: Path2, options: PathStrokeOptions): void;

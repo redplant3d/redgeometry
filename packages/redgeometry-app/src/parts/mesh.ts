@@ -4,7 +4,7 @@ import { RandomXSR128 } from "redgeometry/src/utility";
 import { AppContext2D } from "../context";
 import { nextPointFromBox } from "../data";
 import { RangeInputElement } from "../input";
-import { AppLauncher, AppPart } from "../launcher";
+import { AppLauncher, type AppPart } from "../launcher";
 
 export class MeshAppPart implements AppPart {
     private context: AppContext2D;

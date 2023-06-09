@@ -3,11 +3,11 @@ import {
     createPathStroke,
     DEFAULT_PATH_QUALITY_OPTIONS,
     Path2,
-    PathFlatten2,
-    PathStroke2,
+    type PathFlatten2,
+    type PathStroke2,
 } from "../core";
 import { Matrix3x2, Point2 } from "../primitives";
-import { ContextFillOptions, ContextStrokeOptions, FillRule, Image2, StrokeTransformOrder } from "../render";
+import { FillRule, Image2, StrokeTransformOrder, type ContextFillOptions, type ContextStrokeOptions } from "../render";
 import { clamp } from "../utility";
 import { Compositor } from "./compositor";
 import { RasterizerAliased } from "./rasterizer-aliased";

@@ -1,5 +1,5 @@
 import { expect, test } from "vitest";
-import { PathCommand, PathCommandType } from "../../src/core";
+import { PathCommandType, type PathCommand } from "../../src/core";
 import { copyCommandsReversed } from "../../src/internal";
 
 const cmdMove: PathCommand = { type: PathCommandType.Move };

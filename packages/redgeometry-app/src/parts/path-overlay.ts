@@ -4,7 +4,7 @@ import { RandomXSR128, arrayEquals, assertDebug } from "redgeometry/src/utility"
 import { AppContext2D } from "../context";
 import { createPolygonPair } from "../data";
 import { ComboBoxInputElement, RangeInputElement } from "../input";
-import { AppLauncher, AppPart } from "../launcher";
+import { AppLauncher, type AppPart } from "../launcher";
 import { getWindingRule } from "../utility";
 
 type PathOverlayTagEntry = { tag: number[]; faces: MeshFace2[] };

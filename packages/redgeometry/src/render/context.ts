@@ -1,4 +1,4 @@
-import { BUTT_CAPS, JoinType, Path2, StrokeCaps } from "../core";
+import { BUTT_CAPS, JoinType, Path2, type StrokeCaps } from "../core";
 import { ColorRgba, Matrix3x2 } from "../primitives";
 import { PipelineSoftware } from "../render-software";
 import { Image2 } from "./image";

@@ -1,7 +1,7 @@
 import { Mesh2, MeshFace2, Path2, PathCommandType } from "redgeometry/src/core";
 import { Box2, Edge2, Point2, Polygon2 } from "redgeometry/src/primitives";
 import { Image2 } from "redgeometry/src/render";
-import { Random, assertUnreachable } from "redgeometry/src/utility";
+import { assertUnreachable, type Random } from "redgeometry/src/utility";
 import { createRandomColor } from "./data";
 
 type CanvasStyle = string | CanvasGradient | CanvasPattern;

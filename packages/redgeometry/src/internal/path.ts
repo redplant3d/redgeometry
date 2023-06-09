@@ -1,4 +1,4 @@
-import { CustomWindingOperator, PathCommand, PathCommandType, WindingOperator } from "../core";
+import { PathCommandType, WindingOperator, type CustomWindingOperator, type PathCommand } from "../core";
 import { assertDebug } from "../utility";
 
 export function copyCommandsReversed(

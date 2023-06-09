@@ -1,26 +1,26 @@
 import { Path2CurveIterator, copyCommandsReversed, windingIsInside as isWindingInside } from "../internal";
-import { BezierCurve2, Box2, CurveType, Matrix3x2, Matrix3x3, Point2, Polygon2, Vector2 } from "../primitives";
+import { Box2, CurveType, Matrix3x2, Matrix3x3, Point2, Polygon2, Vector2, type BezierCurve2 } from "../primitives";
 import { assertUnreachable, copyArray, copyArrayReversed } from "../utility";
 import { Mesh2 } from "./mesh";
 import { PathClip2 } from "./path-clip";
 import {
-    CustomWindingOperator,
     DEFAULT_PATH_CLIP_OPTIONS,
     DEFAULT_PATH_DASH_OPTIONS,
     DEFAULT_PATH_OFFSET_OPTIONS,
     DEFAULT_PATH_QUALITY_OPTIONS,
     DEFAULT_PATH_STROKE_OPTIONS,
-    PathClipOptions,
-    PathDashOptions,
-    PathOffsetOptions,
-    PathQualityOptions,
-    PathStrokeOptions,
     WindingOperator,
     createPathDash,
     createPathFlatten,
     createPathOffset,
     createPathSimplify,
     createPathStroke,
+    type CustomWindingOperator,
+    type PathClipOptions,
+    type PathDashOptions,
+    type PathOffsetOptions,
+    type PathQualityOptions,
+    type PathStrokeOptions,
 } from "./path-options";
 
 export interface PathSink2 {
