@@ -1,4 +1,4 @@
-import { Matrix4x4 } from "../primitives";
+import type { Matrix4x4 } from "../primitives/matrix.js";
 
 export type CameraComponent = {
     type: "camera";

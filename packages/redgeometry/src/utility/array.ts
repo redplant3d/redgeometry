@@ -1,5 +1,5 @@
-import { assertDebug } from "../utility";
-import type { KeyValue } from "./types";
+import { assertDebug } from "./debug.js";
+import type { KeyValue } from "./types.js";
 
 /**
  * Multi set (multiple values) backed by an array.

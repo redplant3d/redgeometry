@@ -1,11 +1,14 @@
-import { DEFAULT_PATH_QUALITY_OPTIONS, Mesh2, Path2, PathClip2 } from "redgeometry/src/core";
-import { Polygon2 } from "redgeometry/src/primitives";
-import { RandomXSR128 } from "redgeometry/src/utility";
-import { AppContext2D } from "../context";
-import { createPolygonPair } from "../data";
-import { ComboBoxInputElement, RangeInputElement } from "../input";
-import { AppLauncher, type AppPart } from "../launcher";
-import { getBooleanOperator, getWindingRule } from "../utility";
+import { Mesh2 } from "redgeometry/src/core/mesh.js";
+import { PathClip2 } from "redgeometry/src/core/path-clip.js";
+import { DEFAULT_PATH_QUALITY_OPTIONS } from "redgeometry/src/core/path-options.js";
+import { Path2 } from "redgeometry/src/core/path.js";
+import { Polygon2 } from "redgeometry/src/primitives/polygon.js";
+import { RandomXSR128 } from "redgeometry/src/utility/random.js";
+import { AppContext2D } from "../context.js";
+import { createPolygonPair } from "../data.js";
+import { ComboBoxInputElement, RangeInputElement } from "../input.js";
+import { AppLauncher, type AppPart } from "../launcher.js";
+import { getBooleanOperator, getWindingRule } from "../utility.js";
 
 export class PathClipAppPart implements AppPart {
     private chains: Path2;

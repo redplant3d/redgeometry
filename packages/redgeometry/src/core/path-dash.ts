@@ -1,5 +1,5 @@
+import { DashState } from "../internal/path-dash.js";
 import {
-    DashState,
     isDegenerateQuad,
     isSimpleConic,
     isSimpleQuad,
@@ -9,11 +9,13 @@ import {
     simplifyParameterStepConic,
     simplifyParameterStepCubic,
     simplifyParameterStepQuad,
-} from "../internal";
-import { Bezier1Curve2, Bezier2Curve2, Bezier3Curve2, BezierRCurve2, Point2, Vector2 } from "../primitives";
-import { assertUnreachable } from "../utility";
-import { Path2, PathCommandType } from "./path";
-import { MAX_PARAMETER, type PathDashOptions, type PathQualityOptions } from "./path-options";
+} from "../internal/path-simplify.js";
+import { Bezier1Curve2, Bezier2Curve2, Bezier3Curve2, BezierRCurve2 } from "../primitives/bezier.js";
+import { Point2 } from "../primitives/point.js";
+import { Vector2 } from "../primitives/vector.js";
+import { assertUnreachable } from "../utility/debug.js";
+import { MAX_PARAMETER, type PathDashOptions, type PathQualityOptions } from "./path-options.js";
+import { Path2, PathCommandType } from "./path.js";
 
 export interface PathDash2 {
     process(input: Path2, output: Path2, options: PathDashOptions): void;

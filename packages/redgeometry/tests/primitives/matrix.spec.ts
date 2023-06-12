@@ -1,5 +1,7 @@
 import { expect, test } from "vitest";
-import { Matrix3x2, Matrix3x3, Matrix4x4, Point2, Point3, Vector2, Vector3 } from "../../src/primitives";
+import { Matrix3x2, Matrix3x3, Matrix4x4 } from "../../src/primitives/matrix.js";
+import { Point2, Point3 } from "../../src/primitives/point.js";
+import { Vector2, Vector3 } from "../../src/primitives/vector.js";
 
 test("Matrix3x2 - inverse", () => {
     const mat1 = Matrix3x2.identity;

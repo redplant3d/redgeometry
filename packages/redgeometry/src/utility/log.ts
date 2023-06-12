@@ -1,4 +1,4 @@
-import { formatString, type FormatParameters } from "./string";
+import { formatString, type FormatParameters } from "./string.js";
 
 export type AssertFn = () => boolean;
 export type LogFn = (message: string) => void;

@@ -1,5 +1,5 @@
 import { expect, test } from "vitest";
-import { Vector2 } from "../../src/primitives";
+import { Vector2 } from "../../src/primitives/vector.js";
 
 test("isBetweenCcw", () => {
     const vx = Vector2.unitX;

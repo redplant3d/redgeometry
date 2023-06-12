@@ -1,7 +1,10 @@
-import { Mesh2LnextIterator, Mesh2OnextIterator } from "../internal";
-import { Bezier1Curve2, Point2, Vector2, type BezierCurve2 } from "../primitives";
-import { ArrayMultiMap, assertDebug, log } from "../utility";
-import { Path2 } from "./path";
+import { Mesh2LnextIterator, Mesh2OnextIterator } from "../internal/iterator.js";
+import { Bezier1Curve2, type BezierCurve2 } from "../primitives/bezier.js";
+import { Point2 } from "../primitives/point.js";
+import { Vector2 } from "../primitives/vector.js";
+import { ArrayMultiMap } from "../utility/array.js";
+import { assertDebug, log } from "../utility/debug.js";
+import { Path2 } from "./path.js";
 
 type MeshStatus2 = {
     isMerge: boolean;

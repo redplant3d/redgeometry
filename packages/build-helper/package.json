@@ -1,6 +1,7 @@
 {
     "name": "build-helper",
     "version": "0.1.0",
+    "type": "module",
     "peerDependencies": {
         "esbuild": ">=0.17",
         "typescript": ">=5.0"

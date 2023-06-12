@@ -1,8 +1,15 @@
-import { Path2CurveIterator, copyCommandsReversed, windingIsInside as isWindingInside } from "../internal";
-import { Box2, CurveType, Matrix3x2, Matrix3x3, Point2, Polygon2, Vector2, type BezierCurve2 } from "../primitives";
-import { assertUnreachable, copyArray, copyArrayReversed } from "../utility";
-import { Mesh2 } from "./mesh";
-import { PathClip2 } from "./path-clip";
+import { Path2CurveIterator } from "../internal/iterator.js";
+import { copyCommandsReversed, isWindingInside } from "../internal/path.js";
+import { CurveType, type BezierCurve2 } from "../primitives/bezier.js";
+import { Box2 } from "../primitives/box.js";
+import { Matrix3x2, Matrix3x3 } from "../primitives/matrix.js";
+import { Point2 } from "../primitives/point.js";
+import { Polygon2 } from "../primitives/polygon.js";
+import { Vector2 } from "../primitives/vector.js";
+import { copyArray, copyArrayReversed } from "../utility/array.js";
+import { assertUnreachable } from "../utility/debug.js";
+import { Mesh2 } from "./mesh.js";
+import { PathClip2 } from "./path-clip.js";
 import {
     DEFAULT_PATH_CLIP_OPTIONS,
     DEFAULT_PATH_DASH_OPTIONS,
@@ -21,7 +28,7 @@ import {
     type PathOffsetOptions,
     type PathQualityOptions,
     type PathStrokeOptions,
-} from "./path-options";
+} from "./path-options.js";
 
 export interface PathSink2 {
     close(): void;

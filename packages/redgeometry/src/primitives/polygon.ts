@@ -1,9 +1,9 @@
-import { Path2 } from "../core";
-import { Polygon2EdgeIterator } from "../internal";
-import { Box2 } from "./box";
-import { Edge2 } from "./edge";
-import { Matrix3x2, Matrix3x3 } from "./matrix";
-import { Point2 } from "./point";
+import { Path2 } from "../core/path.js";
+import { Polygon2EdgeIterator } from "../internal/iterator.js";
+import { Box2 } from "./box.js";
+import { Edge2 } from "./edge.js";
+import { Matrix3x2, Matrix3x3 } from "./matrix.js";
+import { Point2 } from "./point.js";
 
 export class Polygon2 {
     private points: Point2[];

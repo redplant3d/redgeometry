@@ -1,5 +1,6 @@
 import { expect, test } from "vitest";
-import { Point2, Polygon2 } from "../../src/primitives";
+import { Point2 } from "../../src/primitives/point.js";
+import { Polygon2 } from "../../src/primitives/polygon.js";
 
 test("isConvex", () => {
     const p0 = new Point2(0, 0);

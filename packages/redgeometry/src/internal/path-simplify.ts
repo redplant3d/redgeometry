@@ -1,5 +1,5 @@
-import { COS_ACUTE } from "../core";
-import { Bezier2Curve2, Bezier3Curve2, BezierRCurve2 } from "../primitives";
+import { COS_ACUTE } from "../core/path-options.js";
+import { Bezier2Curve2, type Bezier3Curve2, type BezierRCurve2 } from "../primitives/bezier.js";
 
 /**
  * Returns `true` if the conic satisfies `cosTolerance`.

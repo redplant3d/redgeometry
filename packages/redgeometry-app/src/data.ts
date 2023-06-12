@@ -1,6 +1,11 @@
-import { Path2 } from "redgeometry/src/core";
-import { Box2, ColorRgba, Edge2, Point2, Polygon2 } from "redgeometry/src/primitives";
-import { Interval, type Random } from "redgeometry/src/utility";
+import { Path2 } from "redgeometry/src/core/path.js";
+import type { Box2 } from "redgeometry/src/primitives/box.js";
+import { ColorRgba } from "redgeometry/src/primitives/color.js";
+import { Edge2 } from "redgeometry/src/primitives/edge.js";
+import { Point2 } from "redgeometry/src/primitives/point.js";
+import { Polygon2 } from "redgeometry/src/primitives/polygon.js";
+import type { Interval } from "redgeometry/src/utility/interval.js";
+import type { Random } from "redgeometry/src/utility/random.js";
 
 export type RandomRoofOptions = {
     dangerousAreaCount: Interval;

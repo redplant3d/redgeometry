@@ -1,4 +1,6 @@
-import { Matrix3x2, Matrix3x3, Matrix4x4, Point2, Point3, Vector2, Vector3 } from "../primitives";
+import { Matrix3x2, Matrix3x3, Matrix4x4 } from "../primitives/matrix.js";
+import { Point2, Point3 } from "../primitives/point.js";
+import { Vector2, Vector3 } from "../primitives/vector.js";
 
 export function deserializePrimitiveObject(json: string): unknown {
     return JSON.parse(json, (_, obj) => {

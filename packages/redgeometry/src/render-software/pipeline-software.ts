@@ -1,16 +1,19 @@
+import type { PathFlatten2 } from "../core/path-flatten.js";
+import { DEFAULT_PATH_QUALITY_OPTIONS, createPathFlatten, createPathStroke } from "../core/path-options.js";
+import type { PathStroke2 } from "../core/path-stroke.js";
+import { Path2 } from "../core/path.js";
+import type { Matrix3x2 } from "../primitives/matrix.js";
+import { Point2 } from "../primitives/point.js";
 import {
-    createPathFlatten,
-    createPathStroke,
-    DEFAULT_PATH_QUALITY_OPTIONS,
-    Path2,
-    type PathFlatten2,
-    type PathStroke2,
-} from "../core";
-import { Matrix3x2, Point2 } from "../primitives";
-import { FillRule, Image2, StrokeTransformOrder, type ContextFillOptions, type ContextStrokeOptions } from "../render";
-import { clamp } from "../utility";
-import { Compositor } from "./compositor";
-import { RasterizerAliased } from "./rasterizer-aliased";
+    FillRule,
+    StrokeTransformOrder,
+    type ContextFillOptions,
+    type ContextStrokeOptions,
+} from "../render/context.js";
+import type { Image2 } from "../render/image.js";
+import { clamp } from "../utility/scalar.js";
+import { Compositor } from "./compositor.js";
+import { RasterizerAliased } from "./rasterizer-aliased.js";
 
 class Rectangle2 {
     public bottom: number;

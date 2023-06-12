@@ -3,12 +3,14 @@ import {
     CapType,
     DEFAULT_PATH_STROKE_OPTIONS,
     JoinType,
-    Path2,
     type CustomCap,
     type PathStrokeOptions,
     type StrokeCaps,
-} from "../core";
-import { Bezier1Curve2, Bezier2Curve2, Point2, Vector2 } from "../primitives";
+} from "../core/path-options.js";
+import { Path2 } from "../core/path.js";
+import { Bezier1Curve2, Bezier2Curve2 } from "../primitives/bezier.js";
+import type { Point2 } from "../primitives/point.js";
+import { Vector2 } from "../primitives/vector.js";
 import {
     getDashIndexNext,
     getDashStart,
@@ -16,8 +18,8 @@ import {
     getLengthQuadratic,
     getParameterAtLengthLinear,
     getParameterAtLengthQuadratic,
-} from "./path-dash";
-import { insertInnerJoin, insertOuterJoin } from "./path-offset";
+} from "./path-dash.js";
+import { insertInnerJoin, insertOuterJoin } from "./path-offset.js";
 
 export class StrokeState {
     public caps: StrokeCaps;

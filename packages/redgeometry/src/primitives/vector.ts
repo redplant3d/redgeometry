@@ -1,5 +1,5 @@
-import { clamp } from "../utility";
-import { Point2, Point3 } from "./point";
+import { clamp } from "../utility/scalar.js";
+import { Point2, Point3 } from "./point.js";
 
 export class Vector2 {
     public readonly x: number;

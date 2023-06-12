@@ -1,6 +1,6 @@
 import { expect, test } from "vitest";
-import { MeshEdge2 } from "../../src/core";
-import { Bezier1Curve2 } from "../../src/primitives";
+import { MeshEdge2 } from "../../src/core/mesh.js";
+import { Bezier1Curve2 } from "../../src/primitives/bezier.js";
 
 test("Mesh2 - splice", () => {
     const c1 = Bezier1Curve2.fromXY(0, 0, 0, 100);

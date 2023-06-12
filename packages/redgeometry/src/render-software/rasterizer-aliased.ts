@@ -1,6 +1,6 @@
-import { FillRule } from "../render";
-import { assertDebug } from "../utility";
-import { Compositor } from "./compositor";
+import { FillRule } from "../render/context.js";
+import { assertDebug } from "../utility/debug.js";
+import { Compositor } from "./compositor.js";
 
 const A8_SHIFT = 8;
 

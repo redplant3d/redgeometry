@@ -1,5 +1,5 @@
-import { assert } from "../utility";
-import { betweenFloat, betweenInt } from "./scalar";
+import { assert } from "./debug.js";
+import { betweenFloat, betweenInt } from "./scalar.js";
 
 export interface Random {
     nextFloat(): number;

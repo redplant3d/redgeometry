@@ -1,9 +1,13 @@
-import { SnapRound2, type EdgeSegment2 } from "redgeometry/src/core";
-import { Bezier1Curve2, Box2, Edge2, Point2 } from "redgeometry/src/primitives";
-import { RandomXSR128, log } from "redgeometry/src/utility";
-import { AppContext2D } from "../context";
-import { RangeInputElement } from "../input";
-import { AppLauncher, type AppPart } from "../launcher";
+import { SnapRound2, type EdgeSegment2 } from "redgeometry/src/core/snapround.js";
+import { Bezier1Curve2 } from "redgeometry/src/primitives/bezier.js";
+import { Box2 } from "redgeometry/src/primitives/box.js";
+import { Edge2 } from "redgeometry/src/primitives/edge.js";
+import { Point2 } from "redgeometry/src/primitives/point.js";
+import { log } from "redgeometry/src/utility/debug.js";
+import { RandomXSR128 } from "redgeometry/src/utility/random.js";
+import { AppContext2D } from "../context.js";
+import { RangeInputElement } from "../input.js";
+import { AppLauncher, type AppPart } from "../launcher.js";
 
 export class SnapRoundingAppPart implements AppPart {
     private context: AppContext2D;

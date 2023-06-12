@@ -1,10 +1,10 @@
-import { Point2 } from "../primitives";
-import type { PathSink2 } from "./path";
-import { PathDashIncremental2, PathDashRecursive2, type PathDash2 } from "./path-dash";
-import { PathFlattenIncremental2, PathFlattenRecursive2, type PathFlatten2 } from "./path-flatten";
-import { PathOffsetIncremental2, PathOffsetRecursive2, type PathOffset2 } from "./path-offset";
-import { PathSimplifyIncremental2, PathSimplifyRecursive2, type PathSimplify2 } from "./path-simplify";
-import { PathStrokeIncremental2, PathStrokeRecursive2, type PathStroke2 } from "./path-stroke";
+import type { Point2 } from "../primitives/point.js";
+import { PathDashIncremental2, PathDashRecursive2, type PathDash2 } from "./path-dash.js";
+import { PathFlattenIncremental2, PathFlattenRecursive2, type PathFlatten2 } from "./path-flatten.js";
+import { PathOffsetIncremental2, PathOffsetRecursive2, type PathOffset2 } from "./path-offset.js";
+import { PathSimplifyIncremental2, PathSimplifyRecursive2, type PathSimplify2 } from "./path-simplify.js";
+import { PathStrokeIncremental2, PathStrokeRecursive2, type PathStroke2 } from "./path-stroke.js";
+import type { PathSink2 } from "./path.js";
 
 export enum ApproximationMode {
     Incremental,

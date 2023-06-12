@@ -1,5 +1,6 @@
-import { World, type EntityId } from "../ecs";
-import { gpuCreateBuffer, type Float32Buffer, type NumberBuffer } from "./buffer";
+import type { EntityId } from "../ecs/types.js";
+import type { World } from "../ecs/world.js";
+import { gpuCreateBuffer, type Float32Buffer, type NumberBuffer } from "./buffer.js";
 
 export interface MeshComponent {
     componentId: "mesh";

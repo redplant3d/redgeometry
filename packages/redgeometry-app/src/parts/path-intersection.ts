@@ -1,8 +1,9 @@
-import { Path2 } from "redgeometry/src/core";
-import { Bezier2Curve2, Point2 } from "redgeometry/src/primitives";
-import { AppContext2D } from "../context";
-import { RangeInputElement } from "../input";
-import { AppLauncher, type AppPart } from "../launcher";
+import { Path2 } from "redgeometry/src/core/path.js";
+import { Bezier2Curve2 } from "redgeometry/src/primitives/bezier.js";
+import { Point2 } from "redgeometry/src/primitives/point.js";
+import { AppContext2D } from "../context.js";
+import { RangeInputElement } from "../input.js";
+import { AppLauncher, type AppPart } from "../launcher.js";
 
 export class PathIntersectionAppPart implements AppPart {
     private context: AppContext2D;

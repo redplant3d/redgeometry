@@ -1,6 +1,9 @@
-import { COS_ACUTE, COS_OBTUSE, JoinType, Path2 } from "../core";
-import { Bezier2Curve2, BezierRCurve2, Point2, Vector2 } from "../primitives";
-import { assertUnreachable } from "../utility";
+import { COS_ACUTE, COS_OBTUSE, JoinType } from "../core/path-options.js";
+import type { Path2 } from "../core/path.js";
+import { Bezier2Curve2, BezierRCurve2 } from "../primitives/bezier.js";
+import type { Point2 } from "../primitives/point.js";
+import type { Vector2 } from "../primitives/vector.js";
+import { assertUnreachable } from "../utility/debug.js";
 
 export function offsetQuadraticSimple(path: Path2, c: Bezier2Curve2, d: number): void {
     // Possible null vector (curve is a point)

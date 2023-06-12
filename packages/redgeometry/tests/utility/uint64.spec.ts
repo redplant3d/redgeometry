@@ -1,5 +1,5 @@
 import { expect, test } from "vitest";
-import { Uint64 } from "../../src/utility";
+import { Uint64 } from "../../src/utility/uint64.js";
 
 test("add", () => {
     const u0 = Uint64.from(0);

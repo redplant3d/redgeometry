@@ -1,10 +1,13 @@
-import { Path2, WindingOperator } from "redgeometry/src/core";
-import { Box2, Point2 } from "redgeometry/src/primitives";
-import { RandomXSR128, log } from "redgeometry/src/utility";
-import { AppContext2D } from "../context";
-import { createPath } from "../data";
-import { TextBoxInputElement } from "../input";
-import { AppLauncher, type AppPart } from "../launcher";
+import { WindingOperator } from "redgeometry/src/core/path-options.js";
+import { Path2 } from "redgeometry/src/core/path.js";
+import { Box2 } from "redgeometry/src/primitives/box.js";
+import { Point2 } from "redgeometry/src/primitives/point.js";
+import { log } from "redgeometry/src/utility/debug.js";
+import { RandomXSR128 } from "redgeometry/src/utility/random.js";
+import { AppContext2D } from "../context.js";
+import { createPath } from "../data.js";
+import { TextBoxInputElement } from "../input.js";
+import { AppLauncher, type AppPart } from "../launcher.js";
 
 export class PathAreaAppPart implements AppPart {
     private bounds: Box2;

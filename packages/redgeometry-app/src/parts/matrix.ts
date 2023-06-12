@@ -1,8 +1,11 @@
-import { Box3, Edge2, Edge3, Matrix4x4, Point2, Point3 } from "redgeometry/src/primitives";
-import type { Random } from "redgeometry/src/utility";
-import { AppContext2D } from "../context";
-import { ComboBoxInputElement, RangeInputElement, TextBoxInputElement } from "../input";
-import { AppLauncher, type AppPart } from "../launcher";
+import type { Box3 } from "redgeometry/src/primitives/box.js";
+import { Edge2, Edge3 } from "redgeometry/src/primitives/edge.js";
+import { Matrix4x4 } from "redgeometry/src/primitives/matrix.js";
+import { Point2, Point3 } from "redgeometry/src/primitives/point.js";
+import type { Random } from "redgeometry/src/utility/random.js";
+import { AppContext2D } from "../context.js";
+import { ComboBoxInputElement, RangeInputElement, TextBoxInputElement } from "../input.js";
+import { AppLauncher, type AppPart } from "../launcher.js";
 
 export class MatrixAppPart implements AppPart {
     private context: AppContext2D;

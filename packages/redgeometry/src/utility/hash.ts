@@ -1,4 +1,4 @@
-import type { KeyValue } from "./types";
+import type { KeyValue } from "./types.js";
 
 const hashViewBuffer = new ArrayBuffer(8);
 const hashF64 = new Float64Array(hashViewBuffer);

@@ -1,6 +1,6 @@
-import { deserializePrimitiveObject, serializePrimitiveObject } from "../internal";
-import { log, throwError } from "../utility";
-import { hasComponentTypes } from "./helper";
+import { deserializePrimitiveObject, serializePrimitiveObject } from "../internal/serialize.js";
+import { log, throwError } from "../utility/debug.js";
+import { hasComponentTypes } from "./helper.js";
 import type {
     Component,
     ComponentTypeOf,
@@ -18,7 +18,7 @@ import type {
     WorldEvent,
     WorldEventId,
     WorldEventTypeOf,
-} from "./types";
+} from "./types.js";
 
 /**
  * Entry of a system with its entities and dependencies.

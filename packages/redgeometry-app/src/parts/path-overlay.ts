@@ -1,11 +1,18 @@
-import { DEFAULT_PATH_QUALITY_OPTIONS, Mesh2, MeshFace2, Path2, PathOverlay2 } from "redgeometry/src/core";
-import { ColorRgba, Edge2, Polygon2 } from "redgeometry/src/primitives";
-import { RandomXSR128, arrayEquals, assertDebug } from "redgeometry/src/utility";
-import { AppContext2D } from "../context";
-import { createPolygonPair } from "../data";
-import { ComboBoxInputElement, RangeInputElement } from "../input";
-import { AppLauncher, type AppPart } from "../launcher";
-import { getWindingRule } from "../utility";
+import { Mesh2, type MeshFace2 } from "redgeometry/src/core/mesh.js";
+import { DEFAULT_PATH_QUALITY_OPTIONS } from "redgeometry/src/core/path-options.js";
+import { PathOverlay2 } from "redgeometry/src/core/path-overlay.js";
+import { Path2 } from "redgeometry/src/core/path.js";
+import { ColorRgba } from "redgeometry/src/primitives/color.js";
+import { Edge2 } from "redgeometry/src/primitives/edge.js";
+import { Polygon2 } from "redgeometry/src/primitives/polygon.js";
+import { arrayEquals } from "redgeometry/src/utility/array.js";
+import { assertDebug } from "redgeometry/src/utility/debug.js";
+import { RandomXSR128 } from "redgeometry/src/utility/random.js";
+import { AppContext2D } from "../context.js";
+import { createPolygonPair } from "../data.js";
+import { ComboBoxInputElement, RangeInputElement } from "../input.js";
+import { AppLauncher, type AppPart } from "../launcher.js";
+import { getWindingRule } from "../utility.js";
 
 type PathOverlayTagEntry = { tag: number[]; faces: MeshFace2[] };
 

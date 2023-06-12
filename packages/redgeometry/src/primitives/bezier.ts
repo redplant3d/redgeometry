@@ -6,12 +6,13 @@ import {
     getWindingAtParameterLinear,
     getWindingAtParameterQuadratic,
     minimizeCurveDistanceAt,
-} from "../internal";
-import { Interval, RootType, solveCubic, solveLinear, solveQuadratic } from "../utility";
-import { Box2 } from "./box";
-import { Edge2 } from "./edge";
-import { Point2, Point3 } from "./point";
-import { Vector2 } from "./vector";
+} from "../internal/bezier.js";
+import { Interval } from "../utility/interval.js";
+import { RootType, solveCubic, solveLinear, solveQuadratic } from "../utility/solve.js";
+import { Box2 } from "./box.js";
+import { Edge2 } from "./edge.js";
+import { Point2, Point3 } from "./point.js";
+import { Vector2 } from "./vector.js";
 
 export enum CurveType {
     Bezier1,

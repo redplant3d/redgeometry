@@ -1,5 +1,5 @@
-import { lerp, roundToPrecision } from "../utility";
-import { Vector2, Vector3 } from "./vector";
+import { lerp, roundToPrecision } from "../utility/scalar.js";
+import { Vector2, Vector3 } from "./vector.js";
 
 export class Point2 {
     public readonly x: number;

@@ -1,10 +1,11 @@
-import { Path2, ROUND_CAPS } from "redgeometry/src/core";
-import { RandomXSR128 } from "redgeometry/src/utility";
-import { AppContext2D } from "../context";
-import { createPath } from "../data";
-import { ComboBoxInputElement, RangeInputElement, TextBoxInputElement } from "../input";
-import { AppLauncher, type AppPart } from "../launcher";
-import { getJoin } from "../utility";
+import { ROUND_CAPS } from "redgeometry/src/core/path-options.js";
+import { Path2 } from "redgeometry/src/core/path.js";
+import { RandomXSR128 } from "redgeometry/src/utility/random.js";
+import { AppContext2D } from "../context.js";
+import { createPath } from "../data.js";
+import { ComboBoxInputElement, RangeInputElement, TextBoxInputElement } from "../input.js";
+import { AppLauncher, type AppPart } from "../launcher.js";
+import { getJoin } from "../utility.js";
 
 export class PathOperationsAppPart implements AppPart {
     private context: AppContext2D;

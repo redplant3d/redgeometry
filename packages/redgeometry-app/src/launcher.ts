@@ -1,14 +1,14 @@
-import { assertUnreachable } from "redgeometry/src/utility";
-import { AnimationFrameContext } from "./animationframe";
-import { AppContext2D } from "./context";
-import { createRandomSeed } from "./data";
+import { assertUnreachable } from "redgeometry/src/utility/debug.js";
+import { AnimationFrameContext } from "./animationframe.js";
+import { AppContext2D } from "./context.js";
+import { createRandomSeed } from "./data.js";
 import {
     AppInputElement,
     AppValueInputElement,
     ButtonInputElement,
     ComboBoxInputElement,
     TextBoxInputElement,
-} from "./input";
+} from "./input.js";
 
 export interface AppPart {
     create(): void;

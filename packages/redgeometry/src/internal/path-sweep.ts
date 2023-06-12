@@ -1,6 +1,7 @@
-import { BooleanOperator, SnapRound2, WindingOperator, type CustomWindingOperator, type EdgeSegment2 } from "../core";
-import { Point2 } from "../primitives";
-import { log } from "../utility";
+import { BooleanOperator, WindingOperator, type CustomWindingOperator } from "../core/path-options.js";
+import type { EdgeSegment2, SnapRound2 } from "../core/snapround.js";
+import { Point2 } from "../primitives/point.js";
+import { log } from "../utility/debug.js";
 
 export class PathSweepEvent2 {
     public left: boolean;

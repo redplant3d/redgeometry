@@ -1,5 +1,7 @@
-import { WindingOperator, type CustomWindingOperator, type EdgeSegmentRef2, type PathOverlayData2 } from "../core";
-import { isInWinding } from "./path-sweep";
+import type { CustomWindingOperator, WindingOperator } from "../core/path-options.js";
+import type { PathOverlayData2 } from "../core/path-overlay.js";
+import type { EdgeSegmentRef2 } from "../core/snapround.js";
+import { isInWinding } from "./path-sweep.js";
 
 export type PathOverlayEntry2 = {
     w0: number;

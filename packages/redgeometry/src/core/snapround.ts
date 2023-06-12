@@ -1,5 +1,10 @@
-import { CurveType, Edge2, Point2, type BezierCurve2 } from "../primitives";
-import { ArrayMultiSet, Float128, assertDebug, log, solveLinear } from "../utility";
+import { CurveType, type BezierCurve2 } from "../primitives/bezier.js";
+import { Edge2 } from "../primitives/edge.js";
+import { Point2 } from "../primitives/point.js";
+import { ArrayMultiSet } from "../utility/array.js";
+import { assertDebug, log } from "../utility/debug.js";
+import { Float128 } from "../utility/float128.js";
+import { solveLinear } from "../utility/solve.js";
 
 enum PixelType {
     Magnet,

@@ -1,14 +1,9 @@
-import { MeshEdge2, PathCommandType, type PathCommand } from "../core";
-import {
-    Bezier1Curve2,
-    Bezier2Curve2,
-    Bezier3Curve2,
-    BezierRCurve2,
-    Edge2,
-    Point2,
-    type BezierCurve2,
-} from "../primitives";
-import { assertUnreachable } from "../utility";
+import type { MeshEdge2 } from "../core/mesh.js";
+import { PathCommandType, type PathCommand } from "../core/path.js";
+import { Bezier1Curve2, Bezier2Curve2, Bezier3Curve2, BezierRCurve2, type BezierCurve2 } from "../primitives/bezier.js";
+import { Edge2 } from "../primitives/edge.js";
+import { Point2 } from "../primitives/point.js";
+import { assertUnreachable } from "../utility/debug.js";
 
 export class Mesh2LnextIterator implements IterableIterator<MeshEdge2> {
     public curr: MeshEdge2;

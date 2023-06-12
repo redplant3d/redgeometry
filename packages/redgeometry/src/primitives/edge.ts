@@ -1,8 +1,9 @@
-import { clamp, RootType, solveQuadratic } from "../utility";
-import { Bezier1Curve2 } from "./bezier";
-import { Box2, Box3 } from "./box";
-import { Point2, Point3 } from "./point";
-import { Vector2, Vector3 } from "./vector";
+import { clamp } from "../utility/scalar.js";
+import { RootType, solveQuadratic } from "../utility/solve.js";
+import { Bezier1Curve2 } from "./bezier.js";
+import { Box2, Box3 } from "./box.js";
+import { Point2, Point3 } from "./point.js";
+import { Vector2, Vector3 } from "./vector.js";
 
 export class Edge2 {
     public readonly p0: Point2;

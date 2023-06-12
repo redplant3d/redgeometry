@@ -1,6 +1,9 @@
-import { Path2, type PathDashOptions } from "../core";
-import { Bezier1Curve2, Bezier2Curve2, Point2, Vector2 } from "../primitives";
-import { RootType, solveQuadratic } from "../utility";
+import type { PathDashOptions } from "../core/path-options.js";
+import { Path2 } from "../core/path.js";
+import { Bezier1Curve2, Bezier2Curve2 } from "../primitives/bezier.js";
+import type { Point2 } from "../primitives/point.js";
+import type { Vector2 } from "../primitives/vector.js";
+import { RootType, solveQuadratic } from "../utility/solve.js";
 
 export class DashState {
     public currentIndex: number;

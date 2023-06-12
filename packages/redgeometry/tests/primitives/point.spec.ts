@@ -1,5 +1,5 @@
 import { expect, test } from "vitest";
-import { Point2 } from "../../src/primitives";
+import { Point2 } from "../../src/primitives/point.js";
 
 test("signedArea", () => {
     const p0 = new Point2(200, 200);

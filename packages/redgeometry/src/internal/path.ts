@@ -1,5 +1,6 @@
-import { PathCommandType, WindingOperator, type CustomWindingOperator, type PathCommand } from "../core";
-import { assertDebug } from "../utility";
+import { WindingOperator, type CustomWindingOperator } from "../core/path-options.js";
+import { PathCommandType, type PathCommand } from "../core/path.js";
+import { assertDebug } from "../utility/debug.js";
 
 export function copyCommandsReversed(
     src: PathCommand[],
@@ -51,7 +52,7 @@ export function copyCommandsReversed(
     }
 }
 
-export function windingIsInside(wind: number, windingOperator: WindingOperator | CustomWindingOperator): boolean {
+export function isWindingInside(wind: number, windingOperator: WindingOperator | CustomWindingOperator): boolean {
     switch (windingOperator) {
         case WindingOperator.NonZero:
             return wind !== 0;

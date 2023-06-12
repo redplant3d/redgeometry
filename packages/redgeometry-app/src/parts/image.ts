@@ -1,10 +1,11 @@
-import { ColorRgba } from "redgeometry/src/primitives";
-import { Context2, FillRule, Image2 } from "redgeometry/src/render";
-import { RandomXSR128 } from "redgeometry/src/utility";
-import { AppContext2D } from "../context";
-import { createPath } from "../data";
-import { RangeInputElement, TextBoxInputElement } from "../input";
-import { AppLauncher, type AppPart } from "../launcher";
+import { ColorRgba } from "redgeometry/src/primitives/color.js";
+import { Context2, FillRule } from "redgeometry/src/render/context.js";
+import { Image2 } from "redgeometry/src/render/image.js";
+import { RandomXSR128 } from "redgeometry/src/utility/random.js";
+import { AppContext2D } from "../context.js";
+import { createPath } from "../data.js";
+import { RangeInputElement, TextBoxInputElement } from "../input.js";
+import { AppLauncher, type AppPart } from "../launcher.js";
 
 export class ImageAppPart implements AppPart {
     private context: AppContext2D;

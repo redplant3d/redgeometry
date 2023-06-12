@@ -1,5 +1,5 @@
 import { expect, test } from "vitest";
-import { Box2, Box3 } from "../../src/primitives";
+import { Box2, Box3 } from "../../src/primitives/box.js";
 
 test("Box2 - intersects", () => {
     const b1 = new Box2(0, 0, 2, 2);

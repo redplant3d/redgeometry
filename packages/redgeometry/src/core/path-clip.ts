@@ -1,8 +1,9 @@
-import { createSweepEventQueue, isIncOutBoolean, isInWinding, PathSweepEvent2 } from "../internal";
-import { Bezier1Curve2, Edge2, type BezierCurve2 } from "../primitives";
-import { ArrayMultiSet, log } from "../utility";
-import { Mesh2 } from "./mesh";
-import { Path2 } from "./path";
+import { PathSweepEvent2, createSweepEventQueue, isInWinding, isIncOutBoolean } from "../internal/path-sweep.js";
+import { Bezier1Curve2, type BezierCurve2 } from "../primitives/bezier.js";
+import type { Edge2 } from "../primitives/edge.js";
+import { ArrayMultiSet } from "../utility/array.js";
+import { log } from "../utility/debug.js";
+import { Mesh2 } from "./mesh.js";
 import {
     ApproximationMode,
     BooleanOperator,
@@ -11,8 +12,9 @@ import {
     type CustomWindingOperator,
     type PathClipOptions,
     type PathQualityOptions,
-} from "./path-options";
-import { SnapRound2 } from "./snapround";
+} from "./path-options.js";
+import { Path2 } from "./path.js";
+import { SnapRound2 } from "./snapround.js";
 
 export class PathClip2 {
     private booleanOperator: BooleanOperator;

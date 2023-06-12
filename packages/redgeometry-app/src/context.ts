@@ -1,8 +1,13 @@
-import { Mesh2, MeshFace2, Path2, PathCommandType } from "redgeometry/src/core";
-import { Box2, Edge2, Point2, Polygon2 } from "redgeometry/src/primitives";
-import { Image2 } from "redgeometry/src/render";
-import { assertUnreachable, type Random } from "redgeometry/src/utility";
-import { createRandomColor } from "./data";
+import type { Mesh2, MeshFace2 } from "redgeometry/src/core/mesh.js";
+import { PathCommandType, type Path2 } from "redgeometry/src/core/path.js";
+import type { Box2 } from "redgeometry/src/primitives/box.js";
+import type { Edge2 } from "redgeometry/src/primitives/edge.js";
+import { Point2 } from "redgeometry/src/primitives/point.js";
+import type { Polygon2 } from "redgeometry/src/primitives/polygon.js";
+import type { Image2 } from "redgeometry/src/render/image.js";
+import { assertUnreachable } from "redgeometry/src/utility/debug.js";
+import type { Random } from "redgeometry/src/utility/random.js";
+import { createRandomColor } from "./data.js";
 
 type CanvasStyle = string | CanvasGradient | CanvasPattern;
 

@@ -1,6 +1,6 @@
-import { buildHelper } from "build-helper/src/esbuild";
-import { removeDir } from "build-helper/src/file";
-import { tscHelper } from "build-helper/src/typescript";
+import { buildHelper } from "build-helper/src/esbuild.js";
+import { removeDir } from "build-helper/src/file.js";
+import { tscHelper } from "build-helper/src/typescript.js";
 
 // Clean old build files
 removeDir("./dist");

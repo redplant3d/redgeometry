@@ -1,6 +1,6 @@
-import { getMaxEigenvalueSym2x2, getMaxEigenvalueSym3x3 } from "../internal";
-import { Point2, Point3 } from "./point";
-import { Vector2, Vector3 } from "./vector";
+import { getMaxEigenvalueSym2x2, getMaxEigenvalueSym3x3 } from "../internal/matrix.js";
+import { Point2, Point3 } from "./point.js";
+import { Vector2, Vector3 } from "./vector.js";
 
 /**
  * Represents a matrix for affine transformations in 2D:

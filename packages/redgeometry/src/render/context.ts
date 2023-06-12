@@ -1,7 +1,9 @@
-import { BUTT_CAPS, JoinType, Path2, type StrokeCaps } from "../core";
-import { ColorRgba, Matrix3x2 } from "../primitives";
-import { PipelineSoftware } from "../render-software";
-import { Image2 } from "./image";
+import { BUTT_CAPS, JoinType, type StrokeCaps } from "../core/path-options.js";
+import type { Path2 } from "../core/path.js";
+import { ColorRgba } from "../primitives/color.js";
+import { Matrix3x2 } from "../primitives/matrix.js";
+import { PipelineSoftware } from "../render-software/pipeline-software.js";
+import { Image2 } from "./image.js";
 
 export enum CompositeOperation {
     Source,

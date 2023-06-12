@@ -1,6 +1,6 @@
 import { expect, test } from "vitest";
-import { PathSweepEvent2 } from "../../src/internal";
-import { Point2 } from "../../src/primitives";
+import { PathSweepEvent2 } from "../../src/internal/path-sweep.js";
+import { Point2 } from "../../src/primitives/point.js";
 
 test("compareQueue", () => {
     const e0 = createEvent(400, 400, 600, 600, true);

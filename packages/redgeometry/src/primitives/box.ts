@@ -1,4 +1,4 @@
-import { Point2, Point3 } from "./point";
+import { Point2, Point3 } from "./point.js";
 
 export class Box2 {
     public x0: number;

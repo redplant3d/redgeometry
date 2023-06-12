@@ -8,12 +8,14 @@ import {
     simplifyParameterStepConic,
     simplifyParameterStepCubic,
     simplifyParameterStepQuad,
-    StrokeState,
-} from "../internal";
-import { Bezier1Curve2, Bezier2Curve2, Bezier3Curve2, BezierRCurve2, Point2, Vector2 } from "../primitives";
-import { assertUnreachable } from "../utility";
-import { Path2, PathCommandType } from "./path";
-import { MAX_PARAMETER, type PathQualityOptions, type PathStrokeOptions } from "./path-options";
+} from "../internal/path-simplify.js";
+import { StrokeState } from "../internal/path-stroke.js";
+import { Bezier1Curve2, Bezier2Curve2, Bezier3Curve2, BezierRCurve2 } from "../primitives/bezier.js";
+import { Point2 } from "../primitives/point.js";
+import { Vector2 } from "../primitives/vector.js";
+import { assertUnreachable } from "../utility/debug.js";
+import { MAX_PARAMETER, type PathQualityOptions, type PathStrokeOptions } from "./path-options.js";
+import { Path2, PathCommandType } from "./path.js";
 
 export interface PathStroke2 {
     process(input: Path2, output: Path2, options: PathStrokeOptions): void;

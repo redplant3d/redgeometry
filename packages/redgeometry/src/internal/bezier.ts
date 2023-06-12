@@ -1,13 +1,10 @@
-import {
-    Bezier1Curve2,
-    Bezier2Curve2,
-    Bezier3Curve2,
-    BezierRCurve2,
-    Box2,
-    Point2,
-    type BezierCurve2,
-} from "../primitives";
-import { Interval, RootType, lerp, log, solveQuadratic } from "../utility";
+import type { Bezier1Curve2, Bezier2Curve2, Bezier3Curve2, BezierCurve2, BezierRCurve2 } from "../primitives/bezier.js";
+import type { Box2 } from "../primitives/box.js";
+import { Point2 } from "../primitives/point.js";
+import { log } from "../utility/debug.js";
+import { Interval } from "../utility/interval.js";
+import { lerp } from "../utility/scalar.js";
+import { RootType, solveQuadratic } from "../utility/solve.js";
 
 export function encloseCurveAt(c: BezierCurve2, box: Box2, t: number): void {
     if (t > 0 && t < 1) {

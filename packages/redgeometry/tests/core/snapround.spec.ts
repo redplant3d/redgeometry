@@ -1,6 +1,6 @@
 import { expect, test } from "vitest";
-import { intersectSegmentWithPixel } from "../../src/core";
-import { Point2 } from "../../src/primitives";
+import { intersectSegmentWithPixel } from "../../src/core/snapround.js";
+import { Point2 } from "../../src/primitives/point.js";
 
 test("intersectSegmentWithPixel", () => {
     const p = new Point2(2.5, 2.5);

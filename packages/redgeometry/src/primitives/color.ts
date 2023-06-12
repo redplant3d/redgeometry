@@ -1,4 +1,4 @@
-import { clamp } from "../utility";
+import { clamp } from "../utility/scalar.js";
 
 export class ColorRgba {
     public a: number;
