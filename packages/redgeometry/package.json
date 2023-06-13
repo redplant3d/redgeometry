@@ -1,6 +1,7 @@
 {
     "name": "redgeometry",
     "version": "0.2.0",
+    "type": "module",
     "repository": {
         "type": "git",
         "url": "https://github.com/redplant3d/redgeometry.git",
@@ -13,10 +14,11 @@
         "src",
         "LICENSE"
     ],
-    "type": "module",
-    "module": "./dist/index.js",
+    "exports": {
+        "import": "./dist/index.js",
+        "require": "./dist/index.cjs"
+    },
     "main": "./dist/index.cjs",
-    "types": "./dist/index.d.ts",
     "engines": {
         "node": ">=14.0.0"
     },

@@ -1,6 +1,6 @@
+import { dtsBundleHelper } from "build-helper/src/dts.js";
 import { buildHelper } from "build-helper/src/esbuild.js";
 import { removeDir } from "build-helper/src/file.js";
-import { tscHelper } from "build-helper/src/typescript.js";
 
 // Clean old build files
 removeDir("./dist");
@@ -30,16 +30,8 @@ await buildHelper(
     ]
 );
 
-// Run `tsc` to create type declarations
-tscHelper(
-    {
-        files: ["./src/index.ts"],
-    },
-    {
-        declaration: true,
-        declarationMap: true,
-        emitDeclarationOnly: true,
-        noEmit: false,
-        outDir: "./dist",
-    }
-);
+// Bundle types
+dtsBundleHelper({
+    config: { filePath: "./src/index.ts" },
+    outputFiles: ["./dist/index.d.ts", "./dist/index.d.cts"],
+});
