@@ -1,5 +1,5 @@
-import { log } from "redgeometry/src/utility/debug.js";
-import { RandomXSR128 } from "redgeometry/src/utility/random.js";
+import { log } from "../../../redgeometry/src/utility/debug.js";
+import { RandomXSR128 } from "../../../redgeometry/src/utility/random.js";
 import { AppContext2D } from "../context.js";
 import { RangeInputElement } from "../input.js";
 import { AppLauncher, type AppPart } from "../launcher.js";

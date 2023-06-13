@@ -1,7 +1,7 @@
-import { Box2 } from "redgeometry/src/primitives/box.js";
-import { log } from "redgeometry/src/utility/debug.js";
-import { RandomXSR128 } from "redgeometry/src/utility/random.js";
-import type { Immutable } from "redgeometry/src/utility/types.js";
+import { Box2 } from "../../../redgeometry/src/primitives/box.js";
+import { log } from "../../../redgeometry/src/utility/debug.js";
+import { RandomXSR128 } from "../../../redgeometry/src/utility/random.js";
+import type { Immutable } from "../../../redgeometry/src/utility/types.js";
 import { AppContext2D } from "../context.js";
 import { RangeInputElement, TextBoxInputElement } from "../input.js";
 import { AppLauncher, type AppPart } from "../launcher.js";
