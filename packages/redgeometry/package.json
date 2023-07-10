@@ -15,8 +15,12 @@
         "LICENSE"
     ],
     "exports": {
-        "import": "./dist/index.js",
-        "require": "./dist/index.cjs"
+        ".": {
+            "import": "./dist/index.js",
+            "require": "./dist/index.cjs"
+        },
+        "./src/*": "./src/*.ts",
+        "./src/*.js": "./src/*.ts"
     },
     "main": "./dist/index.cjs",
     "engines": {
