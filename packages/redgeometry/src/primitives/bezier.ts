@@ -536,7 +536,7 @@ export class Bezier3Curve2 {
         x2: number,
         y2: number,
         x3: number,
-        y3: number
+        y3: number,
     ): Bezier3Curve2 {
         const p0 = new Point2(x0, y0);
         const p1 = new Point2(x1, y1);
@@ -895,7 +895,7 @@ export class BezierRCurve2 {
         y1: number,
         x2: number,
         y2: number,
-        w: number
+        w: number,
     ): BezierRCurve2 {
         const p0 = new Point2(x0, y0);
         const p1 = new Point2(x1, y1);

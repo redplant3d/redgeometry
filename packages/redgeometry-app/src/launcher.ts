@@ -122,7 +122,7 @@ export class AppLauncher {
     public addCanvas2D<T extends AppPart>(
         appId: string,
         animationMode: AnimationMode,
-        PartType: Canvas2DPartType<T>
+        PartType: Canvas2DPartType<T>,
     ): void {
         if (this.options.canvas2DContext === undefined) {
             return;
@@ -196,7 +196,7 @@ export class AppLauncher {
 
     private static createElement<K extends keyof HTMLElementTagNameMap>(
         tagName: K,
-        attributes?: Record<string, string>
+        attributes?: Record<string, string>,
     ): HTMLElementTagNameMap[K] {
         const element = document.createElement(tagName);
 

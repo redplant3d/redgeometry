@@ -27,7 +27,7 @@ await buildHelper(
             format: "cjs",
             outfile: "./dist/index.cjs",
         },
-    ]
+    ],
 );
 
 // Bundle types

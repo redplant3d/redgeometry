@@ -189,7 +189,7 @@ export class SamplingAppPart implements AppPart {
         stratum0: number,
         stratum1: number,
         strata: number,
-        samples: number[]
+        samples: number[],
     ): void {
         const x = stratum0 + random.nextFloat();
         const y = stratum1 + random.nextFloat();

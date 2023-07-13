@@ -35,7 +35,7 @@ export function getMaxEigenvalueSym3x3(
     a13: number,
     a22: number,
     a23: number,
-    a33: number
+    a33: number,
 ): number {
     const p1 = 2 * (a12 * a12 + a13 * a13 + a23 * a23);
 

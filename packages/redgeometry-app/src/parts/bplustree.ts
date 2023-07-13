@@ -285,7 +285,7 @@ class BPlusTree<T> {
         parent: InternalNode<T> | undefined,
         length: number,
         keys: T[],
-        children: Node<T>[]
+        children: Node<T>[],
     ): InternalNode<T> {
         return { type: NodeType.Internal, parent, length, keys, children };
     }
@@ -339,7 +339,7 @@ class BPlusTree<T> {
         parent: InternalNode<T> | undefined,
         length: number,
         values: T[],
-        next: LeafNode<T> | undefined
+        next: LeafNode<T> | undefined,
     ): LeafNode<T> {
         return { type: NodeType.Leaf, parent, length, values, next };
     }

@@ -29,7 +29,7 @@ const FOOTER_LIVE_RELOAD_IIFE = `
 
 export async function buildHelper(
     options: BuildOptions,
-    variants?: BuildOptions[]
+    variants?: BuildOptions[],
 ): Promise<BuildResult<BuildOptions>[]> {
     console.log("Building...");
 
@@ -55,7 +55,7 @@ export async function buildHelper(
 export async function serveHelper(
     buildOptions: BuildOptions,
     serveOptions: ServeOptions,
-    watchOptions?: WatchOptions
+    watchOptions?: WatchOptions,
 ): Promise<BuildContext> {
     console.log("Serving...");
 

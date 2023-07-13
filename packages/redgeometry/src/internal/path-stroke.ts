@@ -426,7 +426,7 @@ export function insertStrokeJoin(
     m1: Vector2,
     d: number,
     ml: number,
-    join: JoinType
+    join: JoinType,
 ): void {
     const n0 = m0.unit.normal;
     const n1 = m1.unit.normal;
@@ -501,7 +501,7 @@ export function combineStroke(
     left: Path2,
     right: Path2,
     startCap: CapType | CustomCap,
-    endCap: CapType | CustomCap
+    endCap: CapType | CustomCap,
 ): void {
     const p1 = right.getLastPoint();
     const p2 = left.getFirstPoint();

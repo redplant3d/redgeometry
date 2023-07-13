@@ -116,7 +116,7 @@ export class PathOverlay2 {
         seg1: BezierCurve2,
         seg2: BezierCurve2,
         data1: PathOverlayData2,
-        data2: PathOverlayData2
+        data2: PathOverlayData2,
     ): void {
         // Create edge pair
         const edge = output.createEdge(seg1, seg2);
@@ -190,7 +190,7 @@ export class PathOverlay2 {
         edge: MeshEdge2,
         edgeSym: MeshEdge2,
         data: PathOverlayData2,
-        dataSym: PathOverlayData2
+        dataSym: PathOverlayData2,
     ): void {
         // Connect edge and set new head
         const ce1 = MeshEdge2.findConnectingEdge(edge, ref.vector);

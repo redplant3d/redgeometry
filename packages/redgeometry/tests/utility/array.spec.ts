@@ -43,7 +43,7 @@ test("ArrayMultiMap.findIndex", () => {
             { key: 2, value: 2 },
             { key: 4, value: 4 },
         ],
-        compareFn
+        compareFn,
     );
 
     const index1 = multiMap.findIndexBy((n) => n === 1);
@@ -67,21 +67,21 @@ test("ArrayMultiMap.insert", () => {
             { key: 2, value: 2 },
             { key: 4, value: 4 },
         ],
-        comp
+        comp,
     );
     const multiMap3 = ArrayMultiMap.fromArray(
         [
             { key: 2, value: 2 },
             { key: 4, value: 4 },
         ],
-        comp
+        comp,
     );
     const multiMap4 = ArrayMultiMap.fromArray(
         [
             { key: 2, value: 2 },
             { key: 4, value: 4 },
         ],
-        comp
+        comp,
     );
 
     multiMap1.insert(3, 3);

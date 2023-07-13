@@ -18,7 +18,7 @@ export class Box2 {
             Number.POSITIVE_INFINITY,
             Number.POSITIVE_INFINITY,
             Number.NEGATIVE_INFINITY,
-            Number.NEGATIVE_INFINITY
+            Number.NEGATIVE_INFINITY,
         );
     }
 
@@ -130,7 +130,7 @@ export class Box3 {
             Number.POSITIVE_INFINITY,
             Number.NEGATIVE_INFINITY,
             Number.NEGATIVE_INFINITY,
-            Number.NEGATIVE_INFINITY
+            Number.NEGATIVE_INFINITY,
         );
     }
 

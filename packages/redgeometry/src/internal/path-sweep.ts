@@ -72,7 +72,7 @@ export class PathSweepEvent2 {
             this.p1,
             this.left ? "left" : "right",
             this.seg.ref.data,
-            this.wind
+            this.wind,
         );
     }
 }
@@ -115,7 +115,7 @@ export function createSweepEventQueue(snapRound: SnapRound2): PathSweepEvent2[] 
 export function isInWinding(
     w0: number,
     w1: number,
-    windingOperator: WindingOperator | CustomWindingOperator
+    windingOperator: WindingOperator | CustomWindingOperator,
 ): [boolean, boolean] {
     let in0 = false;
     let in1 = false;
@@ -156,7 +156,7 @@ export function isIncOutBoolean(
     ina1: boolean,
     inb0: boolean,
     inb1: boolean,
-    booleanOperator: BooleanOperator
+    booleanOperator: BooleanOperator,
 ): [boolean, boolean] {
     // Incoming & outgoing:
     //      inca = !ina0 && ina1;

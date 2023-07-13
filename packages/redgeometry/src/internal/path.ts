@@ -7,11 +7,11 @@ export function copyCommandsReversed(
     srcStart: number,
     dest: PathCommand[],
     destStart: number,
-    length: number
+    length: number,
 ): void {
     assertDebug(
         length <= src.length - srcStart,
-        "Parameter 'length' must be smaller or equal to length of 'src' to avoid over-read"
+        "Parameter 'length' must be smaller or equal to length of 'src' to avoid over-read",
     );
 
     let srcEnd = srcStart;

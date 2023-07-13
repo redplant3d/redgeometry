@@ -509,7 +509,7 @@ export class Matrix3x3 {
         m23: number,
         m31: number,
         m32: number,
-        m33: number
+        m33: number,
     ) {
         this.m11 = m11;
         this.m12 = m12;
@@ -913,7 +913,7 @@ export class Matrix3x3 {
         m23: number,
         m31: number,
         m32: number,
-        m33: number
+        m33: number,
     ): void {
         this.m11 = m11;
         this.m12 = m12;
@@ -1076,7 +1076,7 @@ export class Matrix4x4 {
         m41: number,
         m42: number,
         m43: number,
-        m44: number
+        m44: number,
     ) {
         this.m11 = m11;
         this.m12 = m12;
@@ -1168,7 +1168,7 @@ export class Matrix4x4 {
         top: number,
         bottom: number,
         near: number,
-        far: number
+        far: number,
     ): Matrix4x4 {
         // OpenGL orthographic projection matrix
         const w = right - left;
@@ -1195,7 +1195,7 @@ export class Matrix4x4 {
         top: number,
         bottom: number,
         near: number,
-        far: number
+        far: number,
     ): Matrix4x4 {
         // OpenGL perspective projection matrix
         const w = right - left;
@@ -1462,7 +1462,7 @@ export class Matrix4x4 {
         cosz: number,
         x: number,
         y: number,
-        z: number
+        z: number,
     ): void {
         this.translatePost(x, y, z);
         this.rotateXPost(sinx, cosx);
@@ -1480,7 +1480,7 @@ export class Matrix4x4 {
         cosz: number,
         x: number,
         y: number,
-        z: number
+        z: number,
     ): void {
         this.translatePre(x, y, z);
         this.rotateXPre(sinx, cosx);
@@ -1873,7 +1873,7 @@ export class Matrix4x4 {
         m41: number,
         m42: number,
         m43: number,
-        m44: number
+        m44: number,
     ): void {
         this.m11 = m11;
         this.m12 = m12;

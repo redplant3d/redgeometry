@@ -175,7 +175,7 @@ export class RasterizerAliased {
                 this.compositor.operator(
                     this.width * y,
                     this.activeEdges[0].x0,
-                    this.activeEdges[this.activeEdges.length - 1].x0
+                    this.activeEdges[this.activeEdges.length - 1].x0,
                 );
             }
 

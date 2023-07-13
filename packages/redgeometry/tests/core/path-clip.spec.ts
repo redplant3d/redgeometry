@@ -88,7 +88,7 @@ function checkQueue(before: PathSweepEvent2, after: PathSweepEvent2, id: string)
         console.error(
             `Event order wrong: ${id}\n` +
                 `\tBefore: ${before.p0} -> ${before.p1} (${before.left})\n` +
-                `\tAfter: ${after.p0} -> ${after.p1} (${after.left})`
+                `\tAfter: ${after.p0} -> ${after.p1} (${after.left})`,
         );
     }
 
@@ -105,7 +105,7 @@ function checkStatus(below: PathSweepEvent2, above: PathSweepEvent2, id: string)
         console.error(
             `Event order wrong: ${id}\n` +
                 `\tBelow: ${below.p0} -> ${below.p1}\n` +
-                `\tAbove: ${above.p0} -> ${above.p1}`
+                `\tAbove: ${above.p0} -> ${above.p1}`,
         );
     }
 

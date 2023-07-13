@@ -23,7 +23,7 @@ export type TypedBuffer =
 export function gpuCreateBuffer(
     device: GPUDevice,
     data: NumberBuffer | TypedBuffer,
-    flags: GPUBufferUsageFlags
+    flags: GPUBufferUsageFlags,
 ): GPUBuffer {
     // See: https://toji.github.io/webgpu-best-practices/buffer-uploads.html
     if (data.type === "Number") {

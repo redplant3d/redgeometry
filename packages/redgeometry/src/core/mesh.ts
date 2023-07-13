@@ -1266,7 +1266,7 @@ export class Mesh2 {
         status: ArrayMultiMap<MeshEdge2, MeshStatus2>,
         e1: MeshEdge2,
         isMerge: boolean,
-        force: boolean
+        force: boolean,
     ): void {
         // Get the index of the edge above `e1`
         const idx = status.findIndexNearestEnd(e1);

@@ -152,7 +152,7 @@ export class World {
      */
     public getTypedComponents<T extends Component[]>(
         entity: EntityId,
-        types: ComponentsTypeOf<T>
+        types: ComponentsTypeOf<T>,
     ): TypedComponents<T> | undefined {
         const components = this.getComponents(entity);
 
@@ -183,7 +183,7 @@ export class World {
 
     public queryEntitiesMatch<T extends Component[]>(
         types: ComponentsTypeOf<T>,
-        match: (components: TypedComponents<T>) => boolean
+        match: (components: TypedComponents<T>) => boolean,
     ): TypedEntityEntry<T>[] {
         const result: TypedEntityEntry<T>[] = [];
 

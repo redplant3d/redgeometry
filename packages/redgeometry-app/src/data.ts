@@ -66,7 +66,7 @@ export function createPolygonPair(
     generator: number,
     offset: number,
     width: number,
-    height: number
+    height: number,
 ): [Polygon2, Polygon2] {
     const polygonA = new Polygon2();
     const polygonB = new Polygon2();
@@ -172,7 +172,7 @@ export function createSimplePolygon(
     box: Box2,
     count: number,
     irregularity: number,
-    roundness: number
+    roundness: number,
 ): Polygon2 {
     const result = new Polygon2();
 

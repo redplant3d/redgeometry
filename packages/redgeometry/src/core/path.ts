@@ -274,7 +274,7 @@ export class Path2 implements PathSink2 {
     public clip(
         path: Path2,
         clipOptions?: Partial<PathClipOptions>,
-        qualityOptions?: Partial<PathQualityOptions>
+        qualityOptions?: Partial<PathQualityOptions>,
     ): Path2 {
         const mesh = new Mesh2();
         const pathClip = new PathClip2({ ...DEFAULT_PATH_QUALITY_OPTIONS, ...qualityOptions });
@@ -466,7 +466,7 @@ export class Path2 implements PathSink2 {
     public hasPointInsideFrac(
         p: Point2,
         windingOperator: WindingOperator | CustomWindingOperator,
-        stepSize?: number
+        stepSize?: number,
     ): boolean {
         if (!this.isValid()) {
             return false;
@@ -554,7 +554,7 @@ export class Path2 implements PathSink2 {
         ry: number,
         xAxisRotation: number,
         largeArc: boolean,
-        sweep: boolean
+        sweep: boolean,
     ): void {
         const p0 = this.getLastPoint();
 
@@ -699,7 +699,7 @@ export class Path2 implements PathSink2 {
 
     public toMesh(
         winding: WindingOperator | CustomWindingOperator,
-        qualityOptions?: Partial<PathQualityOptions>
+        qualityOptions?: Partial<PathQualityOptions>,
     ): Mesh2 {
         const mesh = new Mesh2();
         const pathClip = new PathClip2({ ...DEFAULT_PATH_QUALITY_OPTIONS, ...qualityOptions });
@@ -710,7 +710,7 @@ export class Path2 implements PathSink2 {
 
     public toMultiPolygon(
         winding: WindingOperator | CustomWindingOperator,
-        qualityOptions?: Partial<PathQualityOptions>
+        qualityOptions?: Partial<PathQualityOptions>,
     ): Polygon2[] {
         const mesh = this.toMesh(winding, qualityOptions);
         return mesh.getFaces().map((f) => new Polygon2(f.getPoints()));

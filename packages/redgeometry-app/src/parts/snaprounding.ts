@@ -92,7 +92,7 @@ export class SnapRoundingAppPart implements AppPart {
             "Found {} intersections, {} magnets and {} pins",
             this.intersections.length,
             this.magnets.length,
-            this.pins.length
+            this.pins.length,
         );
         log.info("Created {} output edges", this.outputSegments.length);
 

@@ -16,7 +16,7 @@ export function minimizeCurveDistanceAt(
     c: BezierCurve2,
     p: Point2,
     t: number,
-    min: { param: number; distSq: number }
+    min: { param: number; distSq: number },
 ): void {
     if (t > 0 && t < 1) {
         const distSq = c.getValueAt(t).sub(p).lengthSq;
@@ -106,7 +106,7 @@ export function checkIntervalQuadQuad(
     c2: Bezier2Curve2,
     i2: Interval,
     ii: Interval,
-    output: Point2[]
+    output: Point2[],
 ): void {
     const eps = 2 ** -50;
 
@@ -133,7 +133,7 @@ export function getIntersectionQuadQuad(
     i1: Interval,
     c2: Bezier2Curve2,
     i2: Interval,
-    output: Point2[]
+    output: Point2[],
 ): void {
     // 'c1' is the curve part, 'c2' is the line part
     const cc2 = c2.splitBetween(i2.a, i2.b);
