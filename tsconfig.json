@@ -7,7 +7,6 @@
         "noEmit": true,
         "strict": true,
         "target": "ESNext",
-        "typeRoots": ["./node_modules/@types", "./node_modules/@webgpu/types"],
         "verbatimModuleSyntax": true
     }
 }

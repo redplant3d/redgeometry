@@ -1,9 +1,9 @@
-import { Mesh2 } from "../../../redgeometry/src/core/mesh.js";
-import { PathClip2 } from "../../../redgeometry/src/core/path-clip.js";
-import { DEFAULT_PATH_QUALITY_OPTIONS } from "../../../redgeometry/src/core/path-options.js";
-import { Path2 } from "../../../redgeometry/src/core/path.js";
-import { Polygon2 } from "../../../redgeometry/src/primitives/polygon.js";
-import { RandomXSR128 } from "../../../redgeometry/src/utility/random.js";
+import { Mesh2 } from "redgeometry/src/core/mesh.js";
+import { PathClip2 } from "redgeometry/src/core/path-clip.js";
+import { DEFAULT_PATH_QUALITY_OPTIONS } from "redgeometry/src/core/path-options.js";
+import { Path2 } from "redgeometry/src/core/path.js";
+import { Polygon2 } from "redgeometry/src/primitives/polygon.js";
+import { RandomXSR128 } from "redgeometry/src/utility/random.js";
 import { AppContext2D } from "../context.js";
 import { createPolygonPair } from "../data.js";
 import { ComboBoxInputElement, RangeInputElement } from "../input.js";

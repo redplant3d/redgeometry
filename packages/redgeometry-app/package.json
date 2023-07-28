@@ -2,6 +2,12 @@
     "name": "redgeometry-app",
     "version": "0.1.0",
     "type": "module",
+    "dependencies": {
+        "redgeometry": "workspace:*"
+    },
+    "devDependencies": {
+        "@webgpu/types": "^0.1.34"
+    },
     "scripts": {
         "build": "vite-node ./scripts/build.ts",
         "serve": "vite-node ./scripts/serve.ts"

@@ -1,6 +1,6 @@
-import { dtsBundleHelper } from "build-helper/src/dts.js";
-import { buildHelper } from "build-helper/src/esbuild.js";
-import { removeDir } from "build-helper/src/file.js";
+import { dtsBundleHelper } from "../../build-helper/src/dts.js";
+import { buildHelper } from "../../build-helper/src/esbuild.js";
+import { removeDir } from "../../build-helper/src/file.js";
 
 // Clean old build files
 removeDir("./dist");

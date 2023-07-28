@@ -1,10 +1,10 @@
-import { Mesh2 } from "../../../redgeometry/src/core/mesh.js";
-import { PathClip2 } from "../../../redgeometry/src/core/path-clip.js";
-import { DEFAULT_PATH_CLIP_OPTIONS, DEFAULT_PATH_QUALITY_OPTIONS } from "../../../redgeometry/src/core/path-options.js";
-import { Path2 } from "../../../redgeometry/src/core/path.js";
-import { Box2 } from "../../../redgeometry/src/primitives/box.js";
-import type { Point2 } from "../../../redgeometry/src/primitives/point.js";
-import { RandomXSR128 } from "../../../redgeometry/src/utility/random.js";
+import { Mesh2 } from "redgeometry/src/core/mesh.js";
+import { PathClip2 } from "redgeometry/src/core/path-clip.js";
+import { DEFAULT_PATH_CLIP_OPTIONS, DEFAULT_PATH_QUALITY_OPTIONS } from "redgeometry/src/core/path-options.js";
+import { Path2 } from "redgeometry/src/core/path.js";
+import { Box2 } from "redgeometry/src/primitives/box.js";
+import type { Point2 } from "redgeometry/src/primitives/point.js";
+import { RandomXSR128 } from "redgeometry/src/utility/random.js";
 import { AppContext2D } from "../context.js";
 import { nextPointFromBox } from "../data.js";
 import { RangeInputElement } from "../input.js";

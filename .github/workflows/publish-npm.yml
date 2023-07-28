@@ -7,23 +7,23 @@ jobs:
     publish-npm:
         runs-on: ubuntu-latest
         steps:
-            - name: Checkout
-              uses: actions/checkout@v3
-            - name: Setup Node
-              uses: actions/setup-node@v3
+            - uses: actions/checkout@v3
+            - uses: pnpm/action-setup@v2
+              with:
+                  version: 8
+            - uses: actions/setup-node@v3
               with:
                   node-version: 16
                   registry-url: "https://registry.npmjs.org"
             - name: Install
-              run: npm ci
-            - name: Check, Lint & Test
-              run: |
-                  npm run check
-                  npm run lint
-                  npm run test
+              run: pnpm install --frozen-lockfile
             - name: Build
-              run: npm run build -w redgeometry
+              run: |
+                  pnpm run check
+                  pnpm run lint
+                  pnpm run test
+                  pnpm run build -w redgeometry
             - name: Publish
-              run: npm publish ./packages/redgeometry
+              run: pnpm publish ./packages/redgeometry
               env:
                   NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

@@ -1,5 +1,5 @@
-import { buildHelper } from "build-helper/src/esbuild.js";
-import { removeDir } from "build-helper/src/file.js";
+import { buildHelper } from "../../build-helper/src/esbuild.js";
+import { removeDir } from "../../build-helper/src/file.js";
 
 // Clean old build files
 removeDir("./dist");

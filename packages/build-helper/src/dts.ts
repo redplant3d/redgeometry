@@ -1,5 +1,5 @@
-import { writeFile } from "build-helper/src/file.js";
 import { generateDtsBundle, type EntryPointConfig } from "dts-bundle-generator";
+import { writeFile } from "./file.js";
 
 export type DtsBundleOptions = {
     config: EntryPointConfig;

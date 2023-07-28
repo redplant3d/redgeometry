@@ -2,12 +2,15 @@
     "name": "build-helper",
     "version": "0.1.0",
     "type": "module",
+    "private": true,
+    "dependencies": {
+        "dts-bundle-generator": "^8.0.1",
+        "esbuild": "^0.18.17"
+    },
     "peerDependencies": {
-        "dts-bundle-generator": ">=8.0",
-        "esbuild": ">=0.18",
         "typescript": ">=5.1"
     },
     "devDependencies": {
-        "@types/node": "^20.4.1"
+        "@types/node": "^16.18.39"
     }
 }

@@ -1,24 +1,14 @@
-import { Mesh2, MeshEdge2, MeshFace2 } from "../../../redgeometry/src/core/mesh.js";
-import { PathClip2 } from "../../../redgeometry/src/core/path-clip.js";
-import {
-    BooleanOperator,
-    DEFAULT_PATH_QUALITY_OPTIONS,
-    WindingOperator,
-} from "../../../redgeometry/src/core/path-options.js";
-import { Path2 } from "../../../redgeometry/src/core/path.js";
-import { Box2 } from "../../../redgeometry/src/primitives/box.js";
-import { Edge2 } from "../../../redgeometry/src/primitives/edge.js";
-import { Point2 } from "../../../redgeometry/src/primitives/point.js";
-import type { Vector2 } from "../../../redgeometry/src/primitives/vector.js";
-import { assertDebug, log } from "../../../redgeometry/src/utility/debug.js";
-import { RandomXSR128, type Random } from "../../../redgeometry/src/utility/random.js";
-import {
-    RootType,
-    solveLinear,
-    solveQuadratic,
-    type Root1,
-    type Root2,
-} from "../../../redgeometry/src/utility/solve.js";
+import { Mesh2, MeshEdge2, MeshFace2 } from "redgeometry/src/core/mesh.js";
+import { PathClip2 } from "redgeometry/src/core/path-clip.js";
+import { BooleanOperator, DEFAULT_PATH_QUALITY_OPTIONS, WindingOperator } from "redgeometry/src/core/path-options.js";
+import { Path2 } from "redgeometry/src/core/path.js";
+import { Box2 } from "redgeometry/src/primitives/box.js";
+import { Edge2 } from "redgeometry/src/primitives/edge.js";
+import { Point2 } from "redgeometry/src/primitives/point.js";
+import type { Vector2 } from "redgeometry/src/primitives/vector.js";
+import { assertDebug, log } from "redgeometry/src/utility/debug.js";
+import { RandomXSR128, type Random } from "redgeometry/src/utility/random.js";
+import { RootType, solveLinear, solveQuadratic, type Root1, type Root2 } from "redgeometry/src/utility/solve.js";
 import { AppContext2D } from "../context.js";
 import { createPolygonPair, createSimplePolygon } from "../data.js";
 import { RangeInputElement } from "../input.js";
