@@ -7,21 +7,25 @@ jobs:
     deploy-gh-pages:
         runs-on: ubuntu-latest
         steps:
-            - uses: actions/checkout@v3
-            - uses: pnpm/action-setup@v2
+            - name: Checkout
+              uses: actions/checkout@v3
+            - name: pnpm setup
+              uses: pnpm/action-setup@v2
               with:
                   version: 8
-            - uses: actions/setup-node@v3
+            - name: Node.js setup
+              uses: actions/setup-node@v3
               with:
                   node-version: 16
             - name: Install
               run: pnpm install --frozen-lockfile
-            - name: Build
+            - name: Run check, lint and test
               run: |
                   pnpm run check
                   pnpm run lint
                   pnpm run test
-                  pnpm run build -w redgeometry-app
+            - name: Build
+              run: pnpm --filter redgeometry-app run build
             - name: Deploy
               uses: JamesIves/github-pages-deploy-action@v4
               with:
