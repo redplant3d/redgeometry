@@ -9,7 +9,7 @@ removeDir("./dist");
 await buildHelper(
     {
         bundle: true,
-        define: { "process.env.NODE_ENV": '"production"' },
+        define: { REDGEOMETRY_DEBUG: "false" },
         entryPoints: ["./src/index.ts"],
         loader: { ".wgsl": "text" },
         metafile: true,

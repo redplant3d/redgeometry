@@ -16,7 +16,7 @@ export function assert(value: boolean, fmt?: string, ...params: FormatParameters
 }
 
 export function assertDebug(value: boolean, fmt?: string, ...params: FormatParameters): asserts value {
-    if (process.env.NODE_ENV === "development" && !value) {
+    if (REDGEOMETRY_DEBUG && !value) {
         const message = formatString(fmt ?? "Assertion failed", ...params);
         throw new Error(message);
     }

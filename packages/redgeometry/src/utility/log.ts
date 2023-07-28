@@ -40,7 +40,7 @@ export class Log {
     }
 
     public assertDebug(value: boolean, fmt: string, ...params: FormatParameters): void {
-        if (process.env.NODE_ENV === "development" && !value) {
+        if (REDGEOMETRY_DEBUG && !value) {
             const message = formatString(fmt, ...params);
             this.errorFn(message);
         }
@@ -54,7 +54,7 @@ export class Log {
     }
 
     public assertFnDebug(valueFn: AssertFn, fmt: string, ...params: FormatParameters): void {
-        if (process.env.NODE_ENV === "development" && !valueFn()) {
+        if (REDGEOMETRY_DEBUG && !valueFn()) {
             const message = formatString(fmt, ...params);
             this.errorFn(message);
         }
@@ -66,7 +66,7 @@ export class Log {
     }
 
     public errorDebug(fmt: string, ...params: FormatParameters): void {
-        if (process.env.NODE_ENV === "development") {
+        if (REDGEOMETRY_DEBUG) {
             const message = formatString(fmt, ...params);
             this.errorFn(message);
         }
@@ -78,7 +78,7 @@ export class Log {
     }
 
     public infoDebug(fmt: string, ...params: FormatParameters): void {
-        if (process.env.NODE_ENV === "development") {
+        if (REDGEOMETRY_DEBUG) {
             const message = formatString(fmt, ...params);
             this.infoFn(message);
         }
@@ -90,7 +90,7 @@ export class Log {
     }
 
     public warnDebug(fmt: string, ...params: FormatParameters): void {
-        if (process.env.NODE_ENV === "development") {
+        if (REDGEOMETRY_DEBUG) {
             const message = formatString(fmt, ...params);
             this.warnFn(message);
         }

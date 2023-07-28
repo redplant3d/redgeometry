@@ -7,7 +7,7 @@ removeDir("./dist");
 // Build application
 await buildHelper({
     bundle: true,
-    define: { "process.env.NODE_ENV": '"production"' },
+    define: { REDGEOMETRY_DEBUG: "false" },
     entryPoints: [
         { in: "./src/index.ts", out: "index" },
         { in: "./public/index.html", out: "index" },
