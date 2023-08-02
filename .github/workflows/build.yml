@@ -1,0 +1,30 @@
+name: Build (dry run)
+on:
+    push:
+        branches:
+            - develop
+jobs:
+    build:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v3
+            - name: pnpm setup
+              uses: pnpm/action-setup@v2
+              with:
+                  version: 8
+            - name: Node.js setup
+              uses: actions/setup-node@v3
+              with:
+                  node-version: 16
+            - name: Install
+              run: pnpm install --frozen-lockfile
+            - name: Run check, lint and test
+              run: |
+                  pnpm run check
+                  pnpm run lint
+                  pnpm run test
+            - name: Build
+              run: |
+                  pnpm --filter redgeometry run build
+                  pnpm --filter redgeometry-app run build
