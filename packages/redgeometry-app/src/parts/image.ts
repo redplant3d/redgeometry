@@ -1,5 +1,6 @@
 import { ColorRgba } from "redgeometry/src/primitives/color.js";
-import { Context2, FillRule } from "redgeometry/src/render/context.js";
+import { SoftwareRenderContext2 } from "redgeometry/src/render-software/context.js";
+import { FillRule } from "redgeometry/src/render/context.js";
 import { Image2 } from "redgeometry/src/render/image.js";
 import { RandomXSR128 } from "redgeometry/src/utility/random.js";
 import { AppContext2D } from "../context.js";
@@ -61,7 +62,7 @@ export class ImageAppPart implements AppPart {
 
         this.image.resize(size, size);
 
-        const ctx = new Context2();
+        const ctx = new SoftwareRenderContext2();
         ctx.begin(this.image);
         ctx.fillRule = FillRule.EvenOdd;
 
