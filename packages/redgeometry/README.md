@@ -24,3 +24,20 @@ import { log } from "redgeometry/src/utility/debug.js";
 const v = new Vector2(1, 2);
 log.info("length = {}", v.length);
 ```
+
+The behavior is controlled by global environment variables, which can be replaced at compile time, e.g. by esbuild with [defines](https://esbuild.github.io/api/#define):
+
+```json
+{
+    "define": {
+        "REDGEOMETRY_DEBUG": "false"
+    }
+}
+```
+
+Without identifier replacement, some code will fail with a `ReferenceError` (variable is not defined). However, the environment variables may also be defined at the top of the main file:
+
+```typescript
+/// <reference types="redgeometry/src/env" />
+globalThis.REDGEOMETRY_DEBUG = true;
+```

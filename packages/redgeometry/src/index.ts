@@ -29,10 +29,3 @@ export * from "./utility/solve.js";
 export * from "./utility/string.js";
 export * from "./utility/types.js";
 export * from "./utility/uint64.js";
-
-/* eslint-disable no-var */
-declare global {
-    /** Enables debugging asserts for the `redgeometry` package */
-    var REDGEOMETRY_DEBUG: boolean;
-}
-/* eslint-enable no-var */
