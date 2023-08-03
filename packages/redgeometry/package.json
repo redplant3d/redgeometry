@@ -12,7 +12,8 @@
     "files": [
         "dist",
         "src",
-        "README.md"
+        "README.md",
+        "LICENSE"
     ],
     "exports": {
         ".": {
@@ -22,7 +23,7 @@
         "./src/*": "./src/*.ts",
         "./src/*.js": "./src/*.ts"
     },
-    "main": "./dist/index.cjs",
+    "main": "dist/index.cjs",
     "engines": {
         "node": ">=14.17"
     },

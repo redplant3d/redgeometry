@@ -66,6 +66,6 @@ Execute `npm run init` to install/update the development environment and `npm ru
 {
     "editor.formatOnSave": true,
     "editor.defaultFormatter": "esbenp.prettier-vscode",
-    "npm.packageManager": "npm"
+    "npm.packageManager": "pnpm"
 }
 ```
