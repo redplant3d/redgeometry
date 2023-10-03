@@ -11,20 +11,24 @@ import { createDir, joinPaths, writeFile } from "./file.js";
 
 const FOOTER_LIVE_RELOAD_DEFAULT = `
 // footer
-const eventSource = new EventSource("/esbuild");
-eventSource.addEventListener("change", () => {
-  console.log("Live reload");
-  location.reload();
-});`;
-
-const FOOTER_LIVE_RELOAD_IIFE = `
-(() => {
-  // footer
+if (typeof window !== "undefined") {
   const eventSource = new EventSource("/esbuild");
   eventSource.addEventListener("change", () => {
     console.log("Live reload");
     location.reload();
   });
+}`;
+
+const FOOTER_LIVE_RELOAD_IIFE = `
+(() => {
+  // footer
+  if (typeof window !== "undefined") {
+    const eventSource = new EventSource("/esbuild");
+    eventSource.addEventListener("change", () => {
+      console.log("Live reload");
+      location.reload();
+    });
+  }
 })();`;
 
 export async function buildHelper(

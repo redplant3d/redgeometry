@@ -12,22 +12,24 @@ import { createRandomColor } from "./data.js";
 type CanvasStyle = string | CanvasGradient | CanvasPattern;
 
 export class AppContext2D {
-    private canvas: HTMLCanvasElement;
-    private context: CanvasRenderingContext2D;
+    private context: CanvasRenderingContext2D | OffscreenCanvasRenderingContext2D;
 
-    constructor(canvas: HTMLCanvasElement, context: CanvasRenderingContext2D) {
-        this.canvas = canvas;
+    constructor(context: CanvasRenderingContext2D | OffscreenCanvasRenderingContext2D) {
         this.context = context;
     }
 
-    public static fromCanvas(canvas: HTMLCanvasElement): AppContext2D | undefined {
-        const context = canvas.getContext("2d");
+    public get canvas(): HTMLCanvasElement | OffscreenCanvas {
+        return this.context.canvas;
+    }
 
-        if (context !== null) {
-            return new AppContext2D(canvas, context);
-        } else {
+    public static fromCanvas(canvas: HTMLCanvasElement): AppContext2D | undefined {
+        const context = canvas.getContext("2d") as CanvasRenderingContext2D | null;
+
+        if (context === null) {
             return undefined;
         }
+
+        return new AppContext2D(context);
     }
 
     public blitImage(image: Image2, dx: number, dy: number): void {
@@ -43,7 +45,7 @@ export class AppContext2D {
         ctx.resetTransform();
         ctx.save();
         ctx.fillStyle = style;
-        ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+        ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
         ctx.restore();
     }
 
@@ -291,8 +293,9 @@ export class AppContext2D {
     }
 
     public getSize(dynamic: boolean): [number, number] {
+        const canvas = this.context.canvas;
         if (dynamic) {
-            return [this.canvas.width, this.canvas.height];
+            return [canvas.width, canvas.height];
         } else {
             // Static size for reproducible data
             return [1400, 700];
@@ -304,8 +307,9 @@ export class AppContext2D {
             return;
         }
 
-        this.canvas.width = width;
-        this.canvas.height = height;
+        const canvas = this.context.canvas;
+        canvas.width = width;
+        canvas.height = height;
     }
 
     public setTransform(a: number, b: number, c: number, d: number, e: number, f: number): void {
@@ -314,7 +318,7 @@ export class AppContext2D {
         ctx.setTransform(a, b, c, d, e, f);
     }
 
-    private addCircle(ctx: CanvasRenderingContext2D, c: Point2, r: number): void {
+    private addCircle(ctx: CanvasRenderingContext2D | OffscreenCanvasRenderingContext2D, c: Point2, r: number): void {
         ctx.moveTo(c.x + r, c.y);
         ctx.arcTo(c.x + r, c.y + r, c.x, c.y + r, r);
         ctx.arcTo(c.x - r, c.y + r, c.x - r, c.y, r);
@@ -323,7 +327,10 @@ export class AppContext2D {
         ctx.closePath();
     }
 
-    private addMeshFaceToContext(ctx: CanvasRenderingContext2D, face: MeshFace2): void {
+    private addMeshFaceToContext(
+        ctx: CanvasRenderingContext2D | OffscreenCanvasRenderingContext2D,
+        face: MeshFace2,
+    ): void {
         const p0 = face.start.p0;
         ctx.moveTo(p0.x, p0.y);
 
@@ -334,7 +341,7 @@ export class AppContext2D {
         ctx.closePath();
     }
 
-    private addPath(ctx: CanvasRenderingContext2D, path: Path2): void {
+    private addPath(ctx: CanvasRenderingContext2D | OffscreenCanvasRenderingContext2D, path: Path2): void {
         if (!path.isValid()) {
             return;
         }
@@ -405,7 +412,7 @@ export class AppContext2D {
         }
     }
 
-    private addPolygon(ctx: CanvasRenderingContext2D, poly: Polygon2): void {
+    private addPolygon(ctx: CanvasRenderingContext2D | OffscreenCanvasRenderingContext2D, poly: Polygon2): void {
         const vertices = poly.getPoints();
 
         if (vertices.length === 0) {
