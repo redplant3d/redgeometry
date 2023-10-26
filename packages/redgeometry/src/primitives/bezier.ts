@@ -12,7 +12,7 @@ import { RootType, solveCubic, solveLinear, solveQuadratic } from "../utility/so
 import { Box2 } from "./box.js";
 import { Edge2 } from "./edge.js";
 import { Point2, Point3 } from "./point.js";
-import { Vector2 } from "./vector.js";
+import { Vector2, Vector3 } from "./vector.js";
 
 export enum CurveType {
     Bezier1,
@@ -948,25 +948,53 @@ export class BezierRCurve2 {
         const p01 = p0.lerp(p1, t);
         const p12 = p1.lerp(p2, t);
 
-        // TODO: Could this be improved?
-        const pp0 = Point2.fromXYW(p01.x, p01.y, p01.z);
-        const pp1 = Point2.fromXYW(p12.x, p12.y, p12.z);
+        // Point and derivative in homogenous coordinates
+        const p = p01.lerp(p12, t);
+        const pp = p12.sub(p01).mul(2);
 
-        return pp1.sub(pp0).mul(2);
+        // Transforming to cartesian coordinates requires quotient rule
+        const x = pp.x * p.z - p.x * pp.z;
+        const y = pp.y * p.z - p.y * pp.z;
+        const z = p.z * p.z;
+
+        return Vector2.fromXYW(x, y, z);
     }
 
-    public getDerivativeCoefficients(): [Vector2, Vector2, Vector2] {
-        // Note: These coefficients are missing magnitude (of the denominator)
-        const v1 = this.p1.sub(this.p0);
-        const v2 = this.p2.sub(this.p0);
-        const w = this.w;
+    /**
+     * Returns the derivative coefficients of the curve.
+     *
+     * **Note:** Transforming to cartesian coordinates requires the w-component to be squared (see example).
+     *
+     * # Example:
+     * ```
+     * const c = BezierRCurve2.fromXY(0, 0, 0, 1, 1, 1, 2);
+     * const [qqa, qqb, qqc] = c.getDerivativeCoefficients();
+     * const t = 0.5;
+     * const vv = qqa.mul(t).add(qqb).mul(t).addPt(qqc);
+     * const v = Vector2.fromXYW(vv.x, vv.y, vv.z * vv.z);
+     * ```
+     */
+    public getDerivativeCoefficients(): [Vector3, Vector3, Point3] {
+        const [p0, p1, p2] = this.getProjectivePoints();
 
-        // qqa = 2 * (w - 1) * v2
-        // qqb = -4 * w * v1 + 2 * v2
-        // qqc = 2 * w * v1
-        const qqa = v2.mul(2 * w - 2);
-        const qqb = v1.mul(-4 * w).addMul(v2, 2);
-        const qqc = v1.mul(2 * w);
+        const pp2x = p2.x * p1.z - p1.x * p2.z;
+        const pp2y = p2.y * p1.z - p1.y * p2.z;
+        const pp1x = p2.x * p0.z - p0.x * p2.z;
+        const pp1y = p2.y * p0.z - p0.y * p2.z;
+        const pp0x = p1.x * p0.z - p0.x * p1.z;
+        const pp0y = p1.y * p0.z - p0.y * p1.z;
+
+        // Derivative coefficients as points
+        const pp2 = new Point3(2 * pp2x, 2 * pp2y, p2.z);
+        const pp1 = new Point3(pp1x, pp1y, p1.z);
+        const pp0 = new Point3(2 * pp0x, 2 * pp0y, p0.z);
+
+        const vv2 = pp2.sub(pp1);
+        const vv1 = pp1.sub(pp0);
+
+        const qqa = vv2.sub(vv1);
+        const qqb = vv1.mul(2);
+        const qqc = pp0;
 
         return [qqa, qqb, qqc];
     }
