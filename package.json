@@ -3,7 +3,7 @@
     "version": "0.1.0",
     "type": "module",
     "engines": {
-        "node": ">=16",
+        "node": ">=18",
         "pnpm": ">=8"
     },
     "devDependencies": {
