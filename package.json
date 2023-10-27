@@ -1,6 +1,7 @@
 {
     "name": "redpackage",
     "version": "0.1.0",
+    "type": "module",
     "engines": {
         "node": ">=16",
         "pnpm": ">=8"
