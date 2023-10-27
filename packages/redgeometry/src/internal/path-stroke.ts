@@ -12,12 +12,12 @@ import { Bezier1Curve2, Bezier2Curve2 } from "../primitives/bezier.js";
 import type { Point2 } from "../primitives/point.js";
 import { Vector2 } from "../primitives/vector.js";
 import {
+    getDashArcLengthLinear,
+    getDashArcLengthQuadratic,
     getDashIndexNext,
+    getDashParameterLinear,
+    getDashParameterQuadratic,
     getDashStart,
-    getLengthLinear,
-    getLengthQuadratic,
-    getParameterAtLengthLinear,
-    getParameterAtLengthQuadratic,
 } from "./path-dash.js";
 import { insertInnerJoin, insertOuterJoin } from "./path-offset.js";
 
@@ -261,33 +261,33 @@ export class StrokeState {
     }
 
     private insertLinearDashStroke(c0: Bezier1Curve2): void {
+        let lenRem = this.getDashLength() - this.currentLength;
+        let len = getDashArcLengthLinear(c0);
         let c = c0;
 
-        // Remaining length of the current dash and full length of the line
-        let dashRemainingLength = this.getDashLength() - this.currentLength;
-        let length = getLengthLinear(c);
-
-        while (dashRemainingLength < length) {
-            const t = getParameterAtLengthLinear(c, dashRemainingLength);
-
-            c = c.splitAfter(t);
-            length = getLengthLinear(c);
+        while (lenRem < len) {
+            const t = getDashParameterLinear(c, lenRem);
+            const c2 = c.splitAfter(t);
+            const m = c2.getDerivative();
 
             if (this.currentPhase) {
-                this.insertLinearStroke(c.p0, c.getDerivative());
+                this.insertLinearStroke(c2.p0, m);
             } else {
-                this.insertMoveStroke(c.p0, c.getDerivative());
+                this.insertMoveStroke(c2.p0, m);
             }
 
             this.advanceDash();
 
-            dashRemainingLength = this.getDashLength();
+            lenRem = this.getDashLength();
+            len = getDashArcLengthLinear(c2);
+            c = c2;
         }
 
-        this.currentLength += length;
+        this.currentLength += len;
 
         if (this.currentPhase) {
-            this.insertLinearStroke(c.p1, c.getTangentStart());
+            const m = c.getTangentStart();
+            this.insertLinearStroke(c.p1, m);
         }
     }
 
@@ -338,31 +338,29 @@ export class StrokeState {
     }
 
     private insertQuadraticSimpleDashStroke(c0: Bezier2Curve2): void {
+        let lenRem = this.getDashLength() - this.currentLength;
+        let len = getDashArcLengthQuadratic(c0);
         let c = c0;
 
-        // Remaining length of the current dash and full length of the curve
-        let dashRemainingLength = this.getDashLength() - this.currentLength;
-        let length = getLengthQuadratic(c);
-
-        while (dashRemainingLength < length) {
-            const t = getParameterAtLengthQuadratic(c, dashRemainingLength);
-
+        while (lenRem < len) {
+            const t = getDashParameterQuadratic(c, lenRem);
             const [c1, c2] = c.splitAt(t);
-            length = getLengthQuadratic(c2);
 
             if (this.currentPhase) {
                 this.insertQuadraticSimpleStroke(c1);
             } else {
-                this.insertMoveStroke(c2.p0, c2.getTangentStart());
+                const m = c2.getTangentStart();
+                this.insertMoveStroke(c2.p0, m);
             }
 
             this.advanceDash();
 
-            dashRemainingLength = this.getDashLength();
+            lenRem = this.getDashLength();
+            len = getDashArcLengthQuadratic(c2);
             c = c2;
         }
 
-        this.currentLength += length;
+        this.currentLength += len;
 
         if (this.currentPhase) {
             this.insertQuadraticSimpleStroke(c);
@@ -370,7 +368,7 @@ export class StrokeState {
     }
 
     private insertQuadraticSimpleStroke(c: Bezier2Curve2): void {
-        // Possible null vector (curve is a point)
+        // Check for possible null vector (curve is a point)
         let v1 = c.getTangentStart();
         let v2 = c.getTangentEnd();
 

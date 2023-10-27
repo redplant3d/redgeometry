@@ -1,10 +1,11 @@
 import type { Bezier1Curve2, Bezier2Curve2, Bezier3Curve2, BezierCurve2, BezierRCurve2 } from "../primitives/bezier.js";
 import type { Box2 } from "../primitives/box.js";
-import { Point2 } from "../primitives/point.js";
+import { Point2, Point3 } from "../primitives/point.js";
+import { Vector2, Vector3 } from "../primitives/vector.js";
 import { log } from "../utility/debug.js";
 import { Interval } from "../utility/interval.js";
 import { lerp } from "../utility/scalar.js";
-import { RootType, solveQuadratic } from "../utility/solve.js";
+import { RootType, solveCubic, solveQuadratic } from "../utility/solve.js";
 
 export function encloseCurveAt(c: BezierCurve2, box: Box2, t: number): void {
     if (t > 0 && t < 1) {
@@ -168,4 +169,113 @@ export function getIntersectionQuadQuad(
 
         checkIntervalQuadQuad(c1, i1, c2, i2, ii, output);
     }
+}
+
+export function getArcLengthQuadratic(c: Bezier2Curve2): number {
+    let sum = 0;
+
+    const [qqa, qqb] = c.getDerivativeCoefficients();
+
+    // Weights and abscissae for `n = 4`
+    sum += sampleArcLengthQuadratic(0.1739274225687269, 0.06943184420297371, qqa, qqb);
+    sum += sampleArcLengthQuadratic(0.3260725774312731, 0.3300094782075719, qqa, qqb);
+    sum += sampleArcLengthQuadratic(0.3260725774312731, 0.6699905217924281, qqa, qqb);
+    sum += sampleArcLengthQuadratic(0.1739274225687269, 0.9305681557970263, qqa, qqb);
+
+    return sum;
+}
+
+export function getArcLengthCubic(c: Bezier3Curve2): number {
+    let sum = 0;
+
+    const [qqa, qqb, qqc] = c.getDerivativeCoefficients();
+
+    // Weights and abscissae for `n = 8`
+    sum += sampleArcLengthCubic(0.05061426814518813, 0.01985507175123188, qqa, qqb, qqc);
+    sum += sampleArcLengthCubic(0.1111905172266872, 0.1016667612931866, qqa, qqb, qqc);
+    sum += sampleArcLengthCubic(0.1568533229389436, 0.2372337950418355, qqa, qqb, qqc);
+    sum += sampleArcLengthCubic(0.181341891689181, 0.4082826787521751, qqa, qqb, qqc);
+    sum += sampleArcLengthCubic(0.181341891689181, 0.5917173212478249, qqa, qqb, qqc);
+    sum += sampleArcLengthCubic(0.1568533229389436, 0.7627662049581645, qqa, qqb, qqc);
+    sum += sampleArcLengthCubic(0.1111905172266872, 0.8983332387068134, qqa, qqb, qqc);
+    sum += sampleArcLengthCubic(0.05061426814518813, 0.9801449282487681, qqa, qqb, qqc);
+
+    return sum;
+}
+
+export function getArcLengthConic(c: BezierRCurve2): number {
+    let sum = 0;
+
+    const [qqa, qqb, qqc] = c.getDerivativeCoefficients();
+
+    // Weights and abscissae for `n = 8`
+    sum += sampleArcLengthConic(0.05061426814518813, 0.01985507175123188, qqa, qqb, qqc);
+    sum += sampleArcLengthConic(0.1111905172266872, 0.1016667612931866, qqa, qqb, qqc);
+    sum += sampleArcLengthConic(0.1568533229389436, 0.2372337950418355, qqa, qqb, qqc);
+    sum += sampleArcLengthConic(0.181341891689181, 0.4082826787521751, qqa, qqb, qqc);
+    sum += sampleArcLengthConic(0.181341891689181, 0.5917173212478249, qqa, qqb, qqc);
+    sum += sampleArcLengthConic(0.1568533229389436, 0.7627662049581645, qqa, qqb, qqc);
+    sum += sampleArcLengthConic(0.1111905172266872, 0.8983332387068134, qqa, qqb, qqc);
+    sum += sampleArcLengthConic(0.05061426814518813, 0.9801449282487681, qqa, qqb, qqc);
+
+    return sum;
+}
+
+export function getParameterAtArcLengthQuadratic(c: Bezier2Curve2, d: number): number {
+    const d1 = c.p1.sub(c.p0).length;
+    const d2 = c.p2.sub(c.p1).length;
+
+    const r = solveQuadratic(d2 - d1, d1, -d);
+
+    if (r.type === RootType.Two) {
+        return r.x1;
+    } else {
+        // Fallback
+        return 1;
+    }
+}
+
+export function getParameterAtArcLengthCubic(c: Bezier3Curve2, d: number): number {
+    const d1 = c.p1.sub(c.p0).length;
+    const d2 = c.p2.sub(c.p1).length;
+    const d3 = c.p2.sub(c.p1).length;
+
+    const r = solveCubic(d3 - 2 * d2 + d1, d2 - d1, d1, -d);
+
+    if (r.type === RootType.Three) {
+        return r.x1;
+    } else {
+        return r.x;
+    }
+}
+
+export function getParameterAtArcLengthConic(c: BezierRCurve2, d: number): number {
+    const d1 = c.p1.sub(c.p0).length;
+    const d2 = c.p2.sub(c.p1).length;
+    const dw = c.w * d1;
+
+    const r = solveQuadratic(d2 - 2 * dw - d1, dw, -d);
+
+    if (r.type === RootType.Two) {
+        return r.x1;
+    } else {
+        // Fallback
+        return 1;
+    }
+}
+
+function sampleArcLengthQuadratic(wz: number, xz: number, qqa: Vector2, qqb: Vector2): number {
+    const v = qqa.mul(xz).add(qqb);
+    return wz * v.length;
+}
+
+function sampleArcLengthCubic(wz: number, xz: number, qqa: Vector2, qqb: Vector2, qqc: Vector2): number {
+    const v = qqa.mul(xz).add(qqb).mul(xz).add(qqc);
+    return wz * v.length;
+}
+
+function sampleArcLengthConic(wz: number, xz: number, qqa: Vector3, qqb: Vector3, qqc: Point3): number {
+    const vv = qqa.mul(xz).add(qqb).mul(xz).addPt(qqc);
+    const v = Vector2.fromXYW(vv.x, vv.y, vv.z * vv.z);
+    return wz * v.length;
 }

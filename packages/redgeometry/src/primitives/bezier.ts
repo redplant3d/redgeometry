@@ -948,7 +948,7 @@ export class BezierRCurve2 {
         const p01 = p0.lerp(p1, t);
         const p12 = p1.lerp(p2, t);
 
-        // Point and derivative in homogenous coordinates
+        // Point and derivative in homogeneous coordinates
         const p = p01.lerp(p12, t);
         const pp = p12.sub(p01).mul(2);
 

@@ -317,6 +317,13 @@ export class Vector3 {
         return new Vector3(this.x + f * v.x, this.y + f * v.y, this.z + f * v.z);
     }
 
+    /**
+     * Adds the current vector to a point `p`.
+     */
+    public addPt(p: Point3): Point3 {
+        return new Point3(p.x + this.x, p.y + this.y, p.z + this.z);
+    }
+
     public clamp(vmin: Vector3, vmax: Vector3): Vector3 {
         const x = clamp(this.x, vmin.x, vmax.x);
         const y = clamp(this.y, vmin.y, vmax.y);

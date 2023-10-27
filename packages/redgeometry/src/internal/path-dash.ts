@@ -2,8 +2,8 @@ import type { PathDashOptions } from "../core/path-options.js";
 import { Path2 } from "../core/path.js";
 import { Bezier1Curve2, Bezier2Curve2 } from "../primitives/bezier.js";
 import type { Point2 } from "../primitives/point.js";
-import type { Vector2 } from "../primitives/vector.js";
-import { RootType, solveQuadratic } from "../utility/solve.js";
+import { Vector2 } from "../primitives/vector.js";
+import { getArcLengthQuadratic, getParameterAtArcLengthQuadratic } from "./bezier.js";
 
 export class DashState {
     public currentIndex: number;
@@ -50,30 +50,28 @@ export class DashState {
     }
 
     public dashLinear(c0: Bezier1Curve2): void {
+        let lenRem = this.getDashLength() - this.currentLength;
+        let len = getDashArcLengthLinear(c0);
         let c = c0;
 
-        // Remaining length of the current dash and full length of the line
-        let dashRemainingLength = this.getDashLength() - this.currentLength;
-        let length1 = getLengthLinear(c);
-
-        while (dashRemainingLength < length1) {
-            const t = getParameterAtLengthLinear(c, dashRemainingLength);
-
-            c = c.splitAfter(t);
-            length1 = getLengthLinear(c);
+        while (lenRem < len) {
+            const t = getDashParameterLinear(c, lenRem);
+            const c2 = c.splitAfter(t);
 
             if (this.currentPhase) {
-                this.insertLinear(c.p0);
+                this.insertLinear(c2.p0);
             } else {
-                this.insertMove(c.p0);
+                this.insertMove(c2.p0);
             }
 
             this.advance();
 
-            dashRemainingLength = this.getDashLength();
+            lenRem = this.getDashLength();
+            len = getDashArcLengthLinear(c2);
+            c = c2;
         }
 
-        this.currentLength += length1;
+        this.currentLength += len;
 
         if (this.currentPhase) {
             this.insertLinear(c.p1);
@@ -81,31 +79,28 @@ export class DashState {
     }
 
     public dashQuadraticSimple(c0: Bezier2Curve2): void {
+        let lenRem = this.getDashLength() - this.currentLength;
+        let len = getDashArcLengthQuadratic(c0);
         let c = c0;
 
-        // Remaining length of the current dash and full length of the curve
-        let dashRemainingLength = this.getDashLength() - this.currentLength;
-        let length2 = getLengthQuadratic(c);
-
-        while (dashRemainingLength < length2) {
-            const t = getParameterAtLengthQuadratic(c, dashRemainingLength);
-
+        while (lenRem < len) {
+            const t = getDashParameterQuadratic(c, lenRem);
             const [c1, c2] = c.splitAt(t);
-            length2 = getLengthQuadratic(c2);
 
             if (this.currentPhase) {
                 this.insertQuadratic(c1.p1, c1.p2);
             } else {
-                this.insertMove(c2.p0);
+                this.insertMove(c1.p2);
             }
 
             this.advance();
 
-            dashRemainingLength = this.getDashLength();
+            lenRem = this.getDashLength();
+            len = getDashArcLengthQuadratic(c2);
             c = c2;
         }
 
-        this.currentLength += length2;
+        this.currentLength += len;
 
         if (this.currentPhase) {
             this.insertQuadratic(c.p1, c.p2);
@@ -195,7 +190,7 @@ export function getDashIndexNext(dashArray: number[], index: number): number {
 }
 
 export function getDashStart(dashArray: number[], dashOffset: number): [number, number, boolean] {
-    let length = 2 * getDashLength(dashArray);
+    let length = 2 * getDashArrayLength(dashArray);
     let offset = dashOffset % length;
 
     if (offset < 0) {
@@ -221,51 +216,35 @@ export function getDashStart(dashArray: number[], dashOffset: number): [number, 
     return [length, index, phase];
 }
 
-export function getLengthLinear(c: Bezier1Curve2): number {
+export function getDashArcLengthLinear(c: Bezier1Curve2): number {
     return c.p1.sub(c.p0).length;
 }
 
-export function getLengthQuadratic(c: Bezier2Curve2): number {
-    // https://pomax.github.io/bezierinfo/legendre-gauss.html
-    // Let `wz = (z / 2) * w` and `xz = (z / 2) * x + (z / 2)` with `z = 1`,
-    // so that `sum += wz * (B + xz * A).length` is the arc length
-    let sum = 0;
-
-    const [qqa, qqb] = c.getDerivativeCoefficients();
-
-    // Weights and abscissae for `n = 4`
-    sum += gaussLegendreQuadratic(0.1739274225687269, 0.06943184420297371, qqa, qqb);
-    sum += gaussLegendreQuadratic(0.3260725774312731, 0.3300094782075719, qqa, qqb);
-    sum += gaussLegendreQuadratic(0.3260725774312731, 0.6699905217924281, qqa, qqb);
-    sum += gaussLegendreQuadratic(0.1739274225687269, 0.9305681557970263, qqa, qqb);
-
-    return sum;
+export function getDashParameterLinear(c: Bezier1Curve2, length: number): number {
+    return length / getDashArcLengthLinear(c);
 }
 
-export function getParameterAtLengthLinear(c: Bezier1Curve2, length: number): number {
-    return length / getLengthLinear(c);
+export function getDashArcLengthQuadratic(c: Bezier2Curve2): number {
+    return getArcLengthQuadratic(c);
 }
 
-export function getParameterAtLengthQuadratic(c: Bezier2Curve2, length: number): number {
-    let t = interpolateQuadratic(c, length);
+export function getDashParameterQuadratic(c: Bezier2Curve2, length: number): number {
+    const t = getParameterAtArcLengthQuadratic(c, length);
 
-    if (t < 1) {
-        const [c1, c2] = c.splitAt(t);
-
-        // Refine solution one more time
-        const d = length - getLengthQuadratic(c1);
-        t += (1 - t) * interpolateQuadratic(c2, d);
+    if (t >= 1) {
+        // Fallback
+        return 1;
     }
 
-    return t;
+    // Refine solution one more time
+    const [c1, c2] = c.splitAt(t);
+    const length2 = length - getDashArcLengthQuadratic(c1);
+    const t2 = (1 - t) * getParameterAtArcLengthQuadratic(c2, length2);
+
+    return t + t2;
 }
 
-function gaussLegendreQuadratic(wz: number, xz: number, qqa: Vector2, qqb: Vector2): number {
-    // wz * (qqb + xz * qqa)
-    return wz * qqa.mul(xz).add(qqb).length;
-}
-
-function getDashLength(dashArray: number[]): number {
+function getDashArrayLength(dashArray: number[]): number {
     let length = 0;
 
     for (const dash of dashArray) {
@@ -273,19 +252,4 @@ function getDashLength(dashArray: number[]): number {
     }
 
     return length;
-}
-
-function interpolateQuadratic(c: Bezier2Curve2, d: number): number {
-    const d1 = c.p1.sub(c.p0).length;
-    const d2 = c.p2.sub(c.p1).length;
-
-    // Solve `(d2 - d1) * t^2 + d1 * t = d` for `t` (`t = 1` -> `d1 + d2 = d`)
-    const r = solveQuadratic(d2 - d1, d1, -d);
-
-    if (r.type !== RootType.Zero) {
-        return r.x1;
-    } else {
-        // Fallback
-        return (d1 + d2) / d;
-    }
 }
