@@ -44,8 +44,8 @@ export type System = SystemAsync | SystemSync;
 export type SystemMode<T> = T extends SystemAsync
     ? { mode: "async" }
     : T extends SystemSync
-    ? { mode?: "sync" }
-    : never;
+      ? { mode?: "sync" }
+      : never;
 export type SystemArgs<T> = T extends (world: World, ...args: infer A) => void
     ? A extends [unknown, ...unknown[]]
         ? { args: A }

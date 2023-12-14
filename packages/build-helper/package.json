@@ -4,13 +4,13 @@
     "type": "module",
     "private": true,
     "dependencies": {
-        "dts-bundle-generator": "^8.1.2",
-        "esbuild": "^0.19.5"
+        "dts-bundle-generator": "^9.0.0",
+        "esbuild": "^0.19.9"
     },
     "peerDependencies": {
-        "typescript": ">=5.1"
+        "typescript": ">=5.3"
     },
     "devDependencies": {
-        "@types/node": "^20.8.9"
+        "@types/node": "^20.10.4"
     }
 }
