@@ -16,7 +16,7 @@ await buildHelper(
         minify: true,
         sourcemap: true,
         sourcesContent: false,
-        target: "ES2020",
+        target: "ES2022",
     },
     [
         {
