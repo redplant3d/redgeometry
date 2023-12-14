@@ -2,16 +2,15 @@ import { lerp, roundToPrecision } from "../utility/scalar.js";
 import { Vector2, Vector3 } from "./vector.js";
 
 export class Point2 {
+    /**  Returns the point `(0, 0)`.  */
+    public static readonly ZERO = new Point2(0, 0);
+
     public readonly x: number;
     public readonly y: number;
 
-    constructor(x: number, y: number) {
+    public constructor(x: number, y: number) {
         this.x = x;
         this.y = y;
-    }
-
-    public static get zero(): Point2 {
-        return new Point2(0, 0);
     }
 
     public static fromArray(data: number[], offset = 0): Point2 {
@@ -75,7 +74,9 @@ export class Point2 {
      * Returns the sum of the current point and a vector `v` scaled by `f`.
      */
     public addMul(v: Vector2, f: number): Point2 {
-        return new Point2(this.x + f * v.x, this.y + f * v.y);
+        const x = this.x + f * v.x;
+        const y = this.y + f * v.y;
+        return new Point2(x, y);
     }
 
     public copyTo(data: number[], offset = 0): void {
@@ -135,18 +136,17 @@ export class Point2 {
 }
 
 export class Point3 {
+    /** Returns the point `(0, 0, 0)`. */
+    public static readonly ZERO = new Point3(0, 0, 0);
+
     public readonly x: number;
     public readonly y: number;
     public readonly z: number;
 
-    constructor(x: number, y: number, z: number) {
+    public constructor(x: number, y: number, z: number) {
         this.x = x;
         this.y = y;
         this.z = z;
-    }
-
-    public static get zero(): Point3 {
-        return new Point3(0, 0, 0);
     }
 
     public static fromArray(data: number[], offset = 0): Point3 {
@@ -200,7 +200,10 @@ export class Point3 {
      * Returns the sum of the current point and a vector `v` scaled by `f`.
      */
     public addMul(v: Vector3, f: number): Point3 {
-        return new Point3(this.x + f * v.x, this.y + f * v.y, this.z + f * v.z);
+        const x = this.x + f * v.x;
+        const y = this.y + f * v.y;
+        const z = this.z + f * v.z;
+        return new Point3(x, y, z);
     }
 
     public copyTo(data: number[], offset = 0): void {

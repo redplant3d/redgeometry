@@ -2,24 +2,10 @@ export class Uint64 {
     public readonly hi: number;
     public readonly lo: number;
 
-    constructor(hi: number, lo: number) {
+    public constructor(hi: number, lo: number) {
         // Needs to be unsigned so that comparision always works
         this.hi = hi >>> 0;
         this.lo = lo >>> 0;
-    }
-
-    public get neg(): Uint64 {
-        // Two's complement
-        let hi = ~this.hi;
-        const lo = ~this.lo + 1;
-        if (this.lo === 0) {
-            hi++;
-        }
-        return new Uint64(hi, lo);
-    }
-
-    public get value(): number {
-        return 4294967296 * this.hi + this.lo;
     }
 
     public static from(n: number): Uint64 {
@@ -77,6 +63,16 @@ export class Uint64 {
         return u32Mul64(this.lo, n);
     }
 
+    public neg(): Uint64 {
+        // Two's complement
+        let hi = ~this.hi;
+        const lo = ~this.lo + 1;
+        if (this.lo === 0) {
+            hi++;
+        }
+        return new Uint64(hi, lo);
+    }
+
     public or(u: Uint64): Uint64 {
         return new Uint64(this.hi | u.hi, this.lo | u.lo);
     }
@@ -118,7 +114,7 @@ export class Uint64 {
     }
 
     public sub(u: Uint64): Uint64 {
-        return this.add(u.neg);
+        return this.add(u.neg());
     }
 
     public toStringHex(): string {
@@ -129,6 +125,10 @@ export class Uint64 {
             str += this.lo.toString(16);
         }
         return str;
+    }
+
+    public value(): number {
+        return 4294967296 * this.hi + this.lo;
     }
 
     public xor(u: Uint64): Uint64 {

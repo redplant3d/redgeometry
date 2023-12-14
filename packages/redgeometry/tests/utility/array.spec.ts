@@ -30,10 +30,10 @@ test("ArrayMultiSet.insert", () => {
     multiSet3.insert(1);
     multiSet4.insert(5);
 
-    expect(multiSet1.values).toEqual([3]);
-    expect(multiSet2.values).toEqual([2, 3, 4]);
-    expect(multiSet3.values).toEqual([1, 2, 4]);
-    expect(multiSet4.values).toEqual([2, 4, 5]);
+    expect(multiSet1.values()).toEqual([3]);
+    expect(multiSet2.values()).toEqual([2, 3, 4]);
+    expect(multiSet3.values()).toEqual([1, 2, 4]);
+    expect(multiSet4.values()).toEqual([2, 4, 5]);
 });
 
 test("ArrayMultiMap.findIndex", () => {
@@ -89,10 +89,10 @@ test("ArrayMultiMap.insert", () => {
     multiMap3.insert(1, 1);
     multiMap4.insert(5, 5);
 
-    expect(multiMap1.keys).toEqual([3]);
-    expect(multiMap2.keys).toEqual([2, 3, 4]);
-    expect(multiMap3.keys).toEqual([1, 2, 4]);
-    expect(multiMap4.keys).toEqual([2, 4, 5]);
+    expect(multiMap1.keys()).toEqual([3]);
+    expect(multiMap2.keys()).toEqual([2, 3, 4]);
+    expect(multiMap3.keys()).toEqual([1, 2, 4]);
+    expect(multiMap4.keys()).toEqual([2, 4, 5]);
 });
 
 test("copyArray", () => {

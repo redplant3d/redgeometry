@@ -54,15 +54,6 @@ export class MeshEdge2 {
         this.face = undefined;
     }
 
-    public get left(): boolean {
-        // Orientation of the edge
-        if (this.p0.x !== this.p1.x) {
-            return this.p0.x < this.p1.x;
-        } else {
-            return this.p0.y < this.p1.y;
-        }
-    }
-
     public get lprev(): MeshEdge2 {
         return this.onext.sym;
     }
@@ -73,10 +64,6 @@ export class MeshEdge2 {
 
     public get p1(): Point2 {
         return this.sym.p0;
-    }
-
-    public get vector(): Vector2 {
-        return this.p1.sub(this.p0);
     }
 
     /**
@@ -100,10 +87,10 @@ export class MeshEdge2 {
         } else if (e1.p0.y !== e2.p0.y) {
             // Same `x`, sort by `y`
             return e1.p0.y - e2.p0.y;
-        } else if (e1.left !== e2.left) {
+        } else if (e1.left() !== e2.left()) {
             // Same `y`, sort `!left` before `left`
-            return e1.left ? 1 : -1;
-        } else if (e1.left) {
+            return e1.left() ? 1 : -1;
+        } else if (e1.left()) {
             // Same left point
             return Point2.signedArea(e1.p1, e1.p0, e2.p1);
         } else {
@@ -170,7 +157,7 @@ export class MeshEdge2 {
         do {
             const next = curr.onext;
 
-            if (Vector2.isBetweenCcw(v, curr.vector, next.vector)) {
+            if (Vector2.isBetweenCcw(v, curr.vector(), next.vector())) {
                 return curr;
             }
 
@@ -304,6 +291,15 @@ export class MeshEdge2 {
         return new Mesh2OnextIterator(this, this.oprev);
     }
 
+    public left(): boolean {
+        // Orientation of the edge
+        if (this.p0.x !== this.p1.x) {
+            return this.p0.x < this.p1.x;
+        } else {
+            return this.p0.y < this.p1.y;
+        }
+    }
+
     /**
      * Checks if the edge needs swapping according to Delaunay criteria (incircle test).
      */
@@ -328,9 +324,9 @@ export class MeshEdge2 {
         // | bx  by  bx^2 + by^2  1 | = | (bx - dx)  (by - dy)  (bx^2 - dx^2) + (by^2 - dy^2) |
         // | cx  cy  cx^2 + cy^2  1 |   | (cx - dx)  (cy - dy)  (cx^2 - dx^2) + (cy^2 - dy^2) |
         // | dx  dy  dx^2 + dy^2  1 |
-        const a = va.lengthSq * vb.cross(vc);
-        const b = vb.lengthSq * va.cross(vc);
-        const c = vc.lengthSq * va.cross(vb);
+        const a = va.lenSq() * vb.cross(vc);
+        const b = vb.lenSq() * va.cross(vc);
+        const c = vc.lenSq() * va.cross(vb);
 
         // D lies inside the incircle of A, B and C if the determinant > 0
         return a - b + c > 0;
@@ -357,11 +353,15 @@ export class MeshEdge2 {
 
             if (prev !== next) {
                 assertDebug(curr.p0.eq(prev.p0) && curr.p0.eq(next.p0));
-                assertDebug(Vector2.isBetweenCcw(curr.vector, prev.vector, next.vector));
+                assertDebug(Vector2.isBetweenCcw(curr.vector(), prev.vector(), next.vector()));
             }
 
             curr = curr.onext;
         } while (curr !== this.onext);
+    }
+
+    public vector(): Vector2 {
+        return this.p1.sub(this.p0);
     }
 }
 
@@ -373,7 +373,7 @@ export class MeshChain2 {
     public head: MeshEdge2;
     public tail: MeshEdge2;
 
-    constructor(head: MeshEdge2, tail: MeshEdge2, data: unknown) {
+    public constructor(head: MeshEdge2, tail: MeshEdge2, data: unknown) {
         this.head = head;
         this.tail = tail;
         this.data = data;
@@ -430,7 +430,7 @@ export class MeshFace2 {
     public data: unknown;
     public start: MeshEdge2;
 
-    constructor(start: MeshEdge2, data: unknown) {
+    public constructor(start: MeshEdge2, data: unknown) {
         this.start = start;
         this.data = data;
     }
@@ -560,7 +560,7 @@ export class Mesh2 {
     private edges: MeshEdge2[];
     private faces: MeshFace2[];
 
-    constructor() {
+    public constructor() {
         this.chains = [];
         this.edges = [];
         this.faces = [];
@@ -744,14 +744,14 @@ export class Mesh2 {
         if (v.isZero()) {
             // Base points are equivalent, we assume edge fans do not overlap
             // and test any opposing edge (just take `e1` and `e2`)
-            const ce1 = MeshEdge2.findConnectingEdge(e1, e2.vector);
-            const ce2 = MeshEdge2.findConnectingEdge(e2, e1.vector);
+            const ce1 = MeshEdge2.findConnectingEdge(e1, e2.vector());
+            const ce2 = MeshEdge2.findConnectingEdge(e2, e1.vector());
 
             this.connectEdges(ce1, ce2);
         } else {
             // Test respective edges that join the base points
             const ce1 = MeshEdge2.findConnectingEdge(e1, v);
-            const ce2 = MeshEdge2.findConnectingEdge(e2, v.neg);
+            const ce2 = MeshEdge2.findConnectingEdge(e2, v.neg());
 
             this.connectEdges(ce1, ce2);
         }

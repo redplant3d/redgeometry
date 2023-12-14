@@ -39,7 +39,7 @@ export class PathStrokeIncremental2 implements PathStroke2 {
     public simplifyTolerance: number;
     public tanOffsetTolerance: number;
 
-    constructor(qualityOptions: PathQualityOptions) {
+    public constructor(qualityOptions: PathQualityOptions) {
         this.simplifyTolerance = qualityOptions.simplifyTolerance;
         this.tanOffsetTolerance = Math.tan(qualityOptions.offsetTolerance);
 
@@ -59,9 +59,9 @@ export class PathStrokeIncremental2 implements PathStroke2 {
 
         let ct0 = PathCommandType.Move;
 
-        let ps = Point2.zero;
-        let p0 = Point2.zero;
-        let m0 = Vector2.zero;
+        let ps = Point2.ZERO;
+        let p0 = Point2.ZERO;
+        let m0 = Vector2.ZERO;
 
         this.state.initialize(output, options);
 
@@ -79,7 +79,7 @@ export class PathStrokeIncremental2 implements PathStroke2 {
 
                     ps = points[pIdx++];
                     p0 = ps;
-                    m0 = Vector2.zero;
+                    m0 = Vector2.ZERO;
                     break;
                 }
                 case PathCommandType.Linear: {
@@ -157,7 +157,7 @@ export class PathStrokeIncremental2 implements PathStroke2 {
                     }
 
                     p0 = ps;
-                    m0 = Vector2.zero;
+                    m0 = Vector2.ZERO;
                     break;
                 }
                 default: {
@@ -295,7 +295,7 @@ export class PathStrokeRecursive2 implements PathStroke2 {
     public cosOffsetTolerance: number;
     public simplifyTolerance: number;
 
-    constructor(qualityOptions: PathQualityOptions) {
+    public constructor(qualityOptions: PathQualityOptions) {
         this.simplifyTolerance = qualityOptions.simplifyTolerance;
         this.cosOffsetTolerance = Math.cos(qualityOptions.offsetTolerance);
 
@@ -315,9 +315,9 @@ export class PathStrokeRecursive2 implements PathStroke2 {
         let cIdx = 0;
         let pIdx = 0;
 
-        let ps = Point2.zero;
-        let p0 = Point2.zero;
-        let m0 = Vector2.zero;
+        let ps = Point2.ZERO;
+        let p0 = Point2.ZERO;
+        let m0 = Vector2.ZERO;
 
         this.state.initialize(output, options);
 
@@ -335,7 +335,7 @@ export class PathStrokeRecursive2 implements PathStroke2 {
 
                     ps = points[pIdx++];
                     p0 = ps;
-                    m0 = Vector2.zero;
+                    m0 = Vector2.ZERO;
                     break;
                 }
                 case PathCommandType.Linear: {
@@ -413,7 +413,7 @@ export class PathStrokeRecursive2 implements PathStroke2 {
                     }
 
                     p0 = ps;
-                    m0 = Vector2.zero;
+                    m0 = Vector2.ZERO;
                     break;
                 }
                 default: {

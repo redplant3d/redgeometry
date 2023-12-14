@@ -2,73 +2,21 @@ import { clamp } from "../utility/scalar.js";
 import { Point2, Point3 } from "./point.js";
 
 export class Vector2 {
+    /** Returns the vector `(1, 1)`. */
+    public static readonly ONE = new Vector2(1, 1);
+    /** Returns the unit vector in the direction of the x-axis. */
+    public static readonly UNIT_X = new Vector2(1, 0);
+    /** Returns the unit vector in the direction of the y-axis. */
+    public static readonly UNIT_Y = new Vector2(0, 1);
+    /** Returns the vector `(0, 0)`. */
+    public static readonly ZERO = new Vector2(0, 0);
+
     public readonly x: number;
     public readonly y: number;
 
-    constructor(x: number, y: number) {
+    public constructor(x: number, y: number) {
         this.x = x;
         this.y = y;
-    }
-
-    /**
-     * Returns the vector `(1, 1)`.
-     */
-    public static get one(): Vector2 {
-        return new Vector2(1, 1);
-    }
-
-    /**
-     * Returns the unit vector in the direction of the x-axis.
-     */
-    public static get unitX(): Vector2 {
-        return new Vector2(1, 0);
-    }
-
-    /**
-     * Returns the unit vector in the direction of the y-axis.
-     */
-    public static get unitY(): Vector2 {
-        return new Vector2(0, 1);
-    }
-
-    /**
-     * Returns the vector `(0, 0)`.
-     */
-    public static get zero(): Vector2 {
-        return new Vector2(0, 0);
-    }
-
-    /**
-     * Returns the angle of the vector from polar coordinates.
-     */
-    public get angle(): number {
-        return Math.atan2(this.y, this.x);
-    }
-
-    public get length(): number {
-        return Math.sqrt(this.lengthSq);
-    }
-
-    public get lengthSq(): number {
-        return this.dot(this);
-    }
-
-    public get neg(): Vector2 {
-        return new Vector2(-this.x, -this.y);
-    }
-
-    /**
-     * Returns the normal vector.
-     *
-     * The normal is defined by the 3D cross product: \
-     * `(x, y, 0) cross (0, 0, 1) == (y, -x, 0)`
-     */
-    public get normal(): Vector2 {
-        return new Vector2(this.y, -this.x);
-    }
-
-    public get unit(): Vector2 {
-        return this.div(this.length);
     }
 
     public static fromArray(data: number[], offset = 0): Vector2 {
@@ -107,7 +55,9 @@ export class Vector2 {
      * Returns the sum of the current vector and a vector `v` scaled by `f`.
      */
     public addMul(v: Vector2, f: number): Vector2 {
-        return new Vector2(this.x + f * v.x, this.y + f * v.y);
+        const x = this.x + f * v.x;
+        const y = this.y + f * v.y;
+        return new Vector2(x, y);
     }
 
     /**
@@ -115,6 +65,13 @@ export class Vector2 {
      */
     public addPt(p: Point2): Point2 {
         return new Point2(p.x + this.x, p.y + this.y);
+    }
+
+    /**
+     * Returns the angle of the vector from polar coordinates.
+     */
+    public angle(): number {
+        return Math.atan2(this.y, this.x);
     }
 
     public clamp(vmin: Vector2, vmax: Vector2): Vector2 {
@@ -167,11 +124,33 @@ export class Vector2 {
         return this.x === 0 && this.y === 0;
     }
 
+    public len(): number {
+        return Math.sqrt(this.lenSq());
+    }
+
+    public lenSq(): number {
+        return this.x * this.x + this.y * this.y;
+    }
+
     /**
      * Multiplies the current vector by `f`.
      */
     public mul(f: number): Vector2 {
         return new Vector2(f * this.x, f * this.y);
+    }
+
+    public neg(): Vector2 {
+        return new Vector2(-this.x, -this.y);
+    }
+
+    /**
+     * Returns the normal vector.
+     *
+     * The normal is defined by the 3D cross product: \
+     * `(x, y, 0) cross (0, 0, 1) == (y, -x, 0)`
+     */
+    public normal(): Vector2 {
+        return new Vector2(this.y, -this.x);
     }
 
     public sub(v: Vector2): Vector2 {
@@ -189,98 +168,32 @@ export class Vector2 {
     public toString(): string {
         return `{x: ${this.x}, y: ${this.y}}`;
     }
+
+    public unit(): Vector2 {
+        return this.div(this.len());
+    }
 }
 
 export class Vector3 {
+    /** Returns the vector `(1, 1, 1)`. */
+    public static readonly ONE = new Vector3(1, 1, 1);
+    /** Returns the unit vector in the direction of the x-axis. */
+    public static readonly UNIT_X = new Vector3(1, 0, 0);
+    /** Returns the unit vector in the direction of the y-axis. */
+    public static readonly UNIT_Y = new Vector3(0, 1, 0);
+    /** Returns the unit vector in the direction of the z-axis. */
+    public static readonly UNIT_Z = new Vector3(0, 0, 1);
+    /**  Returns the vector `(0, 0, 0)`. */
+    public static readonly ZERO = new Vector3(0, 0, 0);
+
     public readonly x: number;
     public readonly y: number;
     public readonly z: number;
 
-    constructor(x: number, y: number, z: number) {
+    public constructor(x: number, y: number, z: number) {
         this.x = x;
         this.y = y;
         this.z = z;
-    }
-
-    /**
-     * Returns the vector `(1, 1, 1)`.
-     */
-    public static get one(): Vector3 {
-        return new Vector3(1, 1, 1);
-    }
-
-    /**
-     * Returns the unit vector in the direction of the x-axis.
-     */
-    public static get unitX(): Vector3 {
-        return new Vector3(1, 0, 0);
-    }
-
-    /**
-     * Returns the unit vector in the direction of the y-axis.
-     */
-    public static get unitY(): Vector3 {
-        return new Vector3(0, 1, 0);
-    }
-
-    /**
-     * Returns the unit vector in the direction of the z-axis.
-     */
-    public static get unitZ(): Vector3 {
-        return new Vector3(0, 0, 1);
-    }
-
-    /**
-     * Returns the vector `(0, 0, 0)`.
-     */
-    public static get zero(): Vector3 {
-        return new Vector3(0, 0, 0);
-    }
-
-    public get length(): number {
-        return Math.sqrt(this.lengthSq);
-    }
-
-    public get lengthSq(): number {
-        return this.dot(this);
-    }
-
-    public get neg(): Vector3 {
-        return new Vector3(-this.x, -this.y, -this.z);
-    }
-
-    /**
-     * Returns the normal vector around the x-axis.
-     *
-     * The normal is defined by the cross product: \
-     * `(x, y, z) cross (1, 0, 0) == (0, z, -y)`
-     */
-    public get normalX(): Vector3 {
-        return new Vector3(0, this.z, -this.y);
-    }
-
-    /**
-     * Returns the normal vector around the y-axis.
-     *
-     * The normal is defined by the cross product: \
-     * `(x, y, z) cross (0, 1, 0) == (-z, 0, x)`
-     */
-    public get normalY(): Vector3 {
-        return new Vector3(-this.z, 0, this.x);
-    }
-
-    /**
-     * Returns the normal vector around the z-axis.
-     *
-     * The normal is defined by the cross product: \
-     * `(x, y, z) cross (0, 0, 1) == (y, -x, 0)`
-     */
-    public get normalZ(): Vector3 {
-        return new Vector3(this.y, -this.x, 0);
-    }
-
-    public get unit(): Vector3 {
-        return this.div(this.length);
     }
 
     public static fromArray(data: number[], offset = 0): Vector3 {
@@ -314,7 +227,10 @@ export class Vector3 {
      * Returns the sum of the current vector and a vector `v` scaled by `f`.
      */
     public addMul(v: Vector3, f: number): Vector3 {
-        return new Vector3(this.x + f * v.x, this.y + f * v.y, this.z + f * v.z);
+        const x = this.x + f * v.x;
+        const y = this.y + f * v.y;
+        const z = this.z + f * v.z;
+        return new Vector3(x, y, z);
     }
 
     /**
@@ -338,7 +254,10 @@ export class Vector3 {
     }
 
     public cross(v: Vector3): Vector3 {
-        return new Vector3(this.y * v.z - this.z * v.y, this.z * v.x - this.x * v.z, this.x * v.y - this.y * v.x);
+        const x = this.y * v.z - this.z * v.y;
+        const y = this.z * v.x - this.x * v.z;
+        const z = this.x * v.y - this.y * v.x;
+        return new Vector3(x, y, z);
     }
 
     /**
@@ -362,8 +281,50 @@ export class Vector3 {
         return this.x === 0 && this.y === 0 && this.z === 0;
     }
 
+    public len(): number {
+        return Math.sqrt(this.lenSq());
+    }
+
+    public lenSq(): number {
+        return this.x * this.x + this.y * this.y + this.z * this.y;
+    }
+
     public mul(f: number): Vector3 {
         return new Vector3(f * this.x, f * this.y, f * this.z);
+    }
+
+    public neg(): Vector3 {
+        return new Vector3(-this.x, -this.y, -this.z);
+    }
+
+    /**
+     * Returns the normal vector around the x-axis.
+     *
+     * The normal is defined by the cross product: \
+     * `(x, y, z) cross (1, 0, 0) == (0, z, -y)`
+     */
+    public normalX(): Vector3 {
+        return new Vector3(0, this.z, -this.y);
+    }
+
+    /**
+     * Returns the normal vector around the y-axis.
+     *
+     * The normal is defined by the cross product: \
+     * `(x, y, z) cross (0, 1, 0) == (-z, 0, x)`
+     */
+    public normalY(): Vector3 {
+        return new Vector3(-this.z, 0, this.x);
+    }
+
+    /**
+     * Returns the normal vector around the z-axis.
+     *
+     * The normal is defined by the cross product: \
+     * `(x, y, z) cross (0, 0, 1) == (y, -x, 0)`
+     */
+    public normalZ(): Vector3 {
+        return new Vector3(this.y, -this.x, 0);
     }
 
     public sub(v: Vector3): Vector3 {
@@ -380,5 +341,9 @@ export class Vector3 {
 
     public toString(): string {
         return `{x: ${this.x}, y: ${this.y}, z: ${this.z}}`;
+    }
+
+    public unit(): Vector3 {
+        return this.div(this.len());
     }
 }

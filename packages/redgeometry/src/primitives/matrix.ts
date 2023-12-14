@@ -25,7 +25,7 @@ export class Matrix3x2 {
      * |   0    0    1 |
      * ```
      */
-    constructor(m11: number, m12: number, m13: number, m21: number, m22: number, m23: number) {
+    public constructor(m11: number, m12: number, m13: number, m21: number, m22: number, m23: number) {
         this.m11 = m11;
         this.m12 = m12;
         this.m13 = m13;
@@ -41,7 +41,7 @@ export class Matrix3x2 {
      * | 0  0  1 |
      * ```
      */
-    public static get identity(): Matrix3x2 {
+    public static createIdentity(): Matrix3x2 {
         return new Matrix3x2(1, 0, 0, 0, 1, 0);
     }
 
@@ -159,7 +159,7 @@ export class Matrix3x2 {
         const det = this.getDeterminant();
 
         if (det === 0) {
-            return Matrix3x2.identity;
+            return Matrix3x2.createIdentity();
         }
 
         const detInv = 1 / det;
@@ -500,7 +500,7 @@ export class Matrix3x3 {
      * | m31  m32  m33 |
      * ```
      */
-    constructor(
+    public constructor(
         m11: number,
         m12: number,
         m13: number,
@@ -529,7 +529,7 @@ export class Matrix3x3 {
      * | 0  0  1 |
      * ```
      */
-    public static get identity(): Matrix3x3 {
+    public static createIdentity(): Matrix3x3 {
         return new Matrix3x3(1, 0, 0, 0, 1, 0, 0, 0, 1);
     }
 
@@ -540,7 +540,7 @@ export class Matrix3x3 {
      * | 0  0  0 |
      * ```
      */
-    public static get zero(): Matrix3x3 {
+    public static createZero(): Matrix3x3 {
         return new Matrix3x3(0, 0, 0, 0, 0, 0, 0, 0, 0);
     }
 
@@ -674,7 +674,7 @@ export class Matrix3x3 {
         const det = this.getDeterminant();
 
         if (det === 0) {
-            return Matrix3x3.identity;
+            return Matrix3x3.createIdentity();
         }
 
         const detInv = 1 / det;
@@ -1060,7 +1060,7 @@ export class Matrix4x4 {
      * | m41  m42  m43  m44 |
      * ```
      */
-    constructor(
+    public constructor(
         m11: number,
         m12: number,
         m13: number,
@@ -1104,7 +1104,7 @@ export class Matrix4x4 {
      * | 0  0  0  1 |
      * ```
      */
-    public static get identity(): Matrix4x4 {
+    public static createIdentity(): Matrix4x4 {
         return new Matrix4x4(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
     }
 
@@ -1116,7 +1116,7 @@ export class Matrix4x4 {
      * | 0  0  0  0 |
      * ```
      */
-    public static get zero(): Matrix4x4 {
+    public static createZero(): Matrix4x4 {
         return new Matrix4x4(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
     }
 
@@ -2006,7 +2006,7 @@ export class Matrix4x4 {
 export class Matrix4 {
     public data: Float64Array;
 
-    constructor(data: Float64Array) {
+    public constructor(data: Float64Array) {
         this.data = data;
     }
 

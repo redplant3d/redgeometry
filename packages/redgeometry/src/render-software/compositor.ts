@@ -12,7 +12,7 @@ export class Compositor {
     public mask: Uint8Array;
     public operator: (index: number, first: number, last: number) => void;
 
-    constructor() {
+    public constructor() {
         this.mask = new Uint8Array();
         this.operator = this.sourceOverSolid;
 

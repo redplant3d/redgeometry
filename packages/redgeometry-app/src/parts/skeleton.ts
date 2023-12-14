@@ -189,8 +189,8 @@ export class SkeletonAppPart implements AppPart {
 
         MeshEdge2.detachPair(e1);
 
-        e1.p0 = Point2.zero;
-        e1.sym.p0 = Point2.zero;
+        e1.p0 = Point2.ZERO;
+        e1.sym.p0 = Point2.ZERO;
 
         // Not a vertex anymore
         e0.data = undefined;
@@ -243,7 +243,7 @@ export class SkeletonAppPart implements AppPart {
         const v1 = vb.sub(va);
         const v2 = pb.sub(pa);
 
-        return v1.dot(v2.neg) / v1.dot(v1);
+        return v1.dot(v2.neg()) / v1.dot(v1);
     }
 
     /**
@@ -257,7 +257,7 @@ export class SkeletonAppPart implements AppPart {
 
         const v1 = p1.sub(p0);
         const v2 = p2.sub(p1);
-        const n2 = v2.unit.normal;
+        const n2 = v2.unit().normal();
 
         return v1.dot(n2) / (1 + v0.dot(n2));
     }
@@ -437,9 +437,9 @@ export class SkeletonAppPart implements AppPart {
         const p1 = vtx1.getPositionAt(t1);
         const p2 = vtx2.getPositionAt(t1);
 
-        const d0 = p1.sub(p0).lengthSq;
-        const d1 = p2.sub(p1).lengthSq;
-        const d2 = p0.sub(p2).lengthSq;
+        const d0 = p1.sub(p0).lenSq();
+        const d1 = p2.sub(p1).lenSq();
+        const d2 = p0.sub(p2).lenSq();
 
         let d = d0;
         let e = e0;
@@ -481,9 +481,9 @@ export class SkeletonAppPart implements AppPart {
         const p1 = vtx1.getPositionAt(tv);
         const p2 = vtx2.getPositionAt(tv);
 
-        const d0 = p1.sub(p0).lengthSq;
-        const d1 = p2.sub(p1).lengthSq;
-        const d2 = p0.sub(p2).lengthSq;
+        const d0 = p1.sub(p0).lenSq();
+        const d1 = p2.sub(p1).lenSq();
+        const d2 = p0.sub(p2).lenSq();
 
         let d = d0;
         let e = e0;
@@ -582,7 +582,7 @@ export class SkeletonAppPart implements AppPart {
         for (const e of edge.getOnextIterator()) {
             log.infoDebug("  [{}] p0: {}", i, e.p0);
             log.infoDebug("      p1: {}", e.p1);
-            log.infoDebug("      angle: {}", (e.p1.sub(e.p0).angle * 180) / Math.PI);
+            log.infoDebug("      angle: {}", (e.p1.sub(e.p0).angle() * 180) / Math.PI);
 
             if (validate) {
                 assertDebug(e.data === edge.data);
@@ -744,7 +744,7 @@ class KineticVertex {
     public t1: number;
     public vel: Vector2;
 
-    constructor(orig: Point2, n1: Vector2, n2: Vector2, t0: number) {
+    public constructor(orig: Point2, n1: Vector2, n2: Vector2, t0: number) {
         this.orig = orig;
         this.vel = KineticVertex.getVelocity(n1, n2);
         this.n1 = n1;
@@ -759,15 +759,15 @@ class KineticVertex {
         const e1 = KineticVertex.getWavefrontEdgeCw(e);
         const e2 = KineticVertex.getWavefrontEdgeCcw(e);
 
-        const n1 = e1.p1.sub(e1.p0).unit.normal.neg;
-        const n2 = e2.p0.sub(e2.p1).unit.normal.neg;
+        const n1 = e1.p1.sub(e1.p0).unit().normal().neg();
+        const n2 = e2.p0.sub(e2.p1).unit().normal().neg();
 
         return new KineticVertex(orig, n1, n2, 0);
     }
 
     public static getVelocity(n1: Vector2, n2: Vector2): Vector2 {
         const k = n1.add(n2);
-        return k.mul(2).div(k.lengthSq);
+        return k.mul(2).div(k.lenSq());
     }
 
     public static getWavefrontEdgeCcw(e: MeshEdge2): MeshEdge2 {
@@ -812,7 +812,7 @@ class KineticEvent {
     public t1: number;
     public type: KineticEventType;
 
-    constructor(type: KineticEventType, e: MeshEdge2, t1: number) {
+    public constructor(type: KineticEventType, e: MeshEdge2, t1: number) {
         this.type = type;
         this.e = e;
         this.t1 = t1;

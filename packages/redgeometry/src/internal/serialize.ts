@@ -68,7 +68,7 @@ export const DEFAULT_SERIALIZATION_MAPPING: ReadonlyArray<SerializationMapping> 
 export class SerializationMap {
     public mappings: SerializationMapping[];
 
-    constructor(initialMappings?: SerializationMapping[]) {
+    public constructor(initialMappings?: SerializationMapping[]) {
         this.mappings = initialMappings ?? [];
     }
 

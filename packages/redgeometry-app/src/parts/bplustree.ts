@@ -143,7 +143,7 @@ class BPlusTree<T> {
     private leafSize: number;
     private root: Node<T>;
 
-    constructor(compareFn: (a: T, b: T) => number, branchSize?: number, leafSize?: number) {
+    public constructor(compareFn: (a: T, b: T) => number, branchSize?: number, leafSize?: number) {
         this.root = this.leafNodeCreate(undefined, 0, [], undefined);
         this.compareFn = compareFn;
 

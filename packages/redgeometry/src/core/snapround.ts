@@ -97,7 +97,7 @@ export class SnapRoundSweepEvent2 {
     public p1: Point2;
     public seg: EdgeSegment2;
 
-    constructor(p0: Point2, p1: Point2, seg: EdgeSegment2, key: number, left: boolean) {
+    public constructor(p0: Point2, p1: Point2, seg: EdgeSegment2, key: number, left: boolean) {
         this.p0 = p0;
         this.p1 = p1;
         this.seg = seg;
@@ -146,7 +146,7 @@ export class SnapRound2 {
 
     public precision: number;
 
-    constructor() {
+    public constructor() {
         this.precision = 2 ** 16;
 
         this.inputSegments = [];
@@ -264,7 +264,7 @@ export class SnapRound2 {
         const va = v1x.mul(v2y);
         const vb = v1y.mul(v2x);
 
-        return va.sub(vb).value;
+        return va.sub(vb).value();
     }
 
     private addEndpoint(p: Point2, k: number, snap: boolean): Point2 {
@@ -322,10 +322,10 @@ export class SnapRound2 {
         const queue = this.createQueue(segments);
         const status = new ArrayMultiSet<SnapRoundSweepEvent2>(SnapRoundSweepEvent2.compareStatus);
 
-        for (const qe of queue.values) {
+        for (const qe of queue.values()) {
             if (qe.left) {
                 // Try to intersect `qe` against all segments within the sweepline
-                for (const se of status.values) {
+                for (const se of status.values()) {
                     this.writeSegmentIntersectionsTo(qe.seg, se.seg, intersections);
                 }
 

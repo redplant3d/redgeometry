@@ -179,8 +179,8 @@ export function createSimplePolygon(
     const center = box.getCenter();
     const angleStep = (2 * Math.PI) / count;
 
-    const w = 0.5 * box.dx;
-    const h = 0.5 * box.dy;
+    const w = 0.5 * box.dx();
+    const h = 0.5 * box.dy();
 
     for (let i = 0; i < count; i++) {
         const a = i * angleStep + angleStep * random.nextFloatBetween(0, irregularity);

@@ -232,8 +232,8 @@ export class Bezier2Curve2 {
 
         const rt = solveCubic(a, b, c, d);
 
-        const distSq0 = this.p0.sub(p).lengthSq;
-        const distSq1 = this.p2.sub(p).lengthSq;
+        const distSq0 = this.p0.sub(p).lenSq();
+        const distSq1 = this.p2.sub(p).lenSq();
 
         const min = distSq0 < distSq1 ? { param: 0, distSq: distSq0 } : { param: 1, distSq: distSq1 };
 
@@ -276,7 +276,7 @@ export class Bezier2Curve2 {
         const vv = qqa.mul(t).add(qqb);
         const vvv = qqa;
 
-        const len = vv.length;
+        const len = vv.len();
 
         return vv.cross(vvv) / (len * len * len);
     }
@@ -316,14 +316,14 @@ export class Bezier2Curve2 {
         const pp = qa.mul(2 * t).add(qb);
         const ppp = qa.mul(2);
 
-        return p.addMul(pp.normal, pp.lengthSq / pp.cross(ppp));
+        return p.addMul(pp.normal(), pp.lenSq() / pp.cross(ppp));
     }
 
     public getOffsetCuspParameter(rad: number): [number, number] {
         const [qqa, qqb] = this.getDerivativeCoefficients();
 
-        const alen2 = qqa.lengthSq;
-        const blen2 = qqb.lengthSq;
+        const alen2 = qqa.lenSq();
+        const blen2 = qqb.lenSq();
         const axb = qqa.cross(qqb);
         const aob = qqa.dot(qqb);
         const fac = 1 / alen2;
@@ -381,7 +381,7 @@ export class Bezier2Curve2 {
         const [qqa, qqb] = this.getDerivativeCoefficients();
 
         // The vertex is at the minimum of the curvature (only one solution)
-        return qqa.dot(qqb.neg) / qqa.lengthSq;
+        return qqa.dot(qqb.neg()) / qqa.lenSq();
     }
 
     public getWindingAt(p: Point2): number {
@@ -598,7 +598,7 @@ export class Bezier3Curve2 {
         const vv = qqa.mul(t).add(qqb).mul(t).add(qqc);
         const vvv = qqa.mul(2 * t).add(qqb);
 
-        const len = vv.length;
+        const len = vv.len();
 
         return vv.cross(vvv) / (len * len * len);
     }
@@ -649,7 +649,7 @@ export class Bezier3Curve2 {
             .add(qc);
         const ppp = qa.mul(6 * t).addMul(qb, 2);
 
-        return p.addMul(pp.normal, pp.lengthSq / pp.cross(ppp));
+        return p.addMul(pp.normal(), pp.lenSq() / pp.cross(ppp));
     }
 
     public getInflectionParameter(): [number, number] {
@@ -873,8 +873,8 @@ export class BezierRCurve2 {
 
     public static fromCenterPoint(p0: Point2, p1: Point2, p2: Point2, pc: Point2): BezierRCurve2 {
         const pm = p0.lerp(p2, 0.5);
-        const dm = pm.sub(pc).length;
-        const d1 = p1.sub(pc).length;
+        const dm = pm.sub(pc).len();
+        const d1 = p1.sub(pc).len();
         const w = Math.sqrt(dm / d1);
         return new BezierRCurve2(p0, p1, p2, w);
     }
@@ -912,7 +912,7 @@ export class BezierRCurve2 {
         const v1 = p1.sub(pc);
         const v2 = p2.sub(pc);
 
-        return v1.dot(v2) / Math.sqrt(v1.lengthSq * v2.lengthSq);
+        return v1.dot(v2) / Math.sqrt(v1.lenSq() * v2.lenSq());
     }
 
     public getBounds(): Box2 {

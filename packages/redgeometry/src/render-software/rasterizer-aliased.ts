@@ -21,7 +21,7 @@ class Edge {
     public y0: number;
     public y1: number;
 
-    constructor(x0: number, y0: number, x1: number, y1: number, sign: number) {
+    public constructor(x0: number, y0: number, x1: number, y1: number, sign: number) {
         this.x0 = x0;
         this.y0 = y0;
         this.x1 = x1;
@@ -38,7 +38,7 @@ export class RasterizerAliased {
     private mask: Uint8Array;
     private width: number;
 
-    constructor(compositor: Compositor) {
+    public constructor(compositor: Compositor) {
         this.height = 0;
         this.width = 0;
 

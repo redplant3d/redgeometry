@@ -24,7 +24,7 @@ export class PathClip2 {
     private windingOperatorA: WindingOperator | CustomWindingOperator;
     private windingOperatorB: WindingOperator | CustomWindingOperator;
 
-    constructor(options: PathQualityOptions) {
+    public constructor(options: PathQualityOptions) {
         this.status = new ArrayMultiSet(PathSweepEvent2.compareStatus);
         this.snapRound = new SnapRound2();
 
@@ -136,7 +136,7 @@ export class PathClip2 {
         let isDone = false;
 
         // Iterate backwards (substract windings)
-        for (let i = this.status.length - 1; i >= 0; i--) {
+        for (let i = this.status.size() - 1; i >= 0; i--) {
             const status = this.status.getAt(i);
 
             if (status.eq(ev)) {

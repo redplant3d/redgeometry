@@ -62,7 +62,7 @@ export class World {
     private scheduleUpdate: SystemSchedule;
     private serializationMap: SerializationMap;
 
-    constructor() {
+    public constructor() {
         this.serializationMap = new SerializationMap([...DEFAULT_SERIALIZATION_MAPPING]);
 
         this.data = new Map();

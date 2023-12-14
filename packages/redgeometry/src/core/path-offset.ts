@@ -43,7 +43,7 @@ export class PathOffsetIncremental2 implements PathOffset2 {
     private simplifyTolerance: number;
     private tanOffsetTolerance: number;
 
-    constructor(qualityOptions: PathQualityOptions) {
+    public constructor(qualityOptions: PathQualityOptions) {
         this.simplifyTolerance = qualityOptions.simplifyTolerance;
         this.tanOffsetTolerance = Math.tan(qualityOptions.offsetTolerance);
 
@@ -51,8 +51,8 @@ export class PathOffsetIncremental2 implements PathOffset2 {
         this.d = 0;
         this.join = JoinType.Bevel;
         this.miterLimit = 0;
-        this.ms = Vector2.zero;
-        this.ps = Point2.zero;
+        this.ms = Vector2.ZERO;
+        this.ps = Point2.ZERO;
     }
 
     public process(input: Path2, output: Path2, options: PathOffsetOptions): void {
@@ -73,7 +73,7 @@ export class PathOffsetIncremental2 implements PathOffset2 {
 
         // Current point and tangent
         let p0 = this.ps;
-        let m0 = Vector2.zero;
+        let m0 = Vector2.ZERO;
 
         this.buffer.clear();
 
@@ -87,7 +87,7 @@ export class PathOffsetIncremental2 implements PathOffset2 {
                     }
 
                     p0 = points[pIdx++];
-                    m0 = Vector2.zero;
+                    m0 = Vector2.ZERO;
 
                     this.ps = p0;
 
@@ -166,7 +166,7 @@ export class PathOffsetIncremental2 implements PathOffset2 {
                     }
 
                     p0 = this.ps;
-                    m0 = Vector2.zero;
+                    m0 = Vector2.ZERO;
 
                     break;
                 }
@@ -246,13 +246,13 @@ export class PathOffsetIncremental2 implements PathOffset2 {
     }
 
     private offsetLinear(p1: Point2, m: Vector2): void {
-        const v = m.unit.normal.mul(this.d);
+        const v = m.unit().normal().mul(this.d);
 
         this.buffer.lineTo(p1.add(v));
     }
 
     private offsetMove(p0: Point2, m: Vector2): void {
-        const v = m.unit.normal.mul(this.d);
+        const v = m.unit().normal().mul(this.d);
 
         this.buffer.moveTo(p0.add(v));
     }
@@ -335,7 +335,7 @@ export class PathOffsetRecursive2 implements PathOffset2 {
     private ps: Point2;
     private simplifyTolerance: number;
 
-    constructor(qualityOptions: PathQualityOptions) {
+    public constructor(qualityOptions: PathQualityOptions) {
         this.simplifyTolerance = qualityOptions.simplifyTolerance;
         this.cosOffsetTolerance = Math.cos(qualityOptions.offsetTolerance);
 
@@ -343,8 +343,8 @@ export class PathOffsetRecursive2 implements PathOffset2 {
         this.d = 0;
         this.join = JoinType.Bevel;
         this.miterLimit = 0;
-        this.ms = Vector2.zero;
-        this.ps = Point2.zero;
+        this.ms = Vector2.ZERO;
+        this.ps = Point2.ZERO;
     }
 
     public process(input: Path2, output: Path2, options: PathOffsetOptions): void {
@@ -365,7 +365,7 @@ export class PathOffsetRecursive2 implements PathOffset2 {
 
         // Current point and tangent
         let p0 = this.ps;
-        let m0 = Vector2.zero;
+        let m0 = Vector2.ZERO;
 
         this.buffer.clear();
 
@@ -379,7 +379,7 @@ export class PathOffsetRecursive2 implements PathOffset2 {
                     }
 
                     p0 = points[pIdx++];
-                    m0 = Vector2.zero;
+                    m0 = Vector2.ZERO;
 
                     this.ps = p0;
 
@@ -458,7 +458,7 @@ export class PathOffsetRecursive2 implements PathOffset2 {
                     }
 
                     p0 = this.ps;
-                    m0 = Vector2.zero;
+                    m0 = Vector2.ZERO;
 
                     break;
                 }
@@ -536,13 +536,13 @@ export class PathOffsetRecursive2 implements PathOffset2 {
     }
 
     private offsetLinear(p1: Point2, m: Vector2): void {
-        const v = m.unit.normal.mul(this.d);
+        const v = m.unit().normal().mul(this.d);
 
         this.buffer.lineTo(p1.add(v));
     }
 
     private offsetMove(p0: Point2, m: Vector2): void {
-        const v = m.unit.normal.mul(this.d);
+        const v = m.unit().normal().mul(this.d);
 
         this.buffer.moveTo(p0.add(v));
     }

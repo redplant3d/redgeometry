@@ -4,7 +4,7 @@ import { Point2, Point3 } from "../../src/primitives/point.js";
 import { Vector2, Vector3 } from "../../src/primitives/vector.js";
 
 test("Matrix3x2 - inverse", () => {
-    const mat1 = Matrix3x2.identity;
+    const mat1 = Matrix3x2.createIdentity();
     mat1.translatePre(1, 2);
     mat1.scalePre(4, 4);
     mat1.rotateAnglePre(Math.PI);
@@ -12,11 +12,11 @@ test("Matrix3x2 - inverse", () => {
 
     const mat = mat1.mul(mat2);
 
-    expect(mat).toEqual(Matrix3x2.identity);
+    expect(mat).toEqual(Matrix3x2.createIdentity());
 });
 
 test("Matrix3x2 - mapPoint", () => {
-    const mat = Matrix3x2.identity;
+    const mat = Matrix3x2.createIdentity();
     const p = new Point2(1, 2);
 
     const mapPoint = mat.mapPoint(p);
@@ -25,7 +25,7 @@ test("Matrix3x2 - mapPoint", () => {
 });
 
 test("Matrix3x2 - mapVector", () => {
-    const mat = Matrix3x2.identity;
+    const mat = Matrix3x2.createIdentity();
     const v = new Vector2(1, 2);
 
     const mapVector = mat.mapVector(v);
@@ -34,9 +34,9 @@ test("Matrix3x2 - mapVector", () => {
 });
 
 test("Matrix3x2 - rotate", () => {
-    const mat1 = Matrix3x2.identity;
-    const mat2 = Matrix3x2.identity;
-    const mat3 = Matrix3x2.identity;
+    const mat1 = Matrix3x2.createIdentity();
+    const mat2 = Matrix3x2.createIdentity();
+    const mat3 = Matrix3x2.createIdentity();
 
     mat1.rotateAnglePost(1);
     mat2.rotateAnglePre(1);
@@ -47,9 +47,9 @@ test("Matrix3x2 - rotate", () => {
 });
 
 test("Matrix3x2 - scale", () => {
-    const mat1 = Matrix3x2.identity;
-    const mat2 = Matrix3x2.identity;
-    const mat3 = Matrix3x2.identity;
+    const mat1 = Matrix3x2.createIdentity();
+    const mat2 = Matrix3x2.createIdentity();
+    const mat3 = Matrix3x2.createIdentity();
 
     mat1.scalePost(1, 2);
     mat2.scalePre(1, 2);
@@ -60,9 +60,9 @@ test("Matrix3x2 - scale", () => {
 });
 
 test("Matrix3x2 - translate", () => {
-    const mat1 = Matrix3x2.identity;
-    const mat2 = Matrix3x2.identity;
-    const mat3 = Matrix3x2.identity;
+    const mat1 = Matrix3x2.createIdentity();
+    const mat2 = Matrix3x2.createIdentity();
+    const mat3 = Matrix3x2.createIdentity();
 
     mat1.translatePost(1, 2);
     mat2.translatePre(1, 2);
@@ -73,7 +73,7 @@ test("Matrix3x2 - translate", () => {
 });
 
 test("Matrix3x3 - inverse", () => {
-    const mat1 = Matrix3x3.identity;
+    const mat1 = Matrix3x3.createIdentity();
     mat1.translatePre(1, 2);
     mat1.scalePre(4, 4);
     mat1.rotateAnglePre(Math.PI);
@@ -81,11 +81,11 @@ test("Matrix3x3 - inverse", () => {
 
     const m = mat1.mul(mat2);
 
-    expect(m).toEqual(Matrix3x3.identity);
+    expect(m).toEqual(Matrix3x3.createIdentity());
 });
 
 test("Matrix3x3 - mapPoint", () => {
-    const mat = Matrix3x3.identity;
+    const mat = Matrix3x3.createIdentity();
     const p = new Point2(1, 2);
 
     const mapPoint = mat.mapPoint(p);
@@ -94,7 +94,7 @@ test("Matrix3x3 - mapPoint", () => {
 });
 
 test("Matrix3x3 - mapVector", () => {
-    const mat = Matrix3x3.identity;
+    const mat = Matrix3x3.createIdentity();
     const v = new Vector2(1, 2);
 
     const mapVector = mat.mapVector(v);
@@ -103,9 +103,9 @@ test("Matrix3x3 - mapVector", () => {
 });
 
 test("Matrix3x3 - rotate", () => {
-    const mat1 = Matrix3x3.identity;
-    const mat2 = Matrix3x3.identity;
-    const mat3 = Matrix3x3.identity;
+    const mat1 = Matrix3x3.createIdentity();
+    const mat2 = Matrix3x3.createIdentity();
+    const mat3 = Matrix3x3.createIdentity();
 
     mat1.rotateAnglePost(1);
     mat2.rotateAnglePre(1);
@@ -116,9 +116,9 @@ test("Matrix3x3 - rotate", () => {
 });
 
 test("Matrix3x3 - scale", () => {
-    const mat1 = Matrix3x3.identity;
-    const mat2 = Matrix3x3.identity;
-    const mat3 = Matrix3x3.identity;
+    const mat1 = Matrix3x3.createIdentity();
+    const mat2 = Matrix3x3.createIdentity();
+    const mat3 = Matrix3x3.createIdentity();
 
     mat1.scalePost(1, 2);
     mat2.scalePre(1, 2);
@@ -129,9 +129,9 @@ test("Matrix3x3 - scale", () => {
 });
 
 test("Matrix3x3 - translate", () => {
-    const mat1 = Matrix3x3.identity;
-    const mat2 = Matrix3x3.identity;
-    const mat3 = Matrix3x3.identity;
+    const mat1 = Matrix3x3.createIdentity();
+    const mat2 = Matrix3x3.createIdentity();
+    const mat3 = Matrix3x3.createIdentity();
 
     mat1.translatePost(1, 2);
     mat2.translatePre(1, 2);
@@ -142,7 +142,7 @@ test("Matrix3x3 - translate", () => {
 });
 
 test("Matrix4x4 - mapPoint", () => {
-    const mat = Matrix4x4.identity;
+    const mat = Matrix4x4.createIdentity();
     const p = new Point3(1, 2, 3);
 
     const mapPoint = mat.mapPoint(p);
@@ -151,7 +151,7 @@ test("Matrix4x4 - mapPoint", () => {
 });
 
 test("Matrix4x4 - mapVector", () => {
-    const mat = Matrix4x4.identity;
+    const mat = Matrix4x4.createIdentity();
     const v = new Vector3(1, 2, 3);
 
     const mapVector = mat.mapVector(v);
@@ -160,9 +160,9 @@ test("Matrix4x4 - mapVector", () => {
 });
 
 test("Matrix4x4 - rotateX", () => {
-    const mat1 = Matrix4x4.identity;
-    const mat2 = Matrix4x4.identity;
-    const mat3 = Matrix4x4.identity;
+    const mat1 = Matrix4x4.createIdentity();
+    const mat2 = Matrix4x4.createIdentity();
+    const mat3 = Matrix4x4.createIdentity();
 
     mat1.rotateXAnglePost(1);
     mat2.rotateXAnglePre(1);
@@ -173,9 +173,9 @@ test("Matrix4x4 - rotateX", () => {
 });
 
 test("Matrix4x4 - rotateY", () => {
-    const mat1 = Matrix4x4.identity;
-    const mat2 = Matrix4x4.identity;
-    const mat3 = Matrix4x4.identity;
+    const mat1 = Matrix4x4.createIdentity();
+    const mat2 = Matrix4x4.createIdentity();
+    const mat3 = Matrix4x4.createIdentity();
 
     mat1.rotateYAnglePost(1);
     mat2.rotateYAnglePre(1);
@@ -186,9 +186,9 @@ test("Matrix4x4 - rotateY", () => {
 });
 
 test("Matrix4x4 - rotateZ", () => {
-    const mat1 = Matrix4x4.identity;
-    const mat2 = Matrix4x4.identity;
-    const mat3 = Matrix4x4.identity;
+    const mat1 = Matrix4x4.createIdentity();
+    const mat2 = Matrix4x4.createIdentity();
+    const mat3 = Matrix4x4.createIdentity();
 
     mat1.rotateZAnglePost(1);
     mat2.rotateZAnglePre(1);
@@ -199,9 +199,9 @@ test("Matrix4x4 - rotateZ", () => {
 });
 
 test("Matrix4x4 - scale", () => {
-    const mat1 = Matrix4x4.identity;
-    const mat2 = Matrix4x4.identity;
-    const mat3 = Matrix4x4.identity;
+    const mat1 = Matrix4x4.createIdentity();
+    const mat2 = Matrix4x4.createIdentity();
+    const mat3 = Matrix4x4.createIdentity();
 
     mat1.scalePost(1, 2, 3);
     mat2.scalePre(1, 2, 3);
@@ -212,9 +212,9 @@ test("Matrix4x4 - scale", () => {
 });
 
 test("Matrix4x4 - translate", () => {
-    const mat1 = Matrix4x4.identity;
-    const mat2 = Matrix4x4.identity;
-    const mat3 = Matrix4x4.identity;
+    const mat1 = Matrix4x4.createIdentity();
+    const mat2 = Matrix4x4.createIdentity();
+    const mat3 = Matrix4x4.createIdentity();
 
     mat1.translatePost(1, 2, 3);
     mat2.translatePre(1, 2, 3);

@@ -18,7 +18,7 @@ export class DashState {
     public startIndex: number;
     public startPhase: boolean;
 
-    constructor() {
+    public constructor() {
         this.currentIndex = 0;
         this.currentLength = 0;
         this.currentPhase = false;
@@ -217,7 +217,7 @@ export function getDashStart(dashArray: number[], dashOffset: number): [number, 
 }
 
 export function getDashArcLengthLinear(c: Bezier1Curve2): number {
-    return c.p1.sub(c.p0).length;
+    return c.p1.sub(c.p0).len();
 }
 
 export function getDashParameterLinear(c: Bezier1Curve2, length: number): number {

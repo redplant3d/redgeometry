@@ -64,7 +64,7 @@ export class App {
     private groupMap: Map<WorldGroupId, WorldGroup>;
     private groupOptionsMap: Map<WorldGroupId, WorldGroupOptions>;
 
-    constructor(context: AppContext) {
+    public constructor(context: AppContext) {
         this.context = context;
 
         this.groupOptionsMap = new Map();
@@ -189,7 +189,7 @@ export class LocalAppContext implements AppContext {
     public readonly isWorker: boolean;
     public readonly selfName: string | undefined;
 
-    constructor() {
+    public constructor() {
         const isMain = typeof window !== "undefined";
         const isWorker = !isMain;
         const isNode = typeof process !== "undefined";
@@ -236,7 +236,7 @@ export class WebAppContext implements AppContext {
     public readonly isWorker: boolean;
     public readonly selfName: string | undefined;
 
-    constructor(defaultScriptURL: string | URL) {
+    public constructor(defaultScriptURL: string | URL) {
         this.defaultScriptURL = defaultScriptURL;
 
         const isMain = typeof window !== "undefined";

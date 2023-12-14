@@ -14,7 +14,7 @@ type CanvasStyle = string | CanvasGradient | CanvasPattern;
 export class AppContext2D {
     private context: CanvasRenderingContext2D | OffscreenCanvasRenderingContext2D;
 
-    constructor(context: CanvasRenderingContext2D | OffscreenCanvasRenderingContext2D) {
+    public constructor(context: CanvasRenderingContext2D | OffscreenCanvasRenderingContext2D) {
         this.context = context;
     }
 
@@ -230,7 +230,7 @@ export class AppContext2D {
 
             this.addMeshFaceToContext(ctx, face);
 
-            ctx.fillStyle = createRandomColor(random, 0.25, 1, 1).style;
+            ctx.fillStyle = createRandomColor(random, 0.25, 1, 1).style();
             ctx.fill();
         }
 
@@ -352,7 +352,7 @@ export class AppContext2D {
         let cIdx = 0;
         let pIdx = 0;
 
-        let p0 = Point2.zero;
+        let p0 = Point2.ZERO;
 
         while (cIdx < commands.length) {
             const command = commands[cIdx++];

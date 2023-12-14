@@ -6,28 +6,23 @@ export class Box2 {
     public y0: number;
     public y1: number;
 
-    constructor(x0: number, y0: number, x1: number, y1: number) {
+    public constructor(x0: number, y0: number, x1: number, y1: number) {
         this.x0 = x0;
         this.y0 = y0;
         this.x1 = x1;
         this.y1 = y1;
     }
 
-    public static get empty(): Box2 {
+    /**
+     * Returns an empty `Box2` object.
+     */
+    public static createEmpty(): Box2 {
         return new Box2(
             Number.POSITIVE_INFINITY,
             Number.POSITIVE_INFINITY,
             Number.NEGATIVE_INFINITY,
             Number.NEGATIVE_INFINITY,
         );
-    }
-
-    public get dx(): number {
-        return this.x1 - this.x0;
-    }
-
-    public get dy(): number {
-        return this.y1 - this.y0;
     }
 
     public static fromPoints(p0: Point2, p1: Point2): Box2 {
@@ -54,6 +49,14 @@ export class Box2 {
 
     public containsInclusive(p: Point2): boolean {
         return this.x0 <= p.x && this.y0 <= p.y && this.x1 >= p.x && this.y1 >= p.y;
+    }
+
+    public dx(): number {
+        return this.x1 - this.x0;
+    }
+
+    public dy(): number {
+        return this.y1 - this.y0;
     }
 
     public enclose(p: Point2): void {
@@ -84,8 +87,8 @@ export class Box2 {
     }
 
     public scale(fx: number, fy: number): Box2 {
-        const dx = 0.5 * (fx - 1) * this.dx;
-        const dy = 0.5 * (fy - 1) * this.dy;
+        const dx = 0.5 * (fx - 1) * this.dx();
+        const dy = 0.5 * (fy - 1) * this.dy();
 
         return this.scaleAbsolute(dx, dy);
     }
@@ -114,7 +117,7 @@ export class Box3 {
     public z0: number;
     public z1: number;
 
-    constructor(x0: number, y0: number, z0: number, x1: number, y1: number, z1: number) {
+    public constructor(x0: number, y0: number, z0: number, x1: number, y1: number, z1: number) {
         this.x0 = x0;
         this.y0 = y0;
         this.z0 = z0;
@@ -123,7 +126,10 @@ export class Box3 {
         this.z1 = z1;
     }
 
-    public static get empty(): Box3 {
+    /**
+     * Returns an empty `Box3` object.
+     */
+    public static createEmpty(): Box3 {
         return new Box3(
             Number.POSITIVE_INFINITY,
             Number.POSITIVE_INFINITY,
@@ -132,18 +138,6 @@ export class Box3 {
             Number.NEGATIVE_INFINITY,
             Number.NEGATIVE_INFINITY,
         );
-    }
-
-    public get dx(): number {
-        return this.x1 - this.x0;
-    }
-
-    public get dy(): number {
-        return this.y1 - this.y0;
-    }
-
-    public get dz(): number {
-        return this.z1 - this.z0;
     }
 
     public static fromPoints(p0: Point3, p1: Point3): Box3 {
@@ -163,6 +157,18 @@ export class Box3 {
 
     public containsInclusive(p: Point3): boolean {
         return this.x0 <= p.x && this.y0 <= p.y && this.z0 <= p.z && this.x1 >= p.x && this.y1 >= p.y && this.z1 >= p.z;
+    }
+
+    public dx(): number {
+        return this.x1 - this.x0;
+    }
+
+    public dy(): number {
+        return this.y1 - this.y0;
+    }
+
+    public dz(): number {
+        return this.z1 - this.z0;
     }
 
     public enclose(p: Point3): void {
@@ -202,9 +208,9 @@ export class Box3 {
     }
 
     public scale(fx: number, fy: number, fz: number): Box3 {
-        const dx = 0.5 * (fx - 1) * this.dx;
-        const dy = 0.5 * (fy - 1) * this.dy;
-        const dz = 0.5 * (fz - 1) * this.dz;
+        const dx = 0.5 * (fx - 1) * this.dx();
+        const dy = 0.5 * (fy - 1) * this.dy();
+        const dz = 0.5 * (fz - 1) * this.dz();
 
         return this.scaleAbsolute(dx, dy, dz);
     }

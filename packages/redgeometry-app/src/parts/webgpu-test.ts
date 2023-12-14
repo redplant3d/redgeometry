@@ -154,8 +154,8 @@ function initRemoteSystem(world: World): void {
     });
 
     const mainCamera = world.createEntity<CameraBundle>(
-        { componentId: "camera", projection: Matrix4x4.identity },
-        { componentId: "transform", local: Matrix4x4.identity },
+        { componentId: "camera", projection: Matrix4x4.createIdentity() },
+        { componentId: "transform", local: Matrix4x4.createIdentity() },
     );
 
     world.writeData<SceneData>({
@@ -263,7 +263,7 @@ function beginFrameSystem(world: World): void {
 
     const a = (0.25 * time + rotation * Math.PI) / 180;
 
-    const view = Matrix4x4.identity;
+    const view = Matrix4x4.createIdentity();
     view.rotateYAnglePre(a);
     view.rotateXAnglePre(0.5);
     view.translatePre(0, 0, -15);
@@ -306,7 +306,7 @@ function spawnSystem(world: World): void {
         const { random } = appRemoteData;
 
         for (let i = currCount; i < nextCount; i++) {
-            const local = Matrix4x4.identity;
+            const local = Matrix4x4.createIdentity();
             local.rotateXAnglePre(random.nextFloatBetween(-5, 5));
             local.rotateYAnglePre(random.nextFloatBetween(-5, 5));
             local.rotateZAnglePre(random.nextFloatBetween(-5, 5));

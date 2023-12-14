@@ -22,7 +22,7 @@ const FLOAT_LSB_53 = 2 ** -53;
 export class RandomXSR128 implements Random {
     private state: Int32Array;
 
-    constructor(state: Int32Array) {
+    public constructor(state: Int32Array) {
         assert(state.length === 4, "Array length of 'state' must be equal to 4");
 
         this.state = state;

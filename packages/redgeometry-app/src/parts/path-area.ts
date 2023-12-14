@@ -26,7 +26,7 @@ export class PathAreaAppPart implements AppPart {
         this.inputCount.setStyle("width: 80px");
 
         this.input = new Path2();
-        this.bounds = Box2.empty;
+        this.bounds = Box2.createEmpty();
         this.isInside = false;
     }
 

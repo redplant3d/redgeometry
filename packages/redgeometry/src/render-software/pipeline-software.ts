@@ -21,7 +21,7 @@ class Rectangle2 {
     public right: number;
     public top: number;
 
-    constructor(left: number, top: number, right: number, bottom: number) {
+    public constructor(left: number, top: number, right: number, bottom: number) {
         this.left = left;
         this.top = top;
         this.right = right;
@@ -36,7 +36,7 @@ export class PipelineSoftware {
     private pathStroke: PathStroke2;
     private rasterizer: RasterizerAliased;
 
-    constructor() {
+    public constructor() {
         this.compositor = new Compositor();
         this.rasterizer = new RasterizerAliased(this.compositor);
 

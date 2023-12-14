@@ -45,7 +45,7 @@ export class StrokeState {
     public startIndex: number;
     public startPhase: boolean;
 
-    constructor() {
+    public constructor() {
         this.caps = DEFAULT_PATH_STROKE_OPTIONS.caps;
         this.dashArray = DEFAULT_PATH_STROKE_OPTIONS.dashArray;
         this.dashCaps = DEFAULT_PATH_STROKE_OPTIONS.dashCaps;
@@ -58,7 +58,7 @@ export class StrokeState {
         this.currentPhase = false;
         this.isDash = false;
         this.isFirstDash = true;
-        this.ms = Vector2.zero;
+        this.ms = Vector2.ZERO;
         this.output = new Path2();
         this.startAdvancedLength = 0;
         this.startIndex = 0;
@@ -94,7 +94,7 @@ export class StrokeState {
     }
 
     public finalizePoint(p: Point2): void {
-        this.insertMoveStroke(p, Vector2.unitX);
+        this.insertMoveStroke(p, Vector2.UNIT_X);
         this.finalizeOpen();
     }
 
@@ -292,31 +292,31 @@ export class StrokeState {
     }
 
     private insertLinearStroke(p: Point2, m: Vector2): void {
-        const v = m.unit.normal.mul(this.distance);
+        const v = m.unit().normal().mul(this.distance);
 
         this.left.lineTo(p.add(v));
-        this.right.lineTo(p.add(v.neg));
+        this.right.lineTo(p.add(v.neg()));
     }
 
     private insertMoveStroke(p0: Point2, m: Vector2): void {
-        const v = m.unit.normal.mul(this.distance);
+        const v = m.unit().normal().mul(this.distance);
 
         this.left.moveTo(p0.add(v));
-        this.right.moveTo(p0.add(v.neg));
+        this.right.moveTo(p0.add(v.neg()));
     }
 
     private insertQuadraticDegenerateDashStroke(p0: Point2, p1: Point2, p2: Point2): void {
         const c1 = new Bezier2Curve2(p0, p1, p1);
         const c2 = new Bezier2Curve2(p1, p1, p2);
 
-        const n0 = p1.sub(p0).unit.normal;
-        const n1 = p2.sub(p1).unit.normal;
+        const n0 = p1.sub(p0).unit().normal();
+        const n1 = p2.sub(p1).unit().normal();
 
         this.insertQuadraticSimpleStroke(c1);
 
         if (this.currentPhase) {
             insertOuterJoin(this.left, p1, n0, n1, this.distance, 0, JoinType.Round);
-            insertOuterJoin(this.right, p1, n0.neg, n1.neg, this.distance, 0, JoinType.Round);
+            insertOuterJoin(this.right, p1, n0.neg(), n1.neg(), this.distance, 0, JoinType.Round);
         }
 
         this.insertQuadraticSimpleStroke(c2);
@@ -326,13 +326,13 @@ export class StrokeState {
         const c1 = new Bezier2Curve2(p0, p1, p1);
         const c2 = new Bezier2Curve2(p1, p1, p2);
 
-        const n0 = p1.sub(p0).unit.normal;
-        const n1 = p2.sub(p1).unit.normal;
+        const n0 = p1.sub(p0).unit().normal();
+        const n1 = p2.sub(p1).unit().normal();
 
         this.insertQuadraticSimpleStroke(c1);
 
         insertOuterJoin(this.left, p1, n0, n1, this.distance, 0, JoinType.Round);
-        insertOuterJoin(this.right, p1, n0.neg, n1.neg, this.distance, 0, JoinType.Round);
+        insertOuterJoin(this.right, p1, n0.neg(), n1.neg(), this.distance, 0, JoinType.Round);
 
         this.insertQuadraticSimpleStroke(c2);
     }
@@ -375,16 +375,16 @@ export class StrokeState {
         if (!v1.isZero()) {
             const d = this.distance;
 
-            v1 = v1.unit.normal;
-            v2 = v2.unit.normal;
+            v1 = v1.unit().normal();
+            v2 = v2.unit().normal();
 
             v1 = v1.add(v2);
 
-            v1 = v1.mul(2 * d).div(v1.lengthSq);
+            v1 = v1.mul(2 * d).div(v1.lenSq());
             v2 = v2.mul(d);
 
             this.left.quadTo(c.p1.add(v1), c.p2.add(v2));
-            this.right.quadTo(c.p1.add(v1.neg), c.p2.add(v2.neg));
+            this.right.quadTo(c.p1.add(v1.neg()), c.p2.add(v2.neg()));
         }
     }
 
@@ -426,8 +426,8 @@ export function insertStrokeJoin(
     ml: number,
     join: JoinType,
 ): void {
-    const n0 = m0.unit.normal;
-    const n1 = m1.unit.normal;
+    const n0 = m0.unit().normal();
+    const n1 = m1.unit().normal();
 
     // Check if join is not too flat
     if (n0.dot(n1) < COS_OBTUSE) {
@@ -454,7 +454,7 @@ export function insertStrokeCap(path: Path2, p1: Point2, cap: CapType | CustomCa
                 break;
             }
 
-            const v = p1.sub(p0).mul(0.5).normal;
+            const v = p1.sub(p0).mul(0.5).normal();
             path.lineTo(p0.add(v));
             path.lineTo(p1.add(v));
             path.lineTo(p1);
@@ -468,8 +468,8 @@ export function insertStrokeCap(path: Path2, p1: Point2, cap: CapType | CustomCa
                 break;
             }
 
-            const v = p1.sub(p0).mul(0.5).normal;
-            path.arcTo(p0.add(v), p0.add(v.sub(v.normal)));
+            const v = p1.sub(p0).mul(0.5).normal();
+            path.arcTo(p0.add(v), p0.add(v.sub(v.normal())));
             path.arcTo(p1.add(v), p1);
 
             break;

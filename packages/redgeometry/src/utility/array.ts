@@ -8,17 +8,9 @@ export class ArrayMultiSet<T> {
     private comp: (a: T, b: T) => number;
     private data: T[];
 
-    constructor(compareFn: (a: T, b: T) => number) {
+    public constructor(compareFn: (a: T, b: T) => number) {
         this.comp = compareFn;
         this.data = [];
-    }
-
-    public get length(): number {
-        return this.data.length;
-    }
-
-    public get values(): readonly T[] {
-        return this.data;
     }
 
     public static fromArray<T>(array: T[], compareFn: (a: T, b: T) => number): ArrayMultiSet<T> {
@@ -163,8 +155,16 @@ export class ArrayMultiSet<T> {
         return length;
     }
 
+    public size(): number {
+        return this.data.length;
+    }
+
     public toArray(): T[] {
         return this.data.slice();
+    }
+
+    public values(): readonly T[] {
+        return this.data;
     }
 }
 
@@ -175,25 +175,9 @@ export class ArrayMultiMap<K, V> {
     private compareFn: (a: K, b: K) => number;
     private data: KeyValue<K, V>[];
 
-    constructor(compareFn: (a: K, b: K) => number) {
+    public constructor(compareFn: (a: K, b: K) => number) {
         this.compareFn = compareFn;
         this.data = [];
-    }
-
-    public get entries(): readonly KeyValue<K, V>[] {
-        return this.data;
-    }
-
-    public get keys(): K[] {
-        return this.data.map((d) => d.key);
-    }
-
-    public get length(): number {
-        return this.data.length;
-    }
-
-    public get values(): V[] {
-        return this.data.map((d) => d.value);
     }
 
     public static fromArray<K, V>(array: KeyValue<K, V>[], compareFn: (a: K, b: K) => number): ArrayMultiMap<K, V> {
@@ -208,6 +192,10 @@ export class ArrayMultiMap<K, V> {
 
     public dequeue(): KeyValue<K, V> | undefined {
         return this.data.shift();
+    }
+
+    public entries(): readonly KeyValue<K, V>[] {
+        return this.data;
     }
 
     public find(key: K): V | undefined {
@@ -303,6 +291,10 @@ export class ArrayMultiMap<K, V> {
         this.data.splice(idx, 0, { key, value });
     }
 
+    public keys(): K[] {
+        return this.data.map((d) => d.key);
+    }
+
     public remove(key: K): boolean {
         const idx = this.findIndex(key);
 
@@ -338,8 +330,16 @@ export class ArrayMultiMap<K, V> {
         return length;
     }
 
+    public size(): number {
+        return this.data.length;
+    }
+
     public toArray(): KeyValue<K, V>[] {
         return this.data.slice();
+    }
+
+    public values(): V[] {
+        return this.data.map((d) => d.value);
     }
 }
 

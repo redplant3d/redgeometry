@@ -42,10 +42,10 @@ type MeshRenderEntry = {
 
 export interface MeshRenderStateData {
     dataId: "meshRenderState";
+    depthTexture: GPUTexture;
     entries: Map<EntityId, MeshRenderEntry>;
     pipeline: GPURenderPipeline;
     pipelineContext: GPUPipelineContext;
-    depthTexture: GPUTexture;
 }
 
 export function meshRenderPlugin(world: World): void {
@@ -103,7 +103,7 @@ export function meshRenderSystem(world: World): void {
 
         const transform = hasComponent<TransformComponent>(components, "transform")
             ? components.transform.local
-            : Matrix4x4.identity;
+            : Matrix4x4.createIdentity();
 
         if (hasComponent<MeshComponent>(components, "mesh")) {
             if (hasChangeFlag(changeset.mesh, ChangeFlags.Created)) {

@@ -3,7 +3,7 @@ export class Image2 {
     private height: number;
     private width: number;
 
-    constructor(width: number, height: number, buffer?: ArrayBuffer) {
+    public constructor(width: number, height: number, buffer?: ArrayBuffer) {
         this.width = width;
         this.height = height;
 

@@ -67,7 +67,7 @@ export class Path2 implements PathSink2 {
     private commands: PathCommand[];
     private points: Point2[];
 
-    constructor() {
+    public constructor() {
         this.commands = [];
         this.points = [];
     }
@@ -213,13 +213,13 @@ export class Path2 implements PathSink2 {
         // Iteratively process 90 degree segments
         while (sweepAngle > 0.5 * Math.PI + 0.005) {
             // TODO: Investigate correctness of `normal.neg`
-            v1 = v1.normal.neg;
+            v1 = v1.normal().neg();
 
             const p1 = mat.mapVector(vc).toPoint();
             const p2 = mat.mapVector(v1).toPoint();
             this.arcTo(p1, p2);
 
-            vc = vc.normal.neg;
+            vc = vc.normal().neg();
 
             sweepAngle -= 0.5 * Math.PI;
         }
@@ -334,7 +334,7 @@ export class Path2 implements PathSink2 {
     }
 
     public getBounds(): Box2 {
-        const bounds = Box2.empty;
+        const bounds = Box2.createEmpty();
 
         for (const c of this.getCurveIterator()) {
             bounds.union(c.getBounds());
@@ -604,16 +604,18 @@ export class Path2 implements PathSink2 {
         let pc = pp0.add(v);
 
         // If `lenght^2 >= 1` the point is already the center
-        const len2 = v.lengthSq;
+        const len2 = v.lenSq();
 
         if (len2 < 1) {
+            const f = Math.sqrt(1 / len2 - 1);
+
             // TODO: Investigate correctness of `normal.neg`
-            v = v.normal.neg.mul(Math.sqrt(1 / len2 - 1));
+            v = v.normal().neg().mul(f);
 
             if (largeArc !== sweep) {
                 pc = pc.add(v);
             } else {
-                pc = pc.add(v.neg);
+                pc = pc.add(v.neg());
             }
         }
 
@@ -669,7 +671,7 @@ export class Path2 implements PathSink2 {
         // Iteratively process 90 degree segments
         while (sweepAngle > 0.5 * Math.PI + 0.005) {
             // TODO: Investigate correctness of `normal.neg`
-            v1 = v1.normal.neg;
+            v1 = v1.normal().neg();
 
             // Transformed points of the arc segment
             pp0 = mat.mapVector(v).toPoint();
@@ -677,7 +679,7 @@ export class Path2 implements PathSink2 {
 
             this.arcTo(pp0, pp1);
 
-            v = v.normal.neg;
+            v = v.normal().neg();
 
             sweepAngle -= 0.5 * Math.PI;
         }

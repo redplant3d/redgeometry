@@ -29,7 +29,7 @@ export class SystemSchedule {
     private entries: ScheduleEntry[];
     private options: SystemOptions[];
 
-    constructor() {
+    public constructor() {
         this.deps = [];
         this.entries = [];
         this.options = [];

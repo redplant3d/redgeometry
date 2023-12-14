@@ -10,7 +10,7 @@ export class Mesh2LnextIterator implements IterableIterator<MeshEdge2> {
     public last: MeshEdge2;
     public wasLast: boolean;
 
-    constructor(first: MeshEdge2, last: MeshEdge2) {
+    public constructor(first: MeshEdge2, last: MeshEdge2) {
         this.curr = first;
         this.last = last;
 
@@ -37,7 +37,7 @@ export class Mesh2OnextIterator implements IterableIterator<MeshEdge2> {
     public last: MeshEdge2;
     public wasLast: boolean;
 
-    constructor(first: MeshEdge2, last: MeshEdge2) {
+    public constructor(first: MeshEdge2, last: MeshEdge2) {
         this.curr = first;
         this.last = last;
 
@@ -67,15 +67,15 @@ export class Path2CurveIterator implements IterableIterator<BezierCurve2> {
     public points: Point2[];
     public ps: Point2;
 
-    constructor(commands: PathCommand[], points: Point2[]) {
+    public constructor(commands: PathCommand[], points: Point2[]) {
         this.commands = commands;
         this.points = points;
 
         this.cIdx = 0;
         this.pIdx = 0;
 
-        this.ps = Point2.zero;
-        this.p0 = Point2.zero;
+        this.ps = Point2.ZERO;
+        this.p0 = Point2.ZERO;
     }
 
     public [Symbol.iterator](): IterableIterator<BezierCurve2> {
@@ -143,7 +143,7 @@ export class Polygon2EdgeIterator implements IterableIterator<Edge2> {
     public idx: number;
     public points: Point2[];
 
-    constructor(points: Point2[]) {
+    public constructor(points: Point2[]) {
         this.points = points;
         this.idx = 1;
     }

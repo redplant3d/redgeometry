@@ -12,7 +12,7 @@ export type PathOverlayEntry2 = {
 export class PathOverlayState2 {
     private map: Map<number, PathOverlayEntry2>;
 
-    constructor() {
+    public constructor() {
         this.map = new Map<number, PathOverlayEntry2>();
     }
 

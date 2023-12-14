@@ -6,19 +6,11 @@ export class ColorRgba {
     public g: number;
     public r: number;
 
-    constructor(r: number, g: number, b: number, a: number) {
+    public constructor(r: number, g: number, b: number, a: number) {
         this.r = r;
         this.g = g;
         this.b = b;
         this.a = a;
-    }
-
-    public get style(): string {
-        const r = this.clampFloatToHex(this.r);
-        const g = this.clampFloatToHex(this.g);
-        const b = this.clampFloatToHex(this.b);
-        const a = this.clampFloatToHex(this.a);
-        return "#" + r + g + b + a;
     }
 
     public static fromHsv(h: number, s: number, v: number, a: number): ColorRgba {
@@ -53,6 +45,14 @@ export class ColorRgba {
         const r = (n >>> 24) & 0xff;
 
         return new ColorRgba(r / 255, g / 255, b / 255, a / 255);
+    }
+
+    public style(): string {
+        const r = this.clampFloatToHex(this.r);
+        const g = this.clampFloatToHex(this.g);
+        const b = this.clampFloatToHex(this.b);
+        const a = this.clampFloatToHex(this.a);
+        return "#" + r + g + b + a;
     }
 
     private clampFloatToHex(f: number): string {

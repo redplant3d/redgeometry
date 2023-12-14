@@ -41,9 +41,9 @@ test("neg", () => {
     const neg1 = new Uint64(0xffffffff, 0xffffffff);
     const neg2 = new Uint64(0xffffffff, 0xfffffffe);
 
-    expect(u0.neg).toEqual(u0);
-    expect(u1.neg).toEqual(neg1);
-    expect(u2.neg).toEqual(neg2);
+    expect(u0.neg()).toEqual(u0);
+    expect(u1.neg()).toEqual(neg1);
+    expect(u2.neg()).toEqual(neg2);
 });
 
 test("or", () => {
@@ -137,8 +137,8 @@ test("value", () => {
     const u1 = new Uint64(0x00000001, 0x00000000);
     const u2 = new Uint64(0x00000001, 0x00000001);
 
-    expect(u1.value).toEqual(4294967296);
-    expect(u2.value).toEqual(4294967297);
+    expect(u1.value()).toEqual(4294967296);
+    expect(u2.value()).toEqual(4294967297);
 });
 
 test("xor", () => {

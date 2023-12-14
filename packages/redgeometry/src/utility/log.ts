@@ -14,7 +14,7 @@ export class Log {
     public infoFn: LogFn;
     public warnFn: LogFn;
 
-    constructor(options: LogOptions) {
+    public constructor(options: LogOptions) {
         this.errorFn = options.errorFn;
         this.infoFn = options.infoFn;
         this.warnFn = options.warnFn;

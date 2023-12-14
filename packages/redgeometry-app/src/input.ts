@@ -12,7 +12,7 @@ export abstract class AppInputElement {
     private isBound: boolean;
     private style?: string;
 
-    constructor(element: HTMLElement, id: string) {
+    public constructor(element: HTMLElement, id: string) {
         element.id = id;
 
         this.element = element;
@@ -84,7 +84,7 @@ export class AppValueInputElement extends AppInputElement {
     private defaultValue: string;
     private valueInputElement: HTMLInputElement | HTMLSelectElement;
 
-    constructor(element: HTMLInputElement | HTMLSelectElement, id: string, defaultValue: string) {
+    public constructor(element: HTMLInputElement | HTMLSelectElement, id: string, defaultValue: string) {
         super(element, id);
 
         element.value = defaultValue;
@@ -119,7 +119,7 @@ export class AppValueInputElement extends AppInputElement {
 }
 
 export class ButtonInputElement extends AppInputElement {
-    constructor(id: string, label: string) {
+    public constructor(id: string, label: string) {
         const button = document.createElement("button");
         button.textContent = label;
 
@@ -128,7 +128,7 @@ export class ButtonInputElement extends AppInputElement {
 }
 
 export class TextBoxInputElement extends AppValueInputElement {
-    constructor(id: string, defaultValue = "") {
+    public constructor(id: string, defaultValue = "") {
         const input = document.createElement("input");
         input.type = "text";
 
@@ -137,7 +137,7 @@ export class TextBoxInputElement extends AppValueInputElement {
 }
 
 export class RangeInputElement extends AppValueInputElement {
-    constructor(id: string, min: string, max: string, defaultValue = "0") {
+    public constructor(id: string, min: string, max: string, defaultValue = "0") {
         const input = document.createElement("input");
         input.type = "range";
         input.className = "slider";
@@ -151,7 +151,7 @@ export class RangeInputElement extends AppValueInputElement {
 export class ComboBoxInputElement extends AppValueInputElement {
     private selectElement: HTMLSelectElement;
 
-    constructor(id: string, defaultValue = "") {
+    public constructor(id: string, defaultValue = "") {
         const selectElement = document.createElement("select");
 
         super(selectElement, id, defaultValue);

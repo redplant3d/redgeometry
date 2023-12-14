@@ -164,7 +164,7 @@ export class Input {
     public keyboardEvents: InputKeyboardEventType[];
     public mouseEvents: InputMouseEventType[];
 
-    constructor() {
+    public constructor() {
         this.keyboardEvents = [];
         this.mouseEvents = [];
     }

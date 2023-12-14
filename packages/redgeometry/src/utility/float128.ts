@@ -10,17 +10,9 @@ export class Float128 {
     public readonly hi: number;
     public readonly lo: number;
 
-    constructor(hi: number, lo: number) {
+    public constructor(hi: number, lo: number) {
         this.hi = hi;
         this.lo = lo;
-    }
-
-    public get neg(): Float128 {
-        return new Float128(-this.hi, -this.lo);
-    }
-
-    public get value(): number {
-        return this.hi + this.lo;
     }
 
     public static from(n: number): Float128 {
@@ -77,12 +69,20 @@ export class Float128 {
         return f64Add64Fast(c.hi, c.lo + clo2);
     }
 
+    public neg(): Float128 {
+        return new Float128(-this.hi, -this.lo);
+    }
+
     public sub(f: Float128): Float128 {
-        return this.add(f.neg);
+        return this.add(f.neg());
     }
 
     public sub64(n: number): Float128 {
         return this.add64(-n);
+    }
+
+    public value(): number {
+        return this.hi + this.lo;
     }
 }
 

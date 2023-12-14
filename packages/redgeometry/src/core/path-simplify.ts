@@ -28,7 +28,7 @@ export interface PathSimplify2 {
 export class PathSimplifyIncremental2 implements PathSimplify2 {
     public tolerance: number;
 
-    constructor(qualityOptions: PathQualityOptions) {
+    public constructor(qualityOptions: PathQualityOptions) {
         this.tolerance = qualityOptions.simplifyTolerance;
     }
 
@@ -43,7 +43,7 @@ export class PathSimplifyIncremental2 implements PathSimplify2 {
         let cIdx = 0;
         let pIdx = 0;
 
-        let p0 = Point2.zero;
+        let p0 = Point2.ZERO;
 
         while (cIdx < commands.length) {
             const command = commands[cIdx++];
@@ -142,7 +142,7 @@ export class PathSimplifyIncremental2 implements PathSimplify2 {
 export class PathSimplifyRecursive2 implements PathSimplify2 {
     public tolerance: number;
 
-    constructor(qualityOptions: PathQualityOptions) {
+    public constructor(qualityOptions: PathQualityOptions) {
         this.tolerance = qualityOptions.simplifyTolerance;
     }
 
@@ -157,7 +157,7 @@ export class PathSimplifyRecursive2 implements PathSimplify2 {
         let cIdx = 0;
         let pIdx = 0;
 
-        let p0 = Point2.zero;
+        let p0 = Point2.ZERO;
 
         while (cIdx < commands.length) {
             const command = commands[cIdx++];

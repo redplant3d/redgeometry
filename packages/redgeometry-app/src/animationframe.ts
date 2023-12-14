@@ -10,7 +10,7 @@ type AnimationFrameCallbackContext<T> = {
 export class AnimationFrameContext<T> {
     private callbackContext: AnimationFrameCallbackContext<T>;
 
-    constructor(provider: AnimationFrameProvider, target: T, callback: AnimationFrameCallback<T>) {
+    public constructor(provider: AnimationFrameProvider, target: T, callback: AnimationFrameCallback<T>) {
         this.callbackContext = { provider, target, callback, requestHandle: 0 };
     }
 

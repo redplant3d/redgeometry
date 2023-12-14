@@ -21,11 +21,11 @@ export class SoftwareRenderContext2 implements RenderContext2 {
     private strokeOptions: ContextStrokeOptions;
     private transform: Matrix3x2;
 
-    constructor() {
+    public constructor() {
         this.fillOptions = { ...DEFAULT_CONTEXT_FILL_OPTIONS };
         this.strokeOptions = { ...DEFAULT_CONTEXT_STROKE_OPTIONS };
         this.pipeline = new PipelineSoftware();
-        this.transform = Matrix3x2.identity;
+        this.transform = Matrix3x2.createIdentity();
     }
 
     public get caps(): StrokeCaps {

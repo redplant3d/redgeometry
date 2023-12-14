@@ -10,7 +10,7 @@ export class PathSweepEvent2 {
     public seg: EdgeSegment2;
     public wind: number;
 
-    constructor(p0: Point2, p1: Point2, seg: EdgeSegment2, wind: number, left: boolean) {
+    public constructor(p0: Point2, p1: Point2, seg: EdgeSegment2, wind: number, left: boolean) {
         this.p0 = p0;
         this.p1 = p1;
         this.seg = seg;

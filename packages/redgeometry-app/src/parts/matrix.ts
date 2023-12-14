@@ -61,12 +61,12 @@ export class MatrixAppPart implements AppPart {
         const s = 0.2 * Math.min(canvasWidth, canvasHeight);
         const d = (rotation * Math.PI) / 180;
 
-        const model = Matrix4x4.identity;
+        const model = Matrix4x4.createIdentity();
         model.rotateXAnglePre(1.1 * d);
         model.rotateYAnglePre(1.3 * d);
         model.rotateZAnglePre(1.7 * d);
 
-        const view = Matrix4x4.identity;
+        const view = Matrix4x4.createIdentity();
         view.translatePre(0, 0, -10);
 
         let projection;

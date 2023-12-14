@@ -20,7 +20,7 @@ export function minimizeCurveDistanceAt(
     min: { param: number; distSq: number },
 ): void {
     if (t > 0 && t < 1) {
-        const distSq = c.getValueAt(t).sub(p).lengthSq;
+        const distSq = c.getValueAt(t).sub(p).lenSq();
 
         if (distSq < min.distSq) {
             min.param = t;
@@ -120,10 +120,10 @@ export function checkIntervalQuadQuad(
 
     log.infoDebug("Intersection candidate: [{}, {}]", ii.a, ii.b);
 
-    if (ii.diameter < eps) {
+    if (ii.diameter() < eps) {
         const mid = ii.mid;
         log.infoDebug("Intersection found at t = {} (Diam: {})", mid, ii.diameter);
-        output.push(c1.getValueAt(ii.mid));
+        output.push(c1.getValueAt(ii.mid()));
     } else {
         getIntersectionQuadQuad(c2, i2, c1, ii, output);
     }
@@ -222,8 +222,8 @@ export function getArcLengthConic(c: BezierRCurve2): number {
 }
 
 export function getParameterAtArcLengthQuadratic(c: Bezier2Curve2, d: number): number {
-    const d1 = c.p1.sub(c.p0).length;
-    const d2 = c.p2.sub(c.p1).length;
+    const d1 = c.p1.sub(c.p0).len();
+    const d2 = c.p2.sub(c.p1).len();
 
     const r = solveQuadratic(d2 - d1, d1, -d);
 
@@ -236,9 +236,9 @@ export function getParameterAtArcLengthQuadratic(c: Bezier2Curve2, d: number): n
 }
 
 export function getParameterAtArcLengthCubic(c: Bezier3Curve2, d: number): number {
-    const d1 = c.p1.sub(c.p0).length;
-    const d2 = c.p2.sub(c.p1).length;
-    const d3 = c.p2.sub(c.p1).length;
+    const d1 = c.p1.sub(c.p0).len();
+    const d2 = c.p2.sub(c.p1).len();
+    const d3 = c.p2.sub(c.p1).len();
 
     const r = solveCubic(d3 - 2 * d2 + d1, d2 - d1, d1, -d);
 
@@ -250,8 +250,8 @@ export function getParameterAtArcLengthCubic(c: Bezier3Curve2, d: number): numbe
 }
 
 export function getParameterAtArcLengthConic(c: BezierRCurve2, d: number): number {
-    const d1 = c.p1.sub(c.p0).length;
-    const d2 = c.p2.sub(c.p1).length;
+    const d1 = c.p1.sub(c.p0).len();
+    const d2 = c.p2.sub(c.p1).len();
     const dw = c.w * d1;
 
     const r = solveQuadratic(d2 - 2 * dw - d1, dw, -d);
@@ -266,16 +266,16 @@ export function getParameterAtArcLengthConic(c: BezierRCurve2, d: number): numbe
 
 function sampleArcLengthQuadratic(wz: number, xz: number, qqa: Vector2, qqb: Vector2): number {
     const v = qqa.mul(xz).add(qqb);
-    return wz * v.length;
+    return wz * v.len();
 }
 
 function sampleArcLengthCubic(wz: number, xz: number, qqa: Vector2, qqb: Vector2, qqc: Vector2): number {
     const v = qqa.mul(xz).add(qqb).mul(xz).add(qqc);
-    return wz * v.length;
+    return wz * v.len();
 }
 
 function sampleArcLengthConic(wz: number, xz: number, qqa: Vector3, qqb: Vector3, qqc: Point3): number {
     const vv = qqa.mul(xz).add(qqb).mul(xz).addPt(qqc);
     const v = Vector2.fromXYW(vv.x, vv.y, vv.z * vv.z);
-    return wz * v.length;
+    return wz * v.len();
 }

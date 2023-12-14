@@ -56,7 +56,7 @@ export class PathOverlayAppPart implements AppPart {
         const step = 1 / this.tagEntries.length;
         for (let h = 0; h < 1; h += step) {
             const c = ColorRgba.fromHsv(h, 0.25, 1, 1);
-            styles.push(c.style);
+            styles.push(c.style());
         }
 
         for (const face of this.mesh.getFaces()) {

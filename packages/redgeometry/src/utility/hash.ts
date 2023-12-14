@@ -59,11 +59,11 @@ type HashBucket<K extends Hashable, V> = {
 export class HashMap<K extends Hashable, V> {
     private buckets: HashBucket<K, V>[];
 
-    constructor(capacity?: number) {
+    public constructor(capacity?: number) {
         this.buckets = this.createBuckets(capacity ?? 1024);
     }
 
-    public get capacity(): number {
+    public capacity(): number {
         return this.buckets.length;
     }
 
@@ -132,7 +132,7 @@ export class HashMap<K extends Hashable, V> {
     }
 
     private getBucketEntries(key: K): KeyValue<K, V>[] {
-        const idx = key.hash() % this.capacity;
+        const idx = key.hash() % this.capacity();
         const bucket = this.buckets[idx];
 
         return bucket.entries;

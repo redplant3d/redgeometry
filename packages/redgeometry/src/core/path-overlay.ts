@@ -26,7 +26,7 @@ export class PathOverlay2 {
     private status: ArrayMultiSet<PathSweepEvent2>;
     private windingOperator: WindingOperator | CustomWindingOperator;
 
-    constructor(options: PathQualityOptions) {
+    public constructor(options: PathQualityOptions) {
         this.status = new ArrayMultiSet(PathSweepEvent2.compareStatus);
         this.snapRound = new SnapRound2();
 
@@ -193,8 +193,8 @@ export class PathOverlay2 {
         dataSym: PathOverlayData2,
     ): void {
         // Connect edge and set new head
-        const ce1 = MeshEdge2.findConnectingEdge(edge, ref.vector);
-        const ce2 = MeshEdge2.findConnectingEdge(ref, edge.vector);
+        const ce1 = MeshEdge2.findConnectingEdge(edge, ref.vector());
+        const ce2 = MeshEdge2.findConnectingEdge(ref, edge.vector());
         MeshEdge2.splice(ce1, ce2);
 
         // Edge `edge` has just been spliced into its edge fan
@@ -254,7 +254,7 @@ export class PathOverlay2 {
         let isDone = false;
 
         // Iterate backwards (substract windings)
-        for (let i = this.status.length - 1; i >= 0; i--) {
+        for (let i = this.status.size() - 1; i >= 0; i--) {
             const status = this.status.getAt(i);
             const ref = status.seg.ref;
             const entry = state.getEntry(ref.set);

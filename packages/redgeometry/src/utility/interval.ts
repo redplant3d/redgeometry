@@ -2,17 +2,9 @@ export class Interval {
     public readonly a: number;
     public readonly b: number;
 
-    constructor(a: number, b: number) {
+    public constructor(a: number, b: number) {
         this.a = a;
         this.b = b;
-    }
-
-    public get diameter(): number {
-        return this.b - this.a;
-    }
-
-    public get mid(): number {
-        return 0.5 * (this.a + this.b);
     }
 
     public static fromUnordered(a: number, b: number): Interval {
@@ -32,6 +24,10 @@ export class Interval {
 
     public contains(value: number): boolean {
         return this.a < value && this.b > value;
+    }
+
+    public diameter(): number {
+        return this.b - this.a;
     }
 
     public encloseInterval(i: Interval): Interval {
@@ -60,6 +56,10 @@ export class Interval {
         return this.a > this.b;
     }
 
+    public mid(): number {
+        return 0.5 * (this.a + this.b);
+    }
+
     public widen(value: number): Interval {
         return new Interval(this.a - value, this.b + value);
     }
@@ -77,7 +77,7 @@ export class IntervalSetEvent {
     public value: number;
     public weight: number;
 
-    constructor(value: number, weight: number) {
+    public constructor(value: number, weight: number) {
         this.value = value;
         this.weight = weight;
     }
@@ -86,7 +86,7 @@ export class IntervalSetEvent {
 export class IntervalSet {
     private sortedEvents: IntervalSetEvent[];
 
-    constructor() {
+    public constructor() {
         this.sortedEvents = [];
     }
 

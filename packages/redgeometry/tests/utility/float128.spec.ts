@@ -54,8 +54,8 @@ test("neg", () => {
     const neg1 = Float128.from(-1);
     const neg2 = Float128.from(-2);
 
-    expect(f1.neg.value).toEqual(neg1.value);
-    expect(f2.neg.value).toEqual(neg2.value);
+    expect(f1.neg().value()).toEqual(neg1.value());
+    expect(f2.neg().value()).toEqual(neg2.value());
 });
 
 test("sub", () => {

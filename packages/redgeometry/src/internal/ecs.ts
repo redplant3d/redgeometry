@@ -59,7 +59,7 @@ export class WorldChannelLocal implements WorldChannel {
     public readonly world: World;
     public readonly worldId: WorldId;
 
-    constructor(worldId: WorldId, world: World) {
+    public constructor(worldId: WorldId, world: World) {
         this.worldId = worldId;
         this.world = world;
     }
@@ -112,7 +112,7 @@ export class WorldChannelRemote implements WorldChannel {
     public eventBuffer: WorldEvent[];
     public transfer: Transferable[];
 
-    constructor(worldId: WorldId, remote: AppRemoteChild | undefined) {
+    public constructor(worldId: WorldId, remote: AppRemoteChild | undefined) {
         this.worldId = worldId;
         this.remote = remote;
 
@@ -189,7 +189,7 @@ export class WorldGroup {
     public readonly id: WorldGroupId;
     public readonly parent: WorldGroupParent | undefined;
 
-    constructor(
+    public constructor(
         id: WorldGroupId,
         context: AppContext,
         channelMap: Map<WorldId, WorldChannelLocal>,
@@ -323,7 +323,7 @@ export class LocalAppRemote implements AppRemoteChild, AppRemoteParent {
     public readonly responseReceiverId: WorldGroupId;
     public readonly responseSenderId: WorldGroupId;
 
-    constructor(requestSenderId: WorldGroupId, requestReceiverId: WorldGroupId) {
+    public constructor(requestSenderId: WorldGroupId, requestReceiverId: WorldGroupId) {
         this.requestSenderId = requestSenderId;
         this.requestReceiverId = requestReceiverId;
         this.responseSenderId = requestReceiverId;
@@ -390,7 +390,7 @@ export class WebAppRemoteChild implements AppRemoteChild {
     public readonly requestReceiverId: WorldGroupId;
     public readonly requestSenderId: WorldGroupId;
 
-    constructor(requestSenderId: WorldGroupId, requestReceiverId: WorldGroupId, scriptURL: URL | string) {
+    public constructor(requestSenderId: WorldGroupId, requestReceiverId: WorldGroupId, scriptURL: URL | string) {
         this.requestSenderId = requestSenderId;
         this.requestReceiverId = requestReceiverId;
 
@@ -454,7 +454,7 @@ export class WebAppRemoteParent implements AppRemoteParent {
     public readonly responseReceiverId: WorldGroupId;
     public readonly responseSenderId: WorldGroupId;
 
-    constructor(responseSenderId: WorldGroupId, responseReceiverId: WorldGroupId) {
+    public constructor(responseSenderId: WorldGroupId, responseReceiverId: WorldGroupId) {
         this.responseSenderId = responseSenderId;
         this.responseReceiverId = responseReceiverId;
 
@@ -481,7 +481,7 @@ export class EntityEntryIterator<T extends Component[]> implements IterableItera
     public componentIds: ComponentsIdsOf<T>;
     public iterator: IterableIterator<EntityEntry>;
 
-    constructor(map: Map<EntityId, EntityEntry>, componentIds: ComponentsIdsOf<T>) {
+    public constructor(map: Map<EntityId, EntityEntry>, componentIds: ComponentsIdsOf<T>) {
         this.iterator = map.values();
         this.componentIds = componentIds;
     }
@@ -507,7 +507,7 @@ export class EntityEntryChangedIterator<T extends Component[]>
     public componentIds: ComponentsIdsOf<T>;
     public iterator: IterableIterator<EntityEntry>;
 
-    constructor(map: Map<EntityId, EntityEntry>, componentIds: ComponentsIdsOf<T>) {
+    public constructor(map: Map<EntityId, EntityEntry>, componentIds: ComponentsIdsOf<T>) {
         this.iterator = map.values();
         this.componentIds = componentIds;
     }

@@ -8,7 +8,7 @@ import { Point2 } from "./point.js";
 export class Polygon2 {
     private points: Point2[];
 
-    constructor(vertices: Point2[] = []) {
+    public constructor(vertices: Point2[] = []) {
         this.points = vertices;
     }
 
@@ -86,7 +86,7 @@ export class Polygon2 {
 
         // Find the edge with the closest point on it
         for (const edge of this.getEdgeIterator()) {
-            const distSq = edge.getClosestPoint(p).sub(p).lengthSq;
+            const distSq = edge.getClosestPoint(p).sub(p).lenSq();
 
             if (distSq < minDistSq) {
                 minDistSq = distSq;
@@ -142,7 +142,7 @@ export class Polygon2 {
         // Sort points by polar angle around p0
         const points = this.points.slice();
 
-        points.sort((pa, pb) => pa.sub(p0).angle - pb.sub(p0).angle);
+        points.sort((pa, pb) => pa.sub(p0).angle() - pb.sub(p0).angle());
 
         // Compute the convex hull (graham scan)
         let idx = 2;
@@ -197,7 +197,7 @@ export class Polygon2 {
         // Find the oriented bounding box with the smallest area
         let minArea = Number.POSITIVE_INFINITY;
 
-        const points = [Point2.zero, Point2.zero, Point2.zero, Point2.zero];
+        const points = [Point2.ZERO, Point2.ZERO, Point2.ZERO, Point2.ZERO];
         const convexHull = this.getConvexHull();
 
         // Iterate all edges
@@ -224,7 +224,7 @@ export class Polygon2 {
             const p1 = edge.getValueAt(maxParam);
 
             const v0 = p1.sub(p0);
-            const v1 = v0.unit.normal.mul(minDist);
+            const v1 = v0.unit().normal().mul(minDist);
 
             const area = v0.cross(v1);
 
