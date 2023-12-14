@@ -17,5 +17,5 @@ export function dtsBundleHelper(options: DtsBundleOptions): void {
         }
     }
 
-    console.log(`\x1b[32mDone\x1b[0m`);
+    console.log("\x1b[32mDone\x1b[0m");
 }

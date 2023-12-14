@@ -112,26 +112,27 @@ export class BPlusTreeAppPart implements AppPart {
         printNode(bptree.getRootNode(), 0, 0);
 
         function printNode(node: Immutable<Node<number>>, x: number, y: number): number {
+            let yNext = y;
             if (node.type === NodeType.Internal) {
-                drawValues(node.keys, x, y, "#FF8888");
+                drawValues(node.keys, x, yNext, "#FF8888");
                 for (const child of node.children) {
-                    y = printNode(child, x + 1, y + 1);
+                    yNext = printNode(child, x + 1, yNext + 1);
                 }
-                return y;
             } else {
-                drawValues(node.values, x, y, "#8888FF");
-                return y;
+                drawValues(node.values, x, yNext, "#8888FF");
             }
+            return yNext;
         }
 
         function drawValues(values: Immutable<number[]>, x: number, y: number, color: string): void {
+            let xNext = x;
             for (const value of values) {
-                const xCoord = boxOffset + x * (boxWidth + boxPadding);
+                const xCoord = boxOffset + xNext * (boxWidth + boxPadding);
                 const yCoord = boxOffset + y * (boxHeight + boxPadding);
                 const box = Box2.fromXYWH(xCoord, yCoord, boxWidth, boxHeight);
                 ctx.fillBox(box, color);
                 ctx.fillText(value.toFixed(3), box.getCenter(), "#FFFFFF");
-                x++;
+                xNext++;
             }
         }
     }

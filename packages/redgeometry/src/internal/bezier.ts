@@ -116,16 +116,16 @@ export function checkIntervalQuadQuad(
         return;
     }
 
-    ii = ii.clamp(i1.a, i1.b);
+    const iiNext = ii.clamp(i1.a, i1.b);
 
-    log.infoDebug("Intersection candidate: [{}, {}]", ii.a, ii.b);
+    log.infoDebug("Intersection candidate: [{}, {}]", iiNext.a, iiNext.b);
 
-    if (ii.diameter() < eps) {
-        const mid = ii.mid;
-        log.infoDebug("Intersection found at t = {} (Diam: {})", mid, ii.diameter);
-        output.push(c1.getValueAt(ii.mid()));
+    if (iiNext.diameter() < eps) {
+        log.infoDebug("Intersection found at t = {} (Diam: {})", iiNext.mid(), iiNext.diameter());
+
+        output.push(c1.getValueAt(iiNext.mid()));
     } else {
-        getIntersectionQuadQuad(c2, i2, c1, ii, output);
+        getIntersectionQuadQuad(c2, i2, c1, iiNext, output);
     }
 }
 

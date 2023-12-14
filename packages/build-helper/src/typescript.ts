@@ -25,7 +25,7 @@ export function tscHelper(configOptions: ConfigOptions, compilerOptions: Compile
         console.log("\x1b[33mWarning: Emit skipped\x1b[0m");
     }
 
-    console.log(`\x1b[32mDone\x1b[0m`);
+    console.log("\x1b[32mDone\x1b[0m");
 }
 
 function getConfigJson(config: ConfigOptions): unknown {

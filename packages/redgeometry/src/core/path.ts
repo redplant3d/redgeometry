@@ -178,10 +178,12 @@ export class Path2 implements PathSink2 {
     }
 
     public addPie(pc: Point2, rx: number, ry: number, startAngle: number, sweepAngle: number): void {
+        let a = sweepAngle;
+
         // Full circle is allowed
-        if (Math.abs(sweepAngle) > 2 * Math.PI) {
+        if (Math.abs(a) > 2 * Math.PI) {
             // Basically this is the remainder
-            sweepAngle %= 2 * Math.PI;
+            a %= 2 * Math.PI;
         }
 
         let sin = Math.sin(startAngle);
@@ -192,15 +194,15 @@ export class Path2 implements PathSink2 {
         mat.scalePre(rx, ry);
         mat.translatePre(pc.x, pc.y);
 
-        if (sweepAngle < 0) {
+        if (a < 0) {
             // Flip Y
             mat.scalePost(1, -1);
         }
 
-        sweepAngle = Math.abs(sweepAngle);
+        a = Math.abs(a);
 
-        sin = Math.sin(sweepAngle);
-        cos = Math.cos(sweepAngle);
+        sin = Math.sin(a);
+        cos = Math.cos(a);
 
         let v1 = new Vector2(1, 0);
         let vc = new Vector2(1, 1);
@@ -211,7 +213,7 @@ export class Path2 implements PathSink2 {
         this.lineTo(mat.mapVector(v1).toPoint());
 
         // Iteratively process 90 degree segments
-        while (sweepAngle > 0.5 * Math.PI + 0.005) {
+        while (a > 0.5 * Math.PI + 0.005) {
             // TODO: Investigate correctness of `normal.neg`
             v1 = v1.normal().neg();
 
@@ -221,7 +223,7 @@ export class Path2 implements PathSink2 {
 
             vc = vc.normal().neg();
 
-            sweepAngle -= 0.5 * Math.PI;
+            a -= 0.5 * Math.PI;
         }
 
         // Calculate the remaining control point
@@ -578,21 +580,21 @@ export class Path2 implements PathSink2 {
         v = mat.mapVector(v);
 
         // Radii (see https://www.w3.org/TR/SVG/implnote.html#ArcCorrectionOutOfRangeRadii)
-        rx = Math.abs(rx);
-        ry = Math.abs(ry);
+        let sx = Math.abs(rx);
+        let sy = Math.abs(ry);
 
         // If scale > 1 the ellipse will need to be rescaled
-        let scale = (v.x * v.x) / (rx * rx) + (v.y * v.y) / (ry * ry);
+        let scale = (v.x * v.x) / (sx * sx) + (v.y * v.y) / (sy * sy);
 
         if (scale > 1) {
             scale = Math.sqrt(scale);
 
-            rx *= scale;
-            ry *= scale;
+            sx *= scale;
+            sy *= scale;
         }
 
         // Prepend scale
-        mat.scalePre(1 / rx, 1 / ry);
+        mat.scalePre(1 / sx, 1 / sy);
 
         // Calculate unit coordinates
         let pp0 = mat.mapPoint(p0);
@@ -626,7 +628,7 @@ export class Path2 implements PathSink2 {
         // Set up the final transformation matrix
         mat.rotateSet(v1.y, v1.x);
         mat.translatePre(pc.x, pc.y);
-        mat.scalePre(rx, ry);
+        mat.scalePre(sx, sy);
         mat.rotatePre(sin, cos);
 
         // We have `sin = v1.cross(v2) / (v1.length * v2.length)`

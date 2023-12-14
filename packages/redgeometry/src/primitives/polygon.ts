@@ -13,17 +13,17 @@ export class Polygon2 {
     }
 
     public static isAreaIntersection(poly1: Polygon2, poly2: Polygon2, isNonZero: boolean): boolean {
-        if (this.isEdgeIntersection(poly1, poly2)) {
+        if (Polygon2.isEdgeIntersection(poly1, poly2)) {
             // Polygons intersect
             return true;
         }
 
-        if (this.isPointInside(poly1, poly2.points[0], isNonZero)) {
+        if (Polygon2.isPointInside(poly1, poly2.points[0], isNonZero)) {
             // `poly2` is inside `poly1`
             return true;
         }
 
-        if (this.isPointInside(poly2, poly1.points[0], isNonZero)) {
+        if (Polygon2.isPointInside(poly2, poly1.points[0], isNonZero)) {
             // `poly1` is inside `poly2`
             return true;
         }
@@ -60,7 +60,7 @@ export class Polygon2 {
 
     public static isPolygonInside(poly1: Polygon2, poly2: Polygon2, isNonZero = false): boolean {
         for (const p of poly2.points) {
-            if (!this.isPointInside(poly1, p, isNonZero)) {
+            if (!Polygon2.isPointInside(poly1, p, isNonZero)) {
                 return false;
             }
         }

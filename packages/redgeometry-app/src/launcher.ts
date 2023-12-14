@@ -329,6 +329,6 @@ export class AppLauncher {
             }
         }
 
-        window.history.pushState(null, "", "?" + params.toString());
+        window.history.pushState(null, "", `?${params}`);
     }
 }

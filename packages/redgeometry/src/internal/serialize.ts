@@ -82,8 +82,8 @@ export class SerializationMap {
 
     public deserialize(json: string): unknown {
         return JSON.parse(json, (_, obj) => {
-            const type = obj["type"];
-            const data = obj["data"];
+            const type = obj.type;
+            const data = obj.data;
 
             // Check if object needs to be revived
             if (type === undefined || data === undefined) {

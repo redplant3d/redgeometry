@@ -66,7 +66,7 @@ export function insertOuterJoin(
     ml: number,
     join: JoinType,
 ): void {
-    ml *= Math.abs(d);
+    const mld = ml * Math.abs(d);
 
     switch (join) {
         case JoinType.Bevel: {
@@ -79,7 +79,7 @@ export function insertOuterJoin(
 
             k = k.mul(2 * d).div(k.lenSq());
 
-            if (k.lenSq() <= ml * ml) {
+            if (k.lenSq() <= mld * mld) {
                 path.lineTo(p.add(k));
             }
 
@@ -95,18 +95,18 @@ export function insertOuterJoin(
             const pp0 = p.addMul(n0, d);
             const pp2 = p.addMul(n1, d);
 
-            if (k.lenSq() <= ml * ml) {
+            if (k.lenSq() <= mld * mld) {
                 // Same as miter join
                 path.lineTo(p.add(k));
             } else if (n0.dot(n1) <= COS_ACUTE) {
                 // Join is too sharp ('k' is approaching infinity)
-                path.lineTo(pp0.addMul(n0.normal(), -ml));
-                path.lineTo(pp2.addMul(n1.normal(), ml));
+                path.lineTo(pp0.addMul(n0.normal(), -mld));
+                path.lineTo(pp2.addMul(n1.normal(), mld));
             } else {
                 const kov = k.dot(p.sub(pp0));
                 const kok = k.dot(k);
 
-                const t = (kov + ml * Math.sqrt(kok)) / (kov + kok);
+                const t = (kov + mld * Math.sqrt(kok)) / (kov + kok);
 
                 // Fall back to bevel otherwise
                 if (t > 0) {

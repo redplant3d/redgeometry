@@ -883,7 +883,7 @@ export class BezierRCurve2 {
         const pp0 = Point2.fromXYW(p0.x, p0.y, p0.z);
         const pp1 = Point2.fromXYW(p1.x, p1.y, p1.z);
         const pp2 = Point2.fromXYW(p2.x, p2.y, p2.z);
-        const w = this.getNormalizedWeight(p0.z, p1.z, p2.z);
+        const w = BezierRCurve2.getNormalizedWeight(p0.z, p1.z, p2.z);
 
         return new BezierRCurve2(pp0, pp1, pp2, w);
     }

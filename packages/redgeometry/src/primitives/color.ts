@@ -52,7 +52,7 @@ export class ColorRgba {
         const g = this.clampFloatToHex(this.g);
         const b = this.clampFloatToHex(this.b);
         const a = this.clampFloatToHex(this.a);
-        return "#" + r + g + b + a;
+        return `#${r}${g}${b}${a}`;
     }
 
     private clampFloatToHex(f: number): string {

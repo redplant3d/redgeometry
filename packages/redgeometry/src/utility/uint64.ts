@@ -90,26 +90,26 @@ export class Uint64 {
     }
 
     public shl(n: number): Uint64 {
-        n &= 63;
-        if (n < 32) {
-            const hi = (this.hi << n) | (this.lo >>> (32 - n));
-            const lo = this.lo << n;
+        const sh = n & 63;
+        if (sh < 32) {
+            const hi = (this.hi << sh) | (this.lo >>> (32 - sh));
+            const lo = this.lo << sh;
             return new Uint64(hi, lo);
         } else {
             // `lo` is always 0
-            return new Uint64(this.lo << (n - 32), 0);
+            return new Uint64(this.lo << (sh - 32), 0);
         }
     }
 
     public shr(n: number): Uint64 {
-        n &= 63;
-        if (n < 32) {
-            const hi = this.hi >>> n;
-            const lo = (this.lo >>> n) | (this.hi << (32 - n));
+        const sh = n & 63;
+        if (sh < 32) {
+            const hi = this.hi >>> sh;
+            const lo = (this.lo >>> sh) | (this.hi << (32 - sh));
             return new Uint64(hi, lo);
         } else {
             // `hi` is always 0
-            return new Uint64(0, this.hi >>> (n - 32));
+            return new Uint64(0, this.hi >>> (sh - 32));
         }
     }
 

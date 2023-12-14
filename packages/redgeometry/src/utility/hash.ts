@@ -41,14 +41,14 @@ export class Hash {
 
     public static rotateLeft(value: number, n: number): number {
         // JS integer values are 32-bit
-        n &= 31;
-        return (value << n) | (value >>> (32 - n));
+        const sh = n & 31;
+        return (value << sh) | (value >>> (32 - sh));
     }
 
     public static rotateRight(value: number, n: number): number {
         // JS integer values are 32-bit
-        n &= 31;
-        return (value >>> n) | (value << (32 - n));
+        const sh = n & 31;
+        return (value >>> sh) | (value << (32 - sh));
     }
 }
 

@@ -1222,7 +1222,7 @@ export class Matrix4x4 {
         const width = aspect * height;
         const left = -0.5 * width;
 
-        return this.fromPerspective(left, left + width, top, top - height, near, far);
+        return Matrix4x4.fromPerspective(left, left + width, top, top - height, near, far);
     }
 
     /**

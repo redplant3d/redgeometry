@@ -102,5 +102,5 @@ export function writeMeta(path: string, results: BuildResult[]): void {
         writeFile(metaPath, metaData);
     }
 
-    console.log(`\x1b[32mDone\x1b[0m`);
+    console.log("\x1b[32mDone\x1b[0m");
 }
