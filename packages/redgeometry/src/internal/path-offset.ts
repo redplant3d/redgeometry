@@ -127,7 +127,7 @@ export function insertOuterJoin(
 
             if (n0.dot(n1) < 0) {
                 // Obtuse angle (2 segments)
-                const nm = pp2.sub(pp0).unit().normal();
+                const nm = pp2.sub(pp0).unitOrZero().normal();
 
                 let k = n0.add(nm);
 

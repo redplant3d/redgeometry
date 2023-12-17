@@ -172,6 +172,11 @@ export class Vector2 {
     public unit(): Vector2 {
         return this.div(this.len());
     }
+
+    public unitOrZero(): Vector2 {
+        const len = this.len();
+        return len > 0 ? this.div(len) : Vector2.ZERO;
+    }
 }
 
 export class Vector3 {
@@ -345,5 +350,10 @@ export class Vector3 {
 
     public unit(): Vector3 {
         return this.div(this.len());
+    }
+
+    public unitOrZero(): Vector3 {
+        const len = this.len();
+        return len > 0 ? this.div(len) : Vector3.ZERO;
     }
 }
