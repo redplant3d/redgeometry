@@ -7,8 +7,8 @@ export enum MatrixType {
     NonAffine,
 }
 
-export type Matrix3Next = Matrix3x2 | Matrix3x3;
-export type Matrix4Next = Matrix4x3 | Matrix4x4;
+export type Matrix3 = Matrix3x2 | Matrix3x3;
+export type Matrix4 = Matrix4x3 | Matrix4x4;
 
 /**
  * Represents a matrix for affine transformations in 2D:
@@ -684,20 +684,6 @@ export class Matrix3x3 {
         const m33 = detInv * (el[0] * el[4] - el[1] * el[3]);
 
         return new Matrix3x3(m11, m12, m13, m21, m22, m23, m31, m32, m33);
-    }
-
-    public getMaxScale(): number {
-        const el = this.elements;
-
-        // Compute elements of `S^2 = M * M^T`
-        const s11 = el[0] * el[0] + el[1] * el[1];
-        const s12 = el[0] * el[3] + el[1] * el[4];
-        const s22 = el[3] * el[3] + el[4] * el[4];
-
-        // The eigenvalue of `S^2` is the squared eigenvalue of the singular values of `M`
-        const eig = getMaxEigenvalueSym2x2(s11, s12, s22);
-
-        return Math.sqrt(eig);
     }
 
     /**
@@ -1992,8 +1978,8 @@ export class Matrix4x4 {
         this.elements = [m11, m12, m13, m14, m21, m22, m23, m24, m31, m32, m33, m34, m41, m42, m43, m44];
     }
 
-    public get type(): MatrixType.Affine {
-        return MatrixType.Affine;
+    public get type(): MatrixType.NonAffine {
+        return MatrixType.NonAffine;
     }
 
     /**
@@ -2225,23 +2211,6 @@ export class Matrix4x4 {
             el[14],
             el[15],
         );
-    }
-
-    public getMaxScale(): number {
-        const el = this.elements;
-
-        // Compute elements of `S^2 = M * M^T`
-        const s11 = el[0] * el[0] + el[1] * el[1] + el[2] * el[2];
-        const s12 = el[0] * el[4] + el[1] * el[5] + el[2] * el[6];
-        const s13 = el[0] * el[8] + el[1] * el[9] + el[2] * el[10];
-        const s22 = el[4] * el[4] + el[5] * el[5] + el[6] * el[6];
-        const s23 = el[4] * el[8] + el[5] * el[9] + el[6] * el[10];
-        const s33 = el[8] * el[8] + el[9] * el[9] + el[10] * el[10];
-
-        // The eigenvalue of `S^2` is the squared eigenvalue of the singular values of `M`
-        const eig = getMaxEigenvalueSym3x3(s11, s12, s13, s22, s23, s33);
-
-        return Math.sqrt(eig);
     }
 
     /**
