@@ -143,7 +143,8 @@ export function meshRenderSystem(world: World): void {
     const { projection } = mainCameraComponents.camera;
     const { local } = mainCameraComponents.transform;
 
-    const mat = projection.clone().mul(local);
+    const mat = projection.clone();
+    mat.mul(local);
 
     const bindGroup0 = createBindGroup0(device, pipelineContext, mat);
 

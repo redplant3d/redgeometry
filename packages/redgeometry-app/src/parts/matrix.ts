@@ -79,10 +79,10 @@ export class MatrixAppPart implements AppPart {
 
         projection.scalePre(s, s, s);
         projection.translatePre(w, h, 0);
+        projection.mul(view);
+        projection.mul(model);
 
-        const pvm = projection.mul(view).mul(model);
-
-        this.edges = this.transformEdges(edges, pvm);
+        this.edges = this.transformEdges(edges, projection);
 
         // log.infoDebug("*********");
         // for (const e of this.edges) {

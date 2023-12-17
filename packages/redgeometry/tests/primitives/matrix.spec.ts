@@ -1,16 +1,16 @@
 import { expect, test } from "vitest";
-import { Matrix3x2, Matrix3x3, Matrix4x4 } from "../../src/primitives/matrix.js";
+import { Matrix3x2, Matrix3x3, Matrix4x3, Matrix4x4 } from "../../src/primitives/matrix.js";
 import { Point2, Point3 } from "../../src/primitives/point.js";
 import { Vector2, Vector3 } from "../../src/primitives/vector.js";
 
 test("Matrix3x2 - inverse", () => {
-    const mat1 = Matrix3x2.createIdentity();
-    mat1.translatePre(1, 2);
-    mat1.scalePre(4, 4);
-    mat1.rotateAnglePre(Math.PI);
-    const mat2 = mat1.inverse();
+    const mat = Matrix3x2.createIdentity();
+    mat.translatePre(1, 2);
+    mat.scalePre(4, 4);
+    mat.rotateAnglePre(Math.PI);
 
-    const mat = mat1.mul(mat2);
+    const matInv = mat.getInverse();
+    mat.mul(matInv);
 
     expect(mat).toEqual(Matrix3x2.createIdentity());
 });
@@ -73,15 +73,15 @@ test("Matrix3x2 - translate", () => {
 });
 
 test("Matrix3x3 - inverse", () => {
-    const mat1 = Matrix3x3.createIdentity();
-    mat1.translatePre(1, 2);
-    mat1.scalePre(4, 4);
-    mat1.rotateAnglePre(Math.PI);
-    const mat2 = mat1.inverse();
+    const mat = Matrix3x3.createIdentity();
+    mat.translatePre(1, 2);
+    mat.scalePre(4, 4);
+    mat.rotateAnglePre(Math.PI);
 
-    const m = mat1.mul(mat2);
+    const matInv = mat.getInverse();
+    mat.mul(matInv);
 
-    expect(m).toEqual(Matrix3x3.createIdentity());
+    expect(mat).toEqual(Matrix3x3.createIdentity());
 });
 
 test("Matrix3x3 - mapPoint", () => {
@@ -136,6 +136,89 @@ test("Matrix3x3 - translate", () => {
     mat1.translatePost(1, 2);
     mat2.translatePre(1, 2);
     mat3.translateSet(1, 2);
+
+    expect(mat1).toEqual(mat2);
+    expect(mat2).toEqual(mat3);
+});
+
+test("Matrix4x3 - mapPoint", () => {
+    const mat = Matrix4x3.createIdentity();
+    const p = new Point3(1, 2, 3);
+
+    const mapPoint = mat.mapPoint(p);
+
+    expect(mapPoint).toEqual(p);
+});
+
+test("Matrix4x3 - mapVector", () => {
+    const mat = Matrix4x3.createIdentity();
+    const v = new Vector3(1, 2, 3);
+
+    const mapVector = mat.mapVector(v);
+
+    expect(mapVector).toEqual(v);
+});
+
+test("Matrix4x3 - rotateX", () => {
+    const mat1 = Matrix4x3.createIdentity();
+    const mat2 = Matrix4x3.createIdentity();
+    const mat3 = Matrix4x3.createIdentity();
+
+    mat1.rotateXAnglePost(1);
+    mat2.rotateXAnglePre(1);
+    mat3.rotateXAngleSet(1);
+
+    expect(mat1).toEqual(mat2);
+    expect(mat2).toEqual(mat3);
+});
+
+test("Matrix4x3 - rotateY", () => {
+    const mat1 = Matrix4x3.createIdentity();
+    const mat2 = Matrix4x3.createIdentity();
+    const mat3 = Matrix4x3.createIdentity();
+
+    mat1.rotateYAnglePost(1);
+    mat2.rotateYAnglePre(1);
+    mat3.rotateYAngleSet(1);
+
+    expect(mat1).toEqual(mat2);
+    expect(mat2).toEqual(mat3);
+});
+
+test("Matrix4x3 - rotateZ", () => {
+    const mat1 = Matrix4x3.createIdentity();
+    const mat2 = Matrix4x3.createIdentity();
+    const mat3 = Matrix4x3.createIdentity();
+
+    mat1.rotateZAnglePost(1);
+    mat2.rotateZAnglePre(1);
+    mat3.rotateZAngleSet(1);
+
+    expect(mat1).toEqual(mat2);
+    expect(mat2).toEqual(mat3);
+});
+
+test("Matrix4x3 - scale", () => {
+    const mat1 = Matrix4x3.createIdentity();
+    const mat2 = Matrix4x3.createIdentity();
+    const mat3 = Matrix4x3.createIdentity();
+
+    mat1.scalePost(1, 2, 3);
+    mat2.scalePre(1, 2, 3);
+    mat3.scaleSet(1, 2, 3);
+
+    expect(mat1).toEqual(mat2);
+    expect(mat2).toEqual(mat3);
+});
+
+test("Matrix4x3 - translate", () => {
+    const mat1 = Matrix4x3.createIdentity();
+    const mat2 = Matrix4x3.createIdentity();
+    const mat3 = Matrix4x3.createIdentity();
+
+    mat1.translatePost(1, 2, 3);
+    mat2.translatePre(1, 2, 3);
+    mat3.translateSet(1, 2, 3);
 
     expect(mat1).toEqual(mat2);
     expect(mat2).toEqual(mat3);
