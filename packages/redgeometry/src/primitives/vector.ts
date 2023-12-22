@@ -291,7 +291,7 @@ export class Vector3 {
     }
 
     public lenSq(): number {
-        return this.x * this.x + this.y * this.y + this.z * this.y;
+        return this.x * this.x + this.y * this.y + this.z * this.z;
     }
 
     public mul(f: number): Vector3 {
