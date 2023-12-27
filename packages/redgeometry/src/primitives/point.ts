@@ -118,8 +118,8 @@ export class Point2 {
         return this.x === p.x ? this.y <= p.y : this.x < p.x;
     }
 
-    public sub(v: Point2): Vector2 {
-        return new Vector2(this.x - v.x, this.y - v.y);
+    public sub(p: Point2): Vector2 {
+        return new Vector2(this.x - p.x, this.y - p.y);
     }
 
     public toArray(): number[] {
