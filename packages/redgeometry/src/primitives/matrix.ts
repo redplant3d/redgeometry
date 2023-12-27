@@ -78,19 +78,18 @@ export class Matrix3x2 {
 
     /**
      * ```
-     * | cos  -sin  0 |
-     * | sin   cos  0 |
-     * |   0    0   1 |
+     * | z11  z12  0 |
+     * | z21  z22  0 |
+     * |   0    0  1 |
      * ```
      */
-    public static fromRotation(sin: number, cos: number): Matrix3x2 {
-        return new Matrix3x2(cos, -sin, 0, sin, cos, 0);
-    }
+    public static fromRotation(za: number, zb: number): Matrix3x2 {
+        const z11 = za;
+        const z12 = -zb;
+        const z21 = zb;
+        const z22 = za;
 
-    public static fromRotationAngle(a: number): Matrix3x2 {
-        const sin = Math.sin(a);
-        const cos = Math.cos(a);
-        return Matrix3x2.fromRotation(sin, cos);
+        return new Matrix3x2(z11, z12, 0, z21, z22, 0);
     }
 
     /**
@@ -228,110 +227,77 @@ export class Matrix3x2 {
         el1[5] = m23;
     }
 
-    public rotateAnglePost(a: number): void {
-        const sin = Math.sin(a);
-        const cos = Math.cos(a);
-        this.rotatePost(sin, cos);
-    }
-
-    public rotateAnglePre(a: number): void {
-        const sin = Math.sin(a);
-        const cos = Math.cos(a);
-        this.rotatePre(sin, cos);
-    }
-
-    public rotateAngleSet(a: number): void {
-        const sin = Math.sin(a);
-        const cos = Math.cos(a);
-        this.rotateSet(sin, cos);
-    }
-
-    public rotateAroundAnglePost(a: number, x: number, y: number): void {
-        const sin = Math.sin(a);
-        const cos = Math.cos(a);
-        this.rotateAroundPost(sin, cos, x, y);
-    }
-
-    public rotateAroundAnglePre(a: number, x: number, y: number): void {
-        const sin = Math.sin(a);
-        const cos = Math.cos(a);
-        this.rotateAroundPre(sin, cos, x, y);
-    }
-
-    public rotateAroundPost(sin: number, cos: number, x: number, y: number): void {
-        this.translatePost(x, y);
-        this.rotatePost(sin, cos);
-        this.translatePost(-x, -y);
-    }
-
-    public rotateAroundPre(sin: number, cos: number, x: number, y: number): void {
-        this.translatePre(-x, -y);
-        this.rotatePre(sin, cos);
-        this.translatePre(x, y);
-    }
-
     /**
      * ```
-     * | m11  m12  m13 |   | cos  -sin  0 |
-     * | m21  m22  m23 | * | sin   cos  0 |
-     * | 0    0      1 |   |   0     0  1 |
+     * | m11  m12  m13 |   | z11  z12  0 |
+     * | m21  m22  m23 | * | z21  z22  0 |
+     * | 0    0      1 |   |   0    0  1 |
      * ```
      */
-    public rotatePost(sin: number, cos: number): void {
-        // | m11 * cos + m12 * sin  m12 * cos + m11 * -sin  m13 |
-        // | m21 * cos + m22 * sin  m22 * cos + m21 * -sin  m23 |
-        // |                     0                       0    1 |
+    public rotatePost(za: number, zb: number): void {
+        const z11 = za;
+        const z12 = -zb;
+        const z21 = zb;
+        const z22 = za;
+
         const el = this.elements;
 
-        const m11 = el[1] * sin + el[0] * cos;
-        const m12 = el[1] * cos - el[0] * sin;
+        const m11 = el[0] * z11 + el[1] * z21;
+        const m12 = el[0] * z12 + el[1] * z22;
         el[0] = m11;
         el[1] = m12;
 
-        const m21 = el[4] * sin + el[3] * cos;
-        const m22 = el[4] * cos - el[3] * sin;
+        const m21 = el[3] * z11 + el[4] * z21;
+        const m22 = el[3] * z12 + el[4] * z22;
         el[3] = m21;
         el[4] = m22;
     }
 
     /**
      * ```
-     * | cos  -sin  0 |   | m11  m12  m13 |
-     * | sin   cos  0 | * | m21  m22  m23 |
-     * |   0     0  1 |   |   0    0    1 |
+     * | z11  z12  0 |   | m11  m12  m13 |
+     * | z21  z22  0 | * | m21  m22  m23 |
+     * |   0    0  1 |   |   0    0    1 |
      * ```
      */
-    public rotatePre(sin: number, cos: number): void {
-        // | cos * m11 + -sin * m21  cos * m12 + -sin * m22  cos * m13 + -sin * m23 |
-        // |  cos * m21 + sin * m11   cos * m22 + sin * m12   cos * m23 + sin * m13 |
-        // |                      0                       0                       1 |
+    public rotatePre(za: number, zb: number): void {
+        const z11 = za;
+        const z12 = -zb;
+        const z21 = zb;
+        const z22 = za;
+
         const el = this.elements;
 
-        const m11 = el[0] * cos - el[3] * sin;
-        const m21 = el[3] * cos + el[0] * sin;
+        const m11 = z11 * el[0] + z12 * el[3];
+        const m21 = z21 * el[0] + z22 * el[3];
         el[0] = m11;
         el[3] = m21;
 
-        const m12 = el[1] * cos - el[4] * sin;
-        const m22 = el[4] * cos + el[1] * sin;
+        const m12 = z11 * el[1] + z12 * el[4];
+        const m22 = z21 * el[1] + z22 * el[4];
         el[1] = m12;
         el[4] = m22;
 
-        const m13 = el[2] * cos - el[5] * sin;
-        const m23 = el[5] * cos + el[2] * sin;
+        const m13 = z11 * el[2] + z12 * el[5];
+        const m23 = z21 * el[2] + z22 * el[5];
         el[2] = m13;
         el[5] = m23;
     }
 
     /**
      * ```
-     * | cos  -sin  0 |
-     * | sin   cos  0 |
-     * |   0     0  1 |
+     * | z11  z12  0 |
+     * | z21  z22  0 |
+     * |   0    0  1 |
      * ```
      */
-    public rotateSet(sin: number, cos: number): void {
-        this.set(cos, -sin, 0, sin, cos, 0);
+    public rotateSet(za: number, zb: number): void {
+        const z11 = za;
+        const z12 = -zb;
+        const z21 = zb;
+        const z22 = za;
+
+        this.set(z11, z12, 0, z21, z22, 0);
     }
 
     /**
@@ -596,19 +562,18 @@ export class Matrix3x3 {
 
     /**
      * ```
-     * | cos  -sin  0 |
-     * | sin   cos  0 |
-     * |   0    0   1 |
+     * | z11  z12  0 |
+     * | z21  z22  0 |
+     * |   0    0  1 |
      * ```
      */
-    public static fromRotation(sin: number, cos: number): Matrix3x3 {
-        return new Matrix3x3(cos, -sin, 0, sin, cos, 0, 0, 0, 1);
-    }
+    public static fromRotation(za: number, zb: number): Matrix3x3 {
+        const z11 = za;
+        const z12 = -zb;
+        const z21 = zb;
+        const z22 = za;
 
-    public static fromRotationAngle(a: number): Matrix3x3 {
-        const sin = Math.sin(a);
-        const cos = Math.cos(a);
-        return Matrix3x3.fromRotation(sin, cos);
+        return new Matrix3x3(z11, z12, 0, z21, z22, 0, 0, 0, 1);
     }
 
     /**
@@ -752,114 +717,81 @@ export class Matrix3x3 {
         el1[8] = m33;
     }
 
-    public rotateAnglePost(a: number): void {
-        const sin = Math.sin(a);
-        const cos = Math.cos(a);
-        this.rotatePost(sin, cos);
-    }
-
-    public rotateAnglePre(a: number): void {
-        const sin = Math.sin(a);
-        const cos = Math.cos(a);
-        this.rotatePre(sin, cos);
-    }
-
-    public rotateAngleSet(a: number): void {
-        const sin = Math.sin(a);
-        const cos = Math.cos(a);
-        this.rotateSet(sin, cos);
-    }
-
-    public rotateAroundAnglePost(a: number, x: number, y: number): void {
-        const sin = Math.sin(a);
-        const cos = Math.cos(a);
-        this.rotateAroundPost(sin, cos, x, y);
-    }
-
-    public rotateAroundAnglePre(a: number, x: number, y: number): void {
-        const sin = Math.sin(a);
-        const cos = Math.cos(a);
-        this.rotateAroundPre(sin, cos, x, y);
-    }
-
-    public rotateAroundPost(sin: number, cos: number, x: number, y: number): void {
-        this.translatePost(x, y);
-        this.rotatePost(sin, cos);
-        this.translatePost(-x, -y);
-    }
-
-    public rotateAroundPre(sin: number, cos: number, x: number, y: number): void {
-        this.translatePre(-x, -y);
-        this.rotatePre(sin, cos);
-        this.translatePre(x, y);
-    }
-
     /**
      * ```
-     * | m11  m12  m13 |   | cos  -sin  0 |
-     * | m21  m22  m23 | * | sin   cos  0 |
-     * | m31  m32  m33 |   |   0     0  1 |
+     * | m11  m12  m13 |   | z11  z12  0 |
+     * | m21  m22  m23 | * | z21  z22  0 |
+     * | m31  m32  m33 |   |   0    0  1 |
      * ```
      */
-    public rotatePost(sin: number, cos: number): void {
-        // | m11 * cos + m12 * sin  m11 * -sin + m12 * cos  m13 |
-        // | m21 * cos + m12 * sin  m21 * -sin + m22 * cos  m23 |
-        // | m31 * cos + m32 * sin  m31 * -sin + m32 * cos  m33 |
+    public rotatePost(za: number, zb: number): void {
+        const z11 = za;
+        const z12 = -zb;
+        const z21 = zb;
+        const z22 = za;
+
         const el = this.elements;
 
-        const m11 = el[1] * sin + el[0] * cos;
-        const m12 = el[1] * cos - el[0] * sin;
+        const m11 = el[0] * z11 + el[1] * z21;
+        const m12 = el[0] * z12 + el[1] * z22;
         el[0] = m11;
         el[1] = m12;
 
-        const m21 = el[4] * sin + el[3] * cos;
-        const m22 = el[4] * cos - el[3] * sin;
+        const m21 = el[3] * z11 + el[4] * z21;
+        const m22 = el[3] * z12 + el[4] * z22;
         el[3] = m21;
         el[4] = m22;
 
-        const m31 = el[7] * sin + el[6] * cos;
-        const m32 = el[7] * cos - el[6] * sin;
+        const m31 = el[6] * z11 + el[7] * z21;
+        const m32 = el[6] * z12 + el[7] * z22;
         el[6] = m31;
         el[7] = m32;
     }
 
     /**
      * ```
-     * | cos  -sin  0 |   | m11  m12  m13 |
-     * | sin   cos  0 | * | m21  m22  m23 |
-     * |   0     0  1 |   | m31  m32  m33 |
+     * | z11  z12  0 |   | m11  m12  m13 |
+     * | z21  z22  0 | * | m21  m22  m23 |
+     * |   0    0  1 |   | m31  m32  m33 |
      * ```
      */
-    public rotatePre(sin: number, cos: number): void {
-        // | cos * m11 + -sin * m21  cos * m12 + -sin * m22  cos * m32 + -sin * m32 |
-        // |  sin * m11 + cos * m21   sin * m12 + cos * m22   sin * m32 + cos * m32 |
-        // |                    m31                     m32                     m33 |
+    public rotatePre(za: number, zb: number): void {
+        const z11 = za;
+        const z12 = -zb;
+        const z21 = zb;
+        const z22 = za;
+
         const el = this.elements;
 
-        const m11 = el[0] * cos - el[3] * sin;
-        const m21 = el[0] * sin + el[3] * cos;
+        const m11 = z11 * el[0] + z12 * el[3];
+        const m21 = z21 * el[0] + z22 * el[3];
         el[0] = m11;
         el[3] = m21;
 
-        const m12 = el[1] * cos - el[4] * sin;
-        const m22 = el[1] * sin + el[4] * cos;
+        const m12 = z11 * el[1] + z12 * el[4];
+        const m22 = z21 * el[1] + z22 * el[4];
         el[1] = m12;
         el[4] = m22;
 
-        const m13 = el[2] * cos - el[5] * sin;
-        const m23 = el[2] * sin + el[5] * cos;
+        const m13 = z11 * el[2] + z12 * el[5];
+        const m23 = z21 * el[2] + z22 * el[5];
         el[2] = m13;
         el[5] = m23;
     }
 
     /* ```
-     * | cos  -sin  0 |
-     * | sin   cos  0 |
-     * |   0     0  1 |
+     * | z11  z12  0 |
+     * | z21  z22  0 |
+     * |   0    0  1 |
      * ```
      */
-    public rotateSet(sin: number, cos: number): void {
-        this.set(cos, -sin, 0, sin, cos, 0, 0, 0, 1);
+    public rotateSet(za: number, zb: number): void {
+        const z11 = za;
+        const z12 = -zb;
+        const z21 = zb;
+        const z22 = za;
+
+        this.set(z11, z12, 0, z21, z22, 0, 0, 0, 1);
     }
 
     /**
@@ -1136,6 +1068,28 @@ export class Matrix4x3 {
         return new Matrix4x3(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
     }
 
+    /**
+     * ```
+     * | m11  m12  m13  0 |
+     * | m21  m22  m23  0 |
+     * | m31  m32  m33  0 |
+     * |   0    0    0  1 |
+     * ```
+     */
+    public static fromAffine(
+        m11: number,
+        m12: number,
+        m13: number,
+        m21: number,
+        m22: number,
+        m23: number,
+        m31: number,
+        m32: number,
+        m33: number,
+    ): Matrix4x3 {
+        return new Matrix4x3(m11, m12, m13, 0, m21, m22, m23, 0, m31, m32, m33, 0);
+    }
+
     public static fromArray(elements: ArrayLike<number>, offset = 0, transpose = false): Matrix4x3 {
         const el = elements;
         const i = offset;
@@ -1158,56 +1112,37 @@ export class Matrix4x3 {
 
     /**
      * ```
-     * | 1    0     0  0 |
-     * | 0  cos  -sin  0 |
-     * | 0  sin   cos  0 |
-     * | 0    0     0  1 |
+     * | q11  q12  q13  0 |
+     * | q21  q22  q23  0 |
+     * | q31  q32  q33  0 |
+     * |   0    0    0  1 |
      * ```
      */
-    public static fromRotationX(sin: number, cos: number): Matrix4x3 {
-        return new Matrix4x3(1, 0, 0, 0, 0, cos, -sin, 0, 0, sin, cos, 0);
-    }
+    public static fromRotation(qa: number, qb: number, qc: number, qd: number): Matrix4x3 {
+        const qaa = qa * qa;
+        const qbb = qb * qb;
+        const qcc = qc * qc;
+        const qdd = qd * qd;
+        const q11 = qaa + qbb - qcc - qdd;
+        const q22 = qaa - qbb + qcc - qdd;
+        const q33 = qaa - qbb - qcc + qdd;
 
-    public static fromRotationXAngle(a: number): Matrix4x3 {
-        const sin = Math.sin(a);
-        const cos = Math.cos(a);
-        return Matrix4x3.fromRotationX(sin, cos);
-    }
+        const qbc = qb * qc;
+        const qad = qa * qd;
+        const q12 = qbc + qbc - qad - qad;
+        const q21 = qbc + qbc + qad + qad;
 
-    /**
-     * ```
-     * |  cos  0  sin  0 |
-     * |    0  1    0  0 |
-     * | -sin  0  cos  0 |
-     * |    0  0    0  1 |
-     * ```
-     */
-    public static fromRotationY(sin: number, cos: number): Matrix4x3 {
-        return new Matrix4x3(cos, 0, sin, 0, 0, 1, 0, 0, -sin, 0, cos, 0);
-    }
+        const qbd = qb * qd;
+        const qac = qa * qc;
+        const q13 = qbd + qbd + qac + qac;
+        const q31 = qbd + qbd - qac - qac;
 
-    public static fromRotationYAngle(a: number): Matrix4x3 {
-        const sin = Math.sin(a);
-        const cos = Math.cos(a);
-        return Matrix4x3.fromRotationX(sin, cos);
-    }
+        const qcd = qc * qd;
+        const qab = qa * qb;
+        const q23 = qcd + qcd - qab - qab;
+        const q32 = qcd + qcd + qab + qab;
 
-    /**
-     * ```
-     * | cos  -sin  0  0 |
-     * | sin   cos  0  0 |
-     * |   0     0  1  0 |
-     * |   0     0  0  1 |
-     * ```
-     */
-    public static fromRotationZ(sin: number, cos: number): Matrix4x3 {
-        return new Matrix4x3(cos, -sin, 0, 0, sin, cos, 0, 0, 0, 0, 1, 0);
-    }
-
-    public static fromRotationZAngle(a: number): Matrix4x3 {
-        const sin = Math.sin(a);
-        const cos = Math.cos(a);
-        return Matrix4x3.fromRotationX(sin, cos);
+        return new Matrix4x3(q11, q12, q13, 0, q21, q22, q23, 0, q31, q32, q33, 0);
     }
 
     /**
@@ -1318,14 +1253,6 @@ export class Matrix4x3 {
         return new Vector3(x, y, z);
     }
 
-    /**
-     * ```
-     * | m11  m12  m13  m14 |   | m11  m12  m13  m14 |
-     * | m21  m22  m23  m24 | * | m21  m22  m23  m24 |
-     * | m31  m32  m33  m34 |   | m31  m32  m33  m34 |
-     * |   0    0    0    1 |   |   0    0    0    1 |
-     * ```
-     */
     public mul(mat: Matrix4x3): void {
         const el1 = this.elements;
         const el2 = mat.elements;
@@ -1358,353 +1285,158 @@ export class Matrix4x3 {
         el1[11] = m34;
     }
 
-    public rotateAroundAnglePost(ax: number, ay: number, az: number, x: number, y: number, z: number): void {
-        const sinx = Math.sin(ax);
-        const cosx = Math.cos(ax);
-        const siny = Math.sin(ay);
-        const cosy = Math.cos(ay);
-        const sinz = Math.sin(az);
-        const cosz = Math.cos(az);
-
-        this.rotateAroundPost(sinx, cosx, siny, cosy, sinz, cosz, x, y, z);
-    }
-
-    public rotateAroundAnglePre(ax: number, ay: number, az: number, x: number, y: number, z: number): void {
-        const sinx = Math.sin(ax);
-        const cosx = Math.cos(ax);
-        const siny = Math.sin(ay);
-        const cosy = Math.cos(ay);
-        const sinz = Math.sin(az);
-        const cosz = Math.cos(az);
-
-        this.rotateAroundPre(sinx, cosx, siny, cosy, sinz, cosz, x, y, z);
-    }
-
-    public rotateAroundPost(
-        sinx: number,
-        cosx: number,
-        siny: number,
-        cosy: number,
-        sinz: number,
-        cosz: number,
-        x: number,
-        y: number,
-        z: number,
-    ): void {
-        this.translatePost(x, y, z);
-        this.rotateXPost(sinx, cosx);
-        this.rotateYPost(siny, cosy);
-        this.rotateZPost(sinz, cosz);
-        this.translatePost(-x, -y, -z);
-    }
-
-    public rotateAroundPre(
-        sinx: number,
-        cosx: number,
-        siny: number,
-        cosy: number,
-        sinz: number,
-        cosz: number,
-        x: number,
-        y: number,
-        z: number,
-    ): void {
-        this.translatePre(x, y, z);
-        this.rotateXPre(sinx, cosx);
-        this.rotateYPre(siny, cosy);
-        this.rotateZPre(sinz, cosz);
-        this.translatePre(-x, -y, -z);
-    }
-
-    public rotateXAnglePost(a: number): void {
-        const sin = Math.sin(a);
-        const cos = Math.cos(a);
-        this.rotateXPost(sin, cos);
-    }
-
-    public rotateXAnglePre(a: number): void {
-        const sin = Math.sin(a);
-        const cos = Math.cos(a);
-        this.rotateXPre(sin, cos);
-    }
-
-    public rotateXAngleSet(a: number): void {
-        const sin = Math.sin(a);
-        const cos = Math.cos(a);
-        this.rotateXSet(sin, cos);
-    }
-
     /**
      * ```
-     * | m11  m12  m13  m14 |   | 1    0     0  0 |
-     * | m21  m22  m23  m24 | * | 0  cos  -sin  0 |
-     * | m31  m32  m33  m34 |   | 0  sin   cos  0 |
-     * |   0    0    0    1 |   | 0    0     0  1 |
+     * | m11  m12  m13  m14 |   | q11  q12  q13  0 |
+     * | m21  m22  m23  m24 | * | q21  q22  q23  0 |
+     * | m31  m32  m33  m34 |   | q31  q32  q33  0 |
+     * |   0    0    0    1 |   |   0    0    0  1 |
      * ```
      */
-    public rotateXPost(sin: number, cos: number): void {
-        // | m11  m12 * cos + m13 * sin  m12 * -sin + m13 * cos  m14 |
-        // | m21  m22 * cos + m23 * sin  m22 * -sin + m23 * cos  m24 |
-        // | m31  m32 * cos + m33 * sin  m32 * -sin + m33 * cos  m34 |
-        // |   0                      0                       0    1 |
+    public rotatePost(qa: number, qb: number, qc: number, qd: number): void {
+        const qaa = qa * qa;
+        const qbb = qb * qb;
+        const qcc = qc * qc;
+        const qdd = qd * qd;
+        const q11 = qaa + qbb - qcc - qdd;
+        const q22 = qaa - qbb + qcc - qdd;
+        const q33 = qaa - qbb - qcc + qdd;
+
+        const qbc = qb * qc;
+        const qad = qa * qd;
+        const q12 = qbc + qbc - qad - qad;
+        const q21 = qbc + qbc + qad + qad;
+
+        const qbd = qb * qd;
+        const qac = qa * qc;
+        const q13 = qbd + qbd + qac + qac;
+        const q31 = qbd + qbd - qac - qac;
+
+        const qcd = qc * qd;
+        const qab = qa * qb;
+        const q23 = qcd + qcd - qab - qab;
+        const q32 = qcd + qcd + qab + qab;
+
         const el = this.elements;
 
-        const m12 = el[2] * sin + el[1] * cos;
-        const m13 = el[2] * cos - el[1] * sin;
+        const m11 = el[0] * q11 + el[1] * q21 + el[2] * q31;
+        const m12 = el[0] * q12 + el[1] * q22 + el[2] * q32;
+        const m13 = el[0] * q13 + el[1] * q23 + el[2] * q33;
+        el[0] = m11;
         el[1] = m12;
         el[2] = m13;
 
-        const m22 = el[6] * sin + el[5] * cos;
-        const m23 = el[6] * cos - el[5] * sin;
+        const m21 = el[4] * q11 + el[5] * q21 + el[6] * q31;
+        const m22 = el[4] * q12 + el[5] * q22 + el[6] * q32;
+        const m23 = el[4] * q13 + el[5] * q23 + el[6] * q33;
+        el[4] = m21;
         el[5] = m22;
         el[6] = m23;
 
-        const m32 = el[10] * sin + el[9] * cos;
-        const m33 = el[10] * cos - el[9] * sin;
+        const m31 = el[8] * q11 + el[9] * q21 + el[10] * q31;
+        const m32 = el[8] * q12 + el[9] * q22 + el[10] * q32;
+        const m33 = el[8] * q13 + el[9] * q23 + el[10] * q33;
+        el[8] = m31;
         el[9] = m32;
         el[10] = m33;
     }
 
     /**
      * ```
-     * | 1    0     0  0 |   | m11  m12  m13  m14 |
-     * | 0  cos  -sin  0 | * | m21  m22  m23  m24 |
-     * | 0  sin   cos  0 |   | m31  m32  m33  m34 |
-     * | 0    0     0  1 |   |   0    0    0    1 |
+     * | q11  q12  q13  0 |   | m11  m12  m13  m14 |
+     * | q21  q22  q23  0 | * | m21  m22  m23  m24 |
+     * | q31  q32  q33  0 |   | m31  m32  m33  m34 |
+     * |   0    0    0  1 |   |   0    0    0    1 |
      * ```
      */
-    public rotateXPre(sin: number, cos: number): void {
-        // |                    m11                     m12                     m13                     m14 |
-        // | cos * m21 + -sin * m31  cos * m22 + -sin * m32  cos * m23 + -sin * m33  cos * m24 + -sin * m34 |
-        // |  sin * m21 + cos * m31   sin * m22 + cos * m32   sin * m23 + cos * m33   sin * m24 + cos * m34 |
-        // |                      0                       0                       0                       1 |
+    public rotatePre(qa: number, qb: number, qc: number, qd: number): void {
+        const qaa = qa * qa;
+        const qbb = qb * qb;
+        const qcc = qc * qc;
+        const qdd = qd * qd;
+        const q11 = qaa + qbb - qcc - qdd;
+        const q22 = qaa - qbb + qcc - qdd;
+        const q33 = qaa - qbb - qcc + qdd;
+
+        const qbc = qb * qc;
+        const qad = qa * qd;
+        const q12 = qbc + qbc - qad - qad;
+        const q21 = qbc + qbc + qad + qad;
+
+        const qbd = qb * qd;
+        const qac = qa * qc;
+        const q13 = qbd + qbd + qac + qac;
+        const q31 = qbd + qbd - qac - qac;
+
+        const qcd = qc * qd;
+        const qab = qa * qb;
+        const q23 = qcd + qcd - qab - qab;
+        const q32 = qcd + qcd + qab + qab;
+
         const el = this.elements;
 
-        const m21 = el[4] * cos - el[8] * sin;
-        const m31 = el[4] * sin + el[8] * cos;
+        const m11 = q11 * el[0] + q12 * el[4] + q13 * el[8];
+        const m21 = q21 * el[0] + q22 * el[4] + q23 * el[8];
+        const m31 = q31 * el[0] + q32 * el[4] + q33 * el[8];
+        el[0] = m11;
         el[4] = m21;
         el[8] = m31;
 
-        const m22 = el[5] * cos - el[9] * sin;
-        const m32 = el[5] * sin + el[9] * cos;
+        const m12 = q11 * el[1] + q12 * el[5] + q13 * el[9];
+        const m22 = q21 * el[1] + q22 * el[5] + q23 * el[9];
+        const m32 = q31 * el[1] + q32 * el[5] + q33 * el[9];
+        el[1] = m12;
         el[5] = m22;
         el[9] = m32;
 
-        const m23 = el[6] * cos - el[10] * sin;
-        const m33 = el[6] * sin + el[10] * cos;
+        const m13 = q11 * el[2] + q12 * el[6] + q13 * el[10];
+        const m23 = q21 * el[2] + q22 * el[6] + q23 * el[10];
+        const m33 = q31 * el[2] + q32 * el[6] + q33 * el[10];
+        el[2] = m13;
         el[6] = m23;
         el[10] = m33;
 
-        const m24 = el[7] * cos - el[11] * sin;
-        const m34 = el[7] * sin + el[11] * cos;
+        const m14 = q11 * el[3] + q12 * el[7] + q13 * el[11];
+        const m24 = q21 * el[3] + q22 * el[7] + q23 * el[11];
+        const m34 = q31 * el[3] + q32 * el[7] + q33 * el[11];
+        el[3] = m14;
         el[7] = m24;
         el[11] = m34;
     }
 
     /**
      * ```
-     * | 1    0     0  0 |
-     * | 0  cos  -sin  0 |
-     * | 0  sin   cos  0 |
-     * | 0    0     0  1 |
+     * | q11  q12  q13  0 |
+     * | q21  q22  q23  0 |
+     * | q31  q32  q33  0 |
+     * |   0    0    0  1 |
      * ```
      */
-    public rotateXSet(sin: number, cos: number): void {
-        this.set(1, 0, 0, 0, 0, cos, -sin, 0, 0, sin, cos, 0);
-    }
+    public rotateSet(qa: number, qb: number, qc: number, qd: number): void {
+        const qaa = qa * qa;
+        const qbb = qb * qb;
+        const qcc = qc * qc;
+        const qdd = qd * qd;
+        const q11 = qaa + qbb - qcc - qdd;
+        const q22 = qaa - qbb + qcc - qdd;
+        const q33 = qaa - qbb - qcc + qdd;
 
-    public rotateYAnglePost(a: number): void {
-        const sin = Math.sin(a);
-        const cos = Math.cos(a);
-        this.rotateYPost(sin, cos);
-    }
+        const qbc = qb * qc;
+        const qad = qa * qd;
+        const q12 = qbc + qbc - qad - qad;
+        const q21 = qbc + qbc + qad + qad;
 
-    public rotateYAnglePre(a: number): void {
-        const sin = Math.sin(a);
-        const cos = Math.cos(a);
-        this.rotateYPre(sin, cos);
-    }
+        const qbd = qb * qd;
+        const qac = qa * qc;
+        const q13 = qbd + qbd + qac + qac;
+        const q31 = qbd + qbd - qac - qac;
 
-    public rotateYAngleSet(a: number): void {
-        const sin = Math.sin(a);
-        const cos = Math.cos(a);
-        this.rotateYSet(sin, cos);
-    }
+        const qcd = qc * qd;
+        const qab = qa * qb;
+        const q23 = qcd + qcd - qab - qab;
+        const q32 = qcd + qcd + qab + qab;
 
-    /**
-     * ```
-     * | m11  m12  m13  m14 |   |  cos  0  sin  0 |
-     * | m21  m22  m23  m24 | * |    0  1    0  0 |
-     * | m31  m32  m33  m34 |   | -sin  0  cos  0 |
-     * |   0    0    0    1 |   |    0  0    0  1 |
-     * ```
-     */
-    public rotateYPost(sin: number, cos: number): void {
-        // | m11 * cos + m13 * -sin  m12  m11 * sin + m13 * cos  m14 |
-        // | m21 * cos + m23 * -sin  m22  m21 * sin + m23 * cos  m24 |
-        // | m31 * cos + m33 * -sin  m32  m31 * sin + m33 * cos  m34 |
-        // |                      0    0                      0    1 |
-        const el = this.elements;
-
-        const m11 = el[0] * cos - el[2] * sin;
-        const m13 = el[0] * sin + el[2] * cos;
-        el[0] = m11;
-        el[2] = m13;
-
-        const m21 = el[4] * cos - el[6] * sin;
-        const m23 = el[4] * sin + el[6] * cos;
-        el[4] = m21;
-        el[6] = m23;
-
-        const m31 = el[8] * cos - el[10] * sin;
-        const m33 = el[8] * sin + el[10] * cos;
-        el[8] = m31;
-        el[10] = m33;
-    }
-
-    /**
-     * ```
-     * |  cos  0  sin  0 |   | m11  m12  m13  m14 |
-     * |    0  1    0  0 | * | m21  m22  m23  m24 |
-     * | -sin  0  cos  0 |   | m31  m32  m33  m34 |
-     * |    0  0    0  1 |   |   0    0    0    1 |
-     * ```
-     */
-    public rotateYPre(sin: number, cos: number): void {
-        // |  cos * m11 + sin * m31   cos * m12 + sin * m32   cos * m13 + sin * m33   cos * m14 + sin * m34 |
-        // |                    m21                     m22                     m23                     m24 |
-        // | -sin * m11 + cos * m31  -sin * m12 + cos * m32  -sin * m13 + cos * m33  -sin * m14 + cos * m34 |
-        // |                      0                       0                       0                       1 |
-        const el = this.elements;
-
-        const m11 = el[8] * sin + el[0] * cos;
-        const m31 = el[8] * cos - el[0] * sin;
-        el[0] = m11;
-        el[8] = m31;
-
-        const m12 = el[9] * sin + el[1] * cos;
-        const m32 = el[9] * cos - el[1] * sin;
-        el[1] = m12;
-        el[9] = m32;
-
-        const m13 = el[10] * sin + el[2] * cos;
-        const m33 = el[10] * cos - el[2] * sin;
-        el[2] = m13;
-        el[10] = m33;
-
-        const m14 = el[11] * sin + el[3] * cos;
-        const m34 = el[11] * cos - el[3] * sin;
-        el[3] = m14;
-        el[11] = m34;
-    }
-
-    /**
-     * ```
-     * |  cos  0  sin  0 |
-     * |    0  1    0  0 |
-     * | -sin  0  cos  0 |
-     * |    0  0    0  1 |
-     * ```
-     */
-    public rotateYSet(sin: number, cos: number): void {
-        this.set(cos, 0, sin, 0, 0, 1, 0, 0, -sin, 0, cos, 0);
-    }
-
-    public rotateZAnglePost(a: number): void {
-        const sin = Math.sin(a);
-        const cos = Math.cos(a);
-        this.rotateZPost(sin, cos);
-    }
-
-    public rotateZAnglePre(a: number): void {
-        const sin = Math.sin(a);
-        const cos = Math.cos(a);
-        this.rotateZPre(sin, cos);
-    }
-
-    public rotateZAngleSet(a: number): void {
-        const sin = Math.sin(a);
-        const cos = Math.cos(a);
-        this.rotateZSet(sin, cos);
-    }
-
-    /**
-     * ```
-     * | m11  m12  m13  m14 |   | cos  -sin  0  0 |
-     * | m21  m22  m23  m24 | * | sin   cos  0  0 |
-     * | m31  m32  m33  m34 |   |   0     0  1  0 |
-     * |   0    0    0    1 |   |   0     0  0  1 |
-     * ```
-     */
-    public rotateZPost(sin: number, cos: number): void {
-        // | m11 * cos + m12 * sin  m11 * -sin + m12 * cos  m13  m14 |
-        // | m21 * cos + m22 * sin  m21 * -sin + m22 * cos  m23  m24 |
-        // | m31 * cos + m32 * sin  m31 * -sin + m32 * cos  m33  m34 |
-        // |               0                             0    0    1 |
-        const el = this.elements;
-
-        const m11 = el[1] * sin + el[0] * cos;
-        const m12 = el[1] * cos - el[0] * sin;
-        el[0] = m11;
-        el[1] = m12;
-
-        const m21 = el[5] * sin + el[4] * cos;
-        const m22 = el[5] * cos - el[4] * sin;
-        el[4] = m21;
-        el[5] = m22;
-
-        const m31 = el[9] * sin + el[8] * cos;
-        const m32 = el[9] * cos - el[8] * sin;
-        el[8] = m31;
-        el[9] = m32;
-    }
-
-    /**
-     * ```
-     * | cos  -sin  0  0 |   | m11  m12  m13  m14 |
-     * | sin   cos  0  0 | * | m21  m22  m23  m24 |
-     * |   0     0  1  0 |   | m31  m32  m33  m34 |
-     * |   0     0  0  1 |   |   0    0    0    1 |
-     * ```
-     */
-    public rotateZPre(sin: number, cos: number): void {
-        // | cos * m11 + -sin * m21  cos * m12 + -sin * m22  cos * m13 + -sin * m23  cos * m14 + -sin * m24 |
-        // |  sin * m11 + cos * m21   sin * m12 + cos * m22   sin * m13 + cos * m23   sin * m14 + cos * m24 |
-        // |                    m31                     m32                     m33                     m34 |
-        // |                      0                       0                       0                       1 |
-        const el = this.elements;
-
-        const m11 = el[0] * cos - el[4] * sin;
-        const m21 = el[0] * sin + el[4] * cos;
-        el[0] = m11;
-        el[4] = m21;
-
-        const m12 = el[1] * cos - el[5] * sin;
-        const m22 = el[1] * sin + el[5] * cos;
-        el[1] = m12;
-        el[5] = m22;
-
-        const m13 = el[2] * cos - el[6] * sin;
-        const m23 = el[2] * sin + el[6] * cos;
-        el[2] = m13;
-        el[6] = m23;
-
-        const m14 = el[3] * cos - el[7] * sin;
-        const m24 = el[3] * sin + el[7] * cos;
-        el[3] = m14;
-        el[7] = m24;
-    }
-
-    /**
-     * ```
-     * | cos  -sin  0  0 |
-     * | sin   cos  0  0 |
-     * |   0     0  1  0 |
-     * |   0     0  0  1 |
-     * ```
-     */
-    public rotateZSet(sin: number, cos: number): void {
-        this.set(cos, -sin, 0, 0, sin, cos, 0, 0, 0, 0, 1, 0);
+        this.set(q11, q12, q13, 0, q21, q22, q23, 0, q31, q32, q33, 0);
     }
 
     /**
@@ -2006,6 +1738,28 @@ export class Matrix4x4 {
         return new Matrix4x4(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
     }
 
+    /**
+     * ```
+     * | m11  m12  m13  0 |
+     * | m21  m22  m23  0 |
+     * | m31  m32  m33  0 |
+     * |   0    0    0  1 |
+     * ```
+     */
+    public static fromAffine(
+        m11: number,
+        m12: number,
+        m13: number,
+        m21: number,
+        m22: number,
+        m23: number,
+        m31: number,
+        m32: number,
+        m33: number,
+    ): Matrix4x4 {
+        return new Matrix4x4(m11, m12, m13, 0, m21, m22, m23, 0, m31, m32, m33, 0, 0, 0, 0, 1);
+    }
+
     public static fromArray(elements: ArrayLike<number>, offset = 0, transpose = false): Matrix4x4 {
         const el = elements;
         const i = offset;
@@ -2093,56 +1847,37 @@ export class Matrix4x4 {
 
     /**
      * ```
-     * | 1    0     0  0 |
-     * | 0  cos  -sin  0 |
-     * | 0  sin   cos  0 |
-     * | 0    0     0  1 |
+     * | q11  q12  q13  0 |
+     * | q21  q22  q23  0 |
+     * | q31  q32  q33  0 |
+     * |   0    0    0  1 |
      * ```
      */
-    public static fromRotationX(sin: number, cos: number): Matrix4x4 {
-        return new Matrix4x4(1, 0, 0, 0, 0, cos, -sin, 0, 0, sin, cos, 0, 0, 0, 0, 1);
-    }
+    public static fromRotation(qa: number, qb: number, qc: number, qd: number): Matrix4x4 {
+        const qaa = qa * qa;
+        const qbb = qb * qb;
+        const qcc = qc * qc;
+        const qdd = qd * qd;
+        const q11 = qaa + qbb - qcc - qdd;
+        const q22 = qaa - qbb + qcc - qdd;
+        const q33 = qaa - qbb - qcc + qdd;
 
-    public static fromRotationXAngle(a: number): Matrix4x4 {
-        const sin = Math.sin(a);
-        const cos = Math.cos(a);
-        return Matrix4x4.fromRotationX(sin, cos);
-    }
+        const qbc = qb * qc;
+        const qad = qa * qd;
+        const q12 = qbc + qbc - qad - qad;
+        const q21 = qbc + qbc + qad + qad;
 
-    /**
-     * ```
-     * |  cos  0  sin  0 |
-     * |    0  1    0  0 |
-     * | -sin  0  cos  0 |
-     * |    0  0    0  1 |
-     * ```
-     */
-    public static fromRotationY(sin: number, cos: number): Matrix4x4 {
-        return new Matrix4x4(cos, 0, sin, 0, 0, 1, 0, 0, -sin, 0, cos, 0, 0, 0, 0, 1);
-    }
+        const qbd = qb * qd;
+        const qac = qa * qc;
+        const q13 = qbd + qbd + qac + qac;
+        const q31 = qbd + qbd - qac - qac;
 
-    public static fromRotationYAngle(a: number): Matrix4x4 {
-        const sin = Math.sin(a);
-        const cos = Math.cos(a);
-        return Matrix4x4.fromRotationX(sin, cos);
-    }
+        const qcd = qc * qd;
+        const qab = qa * qb;
+        const q23 = qcd + qcd - qab - qab;
+        const q32 = qcd + qcd + qab + qab;
 
-    /**
-     * ```
-     * | cos  -sin  0  0 |
-     * | sin   cos  0  0 |
-     * |   0     0  1  0 |
-     * |   0     0  0  1 |
-     * ```
-     */
-    public static fromRotationZ(sin: number, cos: number): Matrix4x4 {
-        return new Matrix4x4(cos, -sin, 0, 0, sin, cos, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
-    }
-
-    public static fromRotationZAngle(a: number): Matrix4x4 {
-        const sin = Math.sin(a);
-        const cos = Math.cos(a);
-        return Matrix4x4.fromRotationX(sin, cos);
+        return new Matrix4x4(q11, q12, q13, 0, q21, q22, q23, 0, q31, q32, q33, 0, 0, 0, 0, 1);
     }
 
     /**
@@ -2259,14 +1994,6 @@ export class Matrix4x4 {
         return Vector3.fromXYZW(x, y, z, w);
     }
 
-    /**
-     * ```
-     * | m11  m12  m13  m14 |   | m11  m12  m13  m14 |
-     * | m21  m22  m23  m24 | * | m21  m22  m23  m24 |
-     * | m31  m32  m33  m34 |   | m31  m32  m33  m34 |
-     * | m41  m42  m43  m44 |   | m41  m42  m43  m44 |
-     * ```
-     */
     public mul(mat: Matrix4x4): void {
         const el1 = this.elements;
         const el2 = mat.elements;
@@ -2308,368 +2035,165 @@ export class Matrix4x4 {
         el1[15] = m44;
     }
 
-    public rotateAroundAnglePost(ax: number, ay: number, az: number, x: number, y: number, z: number): void {
-        const sinx = Math.sin(ax);
-        const cosx = Math.cos(ax);
-        const siny = Math.sin(ay);
-        const cosy = Math.cos(ay);
-        const sinz = Math.sin(az);
-        const cosz = Math.cos(az);
-
-        this.rotateAroundPost(sinx, cosx, siny, cosy, sinz, cosz, x, y, z);
-    }
-
-    public rotateAroundAnglePre(ax: number, ay: number, az: number, x: number, y: number, z: number): void {
-        const sinx = Math.sin(ax);
-        const cosx = Math.cos(ax);
-        const siny = Math.sin(ay);
-        const cosy = Math.cos(ay);
-        const sinz = Math.sin(az);
-        const cosz = Math.cos(az);
-
-        this.rotateAroundPre(sinx, cosx, siny, cosy, sinz, cosz, x, y, z);
-    }
-
-    public rotateAroundPost(
-        sinx: number,
-        cosx: number,
-        siny: number,
-        cosy: number,
-        sinz: number,
-        cosz: number,
-        x: number,
-        y: number,
-        z: number,
-    ): void {
-        this.translatePost(x, y, z);
-        this.rotateXPost(sinx, cosx);
-        this.rotateYPost(siny, cosy);
-        this.rotateZPost(sinz, cosz);
-        this.translatePost(-x, -y, -z);
-    }
-
-    public rotateAroundPre(
-        sinx: number,
-        cosx: number,
-        siny: number,
-        cosy: number,
-        sinz: number,
-        cosz: number,
-        x: number,
-        y: number,
-        z: number,
-    ): void {
-        this.translatePre(x, y, z);
-        this.rotateXPre(sinx, cosx);
-        this.rotateYPre(siny, cosy);
-        this.rotateZPre(sinz, cosz);
-        this.translatePre(-x, -y, -z);
-    }
-
-    public rotateXAnglePost(a: number): void {
-        const sin = Math.sin(a);
-        const cos = Math.cos(a);
-        this.rotateXPost(sin, cos);
-    }
-
-    public rotateXAnglePre(a: number): void {
-        const sin = Math.sin(a);
-        const cos = Math.cos(a);
-        this.rotateXPre(sin, cos);
-    }
-
-    public rotateXAngleSet(a: number): void {
-        const sin = Math.sin(a);
-        const cos = Math.cos(a);
-        this.rotateXSet(sin, cos);
-    }
-
     /**
      * ```
-     * | m11  m12  m13  m14 |   | 1    0     0  0 |
-     * | m21  m22  m23  m24 | * | 0  cos  -sin  0 |
-     * | m31  m32  m33  m34 |   | 0  sin   cos  0 |
-     * | m41  m42  m43  m44 |   | 0    0     0  1 |
+     * | m11  m12  m13  m14 |   | q11  q12  q13  0 |
+     * | m21  m22  m23  m24 | * | q21  q22  q23  0 |
+     * | m31  m32  m33  m34 |   | q31  q32  q33  0 |
+     * | m41  m42  m43  m44 |   |   0    0    0  1 |
      * ```
      */
-    public rotateXPost(sin: number, cos: number): void {
-        // | m11  m12 * cos + m13 * sin  m12 * -sin + m13 * cos  m14 |
-        // | m21  m22 * cos + m23 * sin  m22 * -sin + m23 * cos  m24 |
-        // | m31  m32 * cos + m33 * sin  m32 * -sin + m33 * cos  m34 |
-        // | m41  m42 * cos + m43 * sin  m42 * -sin + m43 * cos  m44 |
+    public rotatePost(qa: number, qb: number, qc: number, qd: number): void {
+        const qaa = qa * qa;
+        const qbb = qb * qb;
+        const qcc = qc * qc;
+        const qdd = qd * qd;
+        const q11 = qaa + qbb - qcc - qdd;
+        const q22 = qaa - qbb + qcc - qdd;
+        const q33 = qaa - qbb - qcc + qdd;
+
+        const qbc = qb * qc;
+        const qad = qa * qd;
+        const q12 = qbc + qbc - qad - qad;
+        const q21 = qbc + qbc + qad + qad;
+
+        const qbd = qb * qd;
+        const qac = qa * qc;
+        const q13 = qbd + qbd + qac + qac;
+        const q31 = qbd + qbd - qac - qac;
+
+        const qcd = qc * qd;
+        const qab = qa * qb;
+        const q23 = qcd + qcd - qab - qab;
+        const q32 = qcd + qcd + qab + qab;
+
         const el = this.elements;
 
-        const m12 = el[2] * sin + el[1] * cos;
-        const m13 = el[2] * cos - el[1] * sin;
+        const m11 = el[0] * q11 + el[1] * q21 + el[2] * q31;
+        const m12 = el[0] * q12 + el[1] * q22 + el[2] * q32;
+        const m13 = el[0] * q13 + el[1] * q23 + el[2] * q33;
+        el[0] = m11;
         el[1] = m12;
         el[2] = m13;
 
-        const m22 = el[6] * sin + el[5] * cos;
-        const m23 = el[6] * cos - el[5] * sin;
+        const m21 = el[4] * q11 + el[5] * q21 + el[6] * q31;
+        const m22 = el[4] * q12 + el[5] * q22 + el[6] * q32;
+        const m23 = el[4] * q13 + el[5] * q23 + el[6] * q33;
+        el[4] = m21;
         el[5] = m22;
         el[6] = m23;
 
-        const m32 = el[10] * sin + el[9] * cos;
-        const m33 = el[10] * cos - el[9] * sin;
+        const m31 = el[8] * q11 + el[9] * q21 + el[10] * q31;
+        const m32 = el[8] * q12 + el[9] * q22 + el[10] * q32;
+        const m33 = el[8] * q13 + el[9] * q23 + el[10] * q33;
+        el[8] = m31;
         el[9] = m32;
         el[10] = m33;
 
-        const m42 = el[14] * sin + el[13] * cos;
-        const m43 = el[14] * cos - el[13] * sin;
+        const m41 = el[12] * q11 + el[13] * q21 + el[14] * q31;
+        const m42 = el[12] * q12 + el[13] * q22 + el[14] * q32;
+        const m43 = el[12] * q13 + el[13] * q23 + el[14] * q33;
+        el[12] = m41;
         el[13] = m42;
         el[14] = m43;
     }
 
     /**
      * ```
-     * | 1    0     0  0 |   | m11  m12  m13  m14 |
-     * | 0  cos  -sin  0 | * | m21  m22  m23  m24 |
-     * | 0  sin   cos  0 |   | m31  m32  m33  m34 |
-     * | 0    0     0  1 |   | m41  m42  m43  m44 |
+     * | q11  q12  q13  0 |   | m11  m12  m13  m14 |
+     * | q21  q22  q23  0 | * | m21  m22  m23  m24 |
+     * | q31  q32  q33  0 |   | m31  m32  m33  m34 |
+     * |   0    0    0  1 |   | m41  m42  m43  m44 |
      * ```
      */
-    public rotateXPre(sin: number, cos: number): void {
-        // |                    m11                     m12                     m13                     m14 |
-        // | cos * m21 + -sin * m31  cos * m22 + -sin * m32  cos * m23 + -sin * m33  cos * m24 + -sin * m34 |
-        // |  sin * m21 + cos * m31   sin * m22 + cos * m32   sin * m23 + cos * m33   sin * m24 + cos * m34 |
-        // |                    m41                     m42                     m43                     m44 |
+    public rotatePre(qa: number, qb: number, qc: number, qd: number): void {
+        const qaa = qa * qa;
+        const qbb = qb * qb;
+        const qcc = qc * qc;
+        const qdd = qd * qd;
+        const q11 = qaa + qbb - qcc - qdd;
+        const q22 = qaa - qbb + qcc - qdd;
+        const q33 = qaa - qbb - qcc + qdd;
+
+        const qbc = qb * qc;
+        const qad = qa * qd;
+        const q12 = qbc + qbc - qad - qad;
+        const q21 = qbc + qbc + qad + qad;
+
+        const qbd = qb * qd;
+        const qac = qa * qc;
+        const q13 = qbd + qbd + qac + qac;
+        const q31 = qbd + qbd - qac - qac;
+
+        const qcd = qc * qd;
+        const qab = qa * qb;
+        const q23 = qcd + qcd - qab - qab;
+        const q32 = qcd + qcd + qab + qab;
+
         const el = this.elements;
 
-        const m21 = el[4] * cos - el[8] * sin;
-        const m31 = el[4] * sin + el[8] * cos;
+        const m11 = q11 * el[0] + q12 * el[4] + q13 * el[8];
+        const m21 = q21 * el[0] + q22 * el[4] + q23 * el[8];
+        const m31 = q31 * el[0] + q32 * el[4] + q33 * el[8];
+        el[0] = m11;
         el[4] = m21;
         el[8] = m31;
 
-        const m22 = el[5] * cos - el[9] * sin;
-        const m32 = el[5] * sin + el[9] * cos;
+        const m12 = q11 * el[1] + q12 * el[5] + q13 * el[9];
+        const m22 = q21 * el[1] + q22 * el[5] + q23 * el[9];
+        const m32 = q31 * el[1] + q32 * el[5] + q33 * el[9];
+        el[1] = m12;
         el[5] = m22;
         el[9] = m32;
 
-        const m23 = el[6] * cos - el[10] * sin;
-        const m33 = el[6] * sin + el[10] * cos;
+        const m13 = q11 * el[2] + q12 * el[6] + q13 * el[10];
+        const m23 = q21 * el[2] + q22 * el[6] + q23 * el[10];
+        const m33 = q31 * el[2] + q32 * el[6] + q33 * el[10];
+        el[2] = m13;
         el[6] = m23;
         el[10] = m33;
 
-        const m24 = el[7] * cos - el[11] * sin;
-        const m34 = el[7] * sin + el[11] * cos;
+        const m14 = q11 * el[3] + q12 * el[7] + q13 * el[11];
+        const m24 = q21 * el[3] + q22 * el[7] + q23 * el[11];
+        const m34 = q31 * el[3] + q32 * el[7] + q33 * el[11];
+        el[3] = m14;
         el[7] = m24;
         el[11] = m34;
     }
 
     /**
      * ```
-     * | 1    0     0  0 |
-     * | 0  cos  -sin  0 |
-     * | 0  sin   cos  0 |
-     * | 0    0     0  1 |
+     * | q11  q12  q13  0 |
+     * | q21  q22  q23  0 |
+     * | q31  q32  q33  0 |
+     * |   0    0    0  1 |
      * ```
      */
-    public rotateXSet(sin: number, cos: number): void {
-        this.set(1, 0, 0, 0, 0, cos, -sin, 0, 0, sin, cos, 0, 0, 0, 0, 1);
-    }
+    public rotateSet(qa: number, qb: number, qc: number, qd: number): void {
+        const qaa = qa * qa;
+        const qbb = qb * qb;
+        const qcc = qc * qc;
+        const qdd = qd * qd;
+        const q11 = qaa + qbb - qcc - qdd;
+        const q22 = qaa - qbb + qcc - qdd;
+        const q33 = qaa - qbb - qcc + qdd;
 
-    public rotateYAnglePost(a: number): void {
-        const sin = Math.sin(a);
-        const cos = Math.cos(a);
-        this.rotateYPost(sin, cos);
-    }
+        const qbc = qb * qc;
+        const qad = qa * qd;
+        const q12 = qbc + qbc - qad - qad;
+        const q21 = qbc + qbc + qad + qad;
 
-    public rotateYAnglePre(a: number): void {
-        const sin = Math.sin(a);
-        const cos = Math.cos(a);
-        this.rotateYPre(sin, cos);
-    }
+        const qbd = qb * qd;
+        const qac = qa * qc;
+        const q13 = qbd + qbd + qac + qac;
+        const q31 = qbd + qbd - qac - qac;
 
-    public rotateYAngleSet(a: number): void {
-        const sin = Math.sin(a);
-        const cos = Math.cos(a);
-        this.rotateYSet(sin, cos);
-    }
+        const qcd = qc * qd;
+        const qab = qa * qb;
+        const q23 = qcd + qcd - qab - qab;
+        const q32 = qcd + qcd + qab + qab;
 
-    /**
-     * ```
-     * | m11  m12  m13  m14 |   |  cos  0  sin  0 |
-     * | m21  m22  m23  m24 | * |    0  1    0  0 |
-     * | m31  m32  m33  m34 |   | -sin  0  cos  0 |
-     * | m41  m42  m43  m44 |   |    0  0    0  1 |
-     * ```
-     */
-    public rotateYPost(sin: number, cos: number): void {
-        // | m11 * cos + m13 * -sin  m12  m11 * sin + m13 * cos  m14 |
-        // | m21 * cos + m23 * -sin  m22  m21 * sin + m23 * cos  m24 |
-        // | m31 * cos + m33 * -sin  m32  m31 * sin + m33 * cos  m34 |
-        // | m41 * cos + m43 * -sin  m42  m41 * sin + m43 * cos  m44 |
-        const el = this.elements;
-
-        const m11 = el[0] * cos - el[2] * sin;
-        const m13 = el[0] * sin + el[2] * cos;
-        el[0] = m11;
-        el[2] = m13;
-
-        const m21 = el[4] * cos - el[6] * sin;
-        const m23 = el[4] * sin + el[6] * cos;
-        el[4] = m21;
-        el[6] = m23;
-
-        const m31 = el[8] * cos - el[10] * sin;
-        const m33 = el[8] * sin + el[10] * cos;
-        el[8] = m31;
-        el[10] = m33;
-
-        const m41 = el[12] * cos - el[14] * sin;
-        const m43 = el[12] * sin + el[14] * cos;
-        el[12] = m41;
-        el[14] = m43;
-    }
-
-    /**
-     * ```
-     * |  cos  0  sin  0 |   | m11  m12  m13  m14 |
-     * |    0  1    0  0 | * | m21  m22  m23  m24 |
-     * | -sin  0  cos  0 |   | m31  m32  m33  m34 |
-     * |    0  0    0  1 |   | m41  m42  m43  m44 |
-     * ```
-     */
-    public rotateYPre(sin: number, cos: number): void {
-        // |  cos * m11 + sin * m31   cos * m12 + sin * m32   cos * m13 + sin * m33   cos * m14 + sin * m34 |
-        // |                    m21                     m22                     m23                     m24 |
-        // | -sin * m11 + cos * m31  -sin * m12 + cos * m32  -sin * m13 + cos * m33  -sin * m14 + cos * m34 |
-        // |                    m41                     m42                     m43                     m44 |
-        const el = this.elements;
-
-        const m11 = el[8] * sin + el[0] * cos;
-        const m31 = el[8] * cos - el[0] * sin;
-        el[0] = m11;
-        el[8] = m31;
-
-        const m12 = el[9] * sin + el[1] * cos;
-        const m32 = el[9] * cos - el[1] * sin;
-        el[1] = m12;
-        el[9] = m32;
-
-        const m13 = el[10] * sin + el[2] * cos;
-        const m33 = el[10] * cos - el[2] * sin;
-        el[2] = m13;
-        el[10] = m33;
-
-        const m14 = el[11] * sin + el[3] * cos;
-        const m34 = el[11] * cos - el[3] * sin;
-        el[3] = m14;
-        el[11] = m34;
-    }
-
-    /**
-     * ```
-     * |  cos  0  sin  0 |
-     * |    0  1    0  0 |
-     * | -sin  0  cos  0 |
-     * |    0  0    0  1 |
-     * ```
-     */
-    public rotateYSet(sin: number, cos: number): void {
-        this.set(cos, 0, sin, 0, 0, 1, 0, 0, -sin, 0, cos, 0, 0, 0, 0, 1);
-    }
-
-    public rotateZAnglePost(a: number): void {
-        const sin = Math.sin(a);
-        const cos = Math.cos(a);
-        this.rotateZPost(sin, cos);
-    }
-
-    public rotateZAnglePre(a: number): void {
-        const sin = Math.sin(a);
-        const cos = Math.cos(a);
-        this.rotateZPre(sin, cos);
-    }
-
-    public rotateZAngleSet(a: number): void {
-        const sin = Math.sin(a);
-        const cos = Math.cos(a);
-        this.rotateZSet(sin, cos);
-    }
-
-    /**
-     * ```
-     * | m11  m12  m13  m14 |   | cos  -sin  0  0 |
-     * | m21  m22  m23  m24 | * | sin   cos  0  0 |
-     * | m31  m32  m33  m34 |   |   0     0  1  0 |
-     * | m41  m42  m43  m44 |   |   0     0  0  1 |
-     * ```
-     */
-    public rotateZPost(sin: number, cos: number): void {
-        // | m11 * cos + m12 * sin  m11 * -sin + m12 * cos  m13  m14 |
-        // | m21 * cos + m22 * sin  m21 * -sin + m22 * cos  m23  m24 |
-        // | m31 * cos + m32 * sin  m31 * -sin + m32 * cos  m33  m34 |
-        // | m41 * cos + m42 * sin  m41 * -sin + m42 * cos  m43  m44 |
-        const el = this.elements;
-
-        const m11 = el[1] * sin + el[0] * cos;
-        const m12 = el[1] * cos - el[0] * sin;
-        el[0] = m11;
-        el[1] = m12;
-
-        const m21 = el[5] * sin + el[4] * cos;
-        const m22 = el[5] * cos - el[4] * sin;
-        el[4] = m21;
-        el[5] = m22;
-
-        const m31 = el[9] * sin + el[8] * cos;
-        const m32 = el[9] * cos - el[8] * sin;
-        el[8] = m31;
-        el[9] = m32;
-
-        const m41 = el[13] * sin + el[12] * cos;
-        const m42 = el[13] * cos - el[12] * sin;
-        el[12] = m41;
-        el[13] = m42;
-    }
-
-    /**
-     * ```
-     * | cos  -sin  0  0 |   | m11  m12  m13  m14 |
-     * | sin   cos  0  0 | * | m21  m22  m23  m24 |
-     * |   0     0  1  0 |   | m31  m32  m33  m34 |
-     * |   0     0  0  1 |   | m41  m42  m43  m44 |
-     * ```
-     */
-    public rotateZPre(sin: number, cos: number): void {
-        // | cos * m11 + -sin * m21  cos * m12 + -sin * m22  cos * m13 + -sin * m23  cos * m14 + -sin * m24 |
-        // |  sin * m11 + cos * m21   sin * m12 + cos * m22   sin * m13 + cos * m23   sin * m14 + cos * m24 |
-        // |                    m31                     m32                     m33                     m34 |
-        // |                    m41                     m42                     m43                     m44 |
-        const el = this.elements;
-
-        const m11 = el[0] * cos - el[4] * sin;
-        const m21 = el[0] * sin + el[4] * cos;
-        el[0] = m11;
-        el[4] = m21;
-
-        const m12 = el[1] * cos - el[5] * sin;
-        const m22 = el[1] * sin + el[5] * cos;
-        el[1] = m12;
-        el[5] = m22;
-
-        const m13 = el[2] * cos - el[6] * sin;
-        const m23 = el[2] * sin + el[6] * cos;
-        el[2] = m13;
-        el[6] = m23;
-
-        const m14 = el[3] * cos - el[7] * sin;
-        const m24 = el[3] * sin + el[7] * cos;
-        el[3] = m14;
-        el[7] = m24;
-    }
-
-    /**
-     * ```
-     * | cos  -sin  0  0 |
-     * | sin   cos  0  0 |
-     * |   0     0  1  0 |
-     * |   0     0  0  1 |
-     * ```
-     */
-    public rotateZSet(sin: number, cos: number): void {
-        this.set(cos, -sin, 0, 0, sin, cos, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
+        this.set(q11, q12, q13, 0, q21, q22, q23, 0, q31, q32, q33, 0, 0, 0, 0, 1);
     }
 
     /**

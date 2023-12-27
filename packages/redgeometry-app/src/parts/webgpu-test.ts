@@ -1,6 +1,8 @@
 /// <reference types="@webgpu/types" />
 import type { World } from "redgeometry/src/ecs/world.js";
+import { Point3 } from "redgeometry/src/index";
 import { Matrix4x4 } from "redgeometry/src/primitives/matrix.js";
+import { Quaternion, RotationOrder } from "redgeometry/src/primitives/quaternion.js";
 import { CAMERA_BUNDLE_IDS, type CameraBundle } from "redgeometry/src/render-webgpu/camera.js";
 import { gpuPlugin, startGPUSystem, type GPUData, type GPUInitData } from "redgeometry/src/render-webgpu/gpu.js";
 import {
@@ -263,10 +265,9 @@ function beginFrameSystem(world: World): void {
 
     const a = (0.25 * time + rotation * Math.PI) / 180;
 
-    const view = Matrix4x4.createIdentity();
-    view.rotateYAnglePre(a);
-    view.rotateXAnglePre(0.5);
-    view.translatePre(0, 0, -15);
+    const q = Quaternion.fromRotationEuler(0.5, a, 0, RotationOrder.XYZ);
+    const matView = Matrix4x4.fromRotation(q.a, q.b, q.c, q.d);
+    matView.translatePre(0, 0, -15);
 
     let matProj;
 
@@ -284,7 +285,7 @@ function beginFrameSystem(world: World): void {
 
     if (mainCameraComponents !== undefined) {
         mainCameraComponents.camera.projection = matProj;
-        mainCameraComponents.transform.local = view;
+        mainCameraComponents.transform.local = matView;
     }
 }
 
@@ -306,15 +307,20 @@ function spawnSystem(world: World): void {
         const { random } = appRemoteData;
 
         for (let i = currCount; i < nextCount; i++) {
-            const local = Matrix4x4.createIdentity();
-            local.rotateXAnglePre(random.nextFloatBetween(-5, 5));
-            local.rotateYAnglePre(random.nextFloatBetween(-5, 5));
-            local.rotateZAnglePre(random.nextFloatBetween(-5, 5));
-            local.translatePre(
+            const q = Quaternion.fromRotationEuler(
+                random.nextFloatBetween(0, 2 * Math.PI),
+                random.nextFloatBetween(0, 2 * Math.PI),
+                random.nextFloatBetween(0, 2 * Math.PI),
+                RotationOrder.XYZ,
+            );
+            const t = new Point3(
                 random.nextFloatBetween(-7.5, 7.5),
                 random.nextFloatBetween(-2.5, 5),
                 random.nextFloatBetween(-7.5, 7.5),
             );
+
+            const local = Matrix4x4.fromRotation(q.a, q.b, q.c, q.d);
+            local.translatePre(t.x, t.y, t.z);
 
             const color = createRandomColor(random, 0.5, 1, 1);
 

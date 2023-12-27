@@ -2,6 +2,7 @@ import type { Box3 } from "redgeometry/src/primitives/box.js";
 import { Edge2, Edge3 } from "redgeometry/src/primitives/edge.js";
 import { Matrix4x4 } from "redgeometry/src/primitives/matrix.js";
 import { Point2, Point3 } from "redgeometry/src/primitives/point.js";
+import { Quaternion, RotationOrder } from "redgeometry/src/primitives/quaternion.js";
 import type { Random } from "redgeometry/src/utility/random.js";
 import { AppContext2D } from "../context.js";
 import { ComboBoxInputElement, RangeInputElement, TextBoxInputElement } from "../input.js";
@@ -61,28 +62,26 @@ export class MatrixAppPart implements AppPart {
         const s = 0.2 * Math.min(canvasWidth, canvasHeight);
         const d = (rotation * Math.PI) / 180;
 
-        const model = Matrix4x4.createIdentity();
-        model.rotateXAnglePre(1.1 * d);
-        model.rotateYAnglePre(1.3 * d);
-        model.rotateZAnglePre(1.7 * d);
+        let mat;
 
-        const view = Matrix4x4.createIdentity();
-        view.translatePre(0, 0, -10);
-
-        let projection;
-
+        // Projection
         if (this.inputProjection.getValue() === "orthographic") {
-            projection = Matrix4x4.fromOrthographic(-1, 1, 1, -1, -10, 1000);
+            mat = Matrix4x4.fromOrthographic(-1, 1, 1, -1, -10, 1000);
         } else {
-            projection = Matrix4x4.fromPerspective(-1, 1, 1, -1, -10, 1000);
+            mat = Matrix4x4.fromPerspective(-1, 1, 1, -1, -10, 1000);
         }
 
-        projection.scalePre(s, s, s);
-        projection.translatePre(w, h, 0);
-        projection.mul(view);
-        projection.mul(model);
+        mat.scalePre(s, s, s);
+        mat.translatePre(w, h, 0);
 
-        this.edges = this.transformEdges(edges, projection);
+        // View
+        mat.translatePost(0, 0, -10);
+
+        // Model
+        const q = Quaternion.fromRotationEuler(1.1 * d, 1.3 * d, 1.7 * d, RotationOrder.ZYX);
+        mat.rotatePost(q.a, q.b, q.c, q.d);
+
+        this.edges = this.transformEdges(edges, mat);
 
         // log.infoDebug("*********");
         // for (const e of this.edges) {
