@@ -166,7 +166,7 @@ test("Matrix4x3 - mapVector", () => {
 });
 
 test("Matrix4x3 - rotate (x)", () => {
-    const q = Quaternion.fromRotationXAngle(1);
+    const q = Quaternion.fromRotationAngleX(1);
     const mat1 = Matrix4x3.fromRotation(q.a, q.b, q.c, q.d);
     const mat2 = Matrix4x3.createIdentity();
     const mat3 = Matrix4x3.createIdentity();
@@ -182,7 +182,7 @@ test("Matrix4x3 - rotate (x)", () => {
 });
 
 test("Matrix4x3 - rotate (y)", () => {
-    const q = Quaternion.fromRotationYAngle(1);
+    const q = Quaternion.fromRotationAngleY(1);
     const mat1 = Matrix4x3.fromRotation(q.a, q.b, q.c, q.d);
     const mat2 = Matrix4x3.createIdentity();
     const mat3 = Matrix4x3.createIdentity();
@@ -198,7 +198,7 @@ test("Matrix4x3 - rotate (y)", () => {
 });
 
 test("Matrix4x3 - rotate (z)", () => {
-    const q = Quaternion.fromRotationZAngle(1);
+    const q = Quaternion.fromRotationAngleZ(1);
     const mat1 = Matrix4x3.fromRotation(q.a, q.b, q.c, q.d);
     const mat2 = Matrix4x3.createIdentity();
     const mat3 = Matrix4x3.createIdentity();
@@ -262,7 +262,7 @@ test("Matrix4x4 - mapVector", () => {
 });
 
 test("Matrix4x4 - rotate (x)", () => {
-    const q = Quaternion.fromRotationXAngle(1);
+    const q = Quaternion.fromRotationAngleX(1);
     const mat1 = Matrix4x4.fromRotation(q.a, q.b, q.c, q.d);
     const mat2 = Matrix4x4.createIdentity();
     const mat3 = Matrix4x4.createIdentity();
@@ -278,7 +278,7 @@ test("Matrix4x4 - rotate (x)", () => {
 });
 
 test("Matrix4x4 - rotate (y)", () => {
-    const q = Quaternion.fromRotationYAngle(1);
+    const q = Quaternion.fromRotationAngleY(1);
     const mat1 = Matrix4x4.fromRotation(q.a, q.b, q.c, q.d);
     const mat2 = Matrix4x4.createIdentity();
     const mat3 = Matrix4x4.createIdentity();
@@ -294,7 +294,7 @@ test("Matrix4x4 - rotate (y)", () => {
 });
 
 test("Matrix4x4 - rotate (z)", () => {
-    const q = Quaternion.fromRotationZAngle(1);
+    const q = Quaternion.fromRotationAngleZ(1);
     const mat1 = Matrix4x4.fromRotation(q.a, q.b, q.c, q.d);
     const mat2 = Matrix4x4.createIdentity();
     const mat3 = Matrix4x4.createIdentity();

@@ -87,19 +87,19 @@ export class Quaternion {
         }
     }
 
-    public static fromRotationXAngle(angle: number): Quaternion {
+    public static fromRotationAngleX(angle: number): Quaternion {
         const sin = Math.sin(0.5 * angle);
         const cos = Math.cos(0.5 * angle);
         return new Quaternion(cos, sin, 0, 0);
     }
 
-    public static fromRotationYAngle(angle: number): Quaternion {
+    public static fromRotationAngleY(angle: number): Quaternion {
         const sin = Math.sin(0.5 * angle);
         const cos = Math.cos(0.5 * angle);
         return new Quaternion(cos, 0, sin, 0);
     }
 
-    public static fromRotationZAngle(angle: number): Quaternion {
+    public static fromRotationAngleZ(angle: number): Quaternion {
         const sin = Math.sin(0.5 * angle);
         const cos = Math.cos(0.5 * angle);
         return new Quaternion(cos, 0, 0, sin);

@@ -189,7 +189,7 @@ export class Path2 implements PathSink2 {
         let sin = Math.sin(startAngle);
         let cos = Math.cos(startAngle);
 
-        const mat = Matrix3x2.fromRotation(sin, cos);
+        const mat = Matrix3x2.fromRotation(cos, sin);
 
         mat.scalePre(rx, ry);
         mat.translatePre(pc.x, pc.y);
@@ -572,7 +572,7 @@ export class Path2 implements PathSink2 {
         let cos = Math.cos(xAxisRotation);
 
         // Inverse rotation to align the ellipse
-        const mat = Matrix3x2.fromRotation(-sin, cos);
+        const mat = Matrix3x2.fromRotation(cos, -sin);
 
         // Vector from center (transformed midpoint)
         let v = p0.sub(p1).mul(0.5);
@@ -626,10 +626,10 @@ export class Path2 implements PathSink2 {
         let v2 = pp1.sub(pc);
 
         // Set up the final transformation matrix
-        mat.rotateSet(v1.y, v1.x);
+        mat.rotateSet(v1.x, v1.y);
         mat.translatePre(pc.x, pc.y);
         mat.scalePre(sx, sy);
-        mat.rotatePre(sin, cos);
+        mat.rotatePre(cos, sin);
 
         // We have `sin = v1.cross(v2) / (v1.length * v2.length)`
         // with the length of `v1` and `v2` both 1 (unit vectors)
