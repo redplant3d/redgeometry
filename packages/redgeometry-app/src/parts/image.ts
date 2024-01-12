@@ -1,8 +1,8 @@
-import { ColorRgba } from "redgeometry/src/primitives/color.js";
-import { SoftwareRenderContext2 } from "redgeometry/src/render-software/context.js";
-import { FillRule } from "redgeometry/src/render/context.js";
-import { Image2 } from "redgeometry/src/render/image.js";
-import { RandomXSR128 } from "redgeometry/src/utility/random.js";
+import { ColorRgba } from "redgeometry/src/primitives/color";
+import { SoftwareRenderContext2 } from "redgeometry/src/render-software/context";
+import { FillRule } from "redgeometry/src/render/context";
+import { Image2 } from "redgeometry/src/render/image";
+import { RandomXSR128 } from "redgeometry/src/utility/random";
 import { AppContext2D } from "../context.js";
 import { createPath } from "../data.js";
 import { RangeInputElement, TextBoxInputElement } from "../input.js";

@@ -20,8 +20,7 @@
             "import": "./dist/index.js",
             "require": "./dist/index.cjs"
         },
-        "./src/*": "./src/*.ts",
-        "./src/*.js": "./src/*.ts"
+        "./src/*": "./src/*.ts"
     },
     "main": "dist/index.cjs",
     "engines": {

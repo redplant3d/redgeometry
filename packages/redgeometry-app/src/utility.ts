@@ -3,8 +3,8 @@ import {
     JoinType,
     WindingOperator,
     type CustomWindingOperator,
-} from "redgeometry/src/core/path-options.js";
-import { Polygon2 } from "redgeometry/src/primitives/polygon.js";
+} from "redgeometry/src/core/path-options";
+import { Polygon2 } from "redgeometry/src/primitives/polygon";
 
 export function getBooleanOperator(value: string): BooleanOperator {
     switch (value) {

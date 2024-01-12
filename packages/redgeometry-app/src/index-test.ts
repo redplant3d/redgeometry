@@ -1,4 +1,4 @@
-import { App, LocalAppContext, WebAppContext } from "redgeometry/src/ecs/app.js";
+import { App, LocalAppContext, WebAppContext } from "redgeometry/src/ecs/app";
 import { ECS_TEST_MAIN_WORLD, ECS_TEST_REMOTE_WORLD } from "./parts/ecs-test.js";
 import { WEBGPU_TEST_MAIN_WORLD, WEBGPU_TEST_REMOTE_WORLD } from "./parts/webgpu-test.js";
 

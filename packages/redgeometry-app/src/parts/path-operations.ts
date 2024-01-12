@@ -1,6 +1,6 @@
-import { ROUND_CAPS } from "redgeometry/src/core/path-options.js";
-import { Path2 } from "redgeometry/src/core/path.js";
-import { RandomXSR128 } from "redgeometry/src/utility/random.js";
+import { Path2 } from "redgeometry/src/core/path";
+import { ROUND_CAPS } from "redgeometry/src/core/path-options";
+import { RandomXSR128 } from "redgeometry/src/utility/random";
 import { AppContext2D } from "../context.js";
 import { createPath } from "../data.js";
 import { ComboBoxInputElement, RangeInputElement, TextBoxInputElement } from "../input.js";

@@ -1,4 +1,4 @@
-import { assertUnreachable } from "redgeometry/src/utility/debug.js";
+import { assertUnreachable } from "redgeometry/src/utility/debug";
 import { AnimationFrameContext } from "./animationframe.js";
 import { AppContext2D } from "./context.js";
 import { createRandomSeed } from "./data.js";

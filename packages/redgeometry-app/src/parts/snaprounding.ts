@@ -1,10 +1,10 @@
-import { SnapRound2, type EdgeSegment2 } from "redgeometry/src/core/snapround.js";
-import { Bezier1Curve2 } from "redgeometry/src/primitives/bezier.js";
-import { Box2 } from "redgeometry/src/primitives/box.js";
-import { Edge2 } from "redgeometry/src/primitives/edge.js";
-import { Point2 } from "redgeometry/src/primitives/point.js";
-import { log } from "redgeometry/src/utility/debug.js";
-import { RandomXSR128 } from "redgeometry/src/utility/random.js";
+import { SnapRound2, type EdgeSegment2 } from "redgeometry/src/core/snapround";
+import { Bezier1Curve2 } from "redgeometry/src/primitives/bezier";
+import { Box2 } from "redgeometry/src/primitives/box";
+import { Edge2 } from "redgeometry/src/primitives/edge";
+import { Point2 } from "redgeometry/src/primitives/point";
+import { log } from "redgeometry/src/utility/debug";
+import { RandomXSR128 } from "redgeometry/src/utility/random";
 import { AppContext2D } from "../context.js";
 import { RangeInputElement } from "../input.js";
 import { AppLauncher, type AppPart } from "../launcher.js";

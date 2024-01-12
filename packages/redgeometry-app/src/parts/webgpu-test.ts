@@ -1,21 +1,21 @@
 /// <reference types="@webgpu/types" />
-import type { World } from "redgeometry/src/ecs/world.js";
+import type { World } from "redgeometry/src/ecs/world";
 import { Point3 } from "redgeometry/src/index";
-import { Matrix4x4 } from "redgeometry/src/primitives/matrix.js";
-import { Quaternion, RotationOrder } from "redgeometry/src/primitives/quaternion.js";
-import { CAMERA_BUNDLE_IDS, type CameraBundle } from "redgeometry/src/render-webgpu/camera.js";
-import { gpuPlugin, startGPUSystem, type GPUData, type GPUInitData } from "redgeometry/src/render-webgpu/gpu.js";
+import { Matrix4x4 } from "redgeometry/src/primitives/matrix";
+import { Quaternion, RotationOrder } from "redgeometry/src/primitives/quaternion";
+import { CAMERA_BUNDLE_IDS, type CameraBundle } from "redgeometry/src/render-webgpu/camera";
+import { gpuPlugin, startGPUSystem, type GPUData, type GPUInitData } from "redgeometry/src/render-webgpu/gpu";
 import {
     meshRenderPlugin,
     meshRenderSystem,
     type MeshBundle,
     type MeshComponent,
     type MeshRenderStateData,
-} from "redgeometry/src/render-webgpu/mesh.js";
-import type { SceneData } from "redgeometry/src/render-webgpu/scene.js";
-import { requestAnimationFrameSystem, timePlugin, type TimeData } from "redgeometry/src/render-webgpu/time.js";
-import { throwError } from "redgeometry/src/utility/debug.js";
-import { RandomXSR128, type Random } from "redgeometry/src/utility/random.js";
+} from "redgeometry/src/render-webgpu/mesh";
+import type { SceneData } from "redgeometry/src/render-webgpu/scene";
+import { requestAnimationFrameSystem, timePlugin, type TimeData } from "redgeometry/src/render-webgpu/time";
+import { throwError } from "redgeometry/src/utility/debug";
+import { RandomXSR128, type Random } from "redgeometry/src/utility/random";
 import { createRandomColor, createRandomSeed } from "../data.js";
 import {
     appMainPlugin,

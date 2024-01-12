@@ -1,9 +1,9 @@
-import { WindingOperator } from "redgeometry/src/core/path-options.js";
-import { Path2 } from "redgeometry/src/core/path.js";
-import { Box2 } from "redgeometry/src/primitives/box.js";
-import { Point2 } from "redgeometry/src/primitives/point.js";
-import { log } from "redgeometry/src/utility/debug.js";
-import { RandomXSR128 } from "redgeometry/src/utility/random.js";
+import { Path2 } from "redgeometry/src/core/path";
+import { WindingOperator } from "redgeometry/src/core/path-options";
+import { Box2 } from "redgeometry/src/primitives/box";
+import { Point2 } from "redgeometry/src/primitives/point";
+import { log } from "redgeometry/src/utility/debug";
+import { RandomXSR128 } from "redgeometry/src/utility/random";
 import { AppContext2D } from "../context.js";
 import { createPath } from "../data.js";
 import { TextBoxInputElement } from "../input.js";

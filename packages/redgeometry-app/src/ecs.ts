@@ -1,5 +1,5 @@
-import type { World } from "redgeometry/src/ecs/world.js";
-import type { TimeData } from "redgeometry/src/render-webgpu/time.js";
+import type { World } from "redgeometry/src/ecs/world";
+import type { TimeData } from "redgeometry/src/render-webgpu/time";
 import { AppInputElement } from "./input.js";
 
 export function appMainPlugin(world: World): void {

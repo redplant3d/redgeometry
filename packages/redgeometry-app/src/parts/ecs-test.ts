@@ -1,12 +1,12 @@
-import { Path2 } from "redgeometry/src/core/path.js";
-import { hasChangeFlag } from "redgeometry/src/ecs/helper.js";
-import { ChangeFlags } from "redgeometry/src/ecs/types.js";
-import type { World } from "redgeometry/src/ecs/world.js";
-import { Point2 } from "redgeometry/src/primitives/point.js";
-import { Vector2 } from "redgeometry/src/primitives/vector.js";
-import { requestAnimationFrameSystem, timePlugin, type TimeData } from "redgeometry/src/render-webgpu/time.js";
-import { log, throwError } from "redgeometry/src/utility/debug.js";
-import { RandomXSR128, type Random } from "redgeometry/src/utility/random.js";
+import { Path2 } from "redgeometry/src/core/path";
+import { hasChangeFlag } from "redgeometry/src/ecs/helper";
+import { ChangeFlags } from "redgeometry/src/ecs/types";
+import type { World } from "redgeometry/src/ecs/world";
+import { Point2 } from "redgeometry/src/primitives/point";
+import { Vector2 } from "redgeometry/src/primitives/vector";
+import { requestAnimationFrameSystem, timePlugin, type TimeData } from "redgeometry/src/render-webgpu/time";
+import { log, throwError } from "redgeometry/src/utility/debug";
+import { RandomXSR128, type Random } from "redgeometry/src/utility/random";
 import { AppContext2D } from "../context.js";
 import { createRandomSeed } from "../data.js";
 import {

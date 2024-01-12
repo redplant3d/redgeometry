@@ -1,6 +1,6 @@
-import { Path2 } from "redgeometry/src/core/path.js";
-import { Bezier2Curve2 } from "redgeometry/src/primitives/bezier.js";
-import { Point2 } from "redgeometry/src/primitives/point.js";
+import { Path2 } from "redgeometry/src/core/path";
+import { Bezier2Curve2 } from "redgeometry/src/primitives/bezier";
+import { Point2 } from "redgeometry/src/primitives/point";
 import { AppContext2D } from "../context.js";
 import { RangeInputElement } from "../input.js";
 import { AppLauncher, type AppPart } from "../launcher.js";
