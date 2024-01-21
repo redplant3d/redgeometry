@@ -44,25 +44,11 @@ export class Matrix3A {
         return new Matrix3A([1, 0, 0, 0, 1, 0]);
     }
 
-    public static fromArray(elements: ArrayLike<number>, offset = 0, transpose = false): Matrix3A {
+    public static fromArray(elements: ArrayLike<number>, offset = 0): Matrix3A {
         const e = elements;
         const i = offset;
 
-        // prettier-ignore
-        if (transpose) {
-            // row-major order
-            return new Matrix3A([
-                e[i + 0], e[i + 3],
-                e[i + 1], e[i + 4],
-                e[i + 2], e[i + 5]
-            ]);
-        } else {
-            // column-major order
-            return new Matrix3A([
-                e[i + 0], e[i + 1], e[i + 2],
-                e[i + 3], e[i + 4], e[i + 5]
-            ]);
-        }
+        return new Matrix3A([e[i + 0], e[i + 1], e[i + 2], e[i + 3], e[i + 4], e[i + 5]]);
     }
 
     /**
@@ -143,6 +129,32 @@ export class Matrix3A {
 
     public clone(): Matrix3A {
         return new Matrix3A([...this.elements]);
+    }
+
+    public copyFrom(mat: Matrix3A | Matrix3): void {
+        const ea = this.elements;
+        const eb = mat.elements;
+
+        ea[0] = eb[0];
+        ea[1] = eb[1];
+        ea[2] = eb[2];
+        ea[3] = eb[3];
+        ea[4] = eb[4];
+        ea[5] = eb[5];
+    }
+
+    public eq(mat: Matrix3A): boolean {
+        const ea = this.elements;
+        const eb = mat.elements;
+
+        return (
+            eb[0] === ea[0] &&
+            eb[1] === ea[1] &&
+            eb[2] === ea[2] &&
+            eb[3] === ea[3] &&
+            eb[4] === ea[4] &&
+            eb[5] === ea[5]
+        );
     }
 
     public getDeterminant(): number {
@@ -445,25 +457,8 @@ export class Matrix3A {
         eb[5] -= ea[5];
     }
 
-    public toArray(transpose = false): number[] {
-        const e = this.elements;
-
-        // prettier-ignore
-        if (transpose) {
-            // row-major order
-            return [
-                e[0], e[3], 0,
-                e[1], e[4], 0,
-                e[2], e[5], 1,
-            ];
-        } else {
-            // column-major order
-            return [
-                e[0], e[1], e[2],
-                e[3], e[4], e[5],
-                0, 0, 1,
-            ];
-        }
+    public toArray(): number[] {
+        return [...this.elements];
     }
 
     public toString(): string {
@@ -565,26 +560,11 @@ export class Matrix3 {
         return new Matrix3([0, 0, 0, 0, 0, 0, 0, 0, 0]);
     }
 
-    public static fromArray(elements: ArrayLike<number>, offset = 0, transpose = false): Matrix3 {
+    public static fromArray(elements: ArrayLike<number>, offset = 0): Matrix3 {
         const e = elements;
         const i = offset;
 
-        // prettier-ignore
-        if (transpose) {
-            // row-major order
-            return new Matrix3([
-                e[i + 0], e[i + 3], e[i + 6],
-                e[i + 1], e[i + 4], e[i + 7],
-                e[i + 2], e[i + 5], e[i + 8],
-            ]);
-        } else {
-            // column-major order
-            return new Matrix3([
-                e[i + 0], e[i + 1], e[i + 2],
-                e[i + 3], e[i + 4], e[i + 5],
-                e[i + 6], e[i + 7], e[i + 8],
-            ]);
-        }
+        return new Matrix3([e[i + 0], e[i + 1], e[i + 2], e[i + 3], e[i + 4], e[i + 5], e[i + 6], e[i + 7], e[i + 8]]);
     }
 
     /**
@@ -671,6 +651,38 @@ export class Matrix3 {
 
     public clone(): Matrix3 {
         return new Matrix3([...this.elements]);
+    }
+
+    public copyFrom(mat: Matrix3): void {
+        const ea = this.elements;
+        const eb = mat.elements;
+
+        ea[0] = eb[0];
+        ea[1] = eb[1];
+        ea[2] = eb[2];
+        ea[3] = eb[3];
+        ea[4] = eb[4];
+        ea[5] = eb[5];
+        ea[6] = eb[6];
+        ea[7] = eb[7];
+        ea[8] = eb[8];
+    }
+
+    public eq(mat: Matrix3): boolean {
+        const ea = this.elements;
+        const eb = mat.elements;
+
+        return (
+            eb[0] === ea[0] &&
+            eb[1] === ea[1] &&
+            eb[2] === ea[2] &&
+            eb[3] === ea[3] &&
+            eb[4] === ea[4] &&
+            eb[5] === ea[5] &&
+            eb[6] === ea[6] &&
+            eb[7] === ea[7] &&
+            eb[8] === ea[8]
+        );
     }
 
     public getDeterminant(): number {
@@ -1009,25 +1021,8 @@ export class Matrix3 {
         eb[8] -= ea[8];
     }
 
-    public toArray(transpose = false): number[] {
-        const e = this.elements;
-
-        // prettier-ignore
-        if (transpose) {
-            // row-major order
-            return [
-                e[0], e[3], e[6],
-                e[1], e[4], e[7],
-                e[2], e[5], e[8],
-            ];
-        } else {
-            // column-major order
-            return [
-                e[0], e[1], e[2],
-                e[3], e[4], e[5],
-                e[6], e[7], e[8],
-            ];
-        }
+    public toArray(): number[] {
+        return [...this.elements];
     }
 
     public toString(): string {
@@ -1154,27 +1149,24 @@ export class Matrix4A {
         return new Matrix4A([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
     }
 
-    public static fromArray(elements: ArrayLike<number>, offset = 0, transpose = false): Matrix4A {
+    public static fromArray(elements: ArrayLike<number>, offset = 0): Matrix4A {
         const e = elements;
         const i = offset;
 
-        // prettier-ignore
-        if (transpose) {
-            // row-major order
-            return new Matrix4A([
-                e[i + 0], e[i + 4], e[i + 8],
-                e[i + 1], e[i + 5], e[i + 9],
-                e[i + 2], e[i + 6], e[i + 10],
-                e[i + 3], e[i + 7], e[i + 11],
-            ]);
-        } else {
-            // column-major order
-            return new Matrix4A([
-                e[i + 0], e[i + 1], e[i + 2], e[i + 3],
-                e[i + 4], e[i + 5], e[i + 6], e[i + 7],
-                e[i + 8], e[i + 9], e[i + 10], e[i + 11],
-            ]);
-        }
+        return new Matrix4A([
+            e[i + 0],
+            e[i + 1],
+            e[i + 2],
+            e[i + 3],
+            e[i + 4],
+            e[i + 5],
+            e[i + 6],
+            e[i + 7],
+            e[i + 8],
+            e[i + 9],
+            e[i + 10],
+            e[i + 11],
+        ]);
     }
 
     /**
@@ -1290,6 +1282,44 @@ export class Matrix4A {
 
     public clone(): Matrix4A {
         return new Matrix4A([...this.elements]);
+    }
+
+    public copyFrom(mat: Matrix4A | Matrix4): void {
+        const ea = this.elements;
+        const eb = mat.elements;
+
+        ea[0] = eb[0];
+        ea[1] = eb[1];
+        ea[2] = eb[2];
+        ea[3] = eb[3];
+        ea[4] = eb[4];
+        ea[5] = eb[5];
+        ea[6] = eb[6];
+        ea[7] = eb[7];
+        ea[8] = eb[8];
+        ea[9] = eb[9];
+        ea[10] = eb[10];
+        ea[11] = eb[11];
+    }
+
+    public eq(mat: Matrix4A): boolean {
+        const ea = this.elements;
+        const eb = mat.elements;
+
+        return (
+            eb[0] === ea[0] &&
+            eb[1] === ea[1] &&
+            eb[2] === ea[2] &&
+            eb[3] === ea[3] &&
+            eb[4] === ea[4] &&
+            eb[5] === ea[5] &&
+            eb[6] === ea[6] &&
+            eb[7] === ea[7] &&
+            eb[8] === ea[8] &&
+            eb[9] === ea[9] &&
+            eb[10] === ea[10] &&
+            eb[11] === ea[11]
+        );
     }
 
     public getMaxScale(): number {
@@ -1733,27 +1763,8 @@ export class Matrix4A {
         eb[11] -= ea[11];
     }
 
-    public toArray(transpose = false): number[] {
-        const e = this.elements;
-
-        // prettier-ignore
-        if (transpose) {
-            // row-major order
-            return [
-                e[0], e[4], e[8], 0,
-                e[1], e[5], e[9], 0,
-                e[2], e[6], e[10], 0,
-                e[3], e[7], e[11], 1,
-            ];
-        } else {
-            // column-major order
-            return [
-                e[0], e[1], e[2], e[3],
-                e[4], e[5], e[6], e[7],
-                e[8], e[9], e[10], e[11],
-                0, 0, 0, 1,
-            ];
-        }
+    public toArray(): number[] {
+        return [...this.elements];
     }
 
     public toString(): string {
@@ -1901,28 +1912,28 @@ export class Matrix4 {
         return new Matrix4([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
     }
 
-    public static fromArray(elements: ArrayLike<number>, offset = 0, transpose = false): Matrix4 {
+    public static fromArray(elements: ArrayLike<number>, offset = 0): Matrix4 {
         const e = elements;
         const i = offset;
 
-        // prettier-ignore
-        if (transpose) {
-            // row-major order
-            return new Matrix4([
-                e[i + 0], e[i + 4], e[i + 8], e[i + 12],
-                e[i + 1], e[i + 5], e[i + 9], e[i + 13],
-                e[i + 2], e[i + 6], e[i + 10], e[i + 14],
-                e[i + 3], e[i + 7], e[i + 11], e[i + 15],
-            ]);
-        } else {
-            // column-major order
-            return new Matrix4([
-                e[i + 0], e[i + 1], e[i + 2], e[i + 3],
-                e[i + 4], e[i + 5], e[i + 6], e[i + 7],
-                e[i + 8], e[i + 9], e[i + 10], e[i + 11],
-                e[i + 12], e[i + 13], e[i + 14], e[i + 15],
-            ]);
-        }
+        return new Matrix4([
+            e[i + 0],
+            e[i + 1],
+            e[i + 2],
+            e[i + 3],
+            e[i + 4],
+            e[i + 5],
+            e[i + 6],
+            e[i + 7],
+            e[i + 8],
+            e[i + 9],
+            e[i + 10],
+            e[i + 11],
+            e[i + 12],
+            e[i + 13],
+            e[i + 14],
+            e[i + 15],
+        ]);
     }
 
     public static fromOrthographic(
@@ -2109,6 +2120,52 @@ export class Matrix4 {
 
     public clone(): Matrix4 {
         return new Matrix4([...this.elements]);
+    }
+
+    public copyFrom(mat: Matrix4): void {
+        const ea = this.elements;
+        const eb = mat.elements;
+
+        ea[0] = eb[0];
+        ea[1] = eb[1];
+        ea[2] = eb[2];
+        ea[3] = eb[3];
+        ea[4] = eb[4];
+        ea[5] = eb[5];
+        ea[6] = eb[6];
+        ea[7] = eb[7];
+        ea[8] = eb[8];
+        ea[9] = eb[9];
+        ea[10] = eb[10];
+        ea[11] = eb[11];
+        ea[12] = eb[12];
+        ea[13] = eb[13];
+        ea[14] = eb[14];
+        ea[15] = eb[15];
+    }
+
+    public eq(mat: Matrix4): boolean {
+        const ea = this.elements;
+        const eb = mat.elements;
+
+        return (
+            eb[0] === ea[0] &&
+            eb[1] === ea[1] &&
+            eb[2] === ea[2] &&
+            eb[3] === ea[3] &&
+            eb[4] === ea[4] &&
+            eb[5] === ea[5] &&
+            eb[6] === ea[6] &&
+            eb[7] === ea[7] &&
+            eb[8] === ea[8] &&
+            eb[9] === ea[9] &&
+            eb[10] === ea[10] &&
+            eb[11] === ea[11] &&
+            eb[12] === ea[12] &&
+            eb[13] === ea[13] &&
+            eb[14] === ea[14] &&
+            eb[15] === ea[15]
+        );
     }
 
     /**
@@ -2581,27 +2638,8 @@ export class Matrix4 {
         eb[15] -= ea[15];
     }
 
-    public toArray(transpose = false): number[] {
-        const e = this.elements;
-
-        // prettier-ignore
-        if (transpose) {
-            // row-major order
-            return [
-                e[0], e[4], e[8], e[12],
-                e[1], e[5], e[9], e[13],
-                e[2], e[6], e[10], e[14],
-                e[3], e[7], e[11], e[15],
-            ];
-        } else {
-            // column-major order
-            return [
-                e[0], e[1], e[2], e[3],
-                e[4], e[5], e[6], e[7],
-                e[8], e[9], e[10], e[11],
-                e[12], e[13], e[14], e[15],
-            ];
-        }
+    public toArray(): number[] {
+        return [...this.elements];
     }
 
     public toString(): string {

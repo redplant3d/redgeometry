@@ -37,6 +37,24 @@ export class Quaternion {
         return new Quaternion(data[offset], data[offset + 1], data[offset + 2], data[offset + 3]);
     }
 
+    public static fromRotationAngleX(angle: number): Quaternion {
+        const sin = Math.sin(0.5 * angle);
+        const cos = Math.cos(0.5 * angle);
+        return new Quaternion(cos, sin, 0, 0);
+    }
+
+    public static fromRotationAngleY(angle: number): Quaternion {
+        const sin = Math.sin(0.5 * angle);
+        const cos = Math.cos(0.5 * angle);
+        return new Quaternion(cos, 0, sin, 0);
+    }
+
+    public static fromRotationAngleZ(angle: number): Quaternion {
+        const sin = Math.sin(0.5 * angle);
+        const cos = Math.cos(0.5 * angle);
+        return new Quaternion(cos, 0, 0, sin);
+    }
+
     public static fromRotationAxis(v: Vector3, angle: number): Quaternion {
         const sin = Math.sin(0.5 * angle);
         const cos = Math.cos(0.5 * angle);
@@ -87,24 +105,6 @@ export class Quaternion {
         }
     }
 
-    public static fromRotationAngleX(angle: number): Quaternion {
-        const sin = Math.sin(0.5 * angle);
-        const cos = Math.cos(0.5 * angle);
-        return new Quaternion(cos, sin, 0, 0);
-    }
-
-    public static fromRotationAngleY(angle: number): Quaternion {
-        const sin = Math.sin(0.5 * angle);
-        const cos = Math.cos(0.5 * angle);
-        return new Quaternion(cos, 0, sin, 0);
-    }
-
-    public static fromRotationAngleZ(angle: number): Quaternion {
-        const sin = Math.sin(0.5 * angle);
-        const cos = Math.cos(0.5 * angle);
-        return new Quaternion(cos, 0, 0, sin);
-    }
-
     public add(q: Quaternion): Quaternion {
         return new Quaternion(this.a + q.a, this.b + q.b, this.c + q.c, this.d + q.d);
     }
@@ -128,6 +128,10 @@ export class Quaternion {
     public dot(q: Quaternion): number {
         // `(1 / 2) * (q1 * (q2*)) - q2 * (q1*))`
         return this.a * q.a + this.b * q.b + this.c * q.c + this.d * q.d;
+    }
+
+    public eq(q: Quaternion): boolean {
+        return this.a === q.a && this.b === q.b && this.c === q.c && this.d === q.d;
     }
 
     public inverse(): Quaternion {

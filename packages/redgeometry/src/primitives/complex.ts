@@ -41,6 +41,10 @@ export class Complex {
         return this.a * z.a + this.b * z.b;
     }
 
+    public eq(z: Complex): boolean {
+        return this.a === z.a && this.b === z.b;
+    }
+
     public inverse(): Complex {
         return this.unit().conjugate();
     }
