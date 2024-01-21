@@ -1,7 +1,7 @@
 /// <reference types="@webgpu/types" />
 import type { World } from "redgeometry/src/ecs/world";
-import { Point3 } from "redgeometry/src/index";
-import { Matrix4x4 } from "redgeometry/src/primitives/matrix";
+import { Matrix4 } from "redgeometry/src/primitives/matrix";
+import { Point3 } from "redgeometry/src/primitives/point";
 import { Quaternion, RotationOrder } from "redgeometry/src/primitives/quaternion";
 import { CAMERA_BUNDLE_IDS, type CameraBundle } from "redgeometry/src/render-webgpu/camera";
 import { gpuPlugin, startGPUSystem, type GPUData, type GPUInitData } from "redgeometry/src/render-webgpu/gpu";
@@ -156,8 +156,8 @@ function initRemoteSystem(world: World): void {
     });
 
     const mainCamera = world.createEntity<CameraBundle>(
-        { componentId: "camera", projection: Matrix4x4.createIdentity() },
-        { componentId: "transform", local: Matrix4x4.createIdentity() },
+        { componentId: "camera", projection: Matrix4.createIdentity() },
+        { componentId: "transform", local: Matrix4.createIdentity() },
     );
 
     world.writeData<SceneData>({
@@ -266,19 +266,19 @@ function beginFrameSystem(world: World): void {
     const a = (0.25 * time + rotation * Math.PI) / 180;
 
     const q = Quaternion.fromRotationEuler(0.5, a, 0, RotationOrder.XYZ);
-    const matView = Matrix4x4.fromRotation(q.a, q.b, q.c, q.d);
-    matView.translatePre(0, 0, -15);
+    const matView = Matrix4.fromRotation(q.a, q.b, q.c, q.d);
+    matView.translate(0, 0, -15);
 
     let matProj;
 
     if (projection === "orthographic") {
-        matProj = Matrix4x4.fromOrthographic(-10, 10, 10, -10, 1, 2000);
+        matProj = Matrix4.fromOrthographic(-10, 10, 10, -10, 1, 2000);
     } else {
-        matProj = Matrix4x4.fromPerspectiveFrustum(65, canvas.width / canvas.height, 1, 2000);
+        matProj = Matrix4.fromPerspectiveFrustum(65, canvas.width / canvas.height, 1, 2000);
     }
 
-    matProj.translatePre(0, 0, 1);
-    matProj.scalePre(1, 1, 0.5);
+    matProj.translate(0, 0, 1);
+    matProj.scale(1, 1, 0.5);
 
     const { mainCamera } = world.readData<SceneData>("scene");
     const mainCameraComponents = world.getTypedComponents<CameraBundle>(mainCamera, CAMERA_BUNDLE_IDS);
@@ -319,8 +319,8 @@ function spawnSystem(world: World): void {
                 random.nextFloatBetween(-7.5, 7.5),
             );
 
-            const local = Matrix4x4.fromRotation(q.a, q.b, q.c, q.d);
-            local.translatePre(t.x, t.y, t.z);
+            const local = Matrix4.fromRotation(q.a, q.b, q.c, q.d);
+            local.translate(t.x, t.y, t.z);
 
             const color = createRandomColor(random, 0.5, 1, 1);
 

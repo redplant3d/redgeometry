@@ -1,6 +1,6 @@
 import type { Box3 } from "redgeometry/src/primitives/box";
 import { Edge2, Edge3 } from "redgeometry/src/primitives/edge";
-import { Matrix4x4 } from "redgeometry/src/primitives/matrix";
+import { Matrix4 } from "redgeometry/src/primitives/matrix";
 import { Point2, Point3 } from "redgeometry/src/primitives/point";
 import { Quaternion, RotationOrder } from "redgeometry/src/primitives/quaternion";
 import type { Random } from "redgeometry/src/utility/random";
@@ -66,20 +66,20 @@ export class MatrixAppPart implements AppPart {
 
         // Projection
         if (this.inputProjection.getValue() === "orthographic") {
-            mat = Matrix4x4.fromOrthographic(-1, 1, 1, -1, -10, 1000);
+            mat = Matrix4.fromOrthographic(-1, 1, 1, -1, -10, 1000);
         } else {
-            mat = Matrix4x4.fromPerspective(-1, 1, 1, -1, -10, 1000);
+            mat = Matrix4.fromPerspective(-1, 1, 1, -1, -10, 1000);
         }
 
-        mat.scalePre(s, s, s);
-        mat.translatePre(w, h, 0);
+        mat.scale(s, s, s);
+        mat.translate(w, h, 0);
 
         // View
-        mat.translatePost(0, 0, -10);
+        mat.translatePre(0, 0, -10);
 
         // Model
         const q = Quaternion.fromRotationEuler(1.1 * d, 1.3 * d, 1.7 * d, RotationOrder.ZYX);
-        mat.rotatePost(q.a, q.b, q.c, q.d);
+        mat.rotatePre(q.a, q.b, q.c, q.d);
 
         this.edges = this.transformEdges(edges, mat);
 
@@ -133,7 +133,7 @@ export class MatrixAppPart implements AppPart {
         return new Point3(x, y, z);
     }
 
-    private transformEdges(edges: Edge3[], m: Matrix4x4): Edge2[] {
+    private transformEdges(edges: Edge3[], m: Matrix4): Edge2[] {
         const output: Edge2[] = [];
 
         for (const e of edges) {

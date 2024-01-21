@@ -1,7 +1,7 @@
 import { JoinType, type StrokeCaps } from "../core/path-options.js";
 import type { Path2 } from "../core/path.js";
 import { ColorRgba } from "../primitives/color.js";
-import { Matrix3x2 } from "../primitives/matrix.js";
+import { Matrix3A } from "../primitives/matrix.js";
 import {
     DEFAULT_CONTEXT_FILL_OPTIONS,
     DEFAULT_CONTEXT_STROKE_OPTIONS,
@@ -19,13 +19,13 @@ export class SoftwareRenderContext2 implements RenderContext2 {
     private fillOptions: ContextFillOptions;
     private pipeline: PipelineSoftware;
     private strokeOptions: ContextStrokeOptions;
-    private transform: Matrix3x2;
+    private transform: Matrix3A;
 
     public constructor() {
         this.fillOptions = { ...DEFAULT_CONTEXT_FILL_OPTIONS };
         this.strokeOptions = { ...DEFAULT_CONTEXT_STROKE_OPTIONS };
         this.pipeline = new PipelineSoftware();
-        this.transform = Matrix3x2.createIdentity();
+        this.transform = Matrix3A.createIdentity();
     }
 
     public get caps(): StrokeCaps {

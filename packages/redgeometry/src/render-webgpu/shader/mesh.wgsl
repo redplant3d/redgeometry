@@ -25,7 +25,7 @@ var<uniform> color: vec4<f32>;
 fn vertex_main(in: VertexIn) -> VertexOut {
     var pos = vec4<f32>(in.position, 1.0);
     var out: VertexOut;
-    out.position = world * transform * pos;
+    out.position = pos * transform * world;
     return out;
 }
 

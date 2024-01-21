@@ -2,7 +2,7 @@ import { Path2CurveIterator } from "../internal/iterator.js";
 import { copyCommandsReversed, isWindingInside } from "../internal/path.js";
 import { CurveType, type BezierCurve2 } from "../primitives/bezier.js";
 import { Box2 } from "../primitives/box.js";
-import { Matrix3x2, Matrix3x3 } from "../primitives/matrix.js";
+import { Matrix3, Matrix3A } from "../primitives/matrix.js";
 import { Point2 } from "../primitives/point.js";
 import { Polygon2 } from "../primitives/polygon.js";
 import { Vector2 } from "../primitives/vector.js";
@@ -189,14 +189,14 @@ export class Path2 implements PathSink2 {
         let sin = Math.sin(startAngle);
         let cos = Math.cos(startAngle);
 
-        const mat = Matrix3x2.fromRotation(cos, sin);
+        const mat = Matrix3A.fromRotation(cos, sin);
 
-        mat.scalePre(rx, ry);
-        mat.translatePre(pc.x, pc.y);
+        mat.scale(rx, ry);
+        mat.translate(pc.x, pc.y);
 
         if (a < 0) {
             // Flip Y
-            mat.scalePost(1, -1);
+            mat.scalePre(1, -1);
         }
 
         a = Math.abs(a);
@@ -572,7 +572,7 @@ export class Path2 implements PathSink2 {
         let cos = Math.cos(xAxisRotation);
 
         // Inverse rotation to align the ellipse
-        const mat = Matrix3x2.fromRotation(cos, -sin);
+        const mat = Matrix3A.fromRotation(cos, -sin);
 
         // Vector from center (transformed midpoint)
         let v = p0.sub(p1).mul(0.5);
@@ -594,7 +594,7 @@ export class Path2 implements PathSink2 {
         }
 
         // Prepend scale
-        mat.scalePre(1 / sx, 1 / sy);
+        mat.scale(1 / sx, 1 / sy);
 
         // Calculate unit coordinates
         let pp0 = mat.mapPoint(p0);
@@ -627,9 +627,9 @@ export class Path2 implements PathSink2 {
 
         // Set up the final transformation matrix
         mat.rotateSet(v1.x, v1.y);
-        mat.translatePre(pc.x, pc.y);
-        mat.scalePre(sx, sy);
-        mat.rotatePre(cos, sin);
+        mat.translate(pc.x, pc.y);
+        mat.scale(sx, sy);
+        mat.rotate(cos, sin);
 
         // We have `sin = v1.cross(v2) / (v1.length * v2.length)`
         // with the length of `v1` and `v2` both 1 (unit vectors)
@@ -659,7 +659,7 @@ export class Path2 implements PathSink2 {
             }
 
             // Flip Y
-            mat.scalePost(1, -1);
+            mat.scalePre(1, -1);
 
             v2 = new Vector2(cos, -sin);
 
@@ -720,7 +720,7 @@ export class Path2 implements PathSink2 {
         return mesh.getFaces().map((f) => new Polygon2(f.getPoints()));
     }
 
-    public transform(mat: Matrix3x2 | Matrix3x3): void {
+    public transform(mat: Matrix3 | Matrix3A): void {
         const points = this.points;
         for (let i = 0; i < points.length; i++) {
             points[i] = mat.mapPoint(points[i]);

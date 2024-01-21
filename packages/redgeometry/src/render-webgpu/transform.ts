@@ -1,6 +1,6 @@
-import { Matrix4x4 } from "../primitives/matrix.js";
+import { Matrix4 } from "../primitives/matrix.js";
 
 export type TransformComponent = {
     componentId: "transform";
-    local: Matrix4x4;
+    local: Matrix4;
 };

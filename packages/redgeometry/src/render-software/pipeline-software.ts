@@ -2,7 +2,7 @@ import type { PathFlatten2 } from "../core/path-flatten.js";
 import { DEFAULT_PATH_QUALITY_OPTIONS, createPathFlatten, createPathStroke } from "../core/path-options.js";
 import type { PathStroke2 } from "../core/path-stroke.js";
 import { Path2 } from "../core/path.js";
-import type { Matrix3x2 } from "../primitives/matrix.js";
+import type { Matrix3A } from "../primitives/matrix.js";
 import { Point2 } from "../primitives/point.js";
 import {
     FillRule,
@@ -46,7 +46,7 @@ export class PipelineSoftware {
         this.pathStroke = createPathStroke(DEFAULT_PATH_QUALITY_OPTIONS);
     }
 
-    public addFill(path: Path2, mat: Matrix3x2): void {
+    public addFill(path: Path2, mat: Matrix3A): void {
         const input = this.rentPath();
         input.copyFrom(path);
         input.transform(mat);
@@ -55,7 +55,7 @@ export class PipelineSoftware {
         this.returnPath(input);
     }
 
-    public addStroke(path: Path2, mat: Matrix3x2, options: ContextStrokeOptions): void {
+    public addStroke(path: Path2, mat: Matrix3A, options: ContextStrokeOptions): void {
         const stroke = this.rentPath();
 
         if (options.transformOrder === StrokeTransformOrder.Pre) {

@@ -1,7 +1,7 @@
 import { hasChangeFlag, hasComponent } from "../ecs/helper.js";
 import { ChangeFlags, type ComponentsIdsOf, type EntityId } from "../ecs/types.js";
 import type { World } from "../ecs/world.js";
-import { Matrix4x4 } from "../primitives/matrix.js";
+import { Matrix4 } from "../primitives/matrix.js";
 import { log } from "../utility/debug.js";
 import { gpuCreateBuffer, type Float32Buffer, type NumberBuffer } from "./buffer.js";
 import { CAMERA_BUNDLE_IDS, type CameraBundle } from "./camera.js";
@@ -103,7 +103,7 @@ export function meshRenderSystem(world: World): void {
 
         const transform = hasComponent<TransformComponent>(components, "transform")
             ? components.transform.local
-            : Matrix4x4.createIdentity();
+            : Matrix4.createIdentity();
 
         if (hasComponent<MeshComponent>(components, "mesh")) {
             if (hasChangeFlag(changeset.mesh, ChangeFlags.Created)) {
@@ -144,7 +144,7 @@ export function meshRenderSystem(world: World): void {
     const { local } = mainCameraComponents.transform;
 
     const mat = projection.clone();
-    mat.mul(local);
+    mat.mulPre(local);
 
     const bindGroup0 = createBindGroup0(device, pipelineContext, mat);
 
@@ -199,7 +199,7 @@ function createPipelineContext(device: GPUDevice, format: GPUTextureFormat): GPU
     return { vertexState, fragmentState, bindGroupLayouts, pipelineLayout };
 }
 
-function createBindGroup0(device: GPUDevice, pipelineContext: GPUPipelineContext, mat: Matrix4x4): GPUBindGroup {
+function createBindGroup0(device: GPUDevice, pipelineContext: GPUPipelineContext, mat: Matrix4): GPUBindGroup {
     return device.createBindGroup({
         entries: [
             {
@@ -247,7 +247,7 @@ function createColorBuffer(device: GPUDevice, color: GPUColorDict): GPUBuffer {
     return gpuBuffer;
 }
 
-function createMatrixBuffer(device: GPUDevice, mat: Matrix4x4): GPUBuffer {
+function createMatrixBuffer(device: GPUDevice, mat: Matrix4): GPUBuffer {
     const gpuBuffer = device.createBuffer({
         size: 64,
         usage: GPUBufferUsage.UNIFORM,
@@ -257,7 +257,7 @@ function createMatrixBuffer(device: GPUDevice, mat: Matrix4x4): GPUBuffer {
     const mappedRange = gpuBuffer.getMappedRange();
     const destData = new Float32Array(mappedRange);
 
-    const srcData = mat.toArray(true);
+    const srcData = mat.toArray();
 
     for (let i = 0; i < 16; i++) {
         destData[i] = srcData[i];
@@ -273,7 +273,7 @@ function createMeshEntry(
     pipelineContext: GPUPipelineContext,
     pipeline: GPURenderPipeline,
     meshComp: MeshComponent,
-    transform: Matrix4x4,
+    transform: Matrix4,
 ): MeshRenderEntry {
     const { material, vertices } = meshComp;
     const vertexCount = vertices.array.length / 3;
