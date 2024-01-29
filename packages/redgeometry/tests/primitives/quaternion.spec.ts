@@ -1,7 +1,7 @@
 import { expect, test } from "vitest";
 import { Quaternion, RotationOrder } from "../../src/primitives/quaternion.js";
 
-test("Quaternion - fromXAngle", () => {
+test("Quaternion - fromRotationAngleX", () => {
     const q = Quaternion.fromRotationAngleX(1);
 
     const q1 = Quaternion.fromRotationEuler(1, 0, 0, RotationOrder.XYZ);
@@ -19,7 +19,7 @@ test("Quaternion - fromXAngle", () => {
     expectToBeCloseToQuaternion(q, q6);
 });
 
-test("Quaternion - fromYAngle", () => {
+test("Quaternion - fromRotationAngleY", () => {
     const q = Quaternion.fromRotationAngleY(1);
 
     const q1 = Quaternion.fromRotationEuler(0, 1, 0, RotationOrder.XYZ);
@@ -38,7 +38,7 @@ test("Quaternion - fromYAngle", () => {
     expectToBeCloseToQuaternion(q, q6);
 });
 
-test("Quaternion - fromZAngle", () => {
+test("Quaternion - fromRotationAngleZ", () => {
     const q = Quaternion.fromRotationAngleZ(1);
 
     const q1 = Quaternion.fromRotationEuler(0, 0, 1, RotationOrder.XYZ);
@@ -56,7 +56,7 @@ test("Quaternion - fromZAngle", () => {
     expectToBeCloseToQuaternion(q, q6);
 });
 
-test("Quaternion - fromEulerAngles", () => {
+test("Quaternion - fromRotationEuler", () => {
     const ax = 1;
     const ay = 2;
     const az = 3;
@@ -81,6 +81,20 @@ test("Quaternion - fromEulerAngles", () => {
     expectToBeCloseToQuaternion(qd1, qd2);
     expectToBeCloseToQuaternion(qe1, qe2);
     expectToBeCloseToQuaternion(qf1, qf2);
+
+    const qa3 = Quaternion.fromRotationAngleZ(az).rotateYPre(ay).rotateXPre(ax);
+    const qb3 = Quaternion.fromRotationAngleY(ay).rotateZPre(az).rotateXPre(ax);
+    const qc3 = Quaternion.fromRotationAngleZ(az).rotateXPre(ax).rotateYPre(ay);
+    const qd3 = Quaternion.fromRotationAngleX(ax).rotateZPre(az).rotateYPre(ay);
+    const qe3 = Quaternion.fromRotationAngleY(ay).rotateXPre(ax).rotateZPre(az);
+    const qf3 = Quaternion.fromRotationAngleX(ax).rotateYPre(ay).rotateZPre(az);
+
+    expectToBeCloseToQuaternion(qa1, qa3);
+    expectToBeCloseToQuaternion(qb1, qb3);
+    expectToBeCloseToQuaternion(qc1, qc3);
+    expectToBeCloseToQuaternion(qd1, qd3);
+    expectToBeCloseToQuaternion(qe1, qe3);
+    expectToBeCloseToQuaternion(qf1, qf3);
 });
 
 function expectToBeCloseToQuaternion(q1: Quaternion, q2: Quaternion): void {

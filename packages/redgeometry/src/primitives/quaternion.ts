@@ -205,6 +205,23 @@ export class Quaternion {
         );
     }
 
+    /**
+     * ```
+     * | qa |   | a |
+     * | qb | * | b |
+     * | qc |   | c |
+     * | qd |   | d |
+     * ```
+     */
+    public mulPre(q: Quaternion): Quaternion {
+        return new Quaternion(
+            q.a * this.a - q.b * this.b - q.c * this.c - q.d * this.d,
+            q.a * this.b + q.b * this.a + q.c * this.d - q.d * this.c,
+            q.a * this.c - q.b * this.d + q.c * this.a + q.d * this.b,
+            q.a * this.d + q.b * this.c - q.c * this.b + q.d * this.a,
+        );
+    }
+
     public rotateX(ax: number): Quaternion {
         const sin = Math.sin(0.5 * ax);
         const cos = Math.cos(0.5 * ax);
@@ -218,6 +235,22 @@ export class Quaternion {
             this.b * cos + this.a * sin,
             this.c * cos + this.d * sin,
             this.d * cos - this.c * sin,
+        );
+    }
+
+    public rotateXPre(ax: number): Quaternion {
+        const sin = Math.sin(0.5 * ax);
+        const cos = Math.cos(0.5 * ax);
+
+        // | cos |   | a |
+        // | sin | * | b |
+        // |   0 |   | c |
+        // |   0 |   | d |
+        return new Quaternion(
+            cos * this.a - sin * this.b,
+            cos * this.b + sin * this.a,
+            cos * this.c - sin * this.d,
+            cos * this.d + sin * this.c,
         );
     }
 
@@ -237,6 +270,22 @@ export class Quaternion {
         );
     }
 
+    public rotateYPre(ay: number): Quaternion {
+        const sin = Math.sin(0.5 * ay);
+        const cos = Math.cos(0.5 * ay);
+
+        // | cos |   | a |
+        // |   0 | * | b |
+        // | sin |   | c |
+        // |   0 |   | d |
+        return new Quaternion(
+            cos * this.a - sin * this.c,
+            cos * this.b + sin * this.d,
+            cos * this.c + sin * this.a,
+            cos * this.d - sin * this.b,
+        );
+    }
+
     public rotateZ(az: number): Quaternion {
         const sin = Math.sin(0.5 * az);
         const cos = Math.cos(0.5 * az);
@@ -250,6 +299,22 @@ export class Quaternion {
             this.b * cos + this.c * sin,
             this.c * cos - this.b * sin,
             this.d * cos + this.a * sin,
+        );
+    }
+
+    public rotateZPre(az: number): Quaternion {
+        const sin = Math.sin(0.5 * az);
+        const cos = Math.cos(0.5 * az);
+
+        // | cos |   | a |
+        // |   0 | * | b |
+        // |   0 |   | c |
+        // | sin |   | d |
+        return new Quaternion(
+            cos * this.a - sin * this.d,
+            cos * this.b - sin * this.c,
+            cos * this.c + sin * this.b,
+            cos * this.d + sin * this.a,
         );
     }
 
