@@ -174,10 +174,10 @@ export class Matrix3A {
 
         const e0 = detInv * e[4];
         const e1 = detInv * -e[1];
-        const e2 = detInv * (e[1] * e[5] - e[2] * e[4]);
+        const e2 = -(e[2] * e0 + e[5] * e1);
         const e3 = detInv * -e[3];
         const e4 = detInv * e[0];
-        const e5 = detInv * (e[2] * e[3] - e[0] * e[5]);
+        const e5 = -(e[2] * e3 + e[5] * e4);
 
         return new Matrix3A([e0, e1, e2, e3, e4, e5]);
     }
@@ -688,9 +688,9 @@ export class Matrix3 {
     public getDeterminant(): number {
         const e = this.elements;
 
-        const a = e[0] * (e[4] * e[8] - e[5] * e[7]);
-        const b = e[1] * (e[3] * e[8] - e[5] * e[6]);
-        const c = e[2] * (e[3] * e[7] - e[4] * e[6]);
+        const a = e[8] * (e[0] * e[4] - e[1] * e[3]);
+        const b = e[7] * (e[0] * e[5] - e[2] * e[3]);
+        const c = e[6] * (e[1] * e[5] - e[2] * e[4]);
 
         return a - b + c;
     }
@@ -1320,6 +1320,42 @@ export class Matrix4A {
             eb[10] === ea[10] &&
             eb[11] === ea[11]
         );
+    }
+
+    public getDeterminant(): number {
+        const e = this.elements;
+
+        const a = e[10] * (e[0] * e[5] - e[1] * e[4]);
+        const b = e[9] * (e[0] * e[6] - e[2] * e[4]);
+        const c = e[8] * (e[1] * e[6] - e[2] * e[5]);
+
+        return a - b + c;
+    }
+
+    public getInverse(): Matrix4A {
+        const det = this.getDeterminant();
+
+        if (det === 0) {
+            return Matrix4A.createIdentity();
+        }
+
+        const detInv = 1 / det;
+        const e = this.elements;
+
+        const e0 = detInv * (e[5] * e[10] - e[6] * e[9]);
+        const e1 = detInv * (e[2] * e[9] - e[1] * e[10]);
+        const e2 = detInv * (e[1] * e[6] - e[2] * e[5]);
+        const e3 = -(e[3] * e0 + e[7] * e1 + e[11] * e2);
+        const e4 = detInv * (e[6] * e[8] - e[4] * e[10]);
+        const e5 = detInv * (e[0] * e[10] - e[2] * e[8]);
+        const e6 = detInv * (e[2] * e[4] - e[0] * e[6]);
+        const e7 = -(e[3] * e4 + e[7] * e5 + e[11] * e6);
+        const e8 = detInv * (e[4] * e[9] - e[5] * e[8]);
+        const e9 = detInv * (e[1] * e[8] - e[0] * e[9]);
+        const e10 = detInv * (e[0] * e[5] - e[1] * e[4]);
+        const e11 = -(e[3] * e8 + e[7] * e9 + e[11] * e10);
+
+        return new Matrix4A([e0, e1, e2, e3, e4, e5, e6, e7, e8, e9, e10, e11]);
     }
 
     public getMaxScale(): number {

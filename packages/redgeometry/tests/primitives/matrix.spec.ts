@@ -5,7 +5,7 @@ import { Point2, Point3 } from "../../src/primitives/point.js";
 import { Quaternion } from "../../src/primitives/quaternion.js";
 import { Vector2, Vector3 } from "../../src/primitives/vector.js";
 
-test("Matrix3x2 - inverse", () => {
+test("Matrix3A - inverse", () => {
     const c = Complex.fromRotationAngle(Math.PI);
     const mat = Matrix3A.createIdentity();
     mat.translate(1, 2);
@@ -18,7 +18,7 @@ test("Matrix3x2 - inverse", () => {
     expect(mat).toEqual(Matrix3A.createIdentity());
 });
 
-test("Matrix3x2 - mapPoint", () => {
+test("Matrix3A - mapPoint", () => {
     const mat = Matrix3A.createIdentity();
     const p = new Point2(1, 2);
 
@@ -27,7 +27,7 @@ test("Matrix3x2 - mapPoint", () => {
     expect(mapPoint).toEqual(p);
 });
 
-test("Matrix3x2 - mapVector", () => {
+test("Matrix3A - mapVector", () => {
     const mat = Matrix3A.createIdentity();
     const v = new Vector2(1, 2);
 
@@ -36,7 +36,7 @@ test("Matrix3x2 - mapVector", () => {
     expect(mapVector).toEqual(v);
 });
 
-test("Matrix3x2 - rotate", () => {
+test("Matrix3A - rotate", () => {
     const c = Complex.fromRotationAngle(1);
     const mat1 = Matrix3A.createIdentity();
     const mat2 = Matrix3A.createIdentity();
@@ -50,7 +50,7 @@ test("Matrix3x2 - rotate", () => {
     expect(mat2).toEqual(mat3);
 });
 
-test("Matrix3x2 - scale", () => {
+test("Matrix3A - scale", () => {
     const mat1 = Matrix3A.createIdentity();
     const mat2 = Matrix3A.createIdentity();
     const mat3 = Matrix3A.createIdentity();
@@ -63,7 +63,7 @@ test("Matrix3x2 - scale", () => {
     expect(mat2).toEqual(mat3);
 });
 
-test("Matrix3x2 - translate", () => {
+test("Matrix3A - translate", () => {
     const mat1 = Matrix3A.createIdentity();
     const mat2 = Matrix3A.createIdentity();
     const mat3 = Matrix3A.createIdentity();
@@ -76,7 +76,7 @@ test("Matrix3x2 - translate", () => {
     expect(mat2).toEqual(mat3);
 });
 
-test("Matrix3x3 - inverse", () => {
+test("Matrix3 - inverse", () => {
     const c = Complex.fromRotationAngle(Math.PI);
     const mat = Matrix3.createIdentity();
     mat.translate(1, 2);
@@ -89,7 +89,7 @@ test("Matrix3x3 - inverse", () => {
     expect(mat).toEqual(Matrix3.createIdentity());
 });
 
-test("Matrix3x3 - mapPoint", () => {
+test("Matrix3 - mapPoint", () => {
     const mat = Matrix3.createIdentity();
     const p = new Point2(1, 2);
 
@@ -98,7 +98,7 @@ test("Matrix3x3 - mapPoint", () => {
     expect(mapPoint).toEqual(p);
 });
 
-test("Matrix3x3 - mapVector", () => {
+test("Matrix3 - mapVector", () => {
     const mat = Matrix3.createIdentity();
     const v = new Vector2(1, 2);
 
@@ -107,7 +107,7 @@ test("Matrix3x3 - mapVector", () => {
     expect(mapVector).toEqual(v);
 });
 
-test("Matrix3x3 - rotate", () => {
+test("Matrix3 - rotate", () => {
     const c = Complex.fromRotationAngle(1);
     const mat1 = Matrix3.createIdentity();
     const mat2 = Matrix3.createIdentity();
@@ -121,7 +121,7 @@ test("Matrix3x3 - rotate", () => {
     expect(mat2).toEqual(mat3);
 });
 
-test("Matrix3x3 - scale", () => {
+test("Matrix3 - scale", () => {
     const mat1 = Matrix3.createIdentity();
     const mat2 = Matrix3.createIdentity();
     const mat3 = Matrix3.createIdentity();
@@ -134,7 +134,7 @@ test("Matrix3x3 - scale", () => {
     expect(mat2).toEqual(mat3);
 });
 
-test("Matrix3x3 - translate", () => {
+test("Matrix3 - translate", () => {
     const mat1 = Matrix3.createIdentity();
     const mat2 = Matrix3.createIdentity();
     const mat3 = Matrix3.createIdentity();
@@ -147,7 +147,20 @@ test("Matrix3x3 - translate", () => {
     expect(mat2).toEqual(mat3);
 });
 
-test("Matrix4x3 - mapPoint", () => {
+test("Matrix4A - inverse", () => {
+    const q = Quaternion.fromRotationAngleX(Math.PI);
+    const mat = Matrix4A.createIdentity();
+    mat.translate(1, 2, 3);
+    mat.scale(4, 4, 4);
+    mat.rotate(q.a, q.b, q.c, q.d);
+
+    const matInv = mat.getInverse();
+    mat.mulPre(matInv);
+
+    expect(mat).toEqual(Matrix4A.createIdentity());
+});
+
+test("Matrix4A - mapPoint", () => {
     const mat = Matrix4A.createIdentity();
     const p = new Point3(1, 2, 3);
 
@@ -156,7 +169,7 @@ test("Matrix4x3 - mapPoint", () => {
     expect(mapPoint).toEqual(p);
 });
 
-test("Matrix4x3 - mapVector", () => {
+test("Matrix4A - mapVector", () => {
     const mat = Matrix4A.createIdentity();
     const v = new Vector3(1, 2, 3);
 
@@ -165,7 +178,7 @@ test("Matrix4x3 - mapVector", () => {
     expect(mapVector).toEqual(v);
 });
 
-test("Matrix4x3 - rotate (x)", () => {
+test("Matrix4A - rotate (x)", () => {
     const q = Quaternion.fromRotationAngleX(1);
     const mat1 = Matrix4A.fromRotation(q.a, q.b, q.c, q.d);
     const mat2 = Matrix4A.createIdentity();
@@ -181,7 +194,7 @@ test("Matrix4x3 - rotate (x)", () => {
     expect(mat1).toEqual(mat4);
 });
 
-test("Matrix4x3 - rotate (y)", () => {
+test("Matrix4A - rotate (y)", () => {
     const q = Quaternion.fromRotationAngleY(1);
     const mat1 = Matrix4A.fromRotation(q.a, q.b, q.c, q.d);
     const mat2 = Matrix4A.createIdentity();
@@ -197,7 +210,7 @@ test("Matrix4x3 - rotate (y)", () => {
     expect(mat1).toEqual(mat4);
 });
 
-test("Matrix4x3 - rotate (z)", () => {
+test("Matrix4A - rotate (z)", () => {
     const q = Quaternion.fromRotationAngleZ(1);
     const mat1 = Matrix4A.fromRotation(q.a, q.b, q.c, q.d);
     const mat2 = Matrix4A.createIdentity();
@@ -213,7 +226,7 @@ test("Matrix4x3 - rotate (z)", () => {
     expect(mat1).toEqual(mat4);
 });
 
-test("Matrix4x3 - scale", () => {
+test("Matrix4A - scale", () => {
     const mat1 = Matrix4A.fromScale(1, 2, 3);
     const mat2 = Matrix4A.createIdentity();
     const mat3 = Matrix4A.createIdentity();
@@ -228,7 +241,7 @@ test("Matrix4x3 - scale", () => {
     expect(mat1).toEqual(mat4);
 });
 
-test("Matrix4x3 - translate", () => {
+test("Matrix4A - translate", () => {
     const mat1 = Matrix4A.fromTranslation(1, 2, 3);
     const mat2 = Matrix4A.createIdentity();
     const mat3 = Matrix4A.createIdentity();
@@ -243,7 +256,7 @@ test("Matrix4x3 - translate", () => {
     expect(mat1).toEqual(mat4);
 });
 
-test("Matrix4x4 - mapPoint", () => {
+test("Matrix4 - mapPoint", () => {
     const mat = Matrix4.createIdentity();
     const p = new Point3(1, 2, 3);
 
@@ -252,7 +265,7 @@ test("Matrix4x4 - mapPoint", () => {
     expect(mapPoint).toEqual(p);
 });
 
-test("Matrix4x4 - mapVector", () => {
+test("Matrix4 - mapVector", () => {
     const mat = Matrix4.createIdentity();
     const v = new Vector3(1, 2, 3);
 
@@ -261,7 +274,7 @@ test("Matrix4x4 - mapVector", () => {
     expect(mapVector).toEqual(v);
 });
 
-test("Matrix4x4 - rotate (x)", () => {
+test("Matrix4 - rotate (x)", () => {
     const q = Quaternion.fromRotationAngleX(1);
     const mat1 = Matrix4.fromRotation(q.a, q.b, q.c, q.d);
     const mat2 = Matrix4.createIdentity();
@@ -277,7 +290,7 @@ test("Matrix4x4 - rotate (x)", () => {
     expect(mat1).toEqual(mat4);
 });
 
-test("Matrix4x4 - rotate (y)", () => {
+test("Matrix4 - rotate (y)", () => {
     const q = Quaternion.fromRotationAngleY(1);
     const mat1 = Matrix4.fromRotation(q.a, q.b, q.c, q.d);
     const mat2 = Matrix4.createIdentity();
@@ -293,7 +306,7 @@ test("Matrix4x4 - rotate (y)", () => {
     expect(mat1).toEqual(mat4);
 });
 
-test("Matrix4x4 - rotate (z)", () => {
+test("Matrix4 - rotate (z)", () => {
     const q = Quaternion.fromRotationAngleZ(1);
     const mat1 = Matrix4.fromRotation(q.a, q.b, q.c, q.d);
     const mat2 = Matrix4.createIdentity();
@@ -309,7 +322,7 @@ test("Matrix4x4 - rotate (z)", () => {
     expect(mat1).toEqual(mat4);
 });
 
-test("Matrix4x4 - scale", () => {
+test("Matrix4 - scale", () => {
     const mat1 = Matrix4.fromScale(1, 2, 3);
     const mat2 = Matrix4.createIdentity();
     const mat3 = Matrix4.createIdentity();
@@ -324,7 +337,7 @@ test("Matrix4x4 - scale", () => {
     expect(mat1).toEqual(mat4);
 });
 
-test("Matrix4x4 - translate", () => {
+test("Matrix4 - translate", () => {
     const mat1 = Matrix4.fromTranslation(1, 2, 3);
     const mat2 = Matrix4.createIdentity();
     const mat3 = Matrix4.createIdentity();
