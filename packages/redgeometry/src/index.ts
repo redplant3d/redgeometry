@@ -27,6 +27,7 @@ export * from "./utility/interval.js";
 export * from "./utility/log.js";
 export * from "./utility/random.js";
 export * from "./utility/scalar.js";
+export * from "./utility/set.js";
 export * from "./utility/solve.js";
 export * from "./utility/string.js";
 export * from "./utility/types.js";
