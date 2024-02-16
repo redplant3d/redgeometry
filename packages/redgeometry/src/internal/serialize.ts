@@ -103,7 +103,12 @@ export class SerializationMap {
     }
 
     public serialize(data: unknown): string {
+        // TODO: Fix serialization of sentinel values
         return JSON.stringify(data, (_, obj) => {
+            if (obj === undefined || obj === null) {
+                return obj;
+            }
+
             const ctor = obj.constructor;
 
             // Check for primitive types

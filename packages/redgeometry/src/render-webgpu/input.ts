@@ -1,14 +1,18 @@
 import type { WorldId } from "../ecs/types.js";
 import { World } from "../ecs/world.js";
+import { assertUnreachable } from "../index.js";
 
 export interface InputSenderData {
     dataId: "inputSender";
+    keyboardEventHandler: GlobalEventHandlers;
+    mouseEventHandler: GlobalEventHandlers;
     receiverId: WorldId;
 }
 
 export interface InputData {
     dataId: "input";
-    input: Input;
+    keyboard: KeyboardInput;
+    mouse: MouseInput;
 }
 
 export interface InputEventsData {
@@ -25,13 +29,9 @@ export interface InputDataEvent {
 
 export type InputMouseEventType = {
     type: string;
-    altKey: boolean;
     button: number;
-    buttons: number;
     clientX: number;
     clientY: number;
-    ctrlKey: boolean;
-    metaKey: boolean;
     movementX: number;
     movementY: number;
     offsetX: number;
@@ -40,21 +40,60 @@ export type InputMouseEventType = {
     pageY: number;
     screenX: number;
     screenY: number;
-    shiftKey: boolean;
     x: number;
     y: number;
 };
 
 export type InputKeyboardEventType = {
-    altKey: boolean;
+    type: "keydown" | "keyup";
     code: string;
-    ctrlKey: boolean;
     isComposing: boolean;
     key: string;
     location: number;
-    metaKey: boolean;
     repeat: boolean;
-    shiftKey: boolean;
+};
+
+export enum KeyboardButtons {
+    KeyW,
+    KeyA,
+    KeyS,
+    KeyD,
+    Space,
+    KeyC,
+    ShiftLeft,
+}
+
+export enum MouseButtons {
+    Mouse1,
+    Mouse2,
+    Mouse3,
+    Mouse4,
+    Mouse5,
+}
+
+enum ButtonState {
+    None,
+    Pressed,
+    Pressing,
+    Released,
+}
+
+const MOUSE_BUTTONS_LOOKUP: Record<number, MouseButtons> = {
+    0: MouseButtons.Mouse1,
+    1: MouseButtons.Mouse3,
+    2: MouseButtons.Mouse2,
+    3: MouseButtons.Mouse4,
+    4: MouseButtons.Mouse5,
+};
+
+const KEYBOARD_BUTTONS_LOOKUP: Record<string, KeyboardButtons> = {
+    KeyW: KeyboardButtons.KeyW,
+    KeyA: KeyboardButtons.KeyA,
+    KeyS: KeyboardButtons.KeyS,
+    KeyD: KeyboardButtons.KeyD,
+    Space: KeyboardButtons.Space,
+    KeyC: KeyboardButtons.KeyC,
+    ShiftLeft: KeyboardButtons.ShiftLeft,
 };
 
 export function inputSenderPlugin(world: World): void {
@@ -74,36 +113,43 @@ export function inputReceiverPlugin(world: World): void {
 }
 
 export function startInputSenderSystem(world: World): void {
+    const { keyboardEventHandler, mouseEventHandler } = world.readData<InputSenderData>("inputSender");
+
     const keyboardEvents: InputKeyboardEventType[] = [];
     const mouseEvents: InputMouseEventType[] = [];
 
-    const keyboardFn = (ev: KeyboardEvent): void => {
+    const keyDownFn = (ev: KeyboardEvent): void => {
         keyboardEvents.push({
-            altKey: ev.altKey,
+            type: "keydown",
             code: ev.code,
-            ctrlKey: ev.ctrlKey,
             isComposing: ev.isComposing,
             key: ev.key,
             location: ev.location,
-            metaKey: ev.metaKey,
             repeat: ev.repeat,
-            shiftKey: ev.shiftKey,
         });
     };
 
-    self.addEventListener("keydown", keyboardFn);
-    self.addEventListener("keyup", keyboardFn);
+    keyboardEventHandler.addEventListener("keydown", keyDownFn);
+
+    const keyUpFn = (ev: KeyboardEvent): void => {
+        keyboardEvents.push({
+            type: "keyup",
+            code: ev.code,
+            isComposing: ev.isComposing,
+            key: ev.key,
+            location: ev.location,
+            repeat: ev.repeat,
+        });
+    };
+
+    keyboardEventHandler.addEventListener("keyup", keyUpFn);
 
     const mouseFn = (ev: MouseEvent): void => {
         mouseEvents.push({
             type: ev.type,
-            altKey: ev.altKey,
             button: ev.button,
-            buttons: ev.buttons,
             clientX: ev.clientX,
             clientY: ev.clientY,
-            ctrlKey: ev.ctrlKey,
-            metaKey: ev.metaKey,
             movementX: ev.movementX,
             movementY: ev.movementY,
             offsetX: ev.offsetX,
@@ -112,19 +158,18 @@ export function startInputSenderSystem(world: World): void {
             pageY: ev.pageY,
             screenX: ev.screenX,
             screenY: ev.screenY,
-            shiftKey: ev.shiftKey,
             x: ev.x,
             y: ev.y,
         });
     };
 
-    self.addEventListener("mousedown", mouseFn);
-    self.addEventListener("mouseenter", mouseFn);
-    self.addEventListener("mouseleave", mouseFn);
-    self.addEventListener("mousemove", mouseFn);
-    self.addEventListener("mouseout", mouseFn);
-    self.addEventListener("mouseover", mouseFn);
-    self.addEventListener("mouseup", mouseFn);
+    mouseEventHandler.addEventListener("mousedown", mouseFn);
+    mouseEventHandler.addEventListener("mouseenter", mouseFn);
+    mouseEventHandler.addEventListener("mouseleave", mouseFn);
+    mouseEventHandler.addEventListener("mousemove", mouseFn);
+    mouseEventHandler.addEventListener("mouseout", mouseFn);
+    mouseEventHandler.addEventListener("mouseover", mouseFn);
+    mouseEventHandler.addEventListener("mouseup", mouseFn);
 
     world.writeData<InputEventsData>({
         dataId: "inputEvents",
@@ -138,7 +183,11 @@ export function updateInputSenderSystem(world: World): void {
     const channel = world.getChannel(receiverId);
 
     const { keyboardEvents, mouseEvents } = world.readData<InputEventsData>("inputEvents");
-    channel.queueEvent<InputDataEvent>({ eventId: "inputData", keyboardEvents, mouseEvents });
+    channel.queueEvent<InputDataEvent>({
+        eventId: "inputData",
+        keyboardEvents: [...keyboardEvents],
+        mouseEvents: [...mouseEvents],
+    });
 
     mouseEvents.length = 0;
     keyboardEvents.length = 0;
@@ -147,7 +196,8 @@ export function updateInputSenderSystem(world: World): void {
 export function startInputReceiverSystem(world: World): void {
     world.writeData<InputData>({
         dataId: "input",
-        input: new Input(),
+        keyboard: new KeyboardInput(),
+        mouse: new MouseInput(),
     });
 }
 
@@ -155,22 +205,192 @@ export function updateInputReceiverSystem(world: World): void {
     const events = world.readEvents<InputDataEvent>("inputData");
     const data = world.readData<InputData>("input");
 
+    data.keyboard.clear();
+    data.mouse.clear();
+
     for (const ev of events) {
-        data.input.applyEvents(ev.keyboardEvents, ev.mouseEvents);
+        data.keyboard.applyEvents(ev.keyboardEvents);
+        data.mouse.applyEvents(ev.mouseEvents);
     }
 }
 
-export class Input {
-    public keyboardEvents: InputKeyboardEventType[];
-    public mouseEvents: InputMouseEventType[];
+export class KeyboardInput {
+    private states: Map<KeyboardButtons, { code: string; state: ButtonState }>;
+
+    public events: InputKeyboardEventType[];
 
     public constructor() {
-        this.keyboardEvents = [];
-        this.mouseEvents = [];
+        this.states = new Map();
+        this.events = [];
+
+        this.initialize();
     }
 
-    public applyEvents(keyboardEvents: InputKeyboardEventType[], mouseEvents: InputMouseEventType[]): void {
-        this.keyboardEvents = keyboardEvents;
-        this.mouseEvents = mouseEvents;
+    public applyEvents(keyboardEvents: InputKeyboardEventType[]): void {
+        this.events = keyboardEvents;
+
+        for (const ev of keyboardEvents) {
+            const code = KEYBOARD_BUTTONS_LOOKUP[ev.code] as KeyboardButtons | undefined;
+
+            if (code === undefined) {
+                continue;
+            }
+
+            switch (ev.type) {
+                case "keydown": {
+                    this.press(code);
+                    break;
+                }
+                case "keyup": {
+                    this.release(code);
+                    break;
+                }
+                default: {
+                    assertUnreachable(ev.type);
+                }
+            }
+        }
+    }
+
+    public clear(): void {
+        for (const value of this.states.values()) {
+            if (value.state === ButtonState.Released) {
+                value.state = ButtonState.None;
+            } else if (value.state === ButtonState.Pressed) {
+                value.state = ButtonState.Pressing;
+            }
+        }
+    }
+
+    public initialize(): void {
+        for (const key in KEYBOARD_BUTTONS_LOOKUP) {
+            this.states.set(KEYBOARD_BUTTONS_LOOKUP[key], { code: key, state: ButtonState.None });
+        }
+    }
+
+    public isPressed(button: KeyboardButtons): boolean {
+        const key = this.states.get(button);
+        return key !== undefined ? key.state === ButtonState.Pressed : false;
+    }
+
+    public isPressing(button: KeyboardButtons): boolean {
+        const key = this.states.get(button);
+        return key !== undefined ? key.state === ButtonState.Pressed || key.state === ButtonState.Pressing : false;
+    }
+
+    public isReleased(button: KeyboardButtons): boolean {
+        const key = this.states.get(button);
+        return key !== undefined ? key.state === ButtonState.Released : false;
+    }
+
+    public press(button: KeyboardButtons): void {
+        const key = this.states.get(button);
+
+        if (key === undefined) {
+            return;
+        }
+
+        if (key.state === ButtonState.None || key.state === ButtonState.Released) {
+            key.state = ButtonState.Pressed;
+        }
+    }
+
+    public release(button: KeyboardButtons): void {
+        const key = this.states.get(button);
+
+        if (key === undefined) {
+            return;
+        }
+
+        key.state = ButtonState.Released;
+    }
+}
+
+export class MouseInput {
+    private states: Map<MouseButtons, { code: string; state: ButtonState }>;
+
+    public events: InputMouseEventType[];
+
+    public constructor() {
+        this.states = new Map();
+        this.events = [];
+
+        this.initialize();
+    }
+
+    public applyEvents(mouseEvents: InputMouseEventType[]): void {
+        this.events = mouseEvents;
+
+        for (const ev of mouseEvents) {
+            const code = MOUSE_BUTTONS_LOOKUP[ev.button] as MouseButtons | undefined;
+
+            if (code === undefined) {
+                continue;
+            }
+
+            switch (ev.type) {
+                case "mousedown": {
+                    this.press(code);
+                    break;
+                }
+                case "mouseup": {
+                    this.release(code);
+                    break;
+                }
+            }
+        }
+    }
+
+    public clear(): void {
+        for (const value of this.states.values()) {
+            if (value.state === ButtonState.Released) {
+                value.state = ButtonState.None;
+            } else if (value.state === ButtonState.Pressed) {
+                value.state = ButtonState.Pressing;
+            }
+        }
+    }
+
+    public initialize(): void {
+        for (const key in MOUSE_BUTTONS_LOOKUP) {
+            this.states.set(MOUSE_BUTTONS_LOOKUP[key], { code: key, state: ButtonState.None });
+        }
+    }
+
+    public isPressed(button: MouseButtons): boolean {
+        const key = this.states.get(button);
+        return key !== undefined ? key.state === ButtonState.Pressed : false;
+    }
+
+    public isPressing(button: MouseButtons): boolean {
+        const key = this.states.get(button);
+        return key !== undefined ? key.state === ButtonState.Pressed || key.state === ButtonState.Pressing : false;
+    }
+
+    public isReleased(button: MouseButtons): boolean {
+        const key = this.states.get(button);
+        return key !== undefined ? key.state === ButtonState.Released : false;
+    }
+
+    public press(button: MouseButtons): void {
+        const key = this.states.get(button);
+
+        if (key === undefined) {
+            return;
+        }
+
+        if (key.state === ButtonState.None || key.state === ButtonState.Released) {
+            key.state = ButtonState.Pressed;
+        }
+    }
+
+    public release(button: MouseButtons): void {
+        const key = this.states.get(button);
+
+        if (key === undefined) {
+            return;
+        }
+
+        key.state = ButtonState.Released;
     }
 }

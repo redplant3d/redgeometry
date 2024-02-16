@@ -1,7 +1,5 @@
 import { Path2 } from "redgeometry/src/core/path";
-import { hasChangeFlag } from "redgeometry/src/ecs/helper";
-import { ChangeFlags } from "redgeometry/src/ecs/types";
-import type { World } from "redgeometry/src/ecs/world";
+import { ChangeFlags, type World } from "redgeometry/src/ecs/world";
 import { Point2 } from "redgeometry/src/primitives/point";
 import { Vector2 } from "redgeometry/src/primitives/vector";
 import { requestAnimationFrameSystem, timePlugin, type TimeData } from "redgeometry/src/render-webgpu/time";
@@ -266,6 +264,7 @@ function spawnSystem(world: World): void {
             const velocity = new Vector2(random.nextFloatBetween(-1, 1), random.nextFloatBetween(-1, 1));
 
             world.createEntity<[CircleComponent | RectangleComponent, ObjectComponent]>(
+                undefined,
                 { componentId: shape },
                 { componentId: "object", size, color, position, velocity },
             );
@@ -275,9 +274,9 @@ function spawnSystem(world: World): void {
 
         let i = nextCount;
 
-        for (const entry of query) {
+        for (const entityId of query) {
             if (i < currCount) {
-                world.destroyEntity(entry.entity);
+                world.destroyEntity(entityId);
                 i += 1;
             }
         }
@@ -294,10 +293,16 @@ function movementSystem(world: World): void {
 
     const query = world.queryEntities<[ObjectComponent]>(["object"]);
 
-    for (const { entity, components } of query) {
-        const p = components.object.position;
-        const v = components.object.velocity;
-        const d = 0.5 * components.object.size;
+    for (const entityId of query) {
+        const object = world.getComponent<ObjectComponent>(entityId, "object");
+
+        if (object === undefined) {
+            continue;
+        }
+
+        const p = object.position;
+        const v = object.velocity;
+        const d = 0.5 * object.size;
 
         let vx = v.x;
         let vy = v.y;
@@ -320,10 +325,10 @@ function movementSystem(world: World): void {
             vy = -vy;
         }
 
-        components.object.position = new Point2(px, py);
-        components.object.velocity = new Vector2(vx, vy);
+        object.position = new Point2(px, py);
+        object.velocity = new Vector2(vx, vy);
 
-        world.updateComponent<ObjectComponent>(entity, "object");
+        world.updateComponent<ObjectComponent>(entityId, "object");
     }
 }
 
@@ -367,15 +372,22 @@ function clearRenderSystem(world: World): void {
 
 function circleRenderSystem(world: World): void {
     const { appContext } = world.readData<AppRemoteData>("appRemote");
+
     const query = world.queryEntities<[CircleComponent, ObjectComponent]>(["circle", "object"]);
 
     const red = new Path2();
     const blue = new Path2();
 
-    for (const { components } of query) {
-        const p = components.object.position;
-        const d = components.object.size;
-        const c = components.object.color;
+    for (const entityId of query) {
+        const object = world.getComponent<ObjectComponent>(entityId, "object");
+
+        if (object === undefined) {
+            continue;
+        }
+
+        const p = object.position;
+        const d = object.size;
+        const c = object.color;
 
         if (c === "red") {
             red.addCircle(p, 0.5 * d);
@@ -390,15 +402,22 @@ function circleRenderSystem(world: World): void {
 
 function rectangleRenderSystem(world: World): void {
     const { appContext } = world.readData<AppRemoteData>("appRemote");
+
     const query = world.queryEntities<[RectangleComponent, ObjectComponent]>(["rectangle", "object"]);
 
     const red = new Path2();
     const blue = new Path2();
 
-    for (const { components } of query) {
-        const p = components.object.position;
-        const d = components.object.size;
-        const c = components.object.color;
+    for (const entityId of query) {
+        const object = world.getComponent<ObjectComponent>(entityId, "object");
+
+        if (object === undefined) {
+            continue;
+        }
+
+        const p = object.position;
+        const d = object.size;
+        const c = object.color;
 
         const x0 = p.x - 0.5 * d;
         const y0 = p.y - 0.5 * d;
@@ -417,15 +436,15 @@ function rectangleRenderSystem(world: World): void {
 }
 
 function notificationSystem(world: World): void {
-    const changed = world.queryEntitiesChanged<[ObjectComponent]>(["object"]);
-
     let createdCount = 0;
     let deletedCount = 0;
 
-    for (const { changeset } of changed) {
-        if (hasChangeFlag(changeset.object, ChangeFlags.Created)) {
+    for (const entityId of world.getEntitiesChanged()) {
+        if (world.hasChangeFlag<ObjectComponent>(entityId, "object", ChangeFlags.Created)) {
             createdCount += 1;
-        } else if (hasChangeFlag(changeset.object, ChangeFlags.Deleted)) {
+        }
+
+        if (world.hasChangeFlag<ObjectComponent>(entityId, "object", ChangeFlags.Deleted)) {
             deletedCount += 1;
         }
     }

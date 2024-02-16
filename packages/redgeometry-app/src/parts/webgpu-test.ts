@@ -1,19 +1,34 @@
 /// <reference types="@webgpu/types" />
+import type { EntityId } from "redgeometry/src/ecs/types";
 import type { World } from "redgeometry/src/ecs/world";
 import { Matrix4 } from "redgeometry/src/primitives/matrix";
 import { Point3 } from "redgeometry/src/primitives/point";
 import { Quaternion, RotationOrder } from "redgeometry/src/primitives/quaternion";
-import { CAMERA_BUNDLE_IDS, type CameraBundle } from "redgeometry/src/render-webgpu/camera";
+import { Vector3 } from "redgeometry/src/primitives/vector";
+import type { AssetData, AssetId } from "redgeometry/src/render-webgpu/asset";
+import { cameraSystem, type CameraBundle, type CameraComponent } from "redgeometry/src/render-webgpu/camera";
 import { gpuPlugin, startGPUSystem, type GPUData, type GPUInitData } from "redgeometry/src/render-webgpu/gpu";
+import {
+    KeyboardButtons,
+    MouseButtons,
+    inputReceiverPlugin,
+    inputSenderPlugin,
+    startInputSenderSystem,
+    type InputData,
+    type InputSenderData,
+} from "redgeometry/src/render-webgpu/input";
+import type { Material } from "redgeometry/src/render-webgpu/material";
 import {
     meshRenderPlugin,
     meshRenderSystem,
+    startMeshRenderSystem,
+    type Mesh,
     type MeshBundle,
-    type MeshComponent,
     type MeshRenderStateData,
 } from "redgeometry/src/render-webgpu/mesh";
 import type { SceneData } from "redgeometry/src/render-webgpu/scene";
 import { requestAnimationFrameSystem, timePlugin, type TimeData } from "redgeometry/src/render-webgpu/time";
+import { Visibility, transformSystem, type TransformComponent } from "redgeometry/src/render-webgpu/transform";
 import { throwError } from "redgeometry/src/utility/debug";
 import { RandomXSR128, type Random } from "redgeometry/src/utility/random";
 import { createRandomColor, createRandomSeed } from "../data.js";
@@ -24,6 +39,7 @@ import {
     initInputElementsSystem,
     resizeWindowSystem,
     type AppCanvasData,
+    type AppData,
     type AppInputElementData,
     type WindowResizeEvent,
 } from "../ecs.js";
@@ -31,11 +47,11 @@ import { ButtonInputElement, ComboBoxInputElement, RangeInputElement, TextBoxInp
 
 export const WEBGPU_TEST_MAIN_WORLD = {
     id: "webgpu-test-main",
-    plugins: [appMainPlugin, mainPlugin, timePlugin],
+    plugins: [appMainPlugin, mainPlugin, inputSenderPlugin, timePlugin],
 };
 export const WEBGPU_TEST_REMOTE_WORLD = {
     id: "webgpu-test-remote",
-    plugins: [appRemotePlugin, remotePlugin, gpuPlugin, meshRenderPlugin],
+    plugins: [appRemotePlugin, remotePlugin, inputReceiverPlugin, gpuPlugin, meshRenderPlugin],
 };
 
 function mainPlugin(world: World): void {
@@ -58,7 +74,7 @@ function mainPlugin(world: World): void {
         stage: "start",
     });
     world.addDependency({
-        seq: [writeStateSystem, initMainSystem, requestAnimationFrameSystem],
+        seq: [writeStateSystem, initMainSystem, startInputSenderSystem, requestAnimationFrameSystem],
         stage: "start",
     });
     world.addDependency({
@@ -72,6 +88,8 @@ function remotePlugin(world: World): void {
     world.registerEvent<AppCommandEvent>("appCommand");
 
     world.addSystem({ fn: initRemoteSystem, stage: "start" });
+    world.addSystem({ fn: initAssetSystem, stage: "start" });
+    world.addSystem({ fn: cameraMoveSystem });
     world.addSystem({ fn: beginFrameSystem });
     world.addSystem({ fn: spawnSystem });
 
@@ -80,18 +98,30 @@ function remotePlugin(world: World): void {
         stage: "start",
     });
     world.addDependency({
-        seq: [resizeWindowSystem, beginFrameSystem, spawnSystem, meshRenderSystem],
+        seq: [startMeshRenderSystem, initAssetSystem],
+        stage: "start",
+    });
+    world.addDependency({
+        seq: [
+            resizeWindowSystem,
+            cameraMoveSystem,
+            beginFrameSystem,
+            spawnSystem,
+            transformSystem,
+            cameraSystem,
+            meshRenderSystem,
+        ],
     });
 }
 
 type AppMainData = {
     dataId: "appMain";
     countRange: RangeInputElement;
+    fovRange: RangeInputElement;
     generatorTextBox: TextBoxInputElement;
-    projectionComboBox: ComboBoxInputElement;
     randomizeButton: ButtonInputElement;
-    rotationRange: RangeInputElement;
     seedTextBox: TextBoxInputElement;
+    transformComboBox: ComboBoxInputElement;
     updateButton: ButtonInputElement;
 };
 
@@ -99,14 +129,17 @@ type AppRemoteData = {
     dataId: "appRemote";
     count: number;
     random: Random;
+    materialHandles: AssetId<Material>[];
+    meshHandles: AssetId<Mesh>[];
+    parentEntity: EntityId | undefined;
 };
 
 type AppStateData = {
     dataId: "appState";
     count: number;
-    projection: string;
-    rotation: number;
+    fov: number;
     seed: number;
+    transform: string;
 };
 
 type AppCommandEvent = {
@@ -114,9 +147,21 @@ type AppCommandEvent = {
     type: "randomize" | "update";
 };
 
+type TestComponent = {
+    componentId: "test";
+};
+
 function initMainSystem(world: World): Promise<void> {
+    const appData = world.readData<AppData>("app");
     const appStateData = world.readData<AppStateData>("appState");
     const appCanvasData = world.readData<AppCanvasData>("appCanvas");
+
+    world.writeData<InputSenderData>({
+        dataId: "inputSender",
+        receiverId: WEBGPU_TEST_REMOTE_WORLD.id,
+        keyboardEventHandler: self,
+        mouseEventHandler: appData.canvas,
+    });
 
     const channel = world.getChannel(WEBGPU_TEST_REMOTE_WORLD.id);
     channel.queueData<AppStateData>(appStateData);
@@ -153,11 +198,25 @@ function initRemoteSystem(world: World): void {
         dataId: "appRemote",
         count: 0,
         random: RandomXSR128.fromSeedLcg(seed),
+        materialHandles: [],
+        meshHandles: [],
+        parentEntity: undefined,
     });
 
     const mainCamera = world.createEntity<CameraBundle>(
-        { componentId: "camera", projection: Matrix4.createIdentity() },
-        { componentId: "transform", local: Matrix4.createIdentity() },
+        undefined,
+        {
+            componentId: "camera",
+            projection: Matrix4.createIdentity(),
+            viewProjection: Matrix4.createIdentity(),
+        },
+        {
+            componentId: "transform",
+            scale: Vector3.ONE,
+            rotation: Quaternion.IDENTITY,
+            translation: new Point3(0, 0, 15),
+            visible: Visibility.Inherit,
+        },
     );
 
     world.writeData<SceneData>({
@@ -191,26 +250,26 @@ function addInputElementsSystem(world: World): void {
     });
     inputElements.push(updateButton);
 
-    const rotationRange = new RangeInputElement("rotation", "0", "200", "100");
-    rotationRange.setStyle("width: 200px");
-    inputElements.push(rotationRange);
+    const fovRange = new RangeInputElement("fov", "30", "150", "65");
+    fovRange.setStyle("width: 200px");
+    inputElements.push(fovRange);
 
-    const projectionComboBox = new ComboBoxInputElement("projection", "orthographic");
-    projectionComboBox.setOptionValues("orthographic", "perspective");
-    inputElements.push(projectionComboBox);
-
-    const countRange = new RangeInputElement("count", "0", "1000", "10");
+    const countRange = new RangeInputElement("count", "0", "1000000", "15000");
     countRange.setStyle("width: 200px");
     inputElements.push(countRange);
+
+    const transformComboBox = new ComboBoxInputElement("transform", "none");
+    transformComboBox.setOptionValues("none", "rotate");
+    inputElements.push(transformComboBox);
 
     world.writeData<AppMainData>({
         dataId: "appMain",
         countRange,
+        fovRange,
         generatorTextBox,
-        projectionComboBox,
         randomizeButton,
-        rotationRange,
         seedTextBox,
+        transformComboBox,
         updateButton,
     });
 }
@@ -221,9 +280,9 @@ function writeStateSystem(world: World): void {
     world.writeData<AppStateData>({
         dataId: "appState",
         count: appMainData.countRange.getInt(),
-        projection: appMainData.projectionComboBox.getValue(),
-        rotation: appMainData.rotationRange.getInt(),
+        fov: appMainData.fovRange.getInt(),
         seed: appMainData.seedTextBox.getInt(),
+        transform: appMainData.transformComboBox.getValue(),
     });
 }
 
@@ -243,10 +302,10 @@ function mainSystem(world: World): Promise<void> {
 }
 
 function beginFrameSystem(world: World): void {
-    const { rotation, projection } = world.readData<AppStateData>("appState");
     const { context, device, gpu } = world.readData<GPUData>("gpu");
+    const { transform } = world.readData<AppStateData>("appState");
     const { time } = world.readData<TimeData>("time");
-    const { canvas } = context;
+    const { parentEntity } = world.readData<AppRemoteData>("appRemote");
 
     const windowResizeEvent = world.readLatestEvent<WindowResizeEvent>("windowResize");
 
@@ -263,30 +322,50 @@ function beginFrameSystem(world: World): void {
         });
     }
 
-    const a = (0.25 * time + rotation * Math.PI) / 180;
+    if (transform === "rotate" && parentEntity !== undefined) {
+        const a = (0.25 * time) / 180;
+        const transformComp = world.getComponent<TransformComponent>(parentEntity, "transform");
 
-    const q = Quaternion.fromRotationEuler(0.5, a, 0, RotationOrder.XYZ);
-    const matView = Matrix4.fromRotation(q.a, q.b, q.c, q.d);
-    matView.translate(0, 0, -15);
+        if (transformComp !== undefined) {
+            transformComp.rotation = Quaternion.fromRotationEuler(0, a, 0, RotationOrder.XYZ);
+            world.updateComponent<TransformComponent>(parentEntity, "transform");
+        }
+    }
+}
 
-    let matProj;
+function initAssetSystem(world: World): void {
+    const appRemoteData = world.readData<AppRemoteData>("appRemote");
+    const assetData = world.readData<AssetData>("asset");
 
-    if (projection === "orthographic") {
-        matProj = Matrix4.fromOrthographic(-10, 10, 10, -10, 1, 2000);
-    } else {
-        matProj = Matrix4.fromPerspectiveFrustum(65, canvas.width / canvas.height, 1, 2000);
+    const { random } = appRemoteData;
+
+    for (let i = 0; i < 25; i++) {
+        const materialHandle = assetData.materials.add({
+            color: createRandomColor(random, 0.5, 1, 1),
+        });
+        appRemoteData.materialHandles.push(materialHandle);
     }
 
-    matProj.translate(0, 0, 1);
-    matProj.scale(1, 1, 0.5);
+    const cubeVertices = [
+        -1, -1, 1, 1, -1, 1, 1, 1, 1, -1, -1, 1, 1, 1, 1, -1, 1, 1, 1, -1, 1, 1, -1, -1, 1, 1, -1, 1, -1, 1, 1, 1, -1,
+        1, 1, 1, 1, -1, -1, -1, -1, -1, -1, 1, -1, 1, -1, -1, -1, 1, -1, 1, 1, -1, -1, -1, -1, -1, -1, 1, -1, 1, 1, -1,
+        -1, -1, -1, 1, 1, -1, 1, -1, -1, 1, 1, 1, 1, 1, 1, 1, -1, -1, 1, 1, 1, 1, -1, -1, 1, -1, 1, -1, 1, -1, -1, -1,
+        1, -1, -1, 1, -1, 1, -1, -1, 1, -1, -1, -1,
+    ];
 
-    const { mainCamera } = world.readData<SceneData>("scene");
-    const mainCameraComponents = world.getTypedComponents<CameraBundle>(mainCamera, CAMERA_BUNDLE_IDS);
+    const meshHandle = assetData.meshes.add({
+        vertices: { type: "Number", array: cubeVertices },
+    });
 
-    if (mainCameraComponents !== undefined) {
-        mainCameraComponents.camera.projection = matProj;
-        mainCameraComponents.transform.local = matView;
-    }
+    appRemoteData.parentEntity = world.createEntity<[TransformComponent]>(undefined, {
+        componentId: "transform",
+        rotation: Quaternion.IDENTITY,
+        scale: Vector3.ONE,
+        translation: Point3.ZERO,
+        visible: Visibility.Inherit,
+    });
+
+    appRemoteData.meshHandles.push(meshHandle);
 }
 
 function spawnSystem(world: World): void {
@@ -296,55 +375,130 @@ function spawnSystem(world: World): void {
     const currCount = appRemoteData.count;
     const nextCount = appStateData.count;
 
-    if (currCount <= nextCount) {
-        const cubeVertices = [
-            -1, -1, 1, 1, -1, 1, 1, 1, 1, -1, -1, 1, 1, 1, 1, -1, 1, 1, 1, -1, 1, 1, -1, -1, 1, 1, -1, 1, -1, 1, 1, 1,
-            -1, 1, 1, 1, 1, -1, -1, -1, -1, -1, -1, 1, -1, 1, -1, -1, -1, 1, -1, 1, 1, -1, -1, -1, -1, -1, -1, 1, -1, 1,
-            1, -1, -1, -1, -1, 1, 1, -1, 1, -1, -1, 1, 1, 1, 1, 1, 1, 1, -1, -1, 1, 1, 1, 1, -1, -1, 1, -1, 1, -1, 1,
-            -1, -1, -1, 1, -1, -1, 1, -1, 1, -1, -1, 1, -1, -1, -1,
-        ];
+    const maxCount = Math.abs(currCount - nextCount);
+    const minCount = Math.min(maxCount, 2500);
 
-        const { random } = appRemoteData;
+    if (currCount < nextCount) {
+        const { random, materialHandles, meshHandles, parentEntity } = appRemoteData;
 
-        for (let i = currCount; i < nextCount; i++) {
-            const q = Quaternion.fromRotationEuler(
-                random.nextFloatBetween(0, 2 * Math.PI),
-                random.nextFloatBetween(0, 2 * Math.PI),
-                random.nextFloatBetween(0, 2 * Math.PI),
-                RotationOrder.XYZ,
-            );
-            const t = new Point3(
-                random.nextFloatBetween(-7.5, 7.5),
-                random.nextFloatBetween(-2.5, 5),
-                random.nextFloatBetween(-7.5, 7.5),
-            );
-
-            const local = Matrix4.fromRotation(q.a, q.b, q.c, q.d);
-            local.translate(t.x, t.y, t.z);
-
-            const color = createRandomColor(random, 0.5, 1, 1);
-
-            world.createEntity<MeshBundle>(
+        for (let i = 0; i < minCount; i++) {
+            world.createEntity<[TestComponent, ...MeshBundle]>(
+                parentEntity,
+                { componentId: "test" },
+                { componentId: "mesh", handle: meshHandles[i % meshHandles.length] },
+                { componentId: "material", handle: materialHandles[i % materialHandles.length] },
                 {
-                    componentId: "mesh",
-                    material: { topology: "triangle-list", color },
-                    vertices: { type: "Number", array: cubeVertices },
+                    componentId: "transform",
+                    scale: new Vector3(
+                        random.nextFloatBetween(2 ** -8, 2 ** -6),
+                        random.nextFloatBetween(2 ** -8, 2 ** -6),
+                        random.nextFloatBetween(2 ** -8, 2 ** -6),
+                    ),
+                    rotation: Quaternion.fromRotationEuler(
+                        random.nextFloatBetween(0, 2 * Math.PI),
+                        random.nextFloatBetween(0, 2 * Math.PI),
+                        random.nextFloatBetween(0, 2 * Math.PI),
+                        RotationOrder.XYZ,
+                    ),
+                    translation: new Point3(
+                        random.nextFloatBetween(-5, 5),
+                        random.nextFloatBetween(-5, 5),
+                        random.nextFloatBetween(-5, 5),
+                    ),
+                    visible: Visibility.Inherit,
                 },
-                { componentId: "transform", local },
             );
         }
-    } else {
-        const query = world.queryEntities<[MeshComponent]>(["mesh"]);
 
-        let i = nextCount;
+        appRemoteData.count += minCount;
 
-        for (const entry of query) {
-            if (i < currCount) {
-                world.destroyEntity(entry.entity);
+        // log.info("Created {} entities", nextCount - currCount);
+    }
+
+    if (currCount > nextCount) {
+        const query = world.queryEntities<[TestComponent]>(["test"]);
+
+        let i = 0;
+
+        for (const entityId of query) {
+            if (i < minCount) {
+                world.destroyEntity(entityId);
                 i += 1;
             }
         }
+
+        appRemoteData.count -= minCount;
+
+        // log.info("Deleted {} entities", currCount - nextCount);
+    }
+}
+
+export function cameraMoveSystem(world: World): void {
+    const { keyboard, mouse } = world.readData<InputData>("input");
+    const { fov } = world.readData<AppStateData>("appState");
+    const { mainCamera } = world.readData<SceneData>("scene");
+    const { context } = world.readData<GPUData>("gpu");
+    const { delta } = world.readData<TimeData>("time");
+
+    const camera = world.getComponent<CameraComponent>(mainCamera, "camera");
+    const transform = world.getComponent<TransformComponent>(mainCamera, "transform");
+
+    if (camera === undefined || transform === undefined) {
+        return;
     }
 
-    appRemoteData.count = nextCount;
+    let camRot = transform.rotation;
+    let camPos = transform.translation;
+
+    let vel = 0.005;
+    let x = 0;
+    let y = 0;
+    let z = 0;
+
+    if (keyboard.isPressing(KeyboardButtons.KeyW)) z -= 1;
+    if (keyboard.isPressing(KeyboardButtons.KeyS)) z += 1;
+    if (keyboard.isPressing(KeyboardButtons.KeyA)) x -= 1;
+    if (keyboard.isPressing(KeyboardButtons.KeyD)) x += 1;
+    if (keyboard.isPressing(KeyboardButtons.KeyC)) y -= 1;
+    if (keyboard.isPressing(KeyboardButtons.Space)) y += 1;
+    if (keyboard.isPressing(KeyboardButtons.ShiftLeft)) vel *= 3;
+
+    let v = new Vector3(x, y, z);
+
+    if (!v.eq(Vector3.ZERO)) {
+        v = v.unitOrZero().mul(delta * vel);
+        v = camRot.mapVector(v);
+
+        camPos = camPos.add(v);
+    }
+
+    if (mouse.isPressing(MouseButtons.Mouse3)) {
+        let offsetX = 0;
+        let offsetY = 0;
+
+        for (const ev of mouse.events) {
+            offsetX -= ev.movementX;
+            offsetY -= ev.movementY;
+        }
+
+        const sens = 1 / 250;
+        const yaw = sens * offsetX;
+        const pitch = sens * offsetY;
+
+        camRot = camRot.rotateYPre(yaw).rotateX(pitch);
+    }
+
+    transform.rotation = camRot;
+    transform.translation = camPos;
+
+    world.updateComponent<TransformComponent>(mainCamera, "transform");
+
+    const aspect = context.canvas.width / context.canvas.height;
+    const camProj = Matrix4.fromPerspectiveFrustum(fov, aspect, 0.01, 2000);
+
+    // Transform `z` from [-1, 1] to [0, 1]
+    camProj.translate(0, 0, 1);
+    camProj.scale(1, 1, 0.5);
+
+    camera.projection = camProj;
 }
