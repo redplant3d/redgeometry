@@ -1,8 +1,17 @@
 import { Path2 } from "redgeometry/src/core/path";
-import { ChangeFlags, type World } from "redgeometry/src/ecs/world";
+import type { WorldOptions } from "redgeometry/src/ecs/app";
+
+import type { DefaultSystemStage, DefaultWorldScheduleId } from "redgeometry/src/ecs/types";
+import {
+    ChangeFlags,
+    DEFAULT_START_SCHEDULE,
+    DEFAULT_STOP_SCHEDULE,
+    DEFAULT_UPDATE_SCHEDULE,
+    type World,
+} from "redgeometry/src/ecs/world";
 import { Point2 } from "redgeometry/src/primitives/point";
 import { Vector2 } from "redgeometry/src/primitives/vector";
-import { requestAnimationFrameSystem, timePlugin, type TimeData } from "redgeometry/src/render-webgpu/time";
+import { timePlugin, type TimeData } from "redgeometry/src/render-webgpu/time";
 import { log, throwError } from "redgeometry/src/utility/debug";
 import { RandomXSR128, type Random } from "redgeometry/src/utility/random";
 import { AppContext2D } from "../context.js";
@@ -10,22 +19,21 @@ import { createRandomSeed } from "../data.js";
 import {
     appMainPlugin,
     appRemotePlugin,
-    initAppSystem,
-    initInputElementsSystem,
-    resizeWindowSystem,
     type AppCanvasData,
     type AppInputElementData,
     type WindowResizeEvent,
 } from "../ecs.js";
 import { ButtonInputElement, RangeInputElement, TextBoxInputElement } from "../input.js";
 
-export const ECS_TEST_MAIN_WORLD = {
+export const ECS_TEST_MAIN_WORLD: WorldOptions = {
     id: "ecs-test-main",
     plugins: [appMainPlugin, mainPlugin, timePlugin],
+    schedules: [DEFAULT_START_SCHEDULE, DEFAULT_UPDATE_SCHEDULE, DEFAULT_STOP_SCHEDULE],
 };
-export const ECS_TEST_REMOTE_WORLD = {
+export const ECS_TEST_REMOTE_WORLD: WorldOptions = {
     id: "ecs-test-remote",
     plugins: [appRemotePlugin, remotePlugin],
+    schedules: [DEFAULT_START_SCHEDULE, DEFAULT_UPDATE_SCHEDULE, DEFAULT_STOP_SCHEDULE],
 };
 
 function mainPlugin(world: World): void {
@@ -33,26 +41,20 @@ function mainPlugin(world: World): void {
     world.registerData<AppStateData>("appState");
     world.registerEvent<AppCommandEvent>("appCommand");
 
-    world.addSystem({ fn: addInputElementsSystem, stage: "start" });
-    world.addSystem({ fn: writeStateSystem, stage: "start" });
-    world.addSystem({ fn: initMainSystem, stage: "start", mode: "async" });
-    world.addSystem({ fn: writeStateSystem });
-    world.addSystem({ fn: mainSystem, mode: "async" });
+    world.addSystem<DefaultSystemStage>({ stage: "start", fn: addInputElementsSystem });
+    world.addSystem<DefaultSystemStage>({ stage: "start", fn: writeStateSystem });
+    world.addSystem<DefaultSystemStage>({ stage: "start", fn: initMainSystem, awaitMode: "dependency" });
 
-    world.addDependency({
-        seq: [initAppSystem, addInputElementsSystem, initInputElementsSystem],
+    world.addSystem<DefaultSystemStage>({ stage: "update", fn: writeStateSystem });
+    world.addSystem<DefaultSystemStage>({ stage: "update", fn: mainSystem, awaitMode: "dependency" });
+
+    world.addDependency<DefaultSystemStage>({
         stage: "start",
+        seq: [addInputElementsSystem, writeStateSystem, initMainSystem],
     });
-    world.addDependency({
-        seq: [addInputElementsSystem, writeStateSystem],
-        stage: "start",
-    });
-    world.addDependency({
-        seq: [writeStateSystem, initMainSystem, requestAnimationFrameSystem],
-        stage: "start",
-    });
-    world.addDependency({
-        seq: [writeStateSystem, mainSystem, requestAnimationFrameSystem],
+    world.addDependency<DefaultSystemStage>({
+        stage: "update",
+        seq: [writeStateSystem, mainSystem],
     });
 }
 
@@ -64,22 +66,31 @@ function remotePlugin(world: World): void {
     world.registerSerializable(Vector2);
     world.registerSerializable(Point2);
 
-    world.addSystem({ fn: initRemoteSystem, stage: "start" });
-    world.addSystem({ fn: spawnSystem });
-    world.addSystem({ fn: movementSystem });
-    world.addSystem({ fn: commandEventSystem });
-    world.addSystem({ fn: clearRenderSystem });
-    world.addSystem({ fn: circleRenderSystem });
-    world.addSystem({ fn: rectangleRenderSystem });
-    world.addSystem({ fn: notificationSystem });
+    world.addSystem<DefaultSystemStage>({ stage: "start", fn: initRemoteSystem });
 
-    world.addDependency({
+    world.addSystems<DefaultSystemStage>({
+        stage: "update",
+        fns: [
+            spawnSystem,
+            movementSystem,
+            commandEventSystem,
+            clearRenderSystem,
+            circleRenderSystem,
+            rectangleRenderSystem,
+            notificationSystem,
+        ],
+    });
+
+    world.addDependency<DefaultSystemStage>({
+        stage: "update",
         seq: [commandEventSystem, spawnSystem, movementSystem, clearRenderSystem],
     });
-    world.addDependency({
-        seq: [resizeWindowSystem, clearRenderSystem, rectangleRenderSystem, circleRenderSystem],
+    world.addDependency<DefaultSystemStage>({
+        stage: "update",
+        seq: [clearRenderSystem, rectangleRenderSystem, circleRenderSystem],
     });
-    world.addDependency({
+    world.addDependency<DefaultSystemStage>({
+        stage: "update",
         seq: [spawnSystem, notificationSystem],
     });
 }
@@ -143,7 +154,7 @@ function initMainSystem(world: World): Promise<void> {
         channel.queueData<AppCanvasData>(appCanvasData);
     }
 
-    return channel.runStageAsync("start");
+    return channel.runScheduleAsync<DefaultWorldScheduleId>("start");
 }
 
 function initRemoteSystem(world: World): void {
@@ -240,7 +251,7 @@ function mainSystem(world: World): Promise<void> {
     channel.queueEvents(windowResizeEvents);
     channel.queueEvents(appCommandEvents);
 
-    return channel.runStageAsync("update");
+    return channel.runScheduleAsync<DefaultWorldScheduleId>("update");
 }
 
 function spawnSystem(world: World): void {

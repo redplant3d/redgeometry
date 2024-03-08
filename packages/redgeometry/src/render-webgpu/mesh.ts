@@ -1,4 +1,4 @@
-import { type ComponentIdsOf, type EntityId } from "../ecs/types.js";
+import type { ComponentIdsOf, DefaultSystemStage, EntityId } from "../ecs/types.js";
 import type { World } from "../ecs/world.js";
 import { Matrix4 } from "../primitives/matrix.js";
 import { assertDebug, log } from "../utility/debug.js";
@@ -54,26 +54,44 @@ type MeshRenderEntry = {
     meshId: AssetId<Mesh>;
 };
 
-export interface MeshRenderStateData {
+export type MeshRenderStateData = {
     dataId: "meshRenderState";
     depthTexture: GPUTexture;
     entries: Map<EntityId, MeshRenderEntry>;
     materialEntries: Map<AssetId<Material>, MaterialEntry>;
     pipeline: GPURenderPipeline;
     pipelineContext: GPUPipelineContext;
-}
+};
 
 export function meshRenderPlugin(world: World): void {
     world.registerData<MeshRenderStateData>("meshRenderState");
     world.registerData<AssetData>("asset");
     world.registerData<SceneData>("scene");
 
-    world.addSystem({ fn: startMeshRenderSystem, stage: "start" });
-    world.addSystem({ fn: transformSystem });
-    world.addSystem({ fn: cameraSystem });
-    world.addSystem({ fn: meshRenderSystem });
+    world.addSystem<DefaultSystemStage>({ stage: "start-pre", fn: initAssets });
+    world.addSystem<DefaultSystemStage>({ stage: "start-post", fn: startMeshRenderSystem });
 
-    world.addDependency({ seq: [startGPUSystem, startMeshRenderSystem], stage: "start" });
+    world.addSystem<DefaultSystemStage>({ stage: "update-post", fn: transformSystem });
+    world.addSystem<DefaultSystemStage>({ stage: "update-post", fn: cameraSystem });
+    world.addSystem<DefaultSystemStage>({ stage: "update-post", fn: meshRenderSystem });
+
+    world.addDependency<DefaultSystemStage>({
+        stage: "start-post",
+        seq: [startGPUSystem, startMeshRenderSystem],
+    });
+
+    world.addDependency<DefaultSystemStage>({
+        stage: "update-post",
+        seq: [transformSystem, cameraSystem, meshRenderSystem],
+    });
+}
+
+export function initAssets(world: World): void {
+    world.writeData<AssetData>({
+        dataId: "asset",
+        materials: new AssetCollection(),
+        meshes: new AssetCollection(),
+    });
 }
 
 export function startMeshRenderSystem(world: World): void {
@@ -100,12 +118,6 @@ export function startMeshRenderSystem(world: World): void {
         materialEntries,
         pipeline,
         pipelineContext,
-    });
-
-    world.writeData<AssetData>({
-        dataId: "asset",
-        materials: new AssetCollection(),
-        meshes: new AssetCollection(),
     });
 }
 

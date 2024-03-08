@@ -1,3 +1,4 @@
+import type { DefaultSystemStage } from "redgeometry/src/ecs/types";
 import type { World } from "redgeometry/src/ecs/world";
 import type { TimeData } from "redgeometry/src/render-webgpu/time";
 import { AppInputElement } from "./input.js";
@@ -9,8 +10,8 @@ export function appMainPlugin(world: World): void {
 
     world.registerEvent<WindowResizeEvent>("windowResize");
 
-    world.addSystem({ fn: initAppSystem, stage: "start" });
-    world.addSystem({ fn: initInputElementsSystem, stage: "start" });
+    world.addSystem<DefaultSystemStage>({ stage: "start-pre", fn: initAppSystem });
+    world.addSystem<DefaultSystemStage>({ stage: "start-post", fn: initInputElementsSystem });
 }
 
 export function appRemotePlugin(world: World): void {
@@ -18,7 +19,7 @@ export function appRemotePlugin(world: World): void {
     world.registerData<TimeData>("time");
     world.registerEvent<WindowResizeEvent>("windowResize");
 
-    world.addSystem({ fn: resizeWindowSystem });
+    world.addSystem<DefaultSystemStage>({ stage: "update-pre", fn: resizeWindowSystem });
 }
 
 export type AppData = {

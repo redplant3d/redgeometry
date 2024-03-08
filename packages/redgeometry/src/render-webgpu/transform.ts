@@ -1,5 +1,5 @@
 import type { EntityHierarchySelector } from "../ecs/storage-sparse.js";
-import { type EntityId } from "../ecs/types.js";
+import type { EntityId } from "../ecs/types.js";
 import { World } from "../ecs/world.js";
 import { Matrix4A } from "../primitives/matrix.js";
 import { Point3 } from "../primitives/point.js";

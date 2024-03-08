@@ -1,33 +1,36 @@
-import type { SystemStage } from "../ecs/types.js";
+import type { DefaultSystemStage, WorldScheduleId } from "../ecs/types.js";
 import { World } from "../ecs/world.js";
 
-export interface AnimationFrameData {
+export type AnimationFrameData = {
     dataId: "animationFrame";
     requestHandle: number;
     provider: AnimationFrameProvider;
     time: number;
-    stage: SystemStage;
-}
+    scheduleId: WorldScheduleId;
+};
 
-export interface TimeData {
+export type TimeData = {
     dataId: "time";
     time: number;
     delta: number;
     frame: number;
-}
+};
 
 export function timePlugin(world: World): void {
     world.registerData<AnimationFrameData>("animationFrame");
     world.registerData<TimeData>("time");
-    world.addSystem({ fn: requestAnimationFrameSystem, stage: "start" });
-    world.addSystem({ fn: requestAnimationFrameSystem, stage: "update" });
-    world.addSystem({ fn: cancelAnimationFrame, stage: "stop" });
-    world.addSystem({ fn: timeSystem });
+
+    world.addSystem<DefaultSystemStage>({ stage: "start-post", fn: requestAnimationFrameSystem });
+
+    world.addSystem<DefaultSystemStage>({ stage: "update", fn: timeSystem });
+    world.addSystem<DefaultSystemStage>({ stage: "update-post", fn: requestAnimationFrameSystem });
+
+    world.addSystem<DefaultSystemStage>({ stage: "stop-pre", fn: cancelAnimationFrame });
 
     world.writeData<AnimationFrameData>({
         dataId: "animationFrame",
         provider: window,
-        stage: "update",
+        scheduleId: "update",
         requestHandle: 0,
         time: 0,
     });
@@ -62,7 +65,7 @@ export function requestAnimationFrameSystem(world: World): void {
         data.requestHandle = 0;
         data.time = time;
 
-        world.runStage(data.stage);
+        world.runSchedule(data.scheduleId);
     });
 }
 

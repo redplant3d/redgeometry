@@ -1,5 +1,5 @@
 import type { AppContext, AppRemoteChild, AppRemoteParent } from "../ecs/app.js";
-import type { SystemStage, WorldData, WorldEvent, WorldGroupId, WorldId } from "../ecs/types.js";
+import type { WorldData, WorldEvent, WorldGroupId, WorldId, WorldScheduleId } from "../ecs/types.js";
 import type { World, WorldChannel } from "../ecs/world.js";
 import { throwError } from "../utility/debug.js";
 
@@ -7,7 +7,7 @@ export type AppMessageRequestData = {
     worldId: WorldId;
     dataBuffer: WorldData[];
     eventBuffer: WorldEvent[];
-    stage: SystemStage;
+    scheduleId: WorldScheduleId;
 };
 
 export type AppMessageResponseData = {
@@ -76,19 +76,19 @@ export class WorldChannelLocal implements WorldChannel {
         this.world.writeEvents(events);
     }
 
-    public queueStage(stage: SystemStage): void {
-        this.executorAsync(stage);
+    public queueSchedule<T extends WorldScheduleId>(scheduleId: T): void {
+        this.executorAsync(scheduleId);
     }
 
-    public runStageAsync(stage: SystemStage): Promise<void> {
-        return this.executorAsync(stage);
+    public runScheduleAsync<T extends WorldScheduleId>(scheduleId: T): Promise<void> {
+        return this.executorAsync(scheduleId);
     }
 
-    private async executorAsync(stage: SystemStage): Promise<void> {
+    private async executorAsync<T extends WorldScheduleId>(scheduleId: T): Promise<void> {
         // Delay execution to continue as microtask
         await Promise.resolve();
 
-        return this.world.runStage(stage);
+        return this.world.runSchedule(scheduleId);
     }
 }
 
@@ -135,14 +135,14 @@ export class WorldChannelRemote implements WorldChannel {
         }
     }
 
-    public queueStage(stage: SystemStage): void {
+    public queueSchedule<T extends WorldScheduleId>(scheduleId: T): void {
         const { remote, worldId, dataBuffer, eventBuffer, transfer } = this;
 
         if (remote === undefined) {
             throwError("Unable to run stage for parent");
         }
 
-        const data: AppMessageRequestData = { worldId, dataBuffer, eventBuffer, stage };
+        const data: AppMessageRequestData = { worldId, dataBuffer, eventBuffer, scheduleId };
 
         this.resetBuffer();
 
@@ -155,14 +155,14 @@ export class WorldChannelRemote implements WorldChannel {
         this.transfer = [];
     }
 
-    public runStageAsync(stage: SystemStage): Promise<void> {
+    public runScheduleAsync<T extends WorldScheduleId>(scheduleId: T): Promise<void> {
         const { remote, worldId, dataBuffer, eventBuffer, transfer } = this;
 
         if (remote === undefined) {
             throwError("Unable to run stage for parent");
         }
 
-        const data: AppMessageRequestData = { worldId, dataBuffer, eventBuffer, stage };
+        const data: AppMessageRequestData = { worldId, dataBuffer, eventBuffer, scheduleId };
 
         this.resetBuffer();
 
@@ -241,13 +241,13 @@ export class WorldGroup {
     private async receiveRequest(req: AppMessageRequest): Promise<void> {
         // log.infoDebug("{} >> Received request message from group '{}'", this.id, req.senderId);
 
-        const { worldId, stage, dataBuffer, eventBuffer } = req.data;
+        const { worldId, scheduleId, dataBuffer, eventBuffer } = req.data;
 
         const channel = this.getChannel(worldId);
         channel.applyBuffer(dataBuffer, eventBuffer);
 
         // Wait for all systems to finish before sending response
-        await channel.world.runStage(stage);
+        await channel.world.runSchedule(scheduleId);
 
         this.sendResponse(req.messageId);
     }

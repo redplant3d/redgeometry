@@ -1,30 +1,28 @@
 import type { World } from "../ecs/world.js";
 import { assert } from "../utility/debug.js";
 
-export interface GPUInitData {
+export type GPUInitData = {
     dataId: "gpuInit";
     alphaMode: GPUCanvasAlphaMode;
     context: GPUCanvasContext;
     deviceDescriptor: GPUDeviceDescriptor | undefined;
     gpu: GPU | undefined;
     requestAdapterOptions: GPURequestAdapterOptions | undefined;
-}
+};
 
-export interface GPUData {
+export type GPUData = {
     dataId: "gpu";
     adapter: GPUAdapter;
     context: GPUCanvasContext;
     device: GPUDevice;
     gpu: GPU;
-}
+};
 
 export function gpuPlugin(world: World): void {
     world.registerData<GPUInitData>("gpuInit");
     world.registerData<GPUData>("gpu");
 
-    world.addSystem({ fn: startGPUSystem, stage: "start", mode: "async" });
-
-    world.addDependency({ seq: [startGPUSystem], stage: "start" });
+    world.addSystem({ stage: "start-post", fn: startGPUSystem, awaitMode: "dependency" });
 }
 
 export async function startGPUSystem(world: World): Promise<void> {

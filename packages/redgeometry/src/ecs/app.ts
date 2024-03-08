@@ -13,18 +13,30 @@ import {
     type WorldGroupParent,
 } from "../internal/ecs.js";
 import { assertDebug, log, throwError } from "../utility/debug.js";
-import type { SystemStage, WorldGroupId, WorldId, WorldPlugin } from "./types.js";
-import { World } from "./world.js";
+import type {
+    DefaultSystemStage,
+    DefaultWorldScheduleId,
+    SystemStage,
+    WorldGroupId,
+    WorldId,
+    WorldPlugin,
+    WorldScheduleId,
+} from "./types.js";
+import { World, type WorldScheduleOptions } from "./world.js";
 
-export type WorldOptions = {
+export type WorldOptions<
+    T extends WorldScheduleId = DefaultWorldScheduleId,
+    U extends SystemStage = DefaultSystemStage,
+> = {
     id: WorldId;
-    plugins?: WorldPlugin[];
+    plugins: WorldPlugin[];
+    schedules: WorldScheduleOptions<T, U>[];
 };
 
 export type WorldGroupOptions = {
     id: WorldGroupId;
     parent: WorldGroupId | undefined;
-    worlds: WorldOptions[];
+    worlds: WorldOptions<WorldScheduleId, SystemStage>[];
     workerScriptURL?: URL | string;
 };
 
@@ -85,7 +97,7 @@ export class App {
         this.groupOptionsMap.set(id, options);
     }
 
-    public run(worldId: WorldId, stage: SystemStage): void {
+    public run<T extends WorldScheduleId>(worldId: WorldId, scheduleId: T): void {
         const { context } = this;
 
         // Create world groups
@@ -109,7 +121,7 @@ export class App {
             const channel = group.channelMap.get(worldId);
 
             if (channel !== undefined) {
-                channel.world.runStage(stage);
+                channel.world.runSchedule(scheduleId);
             }
         }
     }
@@ -121,11 +133,8 @@ export class App {
             log.infoDebug("{} >> Created local world '{}'", groupOptions.id, worldOptions.id);
 
             const world = new World();
-
-            if (worldOptions.plugins !== undefined) {
-                world.addPlugins(worldOptions.plugins);
-            }
-
+            world.addPlugins(worldOptions.plugins);
+            world.addSchedules(worldOptions.schedules);
             world.init();
 
             const channel = new WorldChannelLocal(worldOptions.id, world);

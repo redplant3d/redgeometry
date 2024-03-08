@@ -1,33 +1,70 @@
 import { assertDebug, log } from "../utility/debug.js";
-import type { System, SystemDependency, SystemOptions } from "./types.js";
+import type {
+    System,
+    SystemArgs,
+    SystemAsync,
+    SystemStage,
+    SystemSync,
+    SystemWithArgsAsync,
+    SystemWithArgsSync,
+} from "./types.js";
 import type { World } from "./world.js";
 
-export type ScheduleEntry = {
-    depsAsync: ScheduleEntry[];
+export type SystemAwaitMode = "none" | "dependency";
+
+export type SystemOptions<T extends SystemStage> = {
+    stage: T;
+    fn: SystemSync | SystemAsync;
+    awaitMode?: SystemAwaitMode;
+};
+
+export type SystemWithArgsOptions<T extends SystemStage, U extends SystemArgs> = {
+    stage: T;
+    fn: SystemWithArgsSync<U> | SystemWithArgsAsync<U>;
+    args: U;
+    awaitMode?: SystemAwaitMode;
+};
+
+export type SystemsOptions<T = SystemStage> = {
+    stage: T;
+    fns: (SystemSync | SystemAsync)[];
+};
+
+export type SystemDependencyOptions<T = SystemStage> = {
+    stage: T;
+    seq: [System, System, ...System[]];
+    optional?: boolean;
+};
+
+type SystemOptionsEntry =
+    | (SystemOptions<SystemStage> & { args: undefined })
+    | SystemWithArgsOptions<SystemStage, SystemArgs>;
+
+type SystemScheduleEntry = {
+    depsAsync: SystemScheduleEntry[];
     idx: number;
-    options: SystemOptions;
+    options: SystemOptionsEntry;
     promise: Promise<void> | undefined;
 };
 
 type SystemDependencyError = {
-    dep: SystemDependency;
+    dep: SystemDependencyOptions;
     fn: System;
     reason: "missing" | "ambiguous";
 };
 
 type SystemNode = {
-    depsAsync: ScheduleEntry[];
+    depsAsync: SystemScheduleEntry[];
     depsIn: Set<number>;
     depsOut: Set<number>;
-    errors: SystemDependencyError[];
     idx: number;
-    options: SystemOptions;
+    options: SystemOptionsEntry;
 };
 
 export class SystemSchedule {
-    private deps: SystemDependency[];
-    private entries: ScheduleEntry[];
-    private options: SystemOptions[];
+    private deps: SystemDependencyOptions[];
+    private entries: SystemScheduleEntry[];
+    private options: SystemOptionsEntry[];
 
     public constructor() {
         this.deps = [];
@@ -35,12 +72,37 @@ export class SystemSchedule {
         this.options = [];
     }
 
-    public addDepedency(dep: SystemDependency): void {
+    public addDepedency(dep: SystemDependencyOptions): void {
         this.deps.push(dep);
     }
 
-    public addSystem(options: SystemOptions): void {
-        this.options.push(options);
+    public addSystem<T extends SystemStage>(options: SystemOptions<T>): void {
+        this.options.push({
+            stage: options.stage,
+            fn: options.fn,
+            args: undefined,
+            awaitMode: options.awaitMode,
+        });
+    }
+
+    public addSystemWithArgs<T extends SystemStage, U extends SystemArgs>(options: SystemWithArgsOptions<T, U>): void {
+        this.options.push({
+            stage: options.stage,
+            fn: options.fn as SystemWithArgsSync<SystemArgs> | SystemWithArgsAsync<SystemArgs>,
+            args: options.args,
+            awaitMode: options.awaitMode,
+        });
+    }
+
+    public addSystems<T extends SystemStage>(options: SystemsOptions<T>): void {
+        for (const optionFn of options.fns) {
+            this.options.push({
+                stage: options.stage,
+                fn: optionFn,
+                args: undefined,
+                awaitMode: undefined,
+            });
+        }
     }
 
     public clear(): void {
@@ -49,9 +111,9 @@ export class SystemSchedule {
         this.options = [];
     }
 
-    public async executeSystems(world: World): Promise<void> {
+    public async execute(world: World): Promise<void> {
         for (const entry of this.entries) {
-            const { fn, args, mode } = entry.options;
+            const { fn, awaitMode, args } = entry.options;
 
             // Wait for incoming dependencies
             for (const depAsync of entry.depsAsync) {
@@ -63,7 +125,7 @@ export class SystemSchedule {
             }
 
             // Call system
-            if (mode === "async") {
+            if (awaitMode === "dependency") {
                 if (args !== undefined) {
                     entry.promise = fn(world, ...args) as Promise<void>;
                 } else {
@@ -84,7 +146,7 @@ export class SystemSchedule {
 
         for (let i = 0; i < this.entries.length; i++) {
             const entry = this.entries[i];
-            const mode = entry.options.mode ?? "sync";
+            const mode = entry.options.awaitMode ?? "sync";
             const name = entry.options.fn.name;
             const idx = entry.idx;
 
@@ -158,7 +220,7 @@ export class SystemSchedule {
 
     private createEntries(nodes: SystemNode[]): void {
         // Kahn's algorithm: We need to sort the nodes topologically to create the schedule
-        const entries: ScheduleEntry[] = [];
+        const entries: SystemScheduleEntry[] = [];
 
         // Create a queue and initialize it with nodes that have no incoming dependencies
         const queue: SystemNode[] = [];
@@ -172,7 +234,7 @@ export class SystemSchedule {
         let node = queue.shift();
 
         while (node !== undefined) {
-            const entry: ScheduleEntry = {
+            const entry: SystemScheduleEntry = {
                 depsAsync: node.depsAsync,
                 idx: node.idx,
                 options: node.options,
@@ -185,7 +247,7 @@ export class SystemSchedule {
                 node.depsOut.delete(nodeDepIdx);
                 nodeDep.depsIn.delete(node.idx);
 
-                if (node.options.mode === "async") {
+                if (node.options.awaitMode === "dependency") {
                     nodeDep.depsAsync.push(entry);
                 }
 
@@ -217,7 +279,6 @@ export class SystemSchedule {
                 options: this.options[i],
                 depsIn: new Set(),
                 depsOut: new Set(),
-                errors: [],
                 depsAsync: [],
             });
         }

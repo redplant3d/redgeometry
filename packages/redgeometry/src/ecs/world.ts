@@ -1,17 +1,23 @@
 import { DEFAULT_SERIALIZATION_MAPPING, SerializationMap } from "../internal/serialize.js";
-import { assertUnreachable, log, throwError } from "../utility/debug.js";
-import { SystemSchedule } from "./schedule.js";
+import { log, throwError } from "../utility/debug.js";
+import {
+    SystemSchedule,
+    type SystemDependencyOptions,
+    type SystemOptions,
+    type SystemWithArgsOptions,
+    type SystemsOptions,
+} from "./schedule.js";
 import { EntityComponentStorage, EntityHierarchySelector } from "./storage-sparse.js";
 import type {
     Component,
     ComponentIdOf,
     ComponentIdsOf,
+    DefaultSystemStage,
+    DefaultWorldScheduleId,
     EntityId,
     Serializable,
     SerializableConstructor,
-    System,
-    SystemDependency,
-    SystemOptions,
+    SystemArgs,
     SystemStage,
     WorldData,
     WorldDataId,
@@ -21,6 +27,7 @@ import type {
     WorldEventIdOf,
     WorldId,
     WorldPlugin,
+    WorldScheduleId,
 } from "./types.js";
 
 /**
@@ -30,9 +37,21 @@ export interface WorldChannel {
     queueData<T extends WorldData>(data: T, transfer?: Transferable[]): void;
     queueEvent<T extends WorldEvent>(event: T, transfer?: Transferable[]): void;
     queueEvents<T extends WorldEvent>(events: T[], transfer?: Transferable[]): void;
-    queueStage(stage: SystemStage): void;
-    runStageAsync(stage: SystemStage): Promise<void>;
+    queueSchedule<T extends WorldScheduleId>(stage: T): void;
+    runScheduleAsync<T extends WorldScheduleId>(stage: T): Promise<void>;
 }
+
+export type WorldScheduleOptions<
+    T extends WorldScheduleId = DefaultWorldScheduleId,
+    U extends SystemStage = DefaultSystemStage,
+> = {
+    id: T;
+    stages: WorldScheduleStage<U>[];
+};
+
+export type WorldScheduleStage<T extends SystemStage> = {
+    id: T;
+};
 
 export enum ChangeFlags {
     None = 0,
@@ -40,6 +59,21 @@ export enum ChangeFlags {
     Updated = 2,
     Deleted = 4,
 }
+
+export const DEFAULT_START_SCHEDULE: WorldScheduleOptions = {
+    id: "start",
+    stages: [{ id: "start-pre" }, { id: "start" }, { id: "start-post" }],
+};
+
+export const DEFAULT_UPDATE_SCHEDULE: WorldScheduleOptions = {
+    id: "update",
+    stages: [{ id: "update-pre" }, { id: "update" }, { id: "update-post" }],
+};
+
+export const DEFAULT_STOP_SCHEDULE: WorldScheduleOptions = {
+    id: "stop",
+    stages: [{ id: "stop-pre" }, { id: "stop" }, { id: "stop-post" }],
+};
 
 /**
  * Represents an instance context for entities and systems.
@@ -49,10 +83,10 @@ export class World {
     private data: Map<WorldDataId, WorldData | undefined>;
     private ecStorage: EntityComponentStorage;
     private events: Map<WorldEventId, WorldEvent[]>;
-    private scheduleStart: SystemSchedule;
-    private scheduleStop: SystemSchedule;
-    private scheduleUpdate: SystemSchedule;
+    private plugins: Map<string, WorldPlugin>;
+    private schedules: Map<SystemStage, SystemSchedule>;
     private serializationMap: SerializationMap;
+    private stages: Map<WorldScheduleId, SystemSchedule[]>;
 
     public constructor() {
         this.serializationMap = new SerializationMap([...DEFAULT_SERIALIZATION_MAPPING]);
@@ -61,9 +95,9 @@ export class World {
         this.events = new Map();
         this.channels = new Map();
 
-        this.scheduleStart = new SystemSchedule();
-        this.scheduleUpdate = new SystemSchedule();
-        this.scheduleStop = new SystemSchedule();
+        this.schedules = new Map();
+        this.plugins = new Map();
+        this.stages = new Map();
 
         this.ecStorage = new EntityComponentStorage();
     }
@@ -76,33 +110,48 @@ export class World {
         this.channels.set(id, channel);
     }
 
-    public addDependency(dep: SystemDependency): void {
-        if (dep.stage === "start") {
-            this.scheduleStart.addDepedency(dep);
-        } else if (dep.stage === "stop") {
-            this.scheduleStop.addDepedency(dep);
-        } else {
-            this.scheduleUpdate.addDepedency(dep);
-        }
+    public addDependency<T extends SystemStage>(dep: SystemDependencyOptions<T>): void {
+        const schedule = this.getSchedule(dep.stage);
+        schedule.addDepedency(dep);
     }
 
     public addPlugins<T extends WorldPlugin>(plugins: T[]): void {
-        for (const fn of plugins) {
-            fn(this);
+        for (const plugin of plugins) {
+            this.plugins.set(plugin.name, plugin);
         }
     }
 
-    /**
-     * Adds a system and registers all existing entities that satify its dependencies.
-     */
-    public addSystem<T extends System>(options: SystemOptions<T>): void {
-        if (options.stage === "start") {
-            this.scheduleStart.addSystem(options);
-        } else if (options.stage === "stop") {
-            this.scheduleStop.addSystem(options);
-        } else {
-            this.scheduleUpdate.addSystem(options);
+    public addSchedules<T extends WorldScheduleId, U extends SystemStage>(
+        WorldScheduleOptions: WorldScheduleOptions<T, U>[],
+    ): void {
+        for (const option of WorldScheduleOptions) {
+            const schedules: SystemSchedule[] = [];
+
+            for (const stage of option.stages) {
+                const schedule = new SystemSchedule();
+
+                schedules.push(schedule);
+
+                this.schedules.set(stage.id, schedule);
+            }
+
+            this.stages.set(option.id, schedules);
         }
+    }
+
+    public addSystem<T extends SystemStage = DefaultSystemStage>(options: SystemOptions<T>): void {
+        const schedule = this.getSchedule(options.stage);
+        schedule.addSystem(options);
+    }
+
+    public addSystemWithArgs<T extends SystemStage, U extends SystemArgs>(options: SystemWithArgsOptions<T, U>): void {
+        const schedule = this.getSchedule(options.stage);
+        schedule.addSystemWithArgs(options);
+    }
+
+    public addSystems<T extends SystemStage>(options: SystemsOptions<T>): void {
+        const schedule = this.getSchedule(options.stage);
+        schedule.addSystems(options);
     }
 
     /**
@@ -161,6 +210,16 @@ export class World {
         return this.ecStorage.getEntitiesChanged();
     }
 
+    public getSchedule(stage: SystemStage): SystemSchedule {
+        const schedule = this.schedules.get(stage);
+
+        if (schedule === undefined) {
+            throwError("Stage '{}' not found", stage);
+        }
+
+        return schedule;
+    }
+
     public hasChangeFlag<T extends Component>(
         entityId: EntityId,
         componentId: ComponentIdOf<T>,
@@ -184,13 +243,17 @@ export class World {
     }
 
     public init(): void {
-        this.scheduleStart.update();
-        this.scheduleUpdate.update();
-        this.scheduleStop.update();
+        for (const plugin of this.plugins.values()) {
+            plugin(this);
+        }
 
-        // log.infoDebug("*** Start Schedule ***\n{}", this.scheduleStart);
-        // log.infoDebug("*** Update Schedule ***\n{}", this.scheduleUpdate);
-        // log.infoDebug("*** Stop Schedule ***\n{}", this.scheduleStop);
+        for (const schedule of this.schedules.values()) {
+            schedule.update();
+        }
+
+        // for (const [id, schedule] of this.schedules) {
+        //     log.infoDebug("*** Schedule: {} ***\n{}", id, schedule);
+        // }
     }
 
     public loadEntities(text: string): void {
@@ -269,25 +332,21 @@ export class World {
         );
     }
 
-    public async runStage(stage: SystemStage): Promise<void> {
-        switch (stage) {
-            case "start": {
-                await this.scheduleStart.executeSystems(this);
-                this.validate();
-                break;
-            }
-            case "update": {
-                await this.scheduleUpdate.executeSystems(this);
-                this.cleanup();
-                break;
-            }
-            case "stop": {
-                await this.scheduleStop.executeSystems(this);
-                break;
-            }
-            default: {
-                assertUnreachable(stage);
-            }
+    public async runSchedule<T extends WorldScheduleId>(scheduleId: T): Promise<void> {
+        const schedules = this.stages.get(scheduleId);
+
+        if (schedules === undefined) {
+            throwError("World stage '{}' unavailable", scheduleId);
+        }
+
+        for (const schedule of schedules) {
+            await schedule.execute(this);
+        }
+
+        if (scheduleId === "start") {
+            this.validate();
+        } else if (scheduleId === "update") {
+            this.cleanup();
         }
     }
 

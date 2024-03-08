@@ -1,5 +1,5 @@
 export type Constructor<T> = {
-    new (...args: any[]): T;
+    new (...args: never[]): T;
 };
 
 export type Immutable<T> = {

@@ -1,43 +1,39 @@
 /// <reference types="@webgpu/types" />
-import type { EntityId } from "redgeometry/src/ecs/types";
+import type { WorldOptions } from "redgeometry/src/ecs/app";
+import type { DefaultSystemStage, DefaultWorldScheduleId, EntityId } from "redgeometry/src/ecs/types";
 import type { World } from "redgeometry/src/ecs/world";
+import { DEFAULT_START_SCHEDULE, DEFAULT_STOP_SCHEDULE, DEFAULT_UPDATE_SCHEDULE } from "redgeometry/src/ecs/world";
 import { Matrix4 } from "redgeometry/src/primitives/matrix";
 import { Point3 } from "redgeometry/src/primitives/point";
 import { Quaternion, RotationOrder } from "redgeometry/src/primitives/quaternion";
 import { Vector3 } from "redgeometry/src/primitives/vector";
 import type { AssetData, AssetId } from "redgeometry/src/render-webgpu/asset";
-import { cameraSystem, type CameraBundle, type CameraComponent } from "redgeometry/src/render-webgpu/camera";
-import { gpuPlugin, startGPUSystem, type GPUData, type GPUInitData } from "redgeometry/src/render-webgpu/gpu";
+import type { CameraBundle, CameraComponent } from "redgeometry/src/render-webgpu/camera";
+import { gpuPlugin, type GPUData, type GPUInitData } from "redgeometry/src/render-webgpu/gpu";
 import {
     KeyboardButtons,
     MouseButtons,
     inputReceiverPlugin,
     inputSenderPlugin,
-    startInputSenderSystem,
     type InputData,
     type InputSenderData,
 } from "redgeometry/src/render-webgpu/input";
 import type { Material } from "redgeometry/src/render-webgpu/material";
 import {
     meshRenderPlugin,
-    meshRenderSystem,
-    startMeshRenderSystem,
     type Mesh,
     type MeshBundle,
     type MeshRenderStateData,
 } from "redgeometry/src/render-webgpu/mesh";
 import type { SceneData } from "redgeometry/src/render-webgpu/scene";
-import { requestAnimationFrameSystem, timePlugin, type TimeData } from "redgeometry/src/render-webgpu/time";
-import { Visibility, transformSystem, type TransformComponent } from "redgeometry/src/render-webgpu/transform";
+import { timePlugin, type TimeData } from "redgeometry/src/render-webgpu/time";
+import { Visibility, type TransformComponent } from "redgeometry/src/render-webgpu/transform";
 import { throwError } from "redgeometry/src/utility/debug";
 import { RandomXSR128, type Random } from "redgeometry/src/utility/random";
 import { createRandomColor, createRandomSeed } from "../data.js";
 import {
     appMainPlugin,
     appRemotePlugin,
-    initAppSystem,
-    initInputElementsSystem,
-    resizeWindowSystem,
     type AppCanvasData,
     type AppData,
     type AppInputElementData,
@@ -45,13 +41,15 @@ import {
 } from "../ecs.js";
 import { ButtonInputElement, ComboBoxInputElement, RangeInputElement, TextBoxInputElement } from "../input.js";
 
-export const WEBGPU_TEST_MAIN_WORLD = {
+export const WEBGPU_TEST_MAIN_WORLD: WorldOptions = {
     id: "webgpu-test-main",
     plugins: [appMainPlugin, mainPlugin, inputSenderPlugin, timePlugin],
+    schedules: [DEFAULT_START_SCHEDULE, DEFAULT_UPDATE_SCHEDULE, DEFAULT_STOP_SCHEDULE],
 };
-export const WEBGPU_TEST_REMOTE_WORLD = {
+export const WEBGPU_TEST_REMOTE_WORLD: WorldOptions = {
     id: "webgpu-test-remote",
     plugins: [appRemotePlugin, remotePlugin, inputReceiverPlugin, gpuPlugin, meshRenderPlugin],
+    schedules: [DEFAULT_START_SCHEDULE, DEFAULT_UPDATE_SCHEDULE, DEFAULT_STOP_SCHEDULE],
 };
 
 function mainPlugin(world: World): void {
@@ -59,26 +57,22 @@ function mainPlugin(world: World): void {
     world.registerData<AppStateData>("appState");
     world.registerEvent<AppCommandEvent>("appCommand");
 
-    world.addSystem({ fn: addInputElementsSystem, stage: "start" });
-    world.addSystem({ fn: writeStateSystem, stage: "start" });
-    world.addSystem({ fn: initMainSystem, stage: "start", mode: "async" });
-    world.addSystem({ fn: writeStateSystem });
-    world.addSystem({ fn: mainSystem, mode: "async" });
+    world.addSystem<DefaultSystemStage>({ stage: "start", fn: addInputElementsSystem });
+    world.addSystem<DefaultSystemStage>({ stage: "start", fn: writeStateSystem });
+    world.addSystem<DefaultSystemStage>({ stage: "start", fn: initMainSystem, awaitMode: "dependency" });
+    world.addSystem<DefaultSystemStage>({ stage: "start", fn: waitSystem });
 
-    world.addDependency({
-        seq: [initAppSystem, addInputElementsSystem, initInputElementsSystem],
+    world.addSystem<DefaultSystemStage>({ stage: "update", fn: writeStateSystem });
+    world.addSystem<DefaultSystemStage>({ stage: "update", fn: mainSystem, awaitMode: "dependency" });
+    world.addSystem<DefaultSystemStage>({ stage: "update", fn: waitSystem });
+
+    world.addDependency<DefaultSystemStage>({
         stage: "start",
+        seq: [addInputElementsSystem, writeStateSystem, initMainSystem, waitSystem],
     });
-    world.addDependency({
-        seq: [addInputElementsSystem, writeStateSystem],
-        stage: "start",
-    });
-    world.addDependency({
-        seq: [writeStateSystem, initMainSystem, startInputSenderSystem, requestAnimationFrameSystem],
-        stage: "start",
-    });
-    world.addDependency({
-        seq: [writeStateSystem, mainSystem, requestAnimationFrameSystem],
+    world.addDependency<DefaultSystemStage>({
+        stage: "update",
+        seq: [writeStateSystem, mainSystem, waitSystem],
     });
 }
 
@@ -87,30 +81,20 @@ function remotePlugin(world: World): void {
     world.registerData<AppStateData>("appState");
     world.registerEvent<AppCommandEvent>("appCommand");
 
-    world.addSystem({ fn: initRemoteSystem, stage: "start" });
-    world.addSystem({ fn: initAssetSystem, stage: "start" });
-    world.addSystem({ fn: cameraMoveSystem });
-    world.addSystem({ fn: beginFrameSystem });
-    world.addSystem({ fn: spawnSystem });
+    world.addSystem<DefaultSystemStage>({ stage: "start", fn: initRemoteSystem });
+    world.addSystem<DefaultSystemStage>({ stage: "start", fn: initAssetSystem });
 
-    world.addDependency({
-        seq: [initRemoteSystem, startGPUSystem],
+    world.addSystem<DefaultSystemStage>({ stage: "update", fn: cameraMoveSystem });
+    world.addSystem<DefaultSystemStage>({ stage: "update", fn: beginFrameSystem });
+    world.addSystem<DefaultSystemStage>({ stage: "update", fn: spawnSystem });
+
+    world.addDependency<DefaultSystemStage>({
         stage: "start",
+        seq: [initRemoteSystem, initAssetSystem],
     });
-    world.addDependency({
-        seq: [startMeshRenderSystem, initAssetSystem],
-        stage: "start",
-    });
-    world.addDependency({
-        seq: [
-            resizeWindowSystem,
-            cameraMoveSystem,
-            beginFrameSystem,
-            spawnSystem,
-            transformSystem,
-            cameraSystem,
-            meshRenderSystem,
-        ],
+    world.addDependency<DefaultSystemStage>({
+        stage: "update",
+        seq: [cameraMoveSystem, beginFrameSystem, spawnSystem],
     });
 }
 
@@ -151,6 +135,8 @@ type TestComponent = {
     componentId: "test";
 };
 
+function waitSystem(): void {}
+
 function initMainSystem(world: World): Promise<void> {
     const appData = world.readData<AppData>("app");
     const appStateData = world.readData<AppStateData>("appState");
@@ -172,7 +158,7 @@ function initMainSystem(world: World): Promise<void> {
         channel.queueData<AppCanvasData>(appCanvasData);
     }
 
-    return channel.runStageAsync("start");
+    return channel.runScheduleAsync<DefaultWorldScheduleId>("start");
 }
 
 function initRemoteSystem(world: World): void {
@@ -298,7 +284,7 @@ function mainSystem(world: World): Promise<void> {
     channel.queueEvents(windowResizeEvents);
     channel.queueEvents(appCommandEvents);
 
-    return channel.runStageAsync("update");
+    return channel.runScheduleAsync<DefaultWorldScheduleId>("update");
 }
 
 function beginFrameSystem(world: World): void {

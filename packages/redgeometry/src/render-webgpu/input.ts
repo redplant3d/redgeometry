@@ -1,31 +1,31 @@
-import type { WorldId } from "../ecs/types.js";
+import type { DefaultSystemStage, WorldId } from "../ecs/types.js";
 import { World } from "../ecs/world.js";
 import { assertUnreachable } from "../index.js";
 
-export interface InputSenderData {
+export type InputSenderData = {
     dataId: "inputSender";
     keyboardEventHandler: GlobalEventHandlers;
     mouseEventHandler: GlobalEventHandlers;
     receiverId: WorldId;
-}
+};
 
-export interface InputData {
+export type InputData = {
     dataId: "input";
     keyboard: KeyboardInput;
     mouse: MouseInput;
-}
+};
 
-export interface InputEventsData {
+export type InputEventsData = {
     dataId: "inputEvents";
     keyboardEvents: InputKeyboardEventType[];
     mouseEvents: InputMouseEventType[];
-}
+};
 
-export interface InputDataEvent {
+export type InputDataEvent = {
     eventId: "inputData";
     keyboardEvents: InputKeyboardEventType[];
     mouseEvents: InputMouseEventType[];
-}
+};
 
 export type InputMouseEventType = {
     type: string;
@@ -100,16 +100,18 @@ export function inputSenderPlugin(world: World): void {
     world.registerData<InputEventsData>("inputEvents");
     world.registerData<InputSenderData>("inputSender");
 
-    world.addSystem({ fn: startInputSenderSystem, stage: "start" });
-    world.addSystem({ fn: updateInputSenderSystem });
+    world.addSystem<DefaultSystemStage>({ stage: "start-post", fn: startInputSenderSystem });
+
+    world.addSystem<DefaultSystemStage>({ stage: "update-pre", fn: updateInputSenderSystem });
 }
 
 export function inputReceiverPlugin(world: World): void {
     world.registerEvent<InputDataEvent>("inputData");
     world.registerData<InputData>("input");
 
-    world.addSystem({ fn: startInputReceiverSystem, stage: "start" });
-    world.addSystem({ fn: updateInputReceiverSystem });
+    world.addSystem<DefaultSystemStage>({ stage: "start-pre", fn: startInputReceiverSystem });
+
+    world.addSystem<DefaultSystemStage>({ stage: "update-pre", fn: updateInputReceiverSystem });
 }
 
 export function startInputSenderSystem(world: World): void {
