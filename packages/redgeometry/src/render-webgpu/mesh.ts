@@ -1,6 +1,6 @@
 import type { ComponentIdsOf, DefaultSystemStage, EntityId } from "../ecs/types.js";
 import type { World } from "../ecs/world.js";
-import { Matrix4 } from "../primitives/matrix.js";
+import type { Matrix4 } from "../primitives/matrix.js";
 import { assertDebug, log } from "../utility/debug.js";
 import { AssetCollection, type AssetData, type AssetId } from "./asset.js";
 import { gpuCreateBuffer, type Float32Buffer, type NumberBuffer } from "./buffer.js";

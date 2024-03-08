@@ -1,8 +1,8 @@
 import type { PathDashOptions } from "../core/path-options.js";
 import { Path2 } from "../core/path.js";
-import { Bezier1Curve2, Bezier2Curve2 } from "../primitives/bezier.js";
+import { Bezier2Curve2, type Bezier1Curve2 } from "../primitives/bezier.js";
 import type { Point2 } from "../primitives/point.js";
-import { Vector2 } from "../primitives/vector.js";
+import type { Vector2 } from "../primitives/vector.js";
 import { getArcLengthQuadratic, getParameterAtArcLengthQuadratic } from "./bezier.js";
 
 export class DashState {

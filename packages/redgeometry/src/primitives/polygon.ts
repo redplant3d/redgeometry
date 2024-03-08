@@ -2,7 +2,7 @@ import { Path2 } from "../core/path.js";
 import { Polygon2EdgeIterator } from "../internal/iterator.js";
 import { Box2 } from "./box.js";
 import { Edge2 } from "./edge.js";
-import { Matrix3, Matrix3A } from "./matrix.js";
+import type { Matrix3, Matrix3A } from "./matrix.js";
 import { Point2 } from "./point.js";
 
 export class Polygon2 {

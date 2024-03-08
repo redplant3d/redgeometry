@@ -3,11 +3,11 @@ import { AnimationFrameContext } from "./animationframe.js";
 import { AppContext2D } from "./context.js";
 import { createRandomSeed } from "./data.js";
 import {
-    AppInputElement,
     AppValueInputElement,
     ButtonInputElement,
     ComboBoxInputElement,
     TextBoxInputElement,
+    type AppInputElement,
 } from "./input.js";
 
 export interface AppPart {

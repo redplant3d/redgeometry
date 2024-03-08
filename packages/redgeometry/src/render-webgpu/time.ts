@@ -1,5 +1,5 @@
 import type { DefaultSystemStage, WorldScheduleId } from "../ecs/types.js";
-import { World } from "../ecs/world.js";
+import type { World } from "../ecs/world.js";
 
 export type AnimationFrameData = {
     dataId: "animationFrame";

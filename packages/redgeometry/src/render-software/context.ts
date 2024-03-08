@@ -1,16 +1,16 @@
-import { JoinType, type StrokeCaps } from "../core/path-options.js";
+import type { JoinType, StrokeCaps } from "../core/path-options.js";
 import type { Path2 } from "../core/path.js";
-import { ColorRgba } from "../primitives/color.js";
+import type { ColorRgba } from "../primitives/color.js";
 import { Matrix3A } from "../primitives/matrix.js";
 import {
     DEFAULT_CONTEXT_FILL_OPTIONS,
     DEFAULT_CONTEXT_STROKE_OPTIONS,
-    FillRule,
-    StrokeTransformOrder,
     type CompositeOperation,
     type ContextFillOptions,
     type ContextStrokeOptions,
+    type FillRule,
     type RenderContext2,
+    type StrokeTransformOrder,
 } from "../render/context.js";
 import type { Image2 } from "../render/image.js";
 import { PipelineSoftware } from "./pipeline-software.js";

@@ -4,10 +4,10 @@ import { Box2 } from "redgeometry/src/primitives/box";
 import { Point2 } from "redgeometry/src/primitives/point";
 import { log } from "redgeometry/src/utility/debug";
 import { RandomXSR128 } from "redgeometry/src/utility/random";
-import { AppContext2D } from "../context.js";
+import type { AppContext2D } from "../context.js";
 import { createPath } from "../data.js";
 import { TextBoxInputElement } from "../input.js";
-import { AppLauncher, type AppPart } from "../launcher.js";
+import type { AppLauncher, AppPart } from "../launcher.js";
 
 export class PathAreaAppPart implements AppPart {
     private bounds: Box2;

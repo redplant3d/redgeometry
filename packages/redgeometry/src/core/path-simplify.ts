@@ -10,7 +10,7 @@ import { Bezier2Curve2, Bezier3Curve2, BezierRCurve2 } from "../primitives/bezie
 import { Point2 } from "../primitives/point.js";
 import { assertUnreachable } from "../utility/debug.js";
 import type { PathQualityOptions } from "./path-options.js";
-import { Path2, PathCommandType } from "./path.js";
+import { PathCommandType, type Path2 } from "./path.js";
 
 export interface PathSimplify2 {
     process(input: Path2, output: Path2): void;

@@ -1,5 +1,5 @@
 import type { Nominal } from "../utility/types.js";
-import { World } from "./world.js";
+import type { World } from "./world.js";
 
 // Entity
 export type EntityId = Nominal<number, "EntityId">;

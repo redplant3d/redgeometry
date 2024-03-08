@@ -15,7 +15,7 @@ import { Point2 } from "../primitives/point.js";
 import { Vector2 } from "../primitives/vector.js";
 import { assertUnreachable } from "../utility/debug.js";
 import { MAX_PARAMETER, type PathQualityOptions, type PathStrokeOptions } from "./path-options.js";
-import { Path2, PathCommandType } from "./path.js";
+import { PathCommandType, type Path2 } from "./path.js";
 
 export interface PathStroke2 {
     process(input: Path2, output: Path2, options: PathStrokeOptions): void;

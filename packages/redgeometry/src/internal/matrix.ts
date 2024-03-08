@@ -59,7 +59,7 @@ export function getMaxEigenvalueSym3x3(
     const det = a - b + c;
     const r = det / (2 * p * p * p);
 
-    let phi;
+    let phi: number | undefined;
 
     // Avoid underflow/overflow
     if (r >= 1) {

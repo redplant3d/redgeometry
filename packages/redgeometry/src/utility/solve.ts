@@ -50,7 +50,8 @@ export function solveQuadratic(a: number, b: number, c: number): Root2 | Root0 {
         return { type: RootType.Zero };
     } else {
         // Two roots
-        let x1, x2;
+        let x1: number | undefined;
+        let x2: number | undefined;
 
         d = Math.sqrt(d);
 
@@ -90,7 +91,7 @@ export function solveCubic(a: number, b: number, c: number, d: number): Root3 | 
 
     if (dt < 0) {
         // Single root (ignore complex pair)
-        let x;
+        let x: number | undefined;
 
         if (b * b * b * d >= a * c * c * c) {
             const da = 2 * b * d1 - a * d2;

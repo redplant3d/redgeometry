@@ -1,5 +1,5 @@
 import type { DefaultSystemStage, WorldId } from "../ecs/types.js";
-import { World } from "../ecs/world.js";
+import type { World } from "../ecs/world.js";
 import { assertUnreachable } from "../index.js";
 
 export type InputSenderData = {

@@ -98,11 +98,11 @@ export class AppValueInputElement extends AppInputElement {
     }
 
     public getFloat(): number {
-        return parseFloat(this.getValue());
+        return Number.parseFloat(this.getValue());
     }
 
     public getInt(): number {
-        return parseInt(this.getValue());
+        return Number.parseInt(this.getValue());
     }
 
     public getValue(): string {

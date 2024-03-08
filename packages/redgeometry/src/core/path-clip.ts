@@ -3,17 +3,17 @@ import { Bezier1Curve2, type BezierCurve2 } from "../primitives/bezier.js";
 import type { Edge2 } from "../primitives/edge.js";
 import { ArrayMultiSet } from "../utility/array.js";
 import { log } from "../utility/debug.js";
-import { Mesh2 } from "./mesh.js";
+import type { Mesh2 } from "./mesh.js";
 import {
     ApproximationMode,
-    BooleanOperator,
     DEFAULT_PATH_CLIP_OPTIONS,
-    WindingOperator,
+    type BooleanOperator,
     type CustomWindingOperator,
     type PathClipOptions,
     type PathQualityOptions,
+    type WindingOperator,
 } from "./path-options.js";
-import { Path2 } from "./path.js";
+import type { Path2 } from "./path.js";
 import { SnapRound2 } from "./snapround.js";
 
 export class PathClip2 {

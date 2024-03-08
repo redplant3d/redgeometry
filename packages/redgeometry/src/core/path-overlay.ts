@@ -4,15 +4,15 @@ import { Bezier1Curve2, type BezierCurve2 } from "../primitives/bezier.js";
 import type { Edge2 } from "../primitives/edge.js";
 import { ArrayMultiSet, arrayEquals } from "../utility/array.js";
 import { assertDebug, log } from "../utility/debug.js";
-import { Mesh2, MeshChain2, MeshEdge2 } from "./mesh.js";
+import { MeshChain2, MeshEdge2, type Mesh2 } from "./mesh.js";
 import {
     ApproximationMode,
     DEFAULT_PATH_CLIP_OPTIONS,
-    WindingOperator,
     type CustomWindingOperator,
     type PathQualityOptions,
+    type WindingOperator,
 } from "./path-options.js";
-import { Path2 } from "./path.js";
+import type { Path2 } from "./path.js";
 import { SnapRound2, type EdgeSegmentRef2 } from "./snapround.js";
 
 export type PathOverlayData2 = {

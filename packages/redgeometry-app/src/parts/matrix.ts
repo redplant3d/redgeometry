@@ -4,9 +4,9 @@ import { Matrix4 } from "redgeometry/src/primitives/matrix";
 import { Point2, Point3 } from "redgeometry/src/primitives/point";
 import { Quaternion, RotationOrder } from "redgeometry/src/primitives/quaternion";
 import type { Random } from "redgeometry/src/utility/random";
-import { AppContext2D } from "../context.js";
+import type { AppContext2D } from "../context.js";
 import { ComboBoxInputElement, RangeInputElement, TextBoxInputElement } from "../input.js";
-import { AppLauncher, type AppPart } from "../launcher.js";
+import type { AppLauncher, AppPart } from "../launcher.js";
 
 export class MatrixAppPart implements AppPart {
     private context: AppContext2D;
@@ -62,7 +62,7 @@ export class MatrixAppPart implements AppPart {
         const s = 0.2 * Math.min(canvasWidth, canvasHeight);
         const d = (rotation * Math.PI) / 180;
 
-        let mat;
+        let mat: Matrix4 | undefined;
 
         // Projection
         if (this.inputProjection.getValue() === "orthographic") {

@@ -1,5 +1,5 @@
 import type { ComponentIdsOf } from "../ecs/types.js";
-import { World } from "../ecs/world.js";
+import type { World } from "../ecs/world.js";
 import type { Matrix4 } from "../primitives/matrix.js";
 import type { GlobalComponent, TransformComponent } from "./transform.js";
 

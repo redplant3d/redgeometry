@@ -5,10 +5,10 @@ import { DEFAULT_PATH_CLIP_OPTIONS, DEFAULT_PATH_QUALITY_OPTIONS } from "redgeom
 import { Box2 } from "redgeometry/src/primitives/box";
 import type { Point2 } from "redgeometry/src/primitives/point";
 import { RandomXSR128 } from "redgeometry/src/utility/random";
-import { AppContext2D } from "../context.js";
+import type { AppContext2D } from "../context.js";
 import { nextPointFromBox } from "../data.js";
 import { RangeInputElement } from "../input.js";
-import { AppLauncher, type AppPart } from "../launcher.js";
+import type { AppLauncher, AppPart } from "../launcher.js";
 
 export class MeshAppPart implements AppPart {
     private context: AppContext2D;

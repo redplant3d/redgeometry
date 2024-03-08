@@ -12,7 +12,7 @@ import { RootType, solveCubic, solveLinear, solveQuadratic } from "../utility/so
 import { Box2 } from "./box.js";
 import { Edge2 } from "./edge.js";
 import { Point2, Point3 } from "./point.js";
-import { Vector2, Vector3 } from "./vector.js";
+import { Vector2, type Vector3 } from "./vector.js";
 
 export enum CurveType {
     Bezier1,
@@ -656,8 +656,8 @@ export class Bezier3Curve2 {
         // To get the inflections C'(t) cross C''(t) = at^2 + bt + c = 0 needs to be solved for 't'
         const [qqa, qqb, qqc] = this.getDerivativeCoefficients();
 
-        let tc;
-        let td;
+        let tc: number | undefined;
+        let td: number | undefined;
 
         // The first cooefficient of the quadratic formula is also the denominator
         const den = qqb.cross(qqa);

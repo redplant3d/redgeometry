@@ -64,7 +64,7 @@ export function formatString(fmt: string, ...params: FormatParameters): string {
 
 function formatData(params: FormatParameters, idxRef: ValueRef<number>, data: string): string {
     // Interpret as array index only (for now)
-    let idx = parseInt(data);
+    let idx = Number.parseInt(data);
 
     if (Number.isNaN(idx) || idx < 0) {
         // Take running index and increment

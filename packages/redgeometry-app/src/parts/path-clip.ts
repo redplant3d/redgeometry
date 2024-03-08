@@ -4,10 +4,10 @@ import { PathClip2 } from "redgeometry/src/core/path-clip";
 import { DEFAULT_PATH_QUALITY_OPTIONS } from "redgeometry/src/core/path-options";
 import { Polygon2 } from "redgeometry/src/primitives/polygon";
 import { RandomXSR128 } from "redgeometry/src/utility/random";
-import { AppContext2D } from "../context.js";
+import type { AppContext2D } from "../context.js";
 import { createPolygonPair } from "../data.js";
 import { ComboBoxInputElement, RangeInputElement } from "../input.js";
-import { AppLauncher, type AppPart } from "../launcher.js";
+import type { AppLauncher, AppPart } from "../launcher.js";
 import { getBooleanOperator, getWindingRule } from "../utility.js";
 
 export class PathClipAppPart implements AppPart {

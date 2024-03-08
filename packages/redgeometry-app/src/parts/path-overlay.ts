@@ -8,10 +8,10 @@ import { Polygon2 } from "redgeometry/src/primitives/polygon";
 import { arrayEquals } from "redgeometry/src/utility/array";
 import { assertDebug } from "redgeometry/src/utility/debug";
 import { RandomXSR128 } from "redgeometry/src/utility/random";
-import { AppContext2D } from "../context.js";
+import type { AppContext2D } from "../context.js";
 import { createPolygonPair } from "../data.js";
 import { ComboBoxInputElement, RangeInputElement } from "../input.js";
-import { AppLauncher, type AppPart } from "../launcher.js";
+import type { AppLauncher, AppPart } from "../launcher.js";
 import { getWindingRule } from "../utility.js";
 
 type PathOverlayTagEntry = { tag: number[]; faces: MeshFace2[] };

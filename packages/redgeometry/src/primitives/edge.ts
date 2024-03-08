@@ -3,7 +3,7 @@ import { RootType, solveQuadratic } from "../utility/solve.js";
 import { Bezier1Curve2 } from "./bezier.js";
 import { Box2, Box3 } from "./box.js";
 import { Point2, Point3 } from "./point.js";
-import { Vector2, Vector3 } from "./vector.js";
+import type { Vector2, Vector3 } from "./vector.js";
 
 export class Edge2 {
     public readonly p0: Point2;
@@ -100,7 +100,8 @@ export class Edge2 {
 
         const acbb = a * c - b * b;
 
-        let t, u;
+        let t: number | undefined;
+        let u: number | undefined;
 
         if (acbb > 0) {
             // Segments are not collinear

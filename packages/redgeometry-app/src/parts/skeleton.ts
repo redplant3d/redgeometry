@@ -1,4 +1,4 @@
-import { Mesh2, MeshEdge2, MeshFace2 } from "redgeometry/src/core/mesh";
+import { Mesh2, MeshEdge2, type MeshFace2 } from "redgeometry/src/core/mesh";
 import { Path2 } from "redgeometry/src/core/path";
 import { PathClip2 } from "redgeometry/src/core/path-clip";
 import { BooleanOperator, DEFAULT_PATH_QUALITY_OPTIONS, WindingOperator } from "redgeometry/src/core/path-options";
@@ -9,10 +9,10 @@ import type { Vector2 } from "redgeometry/src/primitives/vector";
 import { assertDebug, log } from "redgeometry/src/utility/debug";
 import { RandomXSR128, type Random } from "redgeometry/src/utility/random";
 import { RootType, solveLinear, solveQuadratic, type Root1, type Root2 } from "redgeometry/src/utility/solve";
-import { AppContext2D } from "../context.js";
+import type { AppContext2D } from "../context.js";
 import { createPolygonPair, createSimplePolygon } from "../data.js";
 import { RangeInputElement } from "../input.js";
-import { AppLauncher, type AppPart } from "../launcher.js";
+import type { AppLauncher, AppPart } from "../launcher.js";
 
 enum KineticEventType {
     EdgeEvent,
@@ -421,7 +421,7 @@ export class SkeletonAppPart implements AppPart {
 
         const rt = this.getTriangleCollapseParameter(vtx0, vtx1, vtx2);
 
-        let t1;
+        let t1: number | undefined;
 
         if (rt.type === RootType.Two) {
             if (rt.x1 < rt.x2 || rt.x2 < 0) {
@@ -666,7 +666,7 @@ export class SkeletonAppPart implements AppPart {
         const e1 = e0.lnext;
         const e2 = e1.lnext;
 
-        let ev;
+        let ev: KineticEvent | undefined;
 
         if (e0.sym.face === undefined) {
             if (e1.sym.face === undefined) {

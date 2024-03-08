@@ -2,7 +2,7 @@ import { Path2CurveIterator } from "../internal/iterator.js";
 import { copyCommandsReversed, isWindingInside } from "../internal/path.js";
 import { CurveType, type BezierCurve2 } from "../primitives/bezier.js";
 import { Box2 } from "../primitives/box.js";
-import { Matrix3, Matrix3A } from "../primitives/matrix.js";
+import { Matrix3A, type Matrix3 } from "../primitives/matrix.js";
 import { Point2 } from "../primitives/point.js";
 import { Polygon2 } from "../primitives/polygon.js";
 import { Vector2 } from "../primitives/vector.js";
@@ -16,7 +16,6 @@ import {
     DEFAULT_PATH_OFFSET_OPTIONS,
     DEFAULT_PATH_QUALITY_OPTIONS,
     DEFAULT_PATH_STROKE_OPTIONS,
-    WindingOperator,
     createPathDash,
     createPathFlatten,
     createPathOffset,
@@ -28,6 +27,7 @@ import {
     type PathOffsetOptions,
     type PathQualityOptions,
     type PathStrokeOptions,
+    type WindingOperator,
 } from "./path-options.js";
 
 export interface PathSink2 {
@@ -259,7 +259,7 @@ export class Path2 implements PathSink2 {
     }
 
     public arcTo(p1: Point2, p2: Point2): void {
-        this.conicTo(p1, p2, 0.70710678118654757);
+        this.conicTo(p1, p2, Math.SQRT1_2);
     }
 
     public arcToXY(x1: number, y1: number, x2: number, y2: number): void {

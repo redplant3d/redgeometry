@@ -1,7 +1,7 @@
 import type { Bezier1Curve2, Bezier2Curve2, Bezier3Curve2, BezierCurve2, BezierRCurve2 } from "../primitives/bezier.js";
 import type { Box2 } from "../primitives/box.js";
-import { Point2, Point3 } from "../primitives/point.js";
-import { Vector2, Vector3 } from "../primitives/vector.js";
+import { Point2, type Point3 } from "../primitives/point.js";
+import { Vector2, type Vector3 } from "../primitives/vector.js";
 import { log } from "../utility/debug.js";
 import { Interval } from "../utility/interval.js";
 import { lerp } from "../utility/scalar.js";

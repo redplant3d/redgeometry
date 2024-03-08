@@ -3,9 +3,9 @@ import { Image2 } from "redgeometry/src/render/image";
 import { assertUnreachable } from "redgeometry/src/utility/debug";
 import { RandomXSR128, type Random } from "redgeometry/src/utility/random";
 import { clamp } from "redgeometry/src/utility/scalar";
-import { AppContext2D } from "../context.js";
+import type { AppContext2D } from "../context.js";
 import { ComboBoxInputElement, RangeInputElement } from "../input.js";
-import { AppLauncher, type AppPart } from "../launcher.js";
+import type { AppLauncher, AppPart } from "../launcher.js";
 
 const SOBOL_XOR_1 = [
     0x00000000, 0x00000001, 0x00000001, 0x00000007, 0x00000001, 0x00000013, 0x00000015, 0x0000007f, 0x00000001,

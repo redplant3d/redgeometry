@@ -7,7 +7,7 @@ import {
     type SystemWithArgsOptions,
     type SystemsOptions,
 } from "./schedule.js";
-import { EntityComponentStorage, EntityHierarchySelector } from "./storage-sparse.js";
+import { EntityComponentStorage, type EntityHierarchySelector } from "./storage-sparse.js";
 import type {
     Component,
     ComponentIdOf,

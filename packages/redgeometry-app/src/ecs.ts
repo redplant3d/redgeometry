@@ -1,7 +1,7 @@
 import type { DefaultSystemStage } from "redgeometry/src/ecs/types";
 import type { World } from "redgeometry/src/ecs/world";
 import type { TimeData } from "redgeometry/src/render-webgpu/time";
-import { AppInputElement } from "./input.js";
+import type { AppInputElement } from "./input.js";
 
 export function appMainPlugin(world: World): void {
     world.registerData<AppData>("app");

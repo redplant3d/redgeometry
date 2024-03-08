@@ -1,8 +1,8 @@
 import { log } from "redgeometry/src/utility/debug";
 import { RandomXSR128 } from "redgeometry/src/utility/random";
-import { AppContext2D } from "../context.js";
+import type { AppContext2D } from "../context.js";
 import { RangeInputElement } from "../input.js";
-import { AppLauncher, type AppPart } from "../launcher.js";
+import type { AppLauncher, AppPart } from "../launcher.js";
 
 export class PlaygroundAppPart implements AppPart {
     private context: AppContext2D;

@@ -3,10 +3,10 @@ import { SoftwareRenderContext2 } from "redgeometry/src/render-software/context"
 import { FillRule } from "redgeometry/src/render/context";
 import { Image2 } from "redgeometry/src/render/image";
 import { RandomXSR128 } from "redgeometry/src/utility/random";
-import { AppContext2D } from "../context.js";
+import type { AppContext2D } from "../context.js";
 import { createPath } from "../data.js";
 import { RangeInputElement, TextBoxInputElement } from "../input.js";
-import { AppLauncher, type AppPart } from "../launcher.js";
+import type { AppLauncher, AppPart } from "../launcher.js";
 
 export class ImageAppPart implements AppPart {
     private context: AppContext2D;
