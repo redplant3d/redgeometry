@@ -19,7 +19,7 @@ export type RandomRoofOptions = {
 };
 
 export function createPath(random: Random, generator: number, count: number, width: number, height: number): Path2 {
-    const path = new Path2();
+    const path = Path2.createEmpty();
 
     path.moveTo(new Point2(width * random.nextFloat(), height * random.nextFloat()));
 
@@ -68,8 +68,8 @@ export function createPolygonPair(
     width: number,
     height: number,
 ): [Polygon2, Polygon2] {
-    const polygonA = new Polygon2();
-    const polygonB = new Polygon2();
+    const polygonA = Polygon2.createEmpty();
+    const polygonB = Polygon2.createEmpty();
 
     switch (generator) {
         case 0: {
@@ -174,7 +174,7 @@ export function createSimplePolygon(
     irregularity: number,
     roundness: number,
 ): Polygon2 {
-    const result = new Polygon2();
+    const result = Polygon2.createEmpty();
 
     const center = box.getCenter();
     const angleStep = (2 * Math.PI) / count;
@@ -202,7 +202,7 @@ export function createEdge(random: Random, box: Box2): Edge2 {
 }
 
 export function createRandomColor(random: Random, s: number, v: number, a: number): ColorRgba {
-    return ColorRgba.fromHsv(random.nextFloat(), s, v, a);
+    return ColorRgba.fromHSV(random.nextFloat(), s, v, a);
 }
 
 export function createRandomSeed(): number {

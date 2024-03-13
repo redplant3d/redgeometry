@@ -43,11 +43,11 @@ export class PathClipAppPart implements AppPart {
         this.inputWindB.addEventListener("input", () => this.launcher.requestUpdate(true));
         this.inputWindB.setOptionValues("nonzero", "evenodd", "positive", "negative", "absgeqtwo");
 
-        this.polygonA = new Polygon2();
-        this.polygonB = new Polygon2();
+        this.polygonA = Polygon2.createEmpty();
+        this.polygonB = Polygon2.createEmpty();
 
-        this.chains = new Path2();
-        this.faces = new Path2();
+        this.chains = Path2.createEmpty();
+        this.faces = Path2.createEmpty();
     }
 
     public create(): void {
@@ -67,11 +67,11 @@ export class PathClipAppPart implements AppPart {
     }
 
     public reset(): void {
-        this.polygonA = new Polygon2();
-        this.polygonB = new Polygon2();
+        this.polygonA = Polygon2.createEmpty();
+        this.polygonB = Polygon2.createEmpty();
 
-        this.chains = new Path2();
-        this.faces = new Path2();
+        this.chains = Path2.createEmpty();
+        this.faces = Path2.createEmpty();
     }
 
     public update(_delta: number): void {
@@ -97,7 +97,7 @@ export class PathClipAppPart implements AppPart {
         this.faces.clear();
         this.chains.clear();
 
-        const mesh = new Mesh2();
+        const mesh = Mesh2.createEmpty();
         clip.process(mesh, {
             booleanOperator: getBooleanOperator(this.inputBoolOp.getValue()),
             windingOperatorA: getWindingRule(this.inputWindA.getValue()),

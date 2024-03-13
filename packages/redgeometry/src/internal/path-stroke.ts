@@ -59,15 +59,15 @@ export class StrokeState {
         this.isDash = false;
         this.isFirstDash = true;
         this.ms = Vector2.ZERO;
-        this.output = new Path2();
+        this.output = Path2.createEmpty();
         this.startAdvancedLength = 0;
         this.startIndex = 0;
         this.startPhase = false;
 
-        const leftFirst = new Path2();
-        const rightFirst = new Path2();
-        const leftMain = new Path2();
-        const rightMain = new Path2();
+        const leftFirst = Path2.createEmpty();
+        const rightFirst = Path2.createEmpty();
+        const leftMain = Path2.createEmpty();
+        const rightMain = Path2.createEmpty();
 
         this.left = leftFirst;
         this.leftFirst = leftFirst;

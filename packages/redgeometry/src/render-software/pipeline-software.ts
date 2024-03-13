@@ -108,7 +108,7 @@ export class PipelineSoftware {
     }
 
     public rentPath(): Path2 {
-        return new Path2();
+        return Path2.createEmpty();
     }
 
     public returnPath(_path: Path2): void {
@@ -197,7 +197,7 @@ export class PipelineSoftware {
     }
 
     private flatten(path: Path2): void {
-        const flattened = new Path2();
+        const flattened = Path2.createEmpty();
         this.pathFlatten.process(path, flattened, true);
 
         this.clipPolyline(flattened.getPoints(), this.clipRect);

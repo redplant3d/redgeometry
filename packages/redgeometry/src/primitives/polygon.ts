@@ -8,8 +8,12 @@ import { Point2 } from "./point.js";
 export class Polygon2 {
     private points: Point2[];
 
-    public constructor(vertices: Point2[] = []) {
-        this.points = vertices;
+    public constructor(points: Point2[]) {
+        this.points = points;
+    }
+
+    public static createEmpty(): Polygon2 {
+        return new Polygon2([]);
     }
 
     public static isAreaIntersection(poly1: Polygon2, poly2: Polygon2, isNonZero: boolean): boolean {
@@ -302,7 +306,7 @@ export class Polygon2 {
     }
 
     public toPath(): Path2 {
-        const path = new Path2();
+        const path = Path2.createEmpty();
 
         if (this.points.length > 0) {
             path.moveTo(this.points[0]);

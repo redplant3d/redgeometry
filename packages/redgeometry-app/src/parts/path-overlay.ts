@@ -39,9 +39,9 @@ export class PathOverlayAppPart implements AppPart {
         this.inputWind.addEventListener("input", () => this.launcher.requestUpdate(true));
         this.inputWind.setOptionValues("nonzero", "evenodd", "positive", "negative", "absgeqtwo");
 
-        this.polygonA = new Polygon2();
-        this.polygonB = new Polygon2();
-        this.mesh = new Mesh2();
+        this.polygonA = Polygon2.createEmpty();
+        this.polygonB = Polygon2.createEmpty();
+        this.mesh = Mesh2.createEmpty();
         this.tagEntries = [];
     }
 
@@ -55,7 +55,7 @@ export class PathOverlayAppPart implements AppPart {
         const styles: string[] = [];
         const step = 1 / this.tagEntries.length;
         for (let h = 0; h < 1; h += step) {
-            const c = ColorRgba.fromHsv(h, 0.25, 1, 1);
+            const c = ColorRgba.fromHSV(h, 0.25, 1, 1);
             styles.push(c.style());
         }
 
@@ -66,7 +66,7 @@ export class PathOverlayAppPart implements AppPart {
                 continue;
             }
 
-            const path = new Path2();
+            const path = Path2.createEmpty();
             face.writeToPath(path);
 
             const idx = this.tagEntries.findIndex((c) => arrayEquals(c.tag, tag));
@@ -82,9 +82,9 @@ export class PathOverlayAppPart implements AppPart {
     }
 
     public reset(): void {
-        this.polygonA = new Polygon2();
-        this.polygonB = new Polygon2();
-        this.mesh = new Mesh2();
+        this.polygonA = Polygon2.createEmpty();
+        this.polygonB = Polygon2.createEmpty();
+        this.mesh = Mesh2.createEmpty();
     }
 
     public update(_delta: number): void {
@@ -119,7 +119,7 @@ export class PathOverlayAppPart implements AppPart {
         clip.addEdge(Edge2.fromXY(375, 325, 300, 325), 3);
         clip.addEdge(Edge2.fromXY(300, 325, 300, 275), 3);
 
-        const mesh = new Mesh2();
+        const mesh = Mesh2.createEmpty();
 
         clip.process(mesh, getWindingRule(this.inputWind.getValue()));
 

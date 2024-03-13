@@ -386,8 +386,8 @@ function circleRenderSystem(world: World): void {
 
     const query = world.queryEntities<[CircleComponent, ObjectComponent]>(["circle", "object"]);
 
-    const red = new Path2();
-    const blue = new Path2();
+    const red = Path2.createEmpty();
+    const blue = Path2.createEmpty();
 
     for (const entityId of query) {
         const object = world.getComponent<ObjectComponent>(entityId, "object");
@@ -416,8 +416,8 @@ function rectangleRenderSystem(world: World): void {
 
     const query = world.queryEntities<[RectangleComponent, ObjectComponent]>(["rectangle", "object"]);
 
-    const red = new Path2();
-    const blue = new Path2();
+    const red = Path2.createEmpty();
+    const blue = Path2.createEmpty();
 
     for (const entityId of query) {
         const object = world.getComponent<ObjectComponent>(entityId, "object");

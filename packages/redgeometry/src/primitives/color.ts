@@ -13,7 +13,7 @@ export class ColorRgba {
         this.a = a;
     }
 
-    public static fromHsv(h: number, s: number, v: number, a: number): ColorRgba {
+    public static fromHSV(h: number, s: number, v: number, a: number): ColorRgba {
         const i = Math.floor(h * 6);
         const f = h * 6 - i;
         const p = v * (1 - s);

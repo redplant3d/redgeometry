@@ -11,11 +11,11 @@ test("addPathAppend", () => {
     const p3 = new Point2(300, 300);
     const p4 = new Point2(400, 400);
 
-    const path1 = new Path2();
+    const path1 = Path2.createEmpty();
     path1.moveTo(p1);
     path1.lineTo(p2);
 
-    const path2 = new Path2();
+    const path2 = Path2.createEmpty();
     path2.moveTo(p3);
     path2.lineTo(p4);
 
@@ -31,11 +31,11 @@ test("addPathReversedAppend", () => {
     const p3 = new Point2(300, 300);
     const p4 = new Point2(400, 400);
 
-    const path1 = new Path2();
+    const path1 = Path2.createEmpty();
     path1.moveTo(p1);
     path1.lineTo(p2);
 
-    const path2 = new Path2();
+    const path2 = Path2.createEmpty();
     path2.moveTo(p3);
     path2.lineTo(p4);
 

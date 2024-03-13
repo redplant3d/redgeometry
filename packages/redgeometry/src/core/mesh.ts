@@ -560,17 +560,21 @@ export class Mesh2 {
     private edges: MeshEdge2[];
     private faces: MeshFace2[];
 
-    public constructor() {
-        this.chains = [];
-        this.edges = [];
-        this.faces = [];
+    public constructor(edges: MeshEdge2[], chains: MeshChain2[], faces: MeshFace2[]) {
+        this.edges = edges;
+        this.chains = chains;
+        this.faces = faces;
+    }
+
+    public static createEmpty(): Mesh2 {
+        return new Mesh2([], [], []);
     }
 
     /**
      * Create a new mesh from a chain.
      */
-    public static createFromChain(ch: MeshChain2): Mesh2 {
-        const mesh = new Mesh2();
+    public static fromChain(ch: MeshChain2): Mesh2 {
+        const mesh = Mesh2.createEmpty();
 
         const iter = ch.getEdgeIterator();
         const eb0 = iter.curr.clonePair();
@@ -600,8 +604,8 @@ export class Mesh2 {
     /**
      * Create a new mesh from a face.
      */
-    public static createFromFace(f: MeshFace2): Mesh2 {
-        const mesh = new Mesh2();
+    public static fromFace(f: MeshFace2): Mesh2 {
+        const mesh = Mesh2.createEmpty();
 
         const iter = f.getEdgeIterator();
         const eb0 = iter.curr.clonePair();
@@ -672,7 +676,7 @@ export class Mesh2 {
      * Returns a deep copy of the mesh.
      */
     public clone(): Mesh2 {
-        const mesh = new Mesh2();
+        const mesh = Mesh2.createEmpty();
 
         // Create new edges and fill edge map
         const edgeMap = new Map<MeshEdge2, number>();
@@ -937,7 +941,7 @@ export class Mesh2 {
     }
 
     public getChainsPath(): Path2 {
-        const path = new Path2();
+        const path = Path2.createEmpty();
 
         for (const chain of this.chains) {
             chain.writeToPath(path);
@@ -955,7 +959,7 @@ export class Mesh2 {
     }
 
     public getFacesPath(): Path2 {
-        const path = new Path2();
+        const path = Path2.createEmpty();
 
         for (const face of this.faces) {
             face.writeToPath(path);
@@ -968,7 +972,7 @@ export class Mesh2 {
         const output: Path2[] = [];
 
         for (const face of this.faces) {
-            const path = new Path2();
+            const path = Path2.createEmpty();
             face.writeToPath(path);
             output.push(path);
         }

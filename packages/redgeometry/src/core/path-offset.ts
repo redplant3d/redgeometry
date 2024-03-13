@@ -47,7 +47,7 @@ export class PathOffsetIncremental2 implements PathOffset2 {
         this.simplifyTolerance = qualityOptions.simplifyTolerance;
         this.tanOffsetTolerance = Math.tan(qualityOptions.offsetTolerance);
 
-        this.buffer = new Path2();
+        this.buffer = Path2.createEmpty();
         this.d = 0;
         this.join = JoinType.Bevel;
         this.miterLimit = 0;
@@ -339,7 +339,7 @@ export class PathOffsetRecursive2 implements PathOffset2 {
         this.simplifyTolerance = qualityOptions.simplifyTolerance;
         this.cosOffsetTolerance = Math.cos(qualityOptions.offsetTolerance);
 
-        this.buffer = new Path2();
+        this.buffer = Path2.createEmpty();
         this.d = 0;
         this.join = JoinType.Bevel;
         this.miterLimit = 0;

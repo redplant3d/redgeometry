@@ -8,13 +8,13 @@ test("isConvex", () => {
     const p2 = new Point2(1, 1);
     const p3 = new Point2(1, 0);
 
-    const polygon1 = new Polygon2();
+    const polygon1 = Polygon2.createEmpty();
     polygon1.addPoint(p0);
     polygon1.addPoint(p1);
     polygon1.addPoint(p2);
     polygon1.addPoint(p3);
 
-    const polygon2 = new Polygon2();
+    const polygon2 = Polygon2.createEmpty();
     polygon2.addPoint(p0);
     polygon2.addPoint(p2);
     polygon2.addPoint(p1);
@@ -33,13 +33,13 @@ test("isSimple", () => {
     const p2 = new Point2(1, 1);
     const p3 = new Point2(1, 0);
 
-    const polygon1 = new Polygon2();
+    const polygon1 = Polygon2.createEmpty();
     polygon1.addPoint(p0);
     polygon1.addPoint(p1);
     polygon1.addPoint(p2);
     polygon1.addPoint(p3);
 
-    const polygon2 = new Polygon2();
+    const polygon2 = Polygon2.createEmpty();
     polygon2.addPoint(p0);
     polygon2.addPoint(p2);
     polygon2.addPoint(p1);

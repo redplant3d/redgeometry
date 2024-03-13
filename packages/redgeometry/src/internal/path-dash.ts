@@ -24,12 +24,12 @@ export class DashState {
         this.currentPhase = false;
         this.dashArray = [];
         this.isFirst = true;
-        this.output = new Path2();
+        this.output = Path2.createEmpty();
         this.startAdvancedLength = 0;
         this.startIndex = 0;
         this.startPhase = false;
 
-        const first = new Path2();
+        const first = Path2.createEmpty();
 
         this.path = first;
         this.pathFirst = first;

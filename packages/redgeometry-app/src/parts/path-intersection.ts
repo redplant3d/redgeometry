@@ -21,7 +21,7 @@ export class PathIntersectionAppPart implements AppPart {
         this.inputParameter.addEventListener("input", () => this.launcher.requestUpdate());
         this.inputParameter.setStyle("width: 200px");
 
-        this.path = new Path2();
+        this.path = Path2.createEmpty();
         this.points = [];
     }
 
@@ -36,7 +36,7 @@ export class PathIntersectionAppPart implements AppPart {
     }
 
     public reset(): void {
-        this.path = new Path2();
+        this.path = Path2.createEmpty();
         this.points = [];
     }
 
@@ -47,7 +47,7 @@ export class PathIntersectionAppPart implements AppPart {
         const c2 = new Bezier2Curve2(new Point2(100, 500), new Point2(300, 100), new Point2(500, 100 + 3 * offset));
 
         this.points = [];
-        this.path = new Path2();
+        this.path = Path2.createEmpty();
 
         c1.intersectQuad(c2, this.points);
 

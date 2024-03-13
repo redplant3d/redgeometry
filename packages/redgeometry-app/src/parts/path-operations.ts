@@ -42,8 +42,8 @@ export class PathOperationsAppPart implements AppPart {
         this.inputJoin.addEventListener("input", () => this.launcher.requestUpdate(true));
         this.inputJoin.setOptionValues("bevel", "miter", "miterclip", "round");
 
-        this.input = new Path2();
-        this.output = new Path2();
+        this.input = Path2.createEmpty();
+        this.output = Path2.createEmpty();
     }
 
     public create(): void {

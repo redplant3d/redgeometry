@@ -26,7 +26,7 @@ export class MeshAppPart implements AppPart {
         this.inputCount.addEventListener("input", () => this.launcher.requestUpdate());
         this.inputCount.setStyle("width: 200px");
 
-        this.mesh = new Mesh2();
+        this.mesh = Mesh2.createEmpty();
         this.points = [];
     }
 
@@ -45,7 +45,7 @@ export class MeshAppPart implements AppPart {
     }
 
     public reset(): void {
-        this.mesh = new Mesh2();
+        this.mesh = Mesh2.createEmpty();
         this.points = [];
     }
 
@@ -64,13 +64,13 @@ export class MeshAppPart implements AppPart {
 
         this.points.push(p0, p1, p2);
 
-        const path = new Path2();
+        const path = Path2.createEmpty();
         path.moveTo(p0);
         path.lineTo(p1);
         path.lineTo(p2);
         path.close();
 
-        const mesh = new Mesh2();
+        const mesh = Mesh2.createEmpty();
         const pathClip = new PathClip2(DEFAULT_PATH_QUALITY_OPTIONS);
         pathClip.addPath(path);
         pathClip.process(mesh, DEFAULT_PATH_CLIP_OPTIONS);

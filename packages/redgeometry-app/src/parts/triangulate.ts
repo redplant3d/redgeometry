@@ -49,11 +49,11 @@ export class TriangulateAppPart implements AppPart {
         this.inputOptions.addEventListener("input", () => this.launcher.requestUpdate(true));
         this.inputOptions.setOptionValues("monotonize", "triangulate", "triangulateOpt");
 
-        this.polygonA = new Polygon2();
-        this.polygonB = new Polygon2();
+        this.polygonA = Polygon2.createEmpty();
+        this.polygonB = Polygon2.createEmpty();
 
-        this.error = new Path2();
-        this.mesh = new Mesh2();
+        this.error = Path2.createEmpty();
+        this.mesh = Mesh2.createEmpty();
     }
 
     public create(): void {
@@ -74,11 +74,11 @@ export class TriangulateAppPart implements AppPart {
     }
 
     public reset(): void {
-        this.polygonA = new Polygon2();
-        this.polygonB = new Polygon2();
+        this.polygonA = Polygon2.createEmpty();
+        this.polygonB = Polygon2.createEmpty();
 
-        this.error = new Path2();
-        this.mesh = new Mesh2();
+        this.error = Path2.createEmpty();
+        this.mesh = Mesh2.createEmpty();
     }
 
     public update(_delta: number): void {
@@ -101,7 +101,7 @@ export class TriangulateAppPart implements AppPart {
             clip.addEdge(edge, 1);
         }
 
-        const mesh = new Mesh2();
+        const mesh = Mesh2.createEmpty();
         clip.process(mesh, {
             booleanOperator: getBooleanOperator(this.inputBoolOp.getValue()),
             windingOperatorA: getWindingRule(this.inputWindA.getValue()),
@@ -126,7 +126,7 @@ export class TriangulateAppPart implements AppPart {
         mesh.validate();
 
         this.mesh = mesh;
-        this.error = new Path2();
+        this.error = Path2.createEmpty();
 
         for (const face of this.mesh.getFaces()) {
             const orientation = face.getSignedArea();

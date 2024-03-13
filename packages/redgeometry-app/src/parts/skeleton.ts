@@ -40,10 +40,10 @@ export class SkeletonAppPart implements AppPart {
         this.inputTime.addEventListener("input", () => this.launcher.requestUpdate());
         this.inputTime.setStyle("width: 200px");
 
-        this.inner = new Path2();
-        this.outer = new Path2();
-        this.mesh = new Mesh2();
-        this.meshOriginal = new Mesh2();
+        this.inner = Path2.createEmpty();
+        this.outer = Path2.createEmpty();
+        this.mesh = Mesh2.createEmpty();
+        this.meshOriginal = Mesh2.createEmpty();
         this.vertices = [];
     }
 
@@ -61,8 +61,8 @@ export class SkeletonAppPart implements AppPart {
     public reset(): void {
         this.inner.clear();
         this.outer.clear();
-        this.mesh = new Mesh2();
-        this.meshOriginal = new Mesh2();
+        this.mesh = Mesh2.createEmpty();
+        this.meshOriginal = Mesh2.createEmpty();
         this.vertices = [];
     }
 
@@ -288,7 +288,7 @@ export class SkeletonAppPart implements AppPart {
             clip.addEdge(edge, 1);
         }
 
-        const mesh = new Mesh2();
+        const mesh = Mesh2.createEmpty();
         clip.process(mesh, {
             booleanOperator: BooleanOperator.Exclusion,
             windingOperatorA: WindingOperator.NonZero,
