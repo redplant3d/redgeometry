@@ -1,6 +1,5 @@
 import { Path2 } from "redgeometry/src/core/path";
 import type { WorldOptions } from "redgeometry/src/ecs/app";
-
 import type { DefaultSystemStage, DefaultWorldScheduleId } from "redgeometry/src/ecs/types";
 import {
     ChangeFlags,
@@ -285,7 +284,9 @@ function spawnSystem(world: World): void {
 
         let i = nextCount;
 
-        for (const entityId of query) {
+        while (query.next()) {
+            const entityId = query.getEntityId();
+
             if (i < currCount) {
                 world.destroyEntity(entityId);
                 i += 1;
@@ -304,7 +305,8 @@ function movementSystem(world: World): void {
 
     const query = world.queryEntities<[ObjectComponent]>(["object"]);
 
-    for (const entityId of query) {
+    while (query.next()) {
+        const entityId = query.getEntityId();
         const object = world.getComponent<ObjectComponent>(entityId, "object");
 
         if (object === undefined) {
@@ -389,7 +391,8 @@ function circleRenderSystem(world: World): void {
     const red = Path2.createEmpty();
     const blue = Path2.createEmpty();
 
-    for (const entityId of query) {
+    while (query.next()) {
+        const entityId = query.getEntityId();
         const object = world.getComponent<ObjectComponent>(entityId, "object");
 
         if (object === undefined) {
@@ -419,7 +422,8 @@ function rectangleRenderSystem(world: World): void {
     const red = Path2.createEmpty();
     const blue = Path2.createEmpty();
 
-    for (const entityId of query) {
+    while (query.next()) {
+        const entityId = query.getEntityId();
         const object = world.getComponent<ObjectComponent>(entityId, "object");
 
         if (object === undefined) {

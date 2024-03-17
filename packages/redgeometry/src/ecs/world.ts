@@ -7,7 +7,7 @@ import {
     type SystemWithArgsOptions,
     type SystemsOptions,
 } from "./schedule.js";
-import { EntityComponentStorage, type EntityHierarchySelector } from "./storage-sparse.js";
+import { EntityComponentIterator, EntityComponentStorage, EntityHierarchySelector } from "./storage-sparse.js";
 import type {
     Component,
     ComponentIdOf,
@@ -29,6 +29,8 @@ import type {
     WorldPlugin,
     WorldScheduleId,
 } from "./types.js";
+
+export { EntityComponentIterator, EntityHierarchySelector };
 
 /**
  * Channel to remote worlds.
@@ -260,7 +262,7 @@ export class World {
         this.ecStorage.loadEntities(this.serializationMap, text);
     }
 
-    public queryEntities<T extends Component[]>(componentIds: ComponentIdsOf<T>): IterableIterator<EntityId> {
+    public queryEntities<T extends Component[]>(componentIds: ComponentIdsOf<T>): EntityComponentIterator {
         return this.ecStorage.queryEntities(componentIds);
     }
 

@@ -49,7 +49,7 @@ export class EntityComponentStorage {
         this.entityId = 0;
     }
 
-    public createEntity<T extends Component>(parent: EntityId | undefined, components: T[]): EntityId {
+    public createEntity<T extends Component[]>(parent: EntityId | undefined, components: T): EntityId {
         const entityId = this.createEntityId();
 
         let depth = 0;
@@ -177,7 +177,7 @@ export class EntityComponentStorage {
         }
     }
 
-    public queryEntities<T extends Component[]>(componentIds: ComponentIdsOf<T>): IterableIterator<EntityId> {
+    public queryEntities<T extends Component[]>(componentIds: ComponentIdsOf<T>): EntityComponentIterator {
         const componentEntries: ComponentEntry[] = [];
 
         for (const componentId of componentIds) {
@@ -302,27 +302,37 @@ export class EntityComponentStorage {
     }
 }
 
-export class EntityComponentIterator implements IterableIterator<EntityId> {
+export class EntityComponentIterator {
+    private entityEntry: EntityEntry | undefined;
+
     public componentEntries: ComponentEntry[];
     public entityEntries: IterableIterator<EntityEntry>;
 
     public constructor(entityEntries: IterableIterator<EntityEntry>, componentEntries: ComponentEntry[]) {
         this.entityEntries = entityEntries;
         this.componentEntries = componentEntries;
+        this.entityEntry = undefined;
     }
 
-    public [Symbol.iterator](): IterableIterator<EntityId> {
-        return this;
+    public getEntityId(): EntityId {
+        const entityEntry = this.entityEntry;
+
+        if (entityEntry === undefined) {
+            throwError("Invalid entity entry");
+        }
+
+        return entityEntry.entityId;
     }
 
-    public next(): IteratorResult<EntityId> {
-        for (const entry of this.entityEntries) {
-            if (this.hasEntity(entry.entityId)) {
-                return { done: false, value: entry.entityId };
+    public next(): boolean {
+        for (const entityEntry of this.entityEntries) {
+            if (this.hasEntity(entityEntry.entityId)) {
+                this.entityEntry = entityEntry;
+                return true;
             }
         }
 
-        return { done: true, value: undefined };
+        return false;
     }
 
     private hasEntity(entityId: EntityId): boolean {

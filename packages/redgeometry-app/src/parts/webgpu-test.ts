@@ -406,7 +406,9 @@ function spawnSystem(world: World): void {
 
         let i = 0;
 
-        for (const entityId of query) {
+        while (query.next()) {
+            const entityId = query.getEntityId();
+
             if (i < minCount) {
                 world.destroyEntity(entityId);
                 i += 1;
