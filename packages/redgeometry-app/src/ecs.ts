@@ -1,6 +1,6 @@
+import type { TimeData } from "redgeometry/src/ecs-plugins/time";
 import type { DefaultSystemStage } from "redgeometry/src/ecs/types";
 import type { World } from "redgeometry/src/ecs/world";
-import type { TimeData } from "redgeometry/src/render-webgpu/time";
 import type { AppInputElement } from "./input.js";
 
 export function appMainPlugin(world: World): void {

@@ -1,4 +1,4 @@
-import type { EntityId } from "../ecs/types.js";
+import type { EntityId } from "redgeometry/src/ecs/types";
 
 export type SceneData = {
     dataId: "scene";

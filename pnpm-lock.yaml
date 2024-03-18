@@ -52,11 +52,7 @@ importers:
         specifier: ^20.11.26
         version: 20.11.26
 
-  packages/redgeometry:
-    devDependencies:
-      '@webgpu/types':
-        specifier: ^0.1.40
-        version: 0.1.40
+  packages/redgeometry: {}
 
   packages/redgeometry-app:
     dependencies:

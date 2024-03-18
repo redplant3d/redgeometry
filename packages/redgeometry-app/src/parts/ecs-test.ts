@@ -1,4 +1,5 @@
 import { Path2 } from "redgeometry/src/core/path";
+import { timePlugin, type TimeData } from "redgeometry/src/ecs-plugins/time";
 import type { WorldOptions } from "redgeometry/src/ecs/app";
 import type { DefaultSystemStage, DefaultWorldScheduleId } from "redgeometry/src/ecs/types";
 import {
@@ -10,7 +11,6 @@ import {
 } from "redgeometry/src/ecs/world";
 import { Point2 } from "redgeometry/src/primitives/point";
 import { Vector2 } from "redgeometry/src/primitives/vector";
-import { timePlugin, type TimeData } from "redgeometry/src/render-webgpu/time";
 import { log, throwError } from "redgeometry/src/utility/debug";
 import { RandomXSR128, type Random } from "redgeometry/src/utility/random";
 import { AppContext2D } from "../context.js";

@@ -1,4 +1,4 @@
-import type { Nominal } from "../index.js";
+import type { Nominal } from "redgeometry/src/utility/types";
 import type { Material } from "./material.js";
 import type { Mesh } from "./mesh.js";
 

@@ -1,24 +1,4 @@
-export type Float32Buffer = { type: "Float32"; array: Float32Array };
-export type Float64Buffer = { type: "Float64"; array: Float64Array };
-export type Int8Buffer = { type: "Int8"; array: Int8Array };
-export type Int16Buffer = { type: "Int16"; array: Int16Array };
-export type Int32Buffer = { type: "Int32"; array: Int32Array };
-export type Uint8Buffer = { type: "Uint8"; array: Uint8Array };
-export type Uint8ClampedBuffer = { type: "Uint8Clamped"; array: Uint8ClampedArray };
-export type Uint16Buffer = { type: "Uint16"; array: Uint16Array };
-export type Uint32Buffer = { type: "Uint32"; array: Uint32Array };
-export type NumberBuffer = { type: "Number"; array: number[] };
-
-export type TypedBuffer =
-    | Float32Buffer
-    | Float64Buffer
-    | Int8Buffer
-    | Int16Buffer
-    | Int32Buffer
-    | Uint8Buffer
-    | Uint8ClampedBuffer
-    | Uint16Buffer
-    | Uint32Buffer;
+import type { NumberBuffer, TypedBuffer } from "redgeometry/src/utility/buffer";
 
 export function gpuCreateBuffer(
     device: GPUDevice,
@@ -26,7 +6,7 @@ export function gpuCreateBuffer(
     flags: GPUBufferUsageFlags,
 ): GPUBuffer {
     // See: https://toji.github.io/webgpu-best-practices/buffer-uploads.html
-    if (data.type === "Number") {
+    if (data.type === "number") {
         const srcData = data.array;
         const gpuBuffer = device.createBuffer({
             size: 4 * srcData.length,

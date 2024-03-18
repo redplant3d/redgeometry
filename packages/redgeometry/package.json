@@ -26,9 +26,6 @@
     "engines": {
         "node": ">=14.17"
     },
-    "devDependencies": {
-        "@webgpu/types": "^0.1.40"
-    },
     "scripts": {
         "build": "vite-node ./scripts/build.ts"
     }

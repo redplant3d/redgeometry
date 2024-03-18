@@ -11,7 +11,7 @@ import {
     type AppMessageResponseFn,
     type WorldGroupChild,
     type WorldGroupParent,
-} from "../internal/ecs.js";
+} from "../internal/ecs-app.js";
 import { assertDebug, log, throwError } from "../utility/debug.js";
 import type {
     DefaultSystemStage,

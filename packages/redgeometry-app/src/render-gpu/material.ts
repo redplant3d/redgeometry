@@ -1,4 +1,4 @@
-import type { ColorRgba } from "../primitives/color.js";
+import type { ColorRgba } from "redgeometry/src/primitives/color";
 import type { AssetId } from "./asset.js";
 
 export type Material = {

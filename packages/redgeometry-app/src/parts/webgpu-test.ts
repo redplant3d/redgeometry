@@ -1,4 +1,12 @@
-/// <reference types="@webgpu/types" />
+import {
+    KeyboardButtons,
+    MouseButtons,
+    inputReceiverPlugin,
+    inputSenderPlugin,
+    type InputData,
+    type InputSenderData,
+} from "redgeometry/src/ecs-plugins/input";
+import { timePlugin, type TimeData } from "redgeometry/src/ecs-plugins/time";
 import type { WorldOptions } from "redgeometry/src/ecs/app";
 import type { DefaultSystemStage, DefaultWorldScheduleId, EntityId } from "redgeometry/src/ecs/types";
 import type { World } from "redgeometry/src/ecs/world";
@@ -7,30 +15,16 @@ import { Matrix4 } from "redgeometry/src/primitives/matrix";
 import { Point3 } from "redgeometry/src/primitives/point";
 import { Quaternion, RotationOrder } from "redgeometry/src/primitives/quaternion";
 import { Vector3 } from "redgeometry/src/primitives/vector";
-import type { AssetData, AssetId } from "redgeometry/src/render-webgpu/asset";
-import type { CameraBundle, CameraComponent } from "redgeometry/src/render-webgpu/camera";
-import { gpuPlugin, type GPUData, type GPUInitData } from "redgeometry/src/render-webgpu/gpu";
-import {
-    KeyboardButtons,
-    MouseButtons,
-    inputReceiverPlugin,
-    inputSenderPlugin,
-    type InputData,
-    type InputSenderData,
-} from "redgeometry/src/render-webgpu/input";
-import type { Material } from "redgeometry/src/render-webgpu/material";
-import {
-    meshRenderPlugin,
-    type Mesh,
-    type MeshBundle,
-    type MeshRenderStateData,
-} from "redgeometry/src/render-webgpu/mesh";
-import type { SceneData } from "redgeometry/src/render-webgpu/scene";
-import { timePlugin, type TimeData } from "redgeometry/src/render-webgpu/time";
-import { Visibility, type TransformComponent } from "redgeometry/src/render-webgpu/transform";
 import { throwError } from "redgeometry/src/utility/debug";
 import { RandomXSR128, type Random } from "redgeometry/src/utility/random";
 import { createRandomColor, createRandomSeed } from "../data.js";
+import type { AssetData, AssetId } from "../render-gpu/asset.js";
+import type { CameraBundle, CameraComponent } from "../render-gpu/camera.js";
+import { gpuPlugin, type GPUData, type GPUInitData } from "../render-gpu/gpu.js";
+import type { Material } from "../render-gpu/material.js";
+import { meshRenderPlugin, type Mesh, type MeshBundle, type MeshRenderStateData } from "../render-gpu/mesh.js";
+import type { SceneData } from "../render-gpu/scene.js";
+import { Visibility, type TransformComponent } from "../render-gpu/transform.js";
 import {
     appMainPlugin,
     appRemotePlugin,
@@ -340,7 +334,7 @@ function initAssetSystem(world: World): void {
     ];
 
     const meshHandle = assetData.meshes.add({
-        vertices: { type: "Number", array: cubeVertices },
+        vertices: { type: "number", array: cubeVertices },
     });
 
     appRemoteData.parentEntity = world.createEntity<[TransformComponent]>(undefined, {

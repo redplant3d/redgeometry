@@ -1,7 +1,7 @@
-import type { SerializationMap } from "../internal/serialize.js";
+import type { Component, ComponentId, ComponentIdOf, ComponentIdsOf, EntityId } from "../ecs/types.js";
+import { ChangeFlags } from "../ecs/world.js";
 import { throwError } from "../utility/debug.js";
-import type { Component, ComponentId, ComponentIdOf, ComponentIdsOf, EntityId } from "./types.js";
-import { ChangeFlags } from "./world.js";
+import type { SerializationMap } from "./serialize.js";
 
 type EntityEntry = {
     entityId: EntityId;

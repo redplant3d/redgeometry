@@ -1,3 +1,8 @@
+import {
+    EntityComponentIterator,
+    EntityComponentStorage,
+    EntityHierarchySelector,
+} from "../internal/ecs-storage-sparse.js";
 import { DEFAULT_SERIALIZATION_MAPPING, SerializationMap } from "../internal/serialize.js";
 import { log, throwError } from "../utility/debug.js";
 import {
@@ -7,7 +12,6 @@ import {
     type SystemWithArgsOptions,
     type SystemsOptions,
 } from "./schedule.js";
-import { EntityComponentIterator, EntityComponentStorage, EntityHierarchySelector } from "./storage-sparse.js";
 import type {
     Component,
     ComponentIdOf,

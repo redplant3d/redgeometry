@@ -1,9 +1,10 @@
-import type { ComponentIdsOf, DefaultSystemStage, EntityId } from "../ecs/types.js";
-import type { World } from "../ecs/world.js";
-import type { Matrix4 } from "../primitives/matrix.js";
-import { assertDebug, log } from "../utility/debug.js";
+import type { ComponentIdsOf, DefaultSystemStage, EntityId } from "redgeometry/src/ecs/types";
+import type { World } from "redgeometry/src/ecs/world";
+import type { Matrix4 } from "redgeometry/src/primitives/matrix";
+import { type Float32Buffer, type NumberBuffer } from "redgeometry/src/utility/buffer";
+import { assertDebug, log } from "redgeometry/src/utility/debug";
 import { AssetCollection, type AssetData, type AssetId } from "./asset.js";
-import { gpuCreateBuffer, type Float32Buffer, type NumberBuffer } from "./buffer.js";
+import { gpuCreateBuffer } from "./buffer.js";
 import { cameraSystem, type CameraComponent } from "./camera.js";
 import { startGPUSystem, type GPUData } from "./gpu.js";
 import type { Material, MaterialComponent } from "./material.js";
@@ -380,7 +381,7 @@ function createMeshEntry(
         assertDebug(mesh !== undefined);
 
         const transformsData: Float32Buffer = {
-            type: "Float32",
+            type: "float32",
             array: new Float32Array(12 * MESH_MAX_ENTRIES_PER_MATERIAL),
         };
 
