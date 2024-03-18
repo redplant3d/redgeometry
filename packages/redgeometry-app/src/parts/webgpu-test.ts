@@ -18,13 +18,6 @@ import { Vector3 } from "redgeometry/src/primitives/vector";
 import { throwError } from "redgeometry/src/utility/debug";
 import { RandomXSR128, type Random } from "redgeometry/src/utility/random";
 import { createRandomColor, createRandomSeed } from "../data.js";
-import type { AssetData, AssetId } from "../render-gpu/asset.js";
-import type { CameraBundle, CameraComponent } from "../render-gpu/camera.js";
-import { gpuPlugin, type GPUData, type GPUInitData } from "../render-gpu/gpu.js";
-import type { Material } from "../render-gpu/material.js";
-import { meshRenderPlugin, type Mesh, type MeshBundle, type MeshRenderStateData } from "../render-gpu/mesh.js";
-import type { SceneData } from "../render-gpu/scene.js";
-import { Visibility, type TransformComponent } from "../render-gpu/transform.js";
 import {
     appMainPlugin,
     appRemotePlugin,
@@ -34,6 +27,13 @@ import {
     type WindowResizeEvent,
 } from "../ecs.js";
 import { ButtonInputElement, ComboBoxInputElement, RangeInputElement, TextBoxInputElement } from "../input.js";
+import type { AssetData, AssetId } from "../render-gpu/asset.js";
+import type { CameraBundle, CameraComponent } from "../render-gpu/camera.js";
+import { gpuPlugin, type GPUData, type GPUInitData } from "../render-gpu/gpu.js";
+import type { Material } from "../render-gpu/material.js";
+import { meshRenderPlugin, type Mesh, type MeshBundle, type MeshRenderStateData } from "../render-gpu/mesh.js";
+import type { SceneData } from "../render-gpu/scene.js";
+import { Visibility, type TransformComponent } from "../render-gpu/transform.js";
 
 export const WEBGPU_TEST_MAIN_WORLD: WorldOptions = {
     id: "webgpu-test-main",
