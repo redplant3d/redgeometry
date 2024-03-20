@@ -1,6 +1,5 @@
 import { ColorRgba } from "redgeometry/src/primitives/color";
-import { SoftwareRenderContext2 } from "redgeometry/src/render-software/context";
-import { FillRule } from "redgeometry/src/render/context";
+import { FillRule, SoftwareRenderContext2 } from "redgeometry/src/render/context";
 import { Image2 } from "redgeometry/src/render/image";
 import { RandomXSR128 } from "redgeometry/src/utility/random";
 import type { AppContext2D } from "../context.js";

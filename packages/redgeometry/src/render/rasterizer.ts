@@ -1,44 +1,18 @@
-import { FillRule } from "../render/context.js";
 import { assertDebug } from "../utility/debug.js";
-import type { Compositor } from "./compositor.js";
+import type { SoftwareCompositor } from "./compositor.js";
+import { FillRule } from "./context.js";
 
 const A8_SHIFT = 8;
 
-type ActiveEdge = {
-    d: number;
-    d0: number;
-    inc: number;
-    m0: number;
-    sign: number;
-    x0: number;
-    y1: number;
-};
-
-class Edge {
-    public sign: number;
-    public x0: number;
-    public x1: number;
-    public y0: number;
-    public y1: number;
-
-    public constructor(x0: number, y0: number, x1: number, y1: number, sign: number) {
-        this.x0 = x0;
-        this.y0 = y0;
-        this.x1 = x1;
-        this.y1 = y1;
-        this.sign = sign;
-    }
-}
-
-export class RasterizerAliased {
+export class SoftwareRasterizerAliased {
     private activeEdges: ActiveEdge[];
-    private compositor: Compositor;
+    private compositor: SoftwareCompositor;
     private edges: Edge[];
     private height: number;
     private mask: Uint8Array;
     private width: number;
 
-    public constructor(compositor: Compositor) {
+    public constructor(compositor: SoftwareCompositor) {
         this.height = 0;
         this.width = 0;
 
@@ -186,7 +160,7 @@ export class RasterizerAliased {
         this.activeEdges = [];
     }
 
-    public setCompositor(compositor: Compositor): void {
+    public setCompositor(compositor: SoftwareCompositor): void {
         this.compositor = compositor;
         this.mask = compositor.mask;
     }
@@ -224,5 +198,31 @@ export class RasterizerAliased {
         if (i < right) {
             this.quicksort(i, right);
         }
+    }
+}
+
+type ActiveEdge = {
+    d: number;
+    d0: number;
+    inc: number;
+    m0: number;
+    sign: number;
+    x0: number;
+    y1: number;
+};
+
+class Edge {
+    public sign: number;
+    public x0: number;
+    public x1: number;
+    public y0: number;
+    public y1: number;
+
+    public constructor(x0: number, y0: number, x1: number, y1: number, sign: number) {
+        this.x0 = x0;
+        this.y0 = y0;
+        this.x1 = x1;
+        this.y1 = y1;
+        this.sign = sign;
     }
 }

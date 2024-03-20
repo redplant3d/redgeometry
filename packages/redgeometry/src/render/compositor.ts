@@ -1,8 +1,8 @@
 import type { ColorRgba } from "../primitives/color.js";
-import { CompositeOperation } from "../render/context.js";
-import type { Image2 } from "../render/image.js";
+import { CompositeOperation } from "./context.js";
+import type { Image2 } from "./image.js";
 
-export class Compositor {
+export class SoftwareCompositor {
     private buffer: Uint8Array;
     private sa: number;
     private sb: number;

@@ -4,41 +4,34 @@ import type { PathStroke2 } from "../core/path-stroke.js";
 import { Path2 } from "../core/path.js";
 import type { Matrix3A } from "../primitives/matrix.js";
 import { Point2 } from "../primitives/point.js";
-import {
-    FillRule,
-    StrokeTransformOrder,
-    type ContextFillOptions,
-    type ContextStrokeOptions,
-} from "../render/context.js";
-import type { Image2 } from "../render/image.js";
 import { clamp } from "../utility/scalar.js";
-import { Compositor } from "./compositor.js";
-import { RasterizerAliased } from "./rasterizer-aliased.js";
+import { SoftwareCompositor } from "./compositor.js";
+import { FillRule, StrokeTransformOrder, type ContextFillOptions, type ContextStrokeOptions } from "./context.js";
+import type { Image2 } from "./image.js";
+import { SoftwareRasterizerAliased } from "./rasterizer.js";
 
-class Rectangle2 {
-    public bottom: number;
-    public left: number;
-    public right: number;
-    public top: number;
-
-    public constructor(left: number, top: number, right: number, bottom: number) {
-        this.left = left;
-        this.top = top;
-        this.right = right;
-        this.bottom = bottom;
-    }
+export interface RenderPipeline {
+    addFill(path: Path2, mat: Matrix3A): void;
+    addStroke(path: Path2, mat: Matrix3A, options: ContextStrokeOptions): void;
+    begin(image: Image2): void;
+    clear(options: ContextFillOptions): void;
+    end(): void;
+    renderFill(options: ContextFillOptions): void;
+    renderStroke(options: ContextStrokeOptions): void;
+    rentPath(): Path2;
+    returnPath(_path: Path2): void;
 }
 
-export class PipelineSoftware {
+export class SoftwareRenderPipeline implements RenderPipeline {
     private clipRect: Rectangle2;
-    private compositor: Compositor;
+    private compositor: SoftwareCompositor;
     private pathFlatten: PathFlatten2;
     private pathStroke: PathStroke2;
-    private rasterizer: RasterizerAliased;
+    private rasterizer: SoftwareRasterizerAliased;
 
     public constructor() {
-        this.compositor = new Compositor();
-        this.rasterizer = new RasterizerAliased(this.compositor);
+        this.compositor = new SoftwareCompositor();
+        this.rasterizer = new SoftwareRasterizerAliased(this.compositor);
 
         this.clipRect = new Rectangle2(0, 0, 0, 0);
 
@@ -201,6 +194,20 @@ export class PipelineSoftware {
         this.pathFlatten.process(path, flattened, true);
 
         this.clipPolyline(flattened.getPoints(), this.clipRect);
+    }
+}
+
+class Rectangle2 {
+    public bottom: number;
+    public left: number;
+    public right: number;
+    public top: number;
+
+    public constructor(left: number, top: number, right: number, bottom: number) {
+        this.left = left;
+        this.top = top;
+        this.right = right;
+        this.bottom = bottom;
     }
 }
 
