@@ -1,6 +1,6 @@
-import type { DefaultSystemStage, WorldId } from "../ecs/types.js";
-import type { World } from "../ecs/world.js";
-import { assertUnreachable } from "../utility/debug.js";
+import type { DefaultSystemStage, WorldId } from "redgeometry/src/ecs/types";
+import type { World } from "redgeometry/src/ecs/world";
+import { assertUnreachable } from "redgeometry/src/utility/debug";
 
 export type InputSenderData = {
     dataId: "inputSender";

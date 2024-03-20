@@ -1,5 +1,4 @@
 import { Path2 } from "redgeometry/src/core/path";
-import { timePlugin, type TimeData } from "redgeometry/src/ecs-plugins/time";
 import type { WorldOptions } from "redgeometry/src/ecs/app";
 import type { DefaultSystemStage, DefaultWorldScheduleId } from "redgeometry/src/ecs/types";
 import {
@@ -21,7 +20,8 @@ import {
     type AppCanvasData,
     type AppInputElementData,
     type WindowResizeEvent,
-} from "../ecs.js";
+} from "../ecs/app.js";
+import { timePlugin, type TimeData } from "../ecs/time.js";
 import { ButtonInputElement, RangeInputElement, TextBoxInputElement } from "../input.js";
 
 export const ECS_TEST_MAIN_WORLD: WorldOptions = {

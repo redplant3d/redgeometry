@@ -1,12 +1,3 @@
-import {
-    KeyboardButtons,
-    MouseButtons,
-    inputReceiverPlugin,
-    inputSenderPlugin,
-    type InputData,
-    type InputSenderData,
-} from "redgeometry/src/ecs-plugins/input";
-import { timePlugin, type TimeData } from "redgeometry/src/ecs-plugins/time";
 import type { WorldOptions } from "redgeometry/src/ecs/app";
 import type { DefaultSystemStage, DefaultWorldScheduleId, EntityId } from "redgeometry/src/ecs/types";
 import type { World } from "redgeometry/src/ecs/world";
@@ -25,15 +16,24 @@ import {
     type AppData,
     type AppInputElementData,
     type WindowResizeEvent,
-} from "../ecs.js";
+} from "../ecs/app.js";
+import type { AssetData, AssetId } from "../ecs/asset.js";
+import type { CameraBundle, CameraComponent } from "../ecs/camera.js";
+import { gpuPlugin, type GPUData, type GPUInitData } from "../ecs/gpu.js";
+import {
+    KeyboardButtons,
+    MouseButtons,
+    inputReceiverPlugin,
+    inputSenderPlugin,
+    type InputData,
+    type InputSenderData,
+} from "../ecs/input.js";
+import type { Material } from "../ecs/material.js";
+import { meshRenderPlugin, type Mesh, type MeshBundle, type MeshRenderStateData } from "../ecs/mesh.js";
+import type { SceneData } from "../ecs/scene.js";
+import { timePlugin, type TimeData } from "../ecs/time.js";
+import { Visibility, type TransformComponent } from "../ecs/transform.js";
 import { ButtonInputElement, ComboBoxInputElement, RangeInputElement, TextBoxInputElement } from "../input.js";
-import type { AssetData, AssetId } from "../render-gpu/asset.js";
-import type { CameraBundle, CameraComponent } from "../render-gpu/camera.js";
-import { gpuPlugin, type GPUData, type GPUInitData } from "../render-gpu/gpu.js";
-import type { Material } from "../render-gpu/material.js";
-import { meshRenderPlugin, type Mesh, type MeshBundle, type MeshRenderStateData } from "../render-gpu/mesh.js";
-import type { SceneData } from "../render-gpu/scene.js";
-import { Visibility, type TransformComponent } from "../render-gpu/transform.js";
 
 export const WEBGPU_TEST_MAIN_WORLD: WorldOptions = {
     id: "webgpu-test-main",

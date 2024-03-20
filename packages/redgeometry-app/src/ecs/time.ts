@@ -1,5 +1,5 @@
-import type { DefaultSystemStage, WorldScheduleId } from "../ecs/types.js";
-import type { World } from "../ecs/world.js";
+import type { DefaultSystemStage, WorldScheduleId } from "redgeometry/src/ecs/types";
+import type { World } from "redgeometry/src/ecs/world";
 
 export type AnimationFrameData = {
     dataId: "animationFrame";
