@@ -1,4 +1,10 @@
-import type { ComponentIdsOf, DefaultSystemStage, EntityId } from "redgeometry/src/ecs/types";
+import type {
+    ComponentIdsOf,
+    DefaultSystemStage,
+    EntityId,
+    WorldPlugin,
+    WorldPluginId,
+} from "redgeometry/src/ecs/types";
 import type { World } from "redgeometry/src/ecs/world";
 import type { Matrix4 } from "redgeometry/src/primitives/matrix";
 import { type Float32Buffer, type NumberBuffer } from "redgeometry/src/utility/buffer";
@@ -64,27 +70,33 @@ export type MeshRenderStateData = {
     pipelineContext: GPUPipelineContext;
 };
 
-export function meshRenderPlugin(world: World): void {
-    world.registerData<MeshRenderStateData>("meshRenderState");
-    world.registerData<AssetData>("asset");
-    world.registerData<SceneData>("scene");
+export class MeshRenderPlugin implements WorldPlugin {
+    public get id(): WorldPluginId {
+        return "mesh-render";
+    }
 
-    world.addSystem<DefaultSystemStage>({ stage: "start-pre", fn: initAssets });
-    world.addSystem<DefaultSystemStage>({ stage: "start-post", fn: startMeshRenderSystem });
+    public setup(world: World): void {
+        world.registerData<MeshRenderStateData>("meshRenderState");
+        world.registerData<AssetData>("asset");
+        world.registerData<SceneData>("scene");
 
-    world.addSystem<DefaultSystemStage>({ stage: "update-post", fn: transformSystem });
-    world.addSystem<DefaultSystemStage>({ stage: "update-post", fn: cameraSystem });
-    world.addSystem<DefaultSystemStage>({ stage: "update-post", fn: meshRenderSystem });
+        world.addSystem<DefaultSystemStage>({ stage: "start-pre", fn: initAssets });
+        world.addSystem<DefaultSystemStage>({ stage: "start-post", fn: startMeshRenderSystem });
 
-    world.addDependency<DefaultSystemStage>({
-        stage: "start-post",
-        seq: [startGPUSystem, startMeshRenderSystem],
-    });
+        world.addSystem<DefaultSystemStage>({ stage: "update-post", fn: transformSystem });
+        world.addSystem<DefaultSystemStage>({ stage: "update-post", fn: cameraSystem });
+        world.addSystem<DefaultSystemStage>({ stage: "update-post", fn: meshRenderSystem });
 
-    world.addDependency<DefaultSystemStage>({
-        stage: "update-post",
-        seq: [transformSystem, cameraSystem, meshRenderSystem],
-    });
+        world.addDependency<DefaultSystemStage>({
+            stage: "start-post",
+            seq: [startGPUSystem, startMeshRenderSystem],
+        });
+
+        world.addDependency<DefaultSystemStage>({
+            stage: "update-post",
+            seq: [transformSystem, cameraSystem, meshRenderSystem],
+        });
+    }
 }
 
 export function initAssets(world: World): void {

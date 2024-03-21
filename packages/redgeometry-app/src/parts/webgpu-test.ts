@@ -1,5 +1,11 @@
 import type { WorldOptions } from "redgeometry/src/ecs/app";
-import type { DefaultSystemStage, DefaultWorldScheduleId, EntityId } from "redgeometry/src/ecs/types";
+import type {
+    DefaultSystemStage,
+    DefaultWorldScheduleId,
+    EntityId,
+    WorldPlugin,
+    WorldPluginId,
+} from "redgeometry/src/ecs/types";
 import type { World } from "redgeometry/src/ecs/world";
 import { DEFAULT_START_SCHEDULE, DEFAULT_STOP_SCHEDULE, DEFAULT_UPDATE_SCHEDULE } from "redgeometry/src/ecs/world";
 import { Matrix4 } from "redgeometry/src/primitives/matrix";
@@ -10,8 +16,8 @@ import { throwError } from "redgeometry/src/utility/debug";
 import { RandomXSR128, type Random } from "redgeometry/src/utility/random";
 import { createRandomColor, createRandomSeed } from "../data.js";
 import {
-    appMainPlugin,
-    appRemotePlugin,
+    AppMainPlugin,
+    AppRemotePlugin,
     type AppCanvasData,
     type AppData,
     type AppInputElementData,
@@ -19,77 +25,78 @@ import {
 } from "../ecs/app.js";
 import type { AssetData, AssetId } from "../ecs/asset.js";
 import type { CameraBundle, CameraComponent } from "../ecs/camera.js";
-import { gpuPlugin, type GPUData, type GPUInitData } from "../ecs/gpu.js";
+import { GPUPlugin, type GPUData, type GPUInitData } from "../ecs/gpu.js";
 import {
+    InputReceiverPlugin,
+    InputSenderPlugin,
     KeyboardButtons,
     MouseButtons,
-    inputReceiverPlugin,
-    inputSenderPlugin,
     type InputData,
     type InputSenderData,
 } from "../ecs/input.js";
 import type { Material } from "../ecs/material.js";
-import { meshRenderPlugin, type Mesh, type MeshBundle, type MeshRenderStateData } from "../ecs/mesh.js";
+import { MeshRenderPlugin, type Mesh, type MeshBundle, type MeshRenderStateData } from "../ecs/mesh.js";
 import type { SceneData } from "../ecs/scene.js";
-import { timePlugin, type TimeData } from "../ecs/time.js";
+import { TimePlugin, type TimeData } from "../ecs/time.js";
 import { Visibility, type TransformComponent } from "../ecs/transform.js";
 import { ButtonInputElement, ComboBoxInputElement, RangeInputElement, TextBoxInputElement } from "../input.js";
 
-export const WEBGPU_TEST_MAIN_WORLD: WorldOptions = {
-    id: "webgpu-test-main",
-    plugins: [appMainPlugin, mainPlugin, inputSenderPlugin, timePlugin],
-    schedules: [DEFAULT_START_SCHEDULE, DEFAULT_UPDATE_SCHEDULE, DEFAULT_STOP_SCHEDULE],
-};
-export const WEBGPU_TEST_REMOTE_WORLD: WorldOptions = {
-    id: "webgpu-test-remote",
-    plugins: [appRemotePlugin, remotePlugin, inputReceiverPlugin, gpuPlugin, meshRenderPlugin],
-    schedules: [DEFAULT_START_SCHEDULE, DEFAULT_UPDATE_SCHEDULE, DEFAULT_STOP_SCHEDULE],
-};
+class MainPlugin implements WorldPlugin {
+    public get id(): WorldPluginId {
+        return "main";
+    }
 
-function mainPlugin(world: World): void {
-    world.registerData<AppMainData>("appMain");
-    world.registerData<AppStateData>("appState");
-    world.registerEvent<AppCommandEvent>("appCommand");
+    public setup(world: World): void {
+        world.registerData<AppMainData>("appMain");
+        world.registerData<AppStateData>("appState");
+        world.registerEvent<AppCommandEvent>("appCommand");
 
-    world.addSystem<DefaultSystemStage>({ stage: "start", fn: addInputElementsSystem });
-    world.addSystem<DefaultSystemStage>({ stage: "start", fn: writeStateSystem });
-    world.addSystem<DefaultSystemStage>({ stage: "start", fn: initMainSystem, awaitMode: "dependency" });
-    world.addSystem<DefaultSystemStage>({ stage: "start", fn: waitSystem });
+        world.addSystem<DefaultSystemStage>({ stage: "start", fn: addInputElementsSystem });
+        world.addSystem<DefaultSystemStage>({ stage: "start", fn: writeStateSystem });
+        world.addSystem<DefaultSystemStage>({ stage: "start", fn: initMainSystem, awaitMode: "dependency" });
+        world.addSystem<DefaultSystemStage>({ stage: "start", fn: waitSystem });
 
-    world.addSystem<DefaultSystemStage>({ stage: "update", fn: writeStateSystem });
-    world.addSystem<DefaultSystemStage>({ stage: "update", fn: mainSystem, awaitMode: "dependency" });
-    world.addSystem<DefaultSystemStage>({ stage: "update", fn: waitSystem });
+        world.addSystem<DefaultSystemStage>({ stage: "update", fn: writeStateSystem });
+        world.addSystem<DefaultSystemStage>({ stage: "update", fn: mainSystem, awaitMode: "dependency" });
+        world.addSystem<DefaultSystemStage>({ stage: "update", fn: waitSystem });
 
-    world.addDependency<DefaultSystemStage>({
-        stage: "start",
-        seq: [addInputElementsSystem, writeStateSystem, initMainSystem, waitSystem],
-    });
-    world.addDependency<DefaultSystemStage>({
-        stage: "update",
-        seq: [writeStateSystem, mainSystem, waitSystem],
-    });
+        world.addDependency<DefaultSystemStage>({
+            stage: "start",
+            seq: [addInputElementsSystem, writeStateSystem, initMainSystem, waitSystem],
+        });
+        world.addDependency<DefaultSystemStage>({
+            stage: "update",
+            seq: [writeStateSystem, mainSystem, waitSystem],
+        });
+    }
 }
 
-function remotePlugin(world: World): void {
-    world.registerData<AppRemoteData>("appRemote");
-    world.registerData<AppStateData>("appState");
-    world.registerEvent<AppCommandEvent>("appCommand");
+class RemotePlugin implements WorldPlugin {
+    public get id(): WorldPluginId {
+        return "remote";
+    }
 
-    world.addSystem<DefaultSystemStage>({ stage: "start", fn: initRemoteSystem });
-    world.addSystem<DefaultSystemStage>({ stage: "start", fn: initAssetSystem });
+    public setup(world: World): void {
+        world.registerData<AppRemoteData>("appRemote");
+        world.registerData<AppStateData>("appState");
+        world.registerEvent<AppCommandEvent>("appCommand");
 
-    world.addSystem<DefaultSystemStage>({ stage: "update", fn: cameraMoveSystem });
-    world.addSystem<DefaultSystemStage>({ stage: "update", fn: beginFrameSystem });
-    world.addSystem<DefaultSystemStage>({ stage: "update", fn: spawnSystem });
+        world.addSystem<DefaultSystemStage>({ stage: "start", fn: initRemoteSystem });
+        world.addSystem<DefaultSystemStage>({ stage: "start", fn: initAssetSystem });
 
-    world.addDependency<DefaultSystemStage>({
-        stage: "start",
-        seq: [initRemoteSystem, initAssetSystem],
-    });
-    world.addDependency<DefaultSystemStage>({
-        stage: "update",
-        seq: [cameraMoveSystem, beginFrameSystem, spawnSystem],
-    });
+        world.addSystem<DefaultSystemStage>({ stage: "update", fn: cameraMoveSystem });
+        world.addSystem<DefaultSystemStage>({ stage: "update", fn: beginFrameSystem });
+        world.addSystem<DefaultSystemStage>({ stage: "update", fn: spawnSystem });
+
+        world.addDependency<DefaultSystemStage>({
+            stage: "start",
+            seq: [initRemoteSystem, initAssetSystem],
+        });
+        world.addDependency<DefaultSystemStage>({
+            stage: "update",
+            seq: [cameraMoveSystem, beginFrameSystem, spawnSystem],
+        });
+    }
 }
 
 type AppMainData = {
@@ -415,7 +422,7 @@ function spawnSystem(world: World): void {
     }
 }
 
-export function cameraMoveSystem(world: World): void {
+function cameraMoveSystem(world: World): void {
     const { keyboard, mouse } = world.readData<InputData>("input");
     const { fov } = world.readData<AppStateData>("appState");
     const { mainCamera } = world.readData<SceneData>("scene");
@@ -484,3 +491,21 @@ export function cameraMoveSystem(world: World): void {
 
     camera.projection = camProj;
 }
+
+export const WEBGPU_TEST_MAIN_WORLD: WorldOptions = {
+    id: "main",
+    plugins: [new AppMainPlugin(), new MainPlugin(), new InputSenderPlugin(), new TimePlugin()],
+    schedules: [DEFAULT_START_SCHEDULE, DEFAULT_UPDATE_SCHEDULE, DEFAULT_STOP_SCHEDULE],
+};
+
+export const WEBGPU_TEST_REMOTE_WORLD: WorldOptions = {
+    id: "remote",
+    plugins: [
+        new AppRemotePlugin(),
+        new RemotePlugin(),
+        new InputReceiverPlugin(),
+        new GPUPlugin(),
+        new MeshRenderPlugin(),
+    ],
+    schedules: [DEFAULT_START_SCHEDULE, DEFAULT_UPDATE_SCHEDULE, DEFAULT_STOP_SCHEDULE],
+};

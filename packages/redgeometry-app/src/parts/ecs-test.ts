@@ -1,6 +1,6 @@
 import { Path2 } from "redgeometry/src/core/path";
 import type { WorldOptions } from "redgeometry/src/ecs/app";
-import type { DefaultSystemStage, DefaultWorldScheduleId } from "redgeometry/src/ecs/types";
+import type { DefaultSystemStage, DefaultWorldScheduleId, WorldPlugin, WorldPluginId } from "redgeometry/src/ecs/types";
 import {
     ChangeFlags,
     DEFAULT_START_SCHEDULE,
@@ -15,83 +15,84 @@ import { RandomXSR128, type Random } from "redgeometry/src/utility/random";
 import { AppContext2D } from "../context.js";
 import { createRandomSeed } from "../data.js";
 import {
-    appMainPlugin,
-    appRemotePlugin,
+    AppMainPlugin,
+    AppRemotePlugin,
     type AppCanvasData,
     type AppInputElementData,
     type WindowResizeEvent,
 } from "../ecs/app.js";
-import { timePlugin, type TimeData } from "../ecs/time.js";
+import { TimePlugin, type TimeData } from "../ecs/time.js";
 import { ButtonInputElement, RangeInputElement, TextBoxInputElement } from "../input.js";
 
-export const ECS_TEST_MAIN_WORLD: WorldOptions = {
-    id: "ecs-test-main",
-    plugins: [appMainPlugin, mainPlugin, timePlugin],
-    schedules: [DEFAULT_START_SCHEDULE, DEFAULT_UPDATE_SCHEDULE, DEFAULT_STOP_SCHEDULE],
-};
-export const ECS_TEST_REMOTE_WORLD: WorldOptions = {
-    id: "ecs-test-remote",
-    plugins: [appRemotePlugin, remotePlugin],
-    schedules: [DEFAULT_START_SCHEDULE, DEFAULT_UPDATE_SCHEDULE, DEFAULT_STOP_SCHEDULE],
-};
+class MainPlugin implements WorldPlugin {
+    public get id(): WorldPluginId {
+        return "main";
+    }
 
-function mainPlugin(world: World): void {
-    world.registerData<AppMainData>("appMain");
-    world.registerData<AppStateData>("appState");
-    world.registerEvent<AppCommandEvent>("appCommand");
+    public setup(world: World): void {
+        world.registerData<AppMainData>("appMain");
+        world.registerData<AppStateData>("appState");
+        world.registerEvent<AppCommandEvent>("appCommand");
 
-    world.addSystem<DefaultSystemStage>({ stage: "start", fn: addInputElementsSystem });
-    world.addSystem<DefaultSystemStage>({ stage: "start", fn: writeStateSystem });
-    world.addSystem<DefaultSystemStage>({ stage: "start", fn: initMainSystem, awaitMode: "dependency" });
+        world.addSystem<DefaultSystemStage>({ stage: "start", fn: addInputElementsSystem });
+        world.addSystem<DefaultSystemStage>({ stage: "start", fn: writeStateSystem });
+        world.addSystem<DefaultSystemStage>({ stage: "start", fn: initMainSystem, awaitMode: "dependency" });
 
-    world.addSystem<DefaultSystemStage>({ stage: "update", fn: writeStateSystem });
-    world.addSystem<DefaultSystemStage>({ stage: "update", fn: mainSystem, awaitMode: "dependency" });
+        world.addSystem<DefaultSystemStage>({ stage: "update", fn: writeStateSystem });
+        world.addSystem<DefaultSystemStage>({ stage: "update", fn: mainSystem, awaitMode: "dependency" });
 
-    world.addDependency<DefaultSystemStage>({
-        stage: "start",
-        seq: [addInputElementsSystem, writeStateSystem, initMainSystem],
-    });
-    world.addDependency<DefaultSystemStage>({
-        stage: "update",
-        seq: [writeStateSystem, mainSystem],
-    });
+        world.addDependency<DefaultSystemStage>({
+            stage: "start",
+            seq: [addInputElementsSystem, writeStateSystem, initMainSystem],
+        });
+        world.addDependency<DefaultSystemStage>({
+            stage: "update",
+            seq: [writeStateSystem, mainSystem],
+        });
+    }
 }
 
-function remotePlugin(world: World): void {
-    world.registerData<AppRemoteData>("appRemote");
-    world.registerData<AppStateData>("appState");
-    world.registerEvent<AppCommandEvent>("appCommand");
+class RemotePlugin implements WorldPlugin {
+    public get id(): WorldPluginId {
+        return "remote";
+    }
 
-    world.registerSerializable(Vector2);
-    world.registerSerializable(Point2);
+    public setup(world: World): void {
+        world.registerData<AppRemoteData>("appRemote");
+        world.registerData<AppStateData>("appState");
+        world.registerEvent<AppCommandEvent>("appCommand");
 
-    world.addSystem<DefaultSystemStage>({ stage: "start", fn: initRemoteSystem });
+        world.registerSerializable(Vector2);
+        world.registerSerializable(Point2);
 
-    world.addSystems<DefaultSystemStage>({
-        stage: "update",
-        fns: [
-            spawnSystem,
-            movementSystem,
-            commandEventSystem,
-            clearRenderSystem,
-            circleRenderSystem,
-            rectangleRenderSystem,
-            notificationSystem,
-        ],
-    });
+        world.addSystem<DefaultSystemStage>({ stage: "start", fn: initRemoteSystem });
 
-    world.addDependency<DefaultSystemStage>({
-        stage: "update",
-        seq: [commandEventSystem, spawnSystem, movementSystem, clearRenderSystem],
-    });
-    world.addDependency<DefaultSystemStage>({
-        stage: "update",
-        seq: [clearRenderSystem, rectangleRenderSystem, circleRenderSystem],
-    });
-    world.addDependency<DefaultSystemStage>({
-        stage: "update",
-        seq: [spawnSystem, notificationSystem],
-    });
+        world.addSystems<DefaultSystemStage>({
+            stage: "update",
+            fns: [
+                spawnSystem,
+                movementSystem,
+                commandEventSystem,
+                clearRenderSystem,
+                circleRenderSystem,
+                rectangleRenderSystem,
+                notificationSystem,
+            ],
+        });
+
+        world.addDependency<DefaultSystemStage>({
+            stage: "update",
+            seq: [commandEventSystem, spawnSystem, movementSystem, clearRenderSystem],
+        });
+        world.addDependency<DefaultSystemStage>({
+            stage: "update",
+            seq: [clearRenderSystem, rectangleRenderSystem, circleRenderSystem],
+        });
+        world.addDependency<DefaultSystemStage>({
+            stage: "update",
+            seq: [spawnSystem, notificationSystem],
+        });
+    }
 }
 
 type AppMainData = {
@@ -468,3 +469,14 @@ function notificationSystem(world: World): void {
         log.info("created = {}, deleted = {}", createdCount, deletedCount);
     }
 }
+
+export const ECS_TEST_MAIN_WORLD: WorldOptions = {
+    id: "main",
+    plugins: [new AppMainPlugin(), new MainPlugin(), new TimePlugin()],
+    schedules: [DEFAULT_START_SCHEDULE, DEFAULT_UPDATE_SCHEDULE, DEFAULT_STOP_SCHEDULE],
+};
+export const ECS_TEST_REMOTE_WORLD: WorldOptions = {
+    id: "remote",
+    plugins: [new AppRemotePlugin(), new RemotePlugin()],
+    schedules: [DEFAULT_START_SCHEDULE, DEFAULT_UPDATE_SCHEDULE, DEFAULT_STOP_SCHEDULE],
+};

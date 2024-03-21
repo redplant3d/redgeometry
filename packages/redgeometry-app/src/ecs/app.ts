@@ -1,25 +1,37 @@
-import type { DefaultSystemStage } from "redgeometry/src/ecs/types";
+import type { DefaultSystemStage, WorldPlugin, WorldPluginId } from "redgeometry/src/ecs/types";
 import type { World } from "redgeometry/src/ecs/world";
 import type { AppInputElement } from "../input.js";
 import type { TimeData } from "./time.js";
 
-export function appMainPlugin(world: World): void {
-    world.registerData<AppData>("app");
-    world.registerData<AppInputElementData>("appInputElement");
-    world.registerData<AppCanvasData>("appCanvas");
+export class AppMainPlugin implements WorldPlugin {
+    public get id(): WorldPluginId {
+        return "app-main";
+    }
 
-    world.registerEvent<WindowResizeEvent>("windowResize");
+    public setup(world: World): void {
+        world.registerData<AppData>("app");
+        world.registerData<AppInputElementData>("appInputElement");
+        world.registerData<AppCanvasData>("appCanvas");
 
-    world.addSystem<DefaultSystemStage>({ stage: "start-pre", fn: initAppSystem });
-    world.addSystem<DefaultSystemStage>({ stage: "start-post", fn: initInputElementsSystem });
+        world.registerEvent<WindowResizeEvent>("windowResize");
+
+        world.addSystem<DefaultSystemStage>({ stage: "start-pre", fn: initAppSystem });
+        world.addSystem<DefaultSystemStage>({ stage: "start-post", fn: initInputElementsSystem });
+    }
 }
 
-export function appRemotePlugin(world: World): void {
-    world.registerData<AppCanvasData>("appCanvas");
-    world.registerData<TimeData>("time");
-    world.registerEvent<WindowResizeEvent>("windowResize");
+export class AppRemotePlugin implements WorldPlugin {
+    public get id(): WorldPluginId {
+        return "app-remote";
+    }
 
-    world.addSystem<DefaultSystemStage>({ stage: "update-pre", fn: resizeWindowSystem });
+    public setup(world: World): void {
+        world.registerData<AppCanvasData>("appCanvas");
+        world.registerData<TimeData>("time");
+        world.registerEvent<WindowResizeEvent>("windowResize");
+
+        world.addSystem<DefaultSystemStage>({ stage: "update-pre", fn: resizeWindowSystem });
+    }
 }
 
 export type AppData = {

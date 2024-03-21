@@ -123,7 +123,7 @@ export class World {
 
     public addPlugins<T extends WorldPlugin>(plugins: T[]): void {
         for (const plugin of plugins) {
-            this.plugins.set(plugin.name, plugin);
+            this.plugins.set(plugin.id, plugin);
         }
     }
 
@@ -250,7 +250,7 @@ export class World {
 
     public init(): void {
         for (const plugin of this.plugins.values()) {
-            plugin(this);
+            plugin.setup(this);
         }
 
         for (const schedule of this.schedules.values()) {

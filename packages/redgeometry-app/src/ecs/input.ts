@@ -1,4 +1,4 @@
-import type { DefaultSystemStage, WorldId } from "redgeometry/src/ecs/types";
+import type { DefaultSystemStage, WorldId, WorldPlugin, WorldPluginId } from "redgeometry/src/ecs/types";
 import type { World } from "redgeometry/src/ecs/world";
 import { assertUnreachable } from "redgeometry/src/utility/debug";
 
@@ -96,22 +96,34 @@ const KEYBOARD_BUTTONS_LOOKUP: Record<string, KeyboardButtons> = {
     ShiftLeft: KeyboardButtons.ShiftLeft,
 };
 
-export function inputSenderPlugin(world: World): void {
-    world.registerData<InputEventsData>("inputEvents");
-    world.registerData<InputSenderData>("inputSender");
+export class InputSenderPlugin implements WorldPlugin {
+    public get id(): WorldPluginId {
+        return "input-sender";
+    }
 
-    world.addSystem<DefaultSystemStage>({ stage: "start-post", fn: startInputSenderSystem });
+    public setup(world: World): void {
+        world.registerData<InputEventsData>("inputEvents");
+        world.registerData<InputSenderData>("inputSender");
 
-    world.addSystem<DefaultSystemStage>({ stage: "update-pre", fn: updateInputSenderSystem });
+        world.addSystem<DefaultSystemStage>({ stage: "start-post", fn: startInputSenderSystem });
+
+        world.addSystem<DefaultSystemStage>({ stage: "update-pre", fn: updateInputSenderSystem });
+    }
 }
 
-export function inputReceiverPlugin(world: World): void {
-    world.registerEvent<InputDataEvent>("inputData");
-    world.registerData<InputData>("input");
+export class InputReceiverPlugin implements WorldPlugin {
+    public get id(): WorldPluginId {
+        return "input-receiver";
+    }
 
-    world.addSystem<DefaultSystemStage>({ stage: "start-pre", fn: startInputReceiverSystem });
+    public setup(world: World): void {
+        world.registerEvent<InputDataEvent>("inputData");
+        world.registerData<InputData>("input");
 
-    world.addSystem<DefaultSystemStage>({ stage: "update-pre", fn: updateInputReceiverSystem });
+        world.addSystem<DefaultSystemStage>({ stage: "start-pre", fn: startInputReceiverSystem });
+
+        world.addSystem<DefaultSystemStage>({ stage: "update-pre", fn: updateInputReceiverSystem });
+    }
 }
 
 export function startInputSenderSystem(world: World): void {

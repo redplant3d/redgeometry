@@ -38,7 +38,13 @@ export type DefaultSystemStage =
     | "stop-post";
 
 // Plugin
-export type WorldPlugin = (world: World) => void;
+export type WorldPluginId = string;
+
+export interface WorldPlugin {
+    id: WorldPluginId;
+
+    setup(world: World): void;
+}
 
 // World
 export type WorldId = string;

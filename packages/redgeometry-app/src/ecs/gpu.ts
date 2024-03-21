@@ -1,3 +1,4 @@
+import type { WorldPlugin, WorldPluginId } from "redgeometry/src/ecs/types";
 import type { World } from "redgeometry/src/ecs/world";
 import { assert } from "redgeometry/src/utility/debug";
 
@@ -18,11 +19,17 @@ export type GPUData = {
     gpu: GPU;
 };
 
-export function gpuPlugin(world: World): void {
-    world.registerData<GPUInitData>("gpuInit");
-    world.registerData<GPUData>("gpu");
+export class GPUPlugin implements WorldPlugin {
+    public get id(): WorldPluginId {
+        return "gpu";
+    }
 
-    world.addSystem({ stage: "start-post", fn: startGPUSystem, awaitMode: "dependency" });
+    public setup(world: World): void {
+        world.registerData<GPUInitData>("gpuInit");
+        world.registerData<GPUData>("gpu");
+
+        world.addSystem({ stage: "start-post", fn: startGPUSystem, awaitMode: "dependency" });
+    }
 }
 
 export async function startGPUSystem(world: World): Promise<void> {
