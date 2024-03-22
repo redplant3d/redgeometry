@@ -19,7 +19,7 @@ import type {
     SystemStage,
     WorldGroupId,
     WorldId,
-    WorldPlugin,
+    WorldModule,
     WorldScheduleId,
 } from "./types.js";
 import { World, type WorldScheduleOptions } from "./world.js";
@@ -29,7 +29,7 @@ export type WorldOptions<
     U extends SystemStage = DefaultSystemStage,
 > = {
     id: WorldId;
-    plugins: WorldPlugin[];
+    modules: WorldModule[];
     schedules: WorldScheduleOptions<T, U>[];
 };
 
@@ -133,7 +133,7 @@ export class App {
             log.infoDebug("{} >> Created local world '{}'", groupOptions.id, worldOptions.id);
 
             const world = new World();
-            world.addPlugins(worldOptions.plugins);
+            world.addModules(worldOptions.modules);
             world.addSchedules(worldOptions.schedules);
             world.init();
 

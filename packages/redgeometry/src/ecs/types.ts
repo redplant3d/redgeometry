@@ -6,11 +6,10 @@ export type EntityId = Nominal<number, "EntityId">;
 
 // Component
 export type ComponentId = string;
+export type Component = { componentId: ComponentId };
 
 export type ComponentIdOf<T extends Component> = T["componentId"];
 export type ComponentIdsOf<T extends Component[]> = { [P in keyof T]: ComponentIdOf<T[P]> };
-
-export type Component = { componentId: ComponentId };
 
 // System
 export type SystemSync = (world: World) => void;
@@ -37,27 +36,34 @@ export type DefaultSystemStage =
     | "stop"
     | "stop-post";
 
-// Plugin
-export type WorldPluginId = string;
-
-export interface WorldPlugin {
-    id: WorldPluginId;
-
-    setup(world: World): void;
-}
-
 // World
 export type WorldId = string;
 export type WorldGroupId = string;
 
+// World module
+export type WorldModuleId = string;
+
+export interface WorldModule {
+    moduleId: WorldModuleId;
+    setup(world: World): void;
+}
+
+// World plugin
+export type WorldPluginId = string;
+export type WorldPlugin = { pluginId: WorldPluginId };
+
+export type WorldPluginIdOf<T extends WorldPlugin> = T["pluginId"];
+
 // World data
 export type WorldDataId = string;
 export type WorldData = { dataId: WorldDataId };
+
 export type WorldDataIdOf<T extends WorldData> = T["dataId"];
 
 // World event
 export type WorldEventId = string;
 export type WorldEvent = { eventId: WorldEventId };
+
 export type WorldEventIdOf<T extends WorldEvent> = T["eventId"];
 
 // World schedule

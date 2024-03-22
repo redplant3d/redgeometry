@@ -3,8 +3,8 @@ import type {
     DefaultSystemStage,
     DefaultWorldScheduleId,
     EntityId,
-    WorldPlugin,
-    WorldPluginId,
+    WorldModule,
+    WorldModuleId,
 } from "redgeometry/src/ecs/types";
 import type { World } from "redgeometry/src/ecs/world";
 import { DEFAULT_START_SCHEDULE, DEFAULT_STOP_SCHEDULE, DEFAULT_UPDATE_SCHEDULE } from "redgeometry/src/ecs/world";
@@ -16,8 +16,8 @@ import { throwError } from "redgeometry/src/utility/debug";
 import { RandomXSR128, type Random } from "redgeometry/src/utility/random";
 import { createRandomColor, createRandomSeed } from "../data.js";
 import {
-    AppMainPlugin,
-    AppRemotePlugin,
+    AppMainModule,
+    AppRemoteModule,
     type AppCanvasData,
     type AppData,
     type AppInputElementData,
@@ -25,24 +25,24 @@ import {
 } from "../ecs/app.js";
 import type { AssetData, AssetId } from "../ecs/asset.js";
 import type { CameraBundle, CameraComponent } from "../ecs/camera.js";
-import { GPUPlugin, type GPUData, type GPUInitData } from "../ecs/gpu.js";
+import { GPUModule, type GPUData, type GPUInitData } from "../ecs/gpu.js";
 import {
-    InputReceiverPlugin,
-    InputSenderPlugin,
+    InputReceiverModule,
+    InputSenderModule,
     KeyboardButtons,
     MouseButtons,
     type InputData,
     type InputSenderData,
 } from "../ecs/input.js";
 import type { Material } from "../ecs/material.js";
-import { MeshRenderPlugin, type Mesh, type MeshBundle, type MeshRenderStateData } from "../ecs/mesh.js";
+import { MeshRenderModule, type Mesh, type MeshBundle, type MeshRenderStateData } from "../ecs/mesh.js";
 import type { SceneData } from "../ecs/scene.js";
-import { TimePlugin, type TimeData } from "../ecs/time.js";
+import { TimeModule, type TimeData } from "../ecs/time.js";
 import { Visibility, type TransformComponent } from "../ecs/transform.js";
 import { ButtonInputElement, ComboBoxInputElement, RangeInputElement, TextBoxInputElement } from "../input.js";
 
-class MainPlugin implements WorldPlugin {
-    public get id(): WorldPluginId {
+class MainModule implements WorldModule {
+    public get moduleId(): WorldModuleId {
         return "main";
     }
 
@@ -71,8 +71,8 @@ class MainPlugin implements WorldPlugin {
     }
 }
 
-class RemotePlugin implements WorldPlugin {
-    public get id(): WorldPluginId {
+class RemoteModule implements WorldModule {
+    public get moduleId(): WorldModuleId {
         return "remote";
     }
 
@@ -494,18 +494,18 @@ function cameraMoveSystem(world: World): void {
 
 export const WEBGPU_TEST_MAIN_WORLD: WorldOptions = {
     id: "main",
-    plugins: [new AppMainPlugin(), new MainPlugin(), new InputSenderPlugin(), new TimePlugin()],
+    modules: [new AppMainModule(), new MainModule(), new InputSenderModule(), new TimeModule()],
     schedules: [DEFAULT_START_SCHEDULE, DEFAULT_UPDATE_SCHEDULE, DEFAULT_STOP_SCHEDULE],
 };
 
 export const WEBGPU_TEST_REMOTE_WORLD: WorldOptions = {
     id: "remote",
-    plugins: [
-        new AppRemotePlugin(),
-        new RemotePlugin(),
-        new InputReceiverPlugin(),
-        new GPUPlugin(),
-        new MeshRenderPlugin(),
+    modules: [
+        new AppRemoteModule(),
+        new RemoteModule(),
+        new InputReceiverModule(),
+        new GPUModule(),
+        new MeshRenderModule(),
     ],
     schedules: [DEFAULT_START_SCHEDULE, DEFAULT_UPDATE_SCHEDULE, DEFAULT_STOP_SCHEDULE],
 };

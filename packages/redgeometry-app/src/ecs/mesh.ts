@@ -2,8 +2,8 @@ import type {
     ComponentIdsOf,
     DefaultSystemStage,
     EntityId,
-    WorldPlugin,
-    WorldPluginId,
+    WorldModule,
+    WorldModuleId,
 } from "redgeometry/src/ecs/types";
 import type { World } from "redgeometry/src/ecs/world";
 import type { Matrix4 } from "redgeometry/src/primitives/matrix";
@@ -70,8 +70,8 @@ export type MeshRenderStateData = {
     pipelineContext: GPUPipelineContext;
 };
 
-export class MeshRenderPlugin implements WorldPlugin {
-    public get id(): WorldPluginId {
+export class MeshRenderModule implements WorldModule {
+    public get moduleId(): WorldModuleId {
         return "mesh-render";
     }
 

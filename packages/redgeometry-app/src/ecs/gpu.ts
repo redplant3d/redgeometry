@@ -1,4 +1,4 @@
-import type { WorldPlugin, WorldPluginId } from "redgeometry/src/ecs/types";
+import type { WorldModule, WorldModuleId } from "redgeometry/src/ecs/types";
 import type { World } from "redgeometry/src/ecs/world";
 import { assert } from "redgeometry/src/utility/debug";
 
@@ -19,8 +19,8 @@ export type GPUData = {
     gpu: GPU;
 };
 
-export class GPUPlugin implements WorldPlugin {
-    public get id(): WorldPluginId {
+export class GPUModule implements WorldModule {
+    public get moduleId(): WorldModuleId {
         return "gpu";
     }
 

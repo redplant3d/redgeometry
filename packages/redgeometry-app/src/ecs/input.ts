@@ -1,4 +1,4 @@
-import type { DefaultSystemStage, WorldId, WorldPlugin, WorldPluginId } from "redgeometry/src/ecs/types";
+import type { DefaultSystemStage, WorldId, WorldModule, WorldModuleId } from "redgeometry/src/ecs/types";
 import type { World } from "redgeometry/src/ecs/world";
 import { assertUnreachable } from "redgeometry/src/utility/debug";
 
@@ -96,8 +96,8 @@ const KEYBOARD_BUTTONS_LOOKUP: Record<string, KeyboardButtons> = {
     ShiftLeft: KeyboardButtons.ShiftLeft,
 };
 
-export class InputSenderPlugin implements WorldPlugin {
-    public get id(): WorldPluginId {
+export class InputSenderModule implements WorldModule {
+    public get moduleId(): WorldModuleId {
         return "input-sender";
     }
 
@@ -111,8 +111,8 @@ export class InputSenderPlugin implements WorldPlugin {
     }
 }
 
-export class InputReceiverPlugin implements WorldPlugin {
-    public get id(): WorldPluginId {
+export class InputReceiverModule implements WorldModule {
+    public get moduleId(): WorldModuleId {
         return "input-receiver";
     }
 

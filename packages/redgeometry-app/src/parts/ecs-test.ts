@@ -1,6 +1,6 @@
 import { Path2 } from "redgeometry/src/core/path";
 import type { WorldOptions } from "redgeometry/src/ecs/app";
-import type { DefaultSystemStage, DefaultWorldScheduleId, WorldPlugin, WorldPluginId } from "redgeometry/src/ecs/types";
+import type { DefaultSystemStage, DefaultWorldScheduleId, WorldModule, WorldModuleId } from "redgeometry/src/ecs/types";
 import {
     ChangeFlags,
     DEFAULT_START_SCHEDULE,
@@ -15,17 +15,17 @@ import { RandomXSR128, type Random } from "redgeometry/src/utility/random";
 import { AppContext2D } from "../context.js";
 import { createRandomSeed } from "../data.js";
 import {
-    AppMainPlugin,
-    AppRemotePlugin,
+    AppMainModule,
+    AppRemoteModule,
     type AppCanvasData,
     type AppInputElementData,
     type WindowResizeEvent,
 } from "../ecs/app.js";
-import { TimePlugin, type TimeData } from "../ecs/time.js";
+import { TimeModule, type TimeData } from "../ecs/time.js";
 import { ButtonInputElement, RangeInputElement, TextBoxInputElement } from "../input.js";
 
-class MainPlugin implements WorldPlugin {
-    public get id(): WorldPluginId {
+class MainModule implements WorldModule {
+    public get moduleId(): WorldModuleId {
         return "main";
     }
 
@@ -52,8 +52,8 @@ class MainPlugin implements WorldPlugin {
     }
 }
 
-class RemotePlugin implements WorldPlugin {
-    public get id(): WorldPluginId {
+class RemoteModule implements WorldModule {
+    public get moduleId(): WorldModuleId {
         return "remote";
     }
 
@@ -472,11 +472,11 @@ function notificationSystem(world: World): void {
 
 export const ECS_TEST_MAIN_WORLD: WorldOptions = {
     id: "main",
-    plugins: [new AppMainPlugin(), new MainPlugin(), new TimePlugin()],
+    modules: [new AppMainModule(), new MainModule(), new TimeModule()],
     schedules: [DEFAULT_START_SCHEDULE, DEFAULT_UPDATE_SCHEDULE, DEFAULT_STOP_SCHEDULE],
 };
 export const ECS_TEST_REMOTE_WORLD: WorldOptions = {
     id: "remote",
-    plugins: [new AppRemotePlugin(), new RemotePlugin()],
+    modules: [new AppRemoteModule(), new RemoteModule()],
     schedules: [DEFAULT_START_SCHEDULE, DEFAULT_UPDATE_SCHEDULE, DEFAULT_STOP_SCHEDULE],
 };

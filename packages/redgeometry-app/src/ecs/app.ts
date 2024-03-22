@@ -1,10 +1,10 @@
-import type { DefaultSystemStage, WorldPlugin, WorldPluginId } from "redgeometry/src/ecs/types";
+import type { DefaultSystemStage, WorldModule, WorldModuleId } from "redgeometry/src/ecs/types";
 import type { World } from "redgeometry/src/ecs/world";
 import type { AppInputElement } from "../input.js";
 import type { TimeData } from "./time.js";
 
-export class AppMainPlugin implements WorldPlugin {
-    public get id(): WorldPluginId {
+export class AppMainModule implements WorldModule {
+    public get moduleId(): WorldModuleId {
         return "app-main";
     }
 
@@ -20,8 +20,8 @@ export class AppMainPlugin implements WorldPlugin {
     }
 }
 
-export class AppRemotePlugin implements WorldPlugin {
-    public get id(): WorldPluginId {
+export class AppRemoteModule implements WorldModule {
+    public get moduleId(): WorldModuleId {
         return "app-remote";
     }
 

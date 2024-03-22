@@ -30,7 +30,11 @@ import type {
     WorldEventId,
     WorldEventIdOf,
     WorldId,
+    WorldModule,
+    WorldModuleId,
     WorldPlugin,
+    WorldPluginId,
+    WorldPluginIdOf,
     WorldScheduleId,
 } from "./types.js";
 
@@ -89,23 +93,23 @@ export class World {
     private data: Map<WorldDataId, WorldData | undefined>;
     private ecStorage: EntityComponentStorage;
     private events: Map<WorldEventId, WorldEvent[]>;
-    private plugins: Map<string, WorldPlugin>;
+    private modules: Map<WorldModuleId, WorldModule>;
+    private plugins: Map<WorldPluginId, WorldPlugin | undefined>;
     private schedules: Map<SystemStage, SystemSchedule>;
     private serializationMap: SerializationMap;
     private stages: Map<WorldScheduleId, SystemSchedule[]>;
 
     public constructor() {
         this.serializationMap = new SerializationMap([...DEFAULT_SERIALIZATION_MAPPING]);
+        this.ecStorage = new EntityComponentStorage();
 
+        this.channels = new Map();
         this.data = new Map();
         this.events = new Map();
-        this.channels = new Map();
-
-        this.schedules = new Map();
+        this.modules = new Map();
         this.plugins = new Map();
+        this.schedules = new Map();
         this.stages = new Map();
-
-        this.ecStorage = new EntityComponentStorage();
     }
 
     public addChannel(id: WorldId, channel: WorldChannel): void {
@@ -121,9 +125,9 @@ export class World {
         schedule.addDepedency(dep);
     }
 
-    public addPlugins<T extends WorldPlugin>(plugins: T[]): void {
-        for (const plugin of plugins) {
-            this.plugins.set(plugin.id, plugin);
+    public addModules<T extends WorldModule>(modules: T[]): void {
+        for (const module of modules) {
+            this.modules.set(module.moduleId, module);
         }
     }
 
@@ -216,6 +220,16 @@ export class World {
         return this.ecStorage.getEntitiesChanged();
     }
 
+    public getPlugin<T extends WorldPlugin>(pluginId: WorldPluginIdOf<T>): T {
+        const context = this.plugins.get(pluginId);
+
+        if (context === undefined) {
+            throwError("World plugin '{}' not available", pluginId);
+        }
+
+        return context as T;
+    }
+
     public getSchedule(stage: SystemStage): SystemSchedule {
         const schedule = this.schedules.get(stage);
 
@@ -249,8 +263,8 @@ export class World {
     }
 
     public init(): void {
-        for (const plugin of this.plugins.values()) {
-            plugin.setup(this);
+        for (const module of this.modules.values()) {
+            module.setup(this);
         }
 
         for (const schedule of this.schedules.values()) {
@@ -316,7 +330,7 @@ export class World {
 
     public registerData<T extends WorldData>(dataId: WorldDataIdOf<T>): void {
         if (this.data.has(dataId)) {
-            log.warn("World already has dataId '{}' and will be overwritten", dataId);
+            log.warn("World already has data '{}' and will be overwritten", dataId);
         }
 
         this.data.set(dataId, undefined);
@@ -324,10 +338,18 @@ export class World {
 
     public registerEvent<T extends WorldEvent>(eventId: WorldEventIdOf<T>): void {
         if (this.events.has(eventId)) {
-            log.warn("World already has eventId '{}' and will be overwritten", eventId);
+            log.warn("World already has event '{}' and will be overwritten", eventId);
         }
 
         this.events.set(eventId, []);
+    }
+
+    public registerPlugin<T extends WorldPlugin>(plugin: T): void {
+        if (this.plugins.has(plugin.pluginId)) {
+            log.warn("World already has plugin '{}' and will be overwritten", plugin.pluginId);
+        }
+
+        this.plugins.set(plugin.pluginId, plugin);
     }
 
     public registerSerializable<T extends Serializable>(ClassType: SerializableConstructor<T>): void {

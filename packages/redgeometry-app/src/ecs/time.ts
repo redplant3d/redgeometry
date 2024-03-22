@@ -1,4 +1,4 @@
-import type { DefaultSystemStage, WorldPlugin, WorldPluginId, WorldScheduleId } from "redgeometry/src/ecs/types";
+import type { DefaultSystemStage, WorldModule, WorldModuleId, WorldScheduleId } from "redgeometry/src/ecs/types";
 import type { World } from "redgeometry/src/ecs/world";
 
 export type AnimationFrameData = {
@@ -16,8 +16,8 @@ export type TimeData = {
     frame: number;
 };
 
-export class TimePlugin implements WorldPlugin {
-    public get id(): WorldPluginId {
+export class TimeModule implements WorldModule {
+    public get moduleId(): WorldModuleId {
         return "time";
     }
 
