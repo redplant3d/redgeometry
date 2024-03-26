@@ -1,14 +1,27 @@
+import type { DefaultSystemStage, WorldModule, WorldPlugin } from "redgeometry/src/ecs/types";
+import type { World } from "redgeometry/src/ecs/world";
 import type { Nominal } from "redgeometry/src/utility/types";
 import type { Material } from "./material.js";
 import type { Mesh } from "./mesh.js";
 
 export type AssetId<T> = Nominal<number, "AssetId" & T>;
 
-export type AssetData = {
-    dataId: "asset";
-    meshes: AssetCollection<Mesh>;
-    materials: AssetCollection<Material>;
-};
+export function startAssetSystem(world: World): void {
+    const assetPlugin = new AssetPlugin();
+    world.setPlugin<AssetPlugin>(assetPlugin);
+}
+
+export class AssetPlugin implements WorldPlugin {
+    public readonly pluginId = "asset";
+
+    public readonly meshes: AssetCollection<Mesh>;
+    public readonly materials: AssetCollection<Material>;
+
+    constructor() {
+        this.meshes = new AssetCollection();
+        this.materials = new AssetCollection();
+    }
+}
 
 export class AssetCollection<T> {
     private id: number;
@@ -35,5 +48,15 @@ export class AssetCollection<T> {
         const handle = this.id;
         this.id += +1;
         return handle as AssetId<T>;
+    }
+}
+
+export class AssetModule implements WorldModule {
+    public readonly moduleId = "asset";
+
+    public setup(world: World): void {
+        world.registerPlugin<AssetPlugin>("asset");
+
+        world.addSystem<DefaultSystemStage>({ stage: "start-pre", fn: startAssetSystem });
     }
 }

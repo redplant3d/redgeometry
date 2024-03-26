@@ -1,78 +1,147 @@
 import { Path2 } from "redgeometry/src/core/path";
 import { WindingOperator } from "redgeometry/src/core/path-options";
+import type { WorldOptions } from "redgeometry/src/ecs/app";
+import type { DefaultSystemStage, WorldModule } from "redgeometry/src/ecs/types";
+import { DEFAULT_WORLD_SCHEDULES, type World } from "redgeometry/src/ecs/world";
 import { Box2 } from "redgeometry/src/primitives/box";
 import { Point2 } from "redgeometry/src/primitives/point";
-import { log } from "redgeometry/src/utility/debug";
 import { RandomXSR128 } from "redgeometry/src/utility/random";
-import type { AppContext2D } from "../context.js";
-import { createPath } from "../data.js";
-import { TextBoxInputElement } from "../input.js";
-import type { AppLauncher, AppPart } from "../launcher.js";
+import type { AppContextPlugin } from "../ecs/app-context.js";
+import { AppContextModule } from "../ecs/app-context.js";
+import { AppMainModule, AppRemoteModule, type AppMainData, type AppStateData } from "../ecs/app.js";
+import type { MouseInputPlugin } from "../ecs/input.js";
+import { createPath } from "../utility/helper.js";
+import { TextBoxInputElement } from "../utility/input.js";
 
-export class PathAreaAppPart implements AppPart {
-    private bounds: Box2;
-    private context: AppContext2D;
-    private input: Path2;
-    private isInside: boolean;
-    private launcher: AppLauncher;
+type AppPartMainData = {
+    dataId: "app-part-main";
+    countTextBox: TextBoxInputElement;
+};
 
-    public inputCount: TextBoxInputElement;
+type AppPartRemoteData = {
+    dataId: "app-part-remote";
+    bounds: Box2;
+    input: Path2;
+    isInside: boolean;
+};
 
-    public constructor(launcher: AppLauncher, context: AppContext2D) {
-        this.launcher = launcher;
-        this.context = context;
+type AppPartStateData = {
+    dataId: "app-part-state";
+    count: number;
+};
 
-        this.inputCount = new TextBoxInputElement("count", "10");
-        this.inputCount.setStyle("width: 80px");
+function initMainSystem(world: World): void {
+    const { inputElements } = world.readData<AppMainData>("app-main");
 
-        this.input = Path2.createEmpty();
-        this.bounds = Box2.createEmpty();
-        this.isInside = false;
-    }
+    const inputCountTextBox = new TextBoxInputElement("count", "100");
+    inputCountTextBox.setStyle("width: 80px");
+    inputElements.push(inputCountTextBox);
 
-    public create(): void {
-        const canvas = document.getElementById("canvas2D");
-        canvas?.addEventListener("mousemove", (e) => this.onMouseMove(e));
-    }
+    world.writeData<AppPartMainData>({
+        dataId: "app-part-main",
+        countTextBox: inputCountTextBox,
+    });
+}
 
-    public render(): void {
-        this.context.clear();
-        this.context.fillBox(this.bounds, "#ADD8E644");
-        this.context.fillPath(this.input, this.isInside ? "#FFCCCC" : "#CCCCCC", "evenodd");
-        this.context.drawPath(this.input, "#666666");
-        this.context.fillPoints(this.input.getPoints(), "#000000", 5);
-    }
+function initRemoteSystem(world: World): void {
+    world.writeData<AppPartRemoteData>({
+        dataId: "app-part-remote",
+        bounds: Box2.createEmpty(),
+        input: Path2.createEmpty(),
+        isInside: false,
+    });
+}
 
-    public reset(): void {
-        this.input.clear();
-    }
+function writeStateSystem(world: World): void {
+    const { countTextBox } = world.readData<AppPartMainData>("app-part-main");
 
-    public update(_delta: number): void {
-        this.reset();
+    const stateData: AppPartStateData = {
+        dataId: "app-part-state",
+        count: countTextBox.getInt(),
+    };
 
-        const seed = this.launcher.inputSeed.getInt();
-        const generator = this.launcher.inputGenerator.getInt();
-        const count = this.inputCount.getInt();
+    world.writeData(stateData);
 
-        const random = RandomXSR128.fromSeedLcg(seed);
-        const [canvasWidth, canvasHeight] = this.context.getSize(false);
+    const channel = world.getChannel("remote");
+    channel.queueData(stateData);
+}
 
-        const path = createPath(random, generator, count, canvasWidth, canvasHeight);
-        path.close();
+function updateSystem(world: World): void {
+    const { count } = world.readData<AppPartStateData>("app-part-state");
+    const { seed, generator } = world.readData<AppStateData>("app-state");
 
-        this.input = path;
-        this.bounds = path.getBounds();
+    const mouse = world.getPlugin<MouseInputPlugin>("mouse-input");
+    const ctx = world.getPlugin<AppContextPlugin>("app-context");
 
-        log.info("Path area = {}", path.getSignedArea());
-    }
+    const random = RandomXSR128.fromSeedLcg(seed);
+    const [canvasWidth, canvasHeight] = ctx.getSize(false);
 
-    public updateLayout(): void {
-        this.launcher.addAppInput(this.inputCount);
-    }
+    const path = createPath(random, generator, count, canvasWidth, canvasHeight);
+    path.close();
 
-    private onMouseMove(e: MouseEvent): void {
-        const p = new Point2(e.offsetX, e.offsetY);
-        this.isInside = this.input.hasPointInside(p, WindingOperator.EvenOdd);
-        this.launcher.requestUpdate();
+    const mousePos = mouse.getPosition();
+    const p = new Point2(mousePos.offsetX, mousePos.offsetY);
+
+    world.writeData<AppPartRemoteData>({
+        dataId: "app-part-remote",
+        input: path,
+        bounds: path.getBounds(),
+        isInside: path.hasPointInside(p, WindingOperator.EvenOdd),
+    });
+
+    // log.info("Path area = {}", path.getSignedArea());
+}
+
+function renderSystem(world: World): void {
+    const { bounds, input, isInside } = world.readData<AppPartRemoteData>("app-part-remote");
+
+    const ctx = world.getPlugin<AppContextPlugin>("app-context");
+
+    ctx.clear();
+    ctx.fillBox(bounds, "#ADD8E644");
+    ctx.fillPath(input, isInside ? "#FFCCCC" : "#CCCCCC", "evenodd");
+    ctx.drawPath(input, "#666666");
+    ctx.fillPoints(input.getPoints(), "#000000", 5);
+}
+
+class AppPartMainModule implements WorldModule {
+    public readonly moduleId = "app-part-main";
+
+    public setup(world: World): void {
+        world.registerData<AppPartMainData>("app-part-main");
+        world.registerData<AppPartStateData>("app-part-state");
+
+        world.addSystems<DefaultSystemStage>({ stage: "start", fns: [initMainSystem, writeStateSystem] });
+        world.addSystems<DefaultSystemStage>({ stage: "update", fns: [writeStateSystem] });
+
+        world.addDependency<DefaultSystemStage>({ stage: "start", seq: [initMainSystem, writeStateSystem] });
     }
 }
+
+class AppPartRemoteModule implements WorldModule {
+    public readonly moduleId = "app-part-remote";
+
+    public setup(world: World): void {
+        world.addModules([new AppContextModule()]);
+
+        world.registerData<AppPartRemoteData>("app-part-remote");
+        world.registerData<AppPartStateData>("app-part-state");
+
+        world.addSystems<DefaultSystemStage>({ stage: "start", fns: [initRemoteSystem] });
+        world.addSystems<DefaultSystemStage>({ stage: "update", fns: [updateSystem, renderSystem] });
+
+        world.addDependency<DefaultSystemStage>({ stage: "update", seq: [updateSystem, renderSystem] });
+    }
+}
+
+export const PATH_AREA_MAIN_WORLD: WorldOptions = {
+    id: "main",
+    modules: [new AppMainModule(), new AppPartMainModule()],
+    schedules: DEFAULT_WORLD_SCHEDULES,
+};
+
+export const PATH_AREA_REMOTE_WORLD: WorldOptions = {
+    id: "remote",
+    modules: [new AppRemoteModule(), new AppPartRemoteModule()],
+    schedules: DEFAULT_WORLD_SCHEDULES,
+};

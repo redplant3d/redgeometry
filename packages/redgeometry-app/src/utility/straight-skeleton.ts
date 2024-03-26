@@ -1,111 +1,33 @@
 import { Mesh2, MeshEdge2, type MeshFace2 } from "redgeometry/src/core/mesh";
-import { Path2 } from "redgeometry/src/core/path";
 import { PathClip2 } from "redgeometry/src/core/path-clip";
 import { BooleanOperator, DEFAULT_PATH_QUALITY_OPTIONS, WindingOperator } from "redgeometry/src/core/path-options";
-import { Box2 } from "redgeometry/src/primitives/box";
 import { Edge2 } from "redgeometry/src/primitives/edge";
 import { Point2 } from "redgeometry/src/primitives/point";
 import type { Vector2 } from "redgeometry/src/primitives/vector";
 import { assertDebug, log } from "redgeometry/src/utility/debug";
-import { RandomXSR128, type Random } from "redgeometry/src/utility/random";
+import { type Random } from "redgeometry/src/utility/random";
 import { RootType, solveLinear, solveQuadratic, type Root1, type Root2 } from "redgeometry/src/utility/solve";
-import type { AppContext2D } from "../context.js";
-import { createPolygonPair, createSimplePolygon } from "../data.js";
-import { RangeInputElement } from "../input.js";
-import type { AppLauncher, AppPart } from "../launcher.js";
+import { createPolygonPair } from "./helper.js";
 
-enum KineticEventType {
+export enum KineticEventType {
     EdgeEvent,
     SplitEvent,
     FlipEvent,
     FullEvent,
 }
 
-export class SkeletonAppPart implements AppPart {
-    private context: AppContext2D;
-    private inner: Path2;
-    private launcher: AppLauncher;
-    private mesh: Mesh2;
-    private meshOriginal: Mesh2;
-    private outer: Path2;
+export class Skeleton {
     private vertices: KineticVertex[];
 
-    public inputTime: RangeInputElement;
-
-    public constructor(launcher: AppLauncher, context: AppContext2D) {
-        this.launcher = launcher;
-        this.context = context;
-
-        this.inputTime = new RangeInputElement("time", "0", "500", "50");
-        this.inputTime.addEventListener("input", () => this.launcher.requestUpdate());
-        this.inputTime.setStyle("width: 200px");
-
-        this.inner = Path2.createEmpty();
-        this.outer = Path2.createEmpty();
-        this.mesh = Mesh2.createEmpty();
-        this.meshOriginal = Mesh2.createEmpty();
+    constructor() {
         this.vertices = [];
-    }
-
-    public create(): void {
-        return;
-    }
-
-    public render(): void {
-        this.context.clear();
-        this.context.drawEdges(this.getVertexEdges(), "#FF0000");
-        this.context.drawMeshEdges(this.meshOriginal, "#000000");
-        this.context.drawMeshEdges(this.mesh, "#00FF00");
     }
 
     public reset(): void {
-        this.inner.clear();
-        this.outer.clear();
-        this.mesh = Mesh2.createEmpty();
-        this.meshOriginal = Mesh2.createEmpty();
         this.vertices = [];
     }
 
-    public update(_delta: number): void {
-        this.reset();
-
-        const seed = this.launcher.inputSeed.getInt();
-        const random = RandomXSR128.fromSeedLcg(seed);
-        const [canvasWidth, canvasHeight] = this.context.getSize(false);
-        const box = new Box2(0, 0, canvasWidth, canvasHeight);
-
-        const generator = this.launcher.inputGenerator.getInt();
-        const tmax = this.inputTime.getInt();
-
-        // const path = createSimplePolygon(random, box, generator, 0.5, 0.25).toPath();
-        const path = createSimplePolygon(random, box, generator, 1, 0).toPath();
-        // const path = createSimplePolygon(random, box, generator, 0.05, 0.95).toPath();
-
-        // path.clear();
-        // path.moveToXY(100, 100);
-        // path.lineToXY(200, 100);
-        // path.lineToXY(300, 100);
-        // path.lineToXY(300, 200);
-        // path.lineToXY(200, 200);
-        // path.lineToXY(100, 200);
-        // path.close();
-
-        this.mesh = path.toMesh(WindingOperator.NonZero);
-        // const mesh = this.getRandomMesh(random, generator, 25, canvasWidth, canvasHeight);
-
-        this.meshOriginal = this.mesh.clone();
-
-        this.mesh.triangulate(false);
-
-        this.initializeMesh(this.mesh);
-        this.createStraightSkeleton(this.mesh, tmax);
-    }
-
-    public updateLayout(): void {
-        this.launcher.addAppInput(this.inputTime);
-    }
-
-    private createStraightSkeleton(mesh: Mesh2, tmax: number): void {
+    public createStraightSkeleton(mesh: Mesh2, tmax: number): void {
         const faces = mesh.getFaces().slice();
 
         while (faces.length > 0) {
@@ -138,6 +60,30 @@ export class SkeletonAppPart implements AppPart {
             for (const face of faces) {
                 this.updateFaceEvent(face);
             }
+        }
+    }
+
+    public initializeMesh(mesh: Mesh2): void {
+        for (const edge of mesh.getEdges()) {
+            if (edge.data !== undefined) {
+                // Vertex already exists
+                continue;
+            }
+
+            const vtx = KineticVertex.createFrom(edge);
+
+            let curr = edge;
+
+            do {
+                assertDebug(curr.data === undefined);
+
+                curr.data = vtx;
+                curr = curr.onext;
+            } while (curr !== edge);
+        }
+
+        for (const face of mesh.getFaces()) {
+            this.updateFaceEvent(face);
         }
     }
 
@@ -328,7 +274,7 @@ export class SkeletonAppPart implements AppPart {
         }
     }
 
-    private getVertexEdges(): Edge2[] {
+    public getVertexEdges(): Edge2[] {
         const edges: Edge2[] = [];
 
         for (const vtx of this.vertices) {
@@ -536,30 +482,6 @@ export class SkeletonAppPart implements AppPart {
         return new KineticEvent(KineticEventType.FullEvent, e0, t1);
     }
 
-    private initializeMesh(mesh: Mesh2): void {
-        for (const edge of mesh.getEdges()) {
-            if (edge.data !== undefined) {
-                // Vertex already exists
-                continue;
-            }
-
-            const vtx = KineticVertex.createFrom(edge);
-
-            let curr = edge;
-
-            do {
-                assertDebug(curr.data === undefined);
-
-                curr.data = vtx;
-                curr = curr.onext;
-            } while (curr !== edge);
-        }
-
-        for (const face of mesh.getFaces()) {
-            this.updateFaceEvent(face);
-        }
-    }
-
     private printEdgesLnext(edge: MeshEdge2, validate: boolean): void {
         log.infoDebug("lnext");
         let i = 0;
@@ -736,7 +658,7 @@ export class SkeletonAppPart implements AppPart {
     }
 }
 
-class KineticVertex {
+export class KineticVertex {
     public n1: Vector2;
     public n2: Vector2;
     public orig: Point2;
@@ -807,7 +729,7 @@ class KineticVertex {
     }
 }
 
-class KineticEvent {
+export class KineticEvent {
     public e: MeshEdge2;
     public t1: number;
     public type: KineticEventType;

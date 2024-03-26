@@ -1,64 +1,57 @@
-import type { DefaultSystemStage, WorldModule, WorldModuleId } from "redgeometry/src/ecs/types";
+import type { DefaultSystemStage, DefaultWorldScheduleId, WorldModule } from "redgeometry/src/ecs/types";
 import type { World } from "redgeometry/src/ecs/world";
-import type { AppInputElement } from "../input.js";
-import type { TimeData } from "./time.js";
+import { createRandomSeed } from "../utility/helper.js";
+import {
+    ButtonInputElement,
+    ComboBoxInputElement,
+    TextBoxInputElement,
+    type AppInputElement,
+} from "../utility/input.js";
+import type { AppLauncherData } from "./app-launcher.js";
+import { InputReceiverModule, InputSenderModule, type InputSenderData } from "./input.js";
+import { TimeModule, TimePlugin, type TimeData } from "./time.js";
 
-export class AppMainModule implements WorldModule {
-    public get moduleId(): WorldModuleId {
-        return "app-main";
-    }
-
-    public setup(world: World): void {
-        world.registerData<AppData>("app");
-        world.registerData<AppInputElementData>("appInputElement");
-        world.registerData<AppCanvasData>("appCanvas");
-
-        world.registerEvent<WindowResizeEvent>("windowResize");
-
-        world.addSystem<DefaultSystemStage>({ stage: "start-pre", fn: initAppSystem });
-        world.addSystem<DefaultSystemStage>({ stage: "start-post", fn: initInputElementsSystem });
-    }
-}
-
-export class AppRemoteModule implements WorldModule {
-    public get moduleId(): WorldModuleId {
-        return "app-remote";
-    }
-
-    public setup(world: World): void {
-        world.registerData<AppCanvasData>("appCanvas");
-        world.registerData<TimeData>("time");
-        world.registerEvent<WindowResizeEvent>("windowResize");
-
-        world.addSystem<DefaultSystemStage>({ stage: "update-pre", fn: resizeWindowSystem });
-    }
-}
-
-export type AppData = {
-    dataId: "app";
+export type AppMainData = {
+    dataId: "app-main";
     canvas: HTMLCanvasElement;
     canvasContainer: HTMLElement;
     paramsContainer: HTMLElement;
     urlSearchParams: URLSearchParams;
-};
-
-export type AppInputElementData = {
-    dataId: "appInputElement";
     inputElements: AppInputElement[];
 };
 
+export type AppMainInputData = {
+    dataId: "app-main-input";
+    appComboBox: ComboBoxInputElement;
+    randomizeButton: ButtonInputElement;
+    seedTextBox: TextBoxInputElement;
+    generatorTextBox: TextBoxInputElement;
+    updateButton: ButtonInputElement;
+};
+
 export type AppCanvasData = {
-    dataId: "appCanvas";
+    dataId: "app-canvas";
     canvas: HTMLCanvasElement | OffscreenCanvas;
 };
 
+export type AppStateData = {
+    dataId: "app-state";
+    generator: number;
+    seed: number;
+};
+
+export type AppCommandEvent = {
+    eventId: "app-command";
+    command: "randomize" | "update";
+};
+
 export type WindowResizeEvent = {
-    eventId: "windowResize";
+    eventId: "window-resize";
     width: number;
     height: number;
 };
 
-export function initAppSystem(world: World): void {
+export function initAppMainPreSystem(world: World): void {
     const urlSearchParams = new URLSearchParams(window.location.search);
     const parent = document.body;
 
@@ -76,70 +69,164 @@ export function initAppSystem(world: World): void {
     parent.appendChild(canvasContainer);
 
     const canvas = createElement("canvas", { id: "canvas2D" });
-    const offscreenCanvas = canvas.transferControlToOffscreen();
 
     world.writeData<AppCanvasData>({
-        dataId: "appCanvas",
-        canvas: offscreenCanvas,
+        dataId: "app-canvas",
+        canvas: canvas.transferControlToOffscreen(),
     });
 
     canvasContainer.appendChild(canvas);
 
-    world.writeData<AppData>({
-        dataId: "app",
-        urlSearchParams,
-        paramsContainer,
-        canvasContainer,
+    world.writeData<AppMainData>({
+        dataId: "app-main",
         canvas,
-    });
-
-    world.writeData<AppInputElementData>({
-        dataId: "appInputElement",
+        canvasContainer,
+        paramsContainer,
+        urlSearchParams,
         inputElements: [],
     });
 
     world.writeEvent<WindowResizeEvent>({
-        eventId: "windowResize",
+        eventId: "window-resize",
         width: canvasContainer.clientWidth,
         height: canvasContainer.clientHeight,
     });
 
     window.addEventListener("resize", () => {
-        const { canvasContainer } = world.readData<AppData>("app");
+        const { canvasContainer } = world.readData<AppMainData>("app-main");
 
         world.queueEvent<WindowResizeEvent>({
-            eventId: "windowResize",
+            eventId: "window-resize",
             width: canvasContainer.clientWidth,
             height: canvasContainer.clientHeight,
         });
     });
+
+    world.writeData<InputSenderData>({
+        dataId: "input-sender",
+        receiverId: "remote",
+        keyboardEventHandler: self,
+        mouseEventHandler: canvas,
+    });
 }
 
-export function resizeWindowSystem(world: World): void {
-    const windowResizeEvent = world.readLatestEvent<WindowResizeEvent>("windowResize");
+export function addAppInputsSystem(world: World): void {
+    const seed = createRandomSeed();
 
-    if (windowResizeEvent !== undefined) {
-        const { canvas } = world.readData<AppCanvasData>("appCanvas");
+    const { inputElements } = world.readData<AppMainData>("app-main");
+    const { appPartIds, appPartId } = world.readData<AppLauncherData>("appLauncher");
 
-        canvas.width = windowResizeEvent.width;
-        canvas.height = windowResizeEvent.height;
-    }
+    const inputAppComboBox = new ComboBoxInputElement("app-main", appPartId);
+    inputAppComboBox.setOptionValues(...appPartIds);
+    inputAppComboBox.addEventListener("input", () => {
+        window.location.replace(`/?app=${inputAppComboBox.getValue()}`);
+    });
+    inputElements.push(inputAppComboBox);
+
+    const randomizeButton = new ButtonInputElement("randomize", "randomize");
+    randomizeButton.addEventListener("click", () => {
+        world.queueEvent<AppCommandEvent>({ eventId: "app-command", command: "randomize" });
+    });
+    inputElements.push(randomizeButton);
+
+    const seedTextBox = new TextBoxInputElement("seed", seed.toString());
+    seedTextBox.setStyle("width: 80px");
+    inputElements.push(seedTextBox);
+
+    const generatorTextBox = new TextBoxInputElement("generator", "0");
+    generatorTextBox.setStyle("width: 25px");
+    inputElements.push(generatorTextBox);
+
+    const updateButton = new ButtonInputElement("update", "update");
+    updateButton.addEventListener("click", () => {
+        world.queueEvent<AppCommandEvent>({ eventId: "app-command", command: "update" });
+    });
+    inputElements.push(updateButton);
+
+    world.writeData<AppMainInputData>({
+        dataId: "app-main-input",
+        appComboBox: inputAppComboBox,
+        randomizeButton,
+        seedTextBox,
+        generatorTextBox,
+        updateButton,
+    });
+}
+
+export function writeAppStateSystem(world: World): void {
+    const { generatorTextBox, seedTextBox } = world.readData<AppMainInputData>("app-main-input");
+
+    world.writeData<AppStateData>({
+        dataId: "app-state",
+        seed: seedTextBox.getInt(),
+        generator: generatorTextBox.getInt(),
+    });
 }
 
 export function initInputElementsSystem(world: World): void {
-    const { inputElements } = world.readData<AppInputElementData>("appInputElement");
-    const { paramsContainer } = world.readData<AppData>("app");
+    const { inputElements, paramsContainer } = world.readData<AppMainData>("app-main");
 
     for (const inputElement of inputElements) {
         inputElement.register(paramsContainer);
     }
 }
 
+export async function initAppMainPostSystem(world: World): Promise<void> {
+    const channel = world.getChannel("remote");
+
+    const appStateData = world.readData<AppStateData>("app-state");
+    channel.queueData<AppStateData>(appStateData);
+
+    const appCanvasData = world.readData<AppCanvasData>("app-canvas");
+    if (appCanvasData.canvas instanceof OffscreenCanvas) {
+        channel.queueData<AppCanvasData>(appCanvasData, [appCanvasData.canvas]);
+    } else {
+        channel.queueData<AppCanvasData>(appCanvasData);
+    }
+
+    await channel.runScheduleAsync("start");
+
+    const timePlugin = world.getPlugin<TimePlugin>("time");
+    timePlugin.requestAnimationFrame(world);
+}
+
+export async function appMainSystem(world: World): Promise<void> {
+    const channel = world.getChannel("remote");
+
+    const timeData = world.readData<TimeData>("time");
+    channel.queueData(timeData);
+
+    const windowResizeEvents = world.readEvents<WindowResizeEvent>("window-resize");
+    channel.queueEvents(windowResizeEvents);
+
+    const appStateData = world.readData<AppStateData>("app-state");
+    channel.queueData(appStateData);
+
+    const appCommandEvents = world.readEvents<AppCommandEvent>("app-command");
+    channel.queueEvents(appCommandEvents);
+
+    await channel.runScheduleAsync<DefaultWorldScheduleId>("update");
+
+    const timePlugin = world.getPlugin<TimePlugin>("time");
+    timePlugin.requestAnimationFrame(world);
+}
+
 export function deinitInputElementsSystem(world: World): void {
-    const { inputElements } = world.readData<AppInputElementData>("appInputElement");
+    const { inputElements } = world.readData<AppMainData>("app-main");
 
     for (const inputElement of inputElements) {
         inputElement.unregister();
+    }
+}
+
+export function resizeWindowSystem(world: World): void {
+    const windowResizeEvent = world.readLatestEvent<WindowResizeEvent>("window-resize");
+
+    if (windowResizeEvent !== undefined) {
+        const { canvas } = world.readData<AppCanvasData>("app-canvas");
+
+        canvas.width = windowResizeEvent.width;
+        canvas.height = windowResizeEvent.height;
     }
 }
 
@@ -154,4 +241,54 @@ function createElement<K extends keyof HTMLElementTagNameMap>(
     }
 
     return element;
+}
+
+export class AppMainModule implements WorldModule {
+    public readonly moduleId = "app-main-input";
+
+    public setup(world: World): void {
+        world.addModules([new InputSenderModule(), new TimeModule()]);
+
+        world.registerData<AppMainData>("app-main");
+        world.registerData<AppMainInputData>("app-main-input");
+        world.registerData<AppCanvasData>("app-canvas");
+        world.registerData<AppStateData>("app-state");
+
+        world.registerEvent<AppCommandEvent>("app-command");
+        world.registerEvent<WindowResizeEvent>("window-resize");
+
+        world.addSystem<DefaultSystemStage>({ stage: "start-pre", fn: initAppMainPreSystem });
+        world.addSystem<DefaultSystemStage>({ stage: "start-pre", fn: addAppInputsSystem });
+        world.addSystem<DefaultSystemStage>({ stage: "start-pre", fn: writeAppStateSystem });
+        world.addSystem<DefaultSystemStage>({ stage: "start-post", fn: initInputElementsSystem });
+        world.addSystem<DefaultSystemStage>({ stage: "start-post", fn: initAppMainPostSystem });
+        world.addSystem<DefaultSystemStage>({ stage: "update-pre", fn: writeAppStateSystem });
+        world.addSystem<DefaultSystemStage>({ stage: "update-post", fn: appMainSystem });
+
+        world.addDependency({
+            stage: "start-pre",
+            seq: [initAppMainPreSystem, addAppInputsSystem, writeAppStateSystem],
+        });
+        world.addDependency({
+            stage: "start-post",
+            seq: [initInputElementsSystem, initAppMainPostSystem],
+        });
+    }
+}
+
+export class AppRemoteModule implements WorldModule {
+    public readonly moduleId = "app-remote";
+
+    public setup(world: World): void {
+        world.addModules([new InputReceiverModule()]);
+
+        world.registerData<AppCanvasData>("app-canvas");
+        world.registerData<AppStateData>("app-state");
+        world.registerData<TimeData>("time");
+
+        world.registerEvent<AppCommandEvent>("app-command");
+        world.registerEvent<WindowResizeEvent>("window-resize");
+
+        world.addSystem<DefaultSystemStage>({ stage: "update-pre", fn: resizeWindowSystem });
+    }
 }

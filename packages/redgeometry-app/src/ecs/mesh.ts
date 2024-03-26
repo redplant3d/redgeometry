@@ -1,16 +1,10 @@
-import type {
-    ComponentIdsOf,
-    DefaultSystemStage,
-    EntityId,
-    WorldModule,
-    WorldModuleId,
-} from "redgeometry/src/ecs/types";
+import type { ComponentIdsOf, DefaultSystemStage, EntityId, WorldModule } from "redgeometry/src/ecs/types";
 import type { World } from "redgeometry/src/ecs/world";
 import type { Matrix4 } from "redgeometry/src/primitives/matrix";
 import { type Float32Buffer, type NumberBuffer } from "redgeometry/src/utility/buffer";
 import { assertDebug, log } from "redgeometry/src/utility/debug";
-import { AssetCollection, type AssetData, type AssetId } from "./asset.js";
-import { gpuCreateBuffer } from "./buffer.js";
+import { gpuCreateBuffer } from "../utility/buffer.js";
+import { AssetModule, AssetPlugin, type AssetId } from "./asset.js";
 import { cameraSystem, type CameraComponent } from "./camera.js";
 import { startGPUSystem, type GPUData } from "./gpu.js";
 import type { Material, MaterialComponent } from "./material.js";
@@ -71,16 +65,14 @@ export type MeshRenderStateData = {
 };
 
 export class MeshRenderModule implements WorldModule {
-    public get moduleId(): WorldModuleId {
-        return "mesh-render";
-    }
+    public readonly moduleId = "mesh-render";
 
     public setup(world: World): void {
+        world.addModules([new AssetModule()]);
+
         world.registerData<MeshRenderStateData>("meshRenderState");
-        world.registerData<AssetData>("asset");
         world.registerData<SceneData>("scene");
 
-        world.addSystem<DefaultSystemStage>({ stage: "start-pre", fn: initAssets });
         world.addSystem<DefaultSystemStage>({ stage: "start-post", fn: startMeshRenderSystem });
 
         world.addSystem<DefaultSystemStage>({ stage: "update-post", fn: transformSystem });
@@ -97,14 +89,6 @@ export class MeshRenderModule implements WorldModule {
             seq: [transformSystem, cameraSystem, meshRenderSystem],
         });
     }
-}
-
-export function initAssets(world: World): void {
-    world.writeData<AssetData>({
-        dataId: "asset",
-        materials: new AssetCollection(),
-        meshes: new AssetCollection(),
-    });
 }
 
 export function startMeshRenderSystem(world: World): void {
@@ -137,7 +121,8 @@ export function startMeshRenderSystem(world: World): void {
 export function meshRenderSystem(world: World): void {
     const gpuData = world.readData<GPUData>("gpu");
     const stateData = world.readData<MeshRenderStateData>("meshRenderState");
-    const assetData = world.readData<AssetData>("asset");
+
+    const asset = world.getPlugin<AssetPlugin>("asset");
 
     // Entries
     for (const entity of world.getEntitiesChanged()) {
@@ -149,7 +134,7 @@ export function meshRenderSystem(world: World): void {
 
         if (mesh !== undefined && material !== undefined && global !== undefined) {
             if (entry === undefined) {
-                entry = createMeshEntry(gpuData.device, stateData, assetData, entity, mesh, material);
+                entry = createMeshEntry(gpuData.device, stateData, asset, entity, mesh, material);
             }
 
             updateMeshEntry(stateData, entry, global);
@@ -351,7 +336,7 @@ function createMatrixBuffer(device: GPUDevice, mat: Matrix4): GPUBuffer {
 function createMeshEntry(
     device: GPUDevice,
     stateData: MeshRenderStateData,
-    assetData: AssetData,
+    assetPlugin: AssetPlugin,
     entity: EntityId,
     meshComp: MeshComponent,
     materialComp: MaterialComponent,
@@ -360,7 +345,7 @@ function createMeshEntry(
 
     if (materialEntry === undefined) {
         // Create material entry if missing
-        const material = assetData.materials.entries.get(materialComp.handle);
+        const material = assetPlugin.materials.entries.get(materialComp.handle);
         assertDebug(material !== undefined);
 
         const colorBuffer = createColorBuffer(device, material.color);
@@ -389,7 +374,7 @@ function createMeshEntry(
 
     if (meshEntry === undefined) {
         // Create mesh entry if missing
-        const mesh = assetData.meshes.entries.get(meshComp.handle);
+        const mesh = assetPlugin.meshes.entries.get(meshComp.handle);
         assertDebug(mesh !== undefined);
 
         const transformsData: Float32Buffer = {

@@ -1,149 +1,215 @@
-import type { Box3 } from "redgeometry/src/primitives/box";
+import type { WorldOptions } from "redgeometry/src/ecs/app";
+import type { DefaultSystemStage, WorldModule } from "redgeometry/src/ecs/types";
+import { DEFAULT_WORLD_SCHEDULES, type World } from "redgeometry/src/ecs/world";
 import { Edge2, Edge3 } from "redgeometry/src/primitives/edge";
 import { Matrix4 } from "redgeometry/src/primitives/matrix";
 import { Point2, Point3 } from "redgeometry/src/primitives/point";
 import { Quaternion, RotationOrder } from "redgeometry/src/primitives/quaternion";
-import type { Random } from "redgeometry/src/utility/random";
-import type { AppContext2D } from "../context.js";
-import { ComboBoxInputElement, RangeInputElement, TextBoxInputElement } from "../input.js";
-import type { AppLauncher, AppPart } from "../launcher.js";
+import type { AppContextPlugin } from "../ecs/app-context.js";
+import { AppContextModule } from "../ecs/app-context.js";
+import { AppMainModule, AppRemoteModule, type AppMainData } from "../ecs/app.js";
+import { ComboBoxInputElement, RangeInputElement, TextBoxInputElement } from "../utility/input.js";
 
-export class MatrixAppPart implements AppPart {
-    private context: AppContext2D;
-    private edges: Edge2[];
-    private launcher: AppLauncher;
+type AppPartMainData = {
+    dataId: "app-part-main";
+    inputCount: TextBoxInputElement;
+    inputProjection: ComboBoxInputElement;
+    inputRotation: RangeInputElement;
+};
 
-    public inputCount: TextBoxInputElement;
-    public inputProjection: ComboBoxInputElement;
-    public inputRotation: RangeInputElement;
+type AppPartRemoteData = {
+    dataId: "app-part-remote";
+    edges: Edge2[];
+};
 
-    public constructor(launcher: AppLauncher, context: AppContext2D) {
-        this.launcher = launcher;
-        this.context = context;
+type AppPartStateData = {
+    dataId: "app-part-state";
+    count: number;
+    projection: string;
+    rotation: number;
+};
 
-        this.inputCount = new TextBoxInputElement("count", "10");
-        this.inputCount.setStyle("width: 80px");
+function initMainSystem(world: World): void {
+    const { inputElements } = world.readData<AppMainData>("app-main");
 
-        this.inputRotation = new RangeInputElement("rotation", "0", "360", "0");
-        this.inputRotation.addEventListener("input", () => this.launcher.requestUpdate());
-        this.inputRotation.setStyle("width: 200px");
+    const inputCount = new TextBoxInputElement("count", "10");
+    inputCount.setStyle("width: 80px");
+    inputElements.push(inputCount);
 
-        this.inputProjection = new ComboBoxInputElement("projection", "orthographic");
-        this.inputProjection.addEventListener("input", () => this.launcher.requestUpdate(true));
-        this.inputProjection.setOptionValues("orthographic", "perspective");
+    const inputRotation = new RangeInputElement("rotation", "0", "360", "0");
+    inputRotation.setStyle("width: 200px");
+    inputElements.push(inputRotation);
 
-        this.edges = [];
+    const inputProjection = new ComboBoxInputElement("projection", "orthographic");
+    inputProjection.setOptionValues("orthographic", "perspective");
+    inputElements.push(inputProjection);
+
+    world.writeData<AppPartMainData>({
+        dataId: "app-part-main",
+        inputCount,
+        inputRotation,
+        inputProjection,
+    });
+}
+
+function initRemoteSystem(world: World): void {
+    world.writeData<AppPartRemoteData>({
+        dataId: "app-part-remote",
+        edges: [],
+    });
+}
+
+function writeStateSystem(world: World): void {
+    const { inputCount, inputRotation, inputProjection } = world.readData<AppPartMainData>("app-part-main");
+
+    const stateData: AppPartStateData = {
+        dataId: "app-part-state",
+        count: inputCount.getInt(),
+        projection: inputProjection.getValue(),
+        rotation: inputRotation.getInt(),
+    };
+
+    world.writeData(stateData);
+
+    const channel = world.getChannel("remote");
+    channel.queueData(stateData);
+}
+
+function updateSystem(world: World): void {
+    const { projection, rotation } = world.readData<AppPartStateData>("app-part-state");
+
+    const ctx = world.getPlugin<AppContextPlugin>("app-context");
+
+    const [canvasWidth, canvasHeight] = ctx.getSize(true);
+
+    const edges = createCube();
+
+    const w = 0.5 * canvasWidth;
+    const h = 0.5 * canvasHeight;
+    const s = 0.2 * Math.min(canvasWidth, canvasHeight);
+    const d = (rotation * Math.PI) / 180;
+
+    let mat: Matrix4 | undefined;
+
+    // Projection
+    if (projection === "orthographic") {
+        mat = Matrix4.fromOrthographic(-1, 1, 1, -1, -10, 1000);
+    } else {
+        mat = Matrix4.fromPerspective(-1, 1, 1, -1, -10, 1000);
     }
 
-    public create(): void {
-        return;
+    mat.scale(s, s, s);
+    mat.translate(w, h, 0);
+
+    // View
+    mat.translatePre(0, 0, -10);
+
+    // Model
+    const q = Quaternion.fromRotationEuler(1.1 * d, 1.3 * d, 1.7 * d, RotationOrder.ZYX);
+    mat.rotatePre(q.a, q.b, q.c, q.d);
+
+    // log.infoDebug("*********");
+    // for (const e of this.edges) {
+    //     log.infoDebug("{}", e);
+    // }
+
+    world.writeData<AppPartRemoteData>({
+        dataId: "app-part-remote",
+        edges: transformEdges(edges, mat),
+    });
+}
+
+function renderSystem(world: World): void {
+    const { edges } = world.readData<AppPartRemoteData>("app-part-remote");
+
+    const ctx = world.getPlugin<AppContextPlugin>("app-context");
+
+    ctx.clear();
+    ctx.drawEdges(edges, "#000000");
+}
+
+function createCube(): Edge3[] {
+    const p0 = new Point3(1, 1, 1);
+    const p1 = new Point3(1, 1, -1);
+    const p2 = new Point3(1, -1, 1);
+    const p3 = new Point3(1, -1, -1);
+    const p4 = new Point3(-1, 1, 1);
+    const p5 = new Point3(-1, 1, -1);
+    const p6 = new Point3(-1, -1, 1);
+    const p7 = new Point3(-1, -1, -1);
+
+    const edges = [
+        new Edge3(p0, p1),
+        new Edge3(p2, p3),
+        new Edge3(p4, p5),
+        new Edge3(p6, p7),
+
+        new Edge3(p0, p2),
+        new Edge3(p1, p3),
+        new Edge3(p4, p6),
+        new Edge3(p5, p7),
+
+        new Edge3(p0, p4),
+        new Edge3(p1, p5),
+        new Edge3(p2, p6),
+        new Edge3(p3, p7),
+    ];
+
+    return edges;
+}
+
+function transformEdges(edges: Edge3[], m: Matrix4): Edge2[] {
+    const output: Edge2[] = [];
+
+    for (const e of edges) {
+        const p0 = m.mapPoint(e.p0);
+        const p1 = m.mapPoint(e.p1);
+        const pp0 = Point2.fromObject(p0);
+        const pp1 = Point2.fromObject(p1);
+        output.push(new Edge2(pp0, pp1));
     }
 
-    public render(): void {
-        this.context.clear();
-        this.context.drawEdges(this.edges, "#000000");
-    }
+    return output;
+}
 
-    public reset(): void {
-        this.edges = [];
-    }
+class AppPartMainModule implements WorldModule {
+    public readonly moduleId = "app-part-main";
 
-    public update(_delta: number): void {
-        this.reset();
+    public setup(world: World): void {
+        world.registerData<AppPartMainData>("app-part-main");
+        world.registerData<AppPartStateData>("app-part-state");
 
-        const rotation = this.inputRotation.getInt();
+        world.addSystems<DefaultSystemStage>({ stage: "start", fns: [initMainSystem, writeStateSystem] });
+        world.addSystems<DefaultSystemStage>({ stage: "update", fns: [writeStateSystem] });
 
-        const [canvasWidth, canvasHeight] = this.context.getSize(true);
-
-        const edges = this.createCube();
-
-        const w = 0.5 * canvasWidth;
-        const h = 0.5 * canvasHeight;
-        const s = 0.2 * Math.min(canvasWidth, canvasHeight);
-        const d = (rotation * Math.PI) / 180;
-
-        let mat: Matrix4 | undefined;
-
-        // Projection
-        if (this.inputProjection.getValue() === "orthographic") {
-            mat = Matrix4.fromOrthographic(-1, 1, 1, -1, -10, 1000);
-        } else {
-            mat = Matrix4.fromPerspective(-1, 1, 1, -1, -10, 1000);
-        }
-
-        mat.scale(s, s, s);
-        mat.translate(w, h, 0);
-
-        // View
-        mat.translatePre(0, 0, -10);
-
-        // Model
-        const q = Quaternion.fromRotationEuler(1.1 * d, 1.3 * d, 1.7 * d, RotationOrder.ZYX);
-        mat.rotatePre(q.a, q.b, q.c, q.d);
-
-        this.edges = this.transformEdges(edges, mat);
-
-        // log.infoDebug("*********");
-        // for (const e of this.edges) {
-        //     log.infoDebug("{}", e);
-        // }
-    }
-
-    public updateLayout(): void {
-        this.launcher.addAppInput(this.inputCount);
-        this.launcher.addAppInput(this.inputRotation);
-        this.launcher.addAppInput(this.inputProjection);
-    }
-
-    private createCube(): Edge3[] {
-        const p0 = new Point3(1, 1, 1);
-        const p1 = new Point3(1, 1, -1);
-        const p2 = new Point3(1, -1, 1);
-        const p3 = new Point3(1, -1, -1);
-        const p4 = new Point3(-1, 1, 1);
-        const p5 = new Point3(-1, 1, -1);
-        const p6 = new Point3(-1, -1, 1);
-        const p7 = new Point3(-1, -1, -1);
-
-        const edges = [
-            new Edge3(p0, p1),
-            new Edge3(p2, p3),
-            new Edge3(p4, p5),
-            new Edge3(p6, p7),
-
-            new Edge3(p0, p2),
-            new Edge3(p1, p3),
-            new Edge3(p4, p6),
-            new Edge3(p5, p7),
-
-            new Edge3(p0, p4),
-            new Edge3(p1, p5),
-            new Edge3(p2, p6),
-            new Edge3(p3, p7),
-        ];
-
-        return edges;
-    }
-
-    private nextPointFromBox(random: Random, box: Box3): Point3 {
-        const x = random.nextFloatBetween(box.x0, box.x1);
-        const y = random.nextFloatBetween(box.y0, box.y1);
-        const z = random.nextFloatBetween(box.z0, box.z1);
-
-        return new Point3(x, y, z);
-    }
-
-    private transformEdges(edges: Edge3[], m: Matrix4): Edge2[] {
-        const output: Edge2[] = [];
-
-        for (const e of edges) {
-            const p0 = m.mapPoint(e.p0);
-            const p1 = m.mapPoint(e.p1);
-            const pp0 = Point2.fromObject(p0);
-            const pp1 = Point2.fromObject(p1);
-            output.push(new Edge2(pp0, pp1));
-        }
-
-        return output;
+        world.addDependency<DefaultSystemStage>({ stage: "start", seq: [initMainSystem, writeStateSystem] });
     }
 }
+
+class AppPartRemoteModule implements WorldModule {
+    public readonly moduleId = "app-part-remote";
+
+    public setup(world: World): void {
+        world.addModules([new AppContextModule()]);
+
+        world.registerData<AppPartRemoteData>("app-part-remote");
+        world.registerData<AppPartStateData>("app-part-state");
+
+        world.addSystems<DefaultSystemStage>({ stage: "start", fns: [initRemoteSystem] });
+        world.addSystems<DefaultSystemStage>({ stage: "update", fns: [updateSystem, renderSystem] });
+
+        world.addDependency<DefaultSystemStage>({ stage: "update", seq: [updateSystem, renderSystem] });
+    }
+}
+
+export const MATRIX_MAIN_WORLD: WorldOptions = {
+    id: "main",
+    modules: [new AppMainModule(), new AppPartMainModule()],
+    schedules: DEFAULT_WORLD_SCHEDULES,
+};
+
+export const MATRIX_REMOTE_WORLD: WorldOptions = {
+    id: "remote",
+    modules: [new AppRemoteModule(), new AppPartRemoteModule()],
+    schedules: DEFAULT_WORLD_SCHEDULES,
+};

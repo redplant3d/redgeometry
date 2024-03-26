@@ -1,17 +1,36 @@
 import type { Mesh2, MeshFace2 } from "redgeometry/src/core/mesh";
 import { PathCommandType, type Path2 } from "redgeometry/src/core/path";
+import type { DefaultSystemStage, WorldModule, WorldPlugin } from "redgeometry/src/ecs/types";
+import type { World } from "redgeometry/src/ecs/world";
 import type { Box2 } from "redgeometry/src/primitives/box";
 import type { Edge2 } from "redgeometry/src/primitives/edge";
 import { Point2 } from "redgeometry/src/primitives/point";
 import type { Polygon2 } from "redgeometry/src/primitives/polygon";
 import type { Image2 } from "redgeometry/src/render/image";
-import { assertUnreachable } from "redgeometry/src/utility/debug";
+import { assertUnreachable, throwError } from "redgeometry/src/utility/debug";
 import type { Random } from "redgeometry/src/utility/random";
-import { createRandomColor } from "./data.js";
+import { createRandomColor } from "../utility/helper.js";
+import type { AppCanvasData } from "./app.js";
 
 type CanvasStyle = string | CanvasGradient | CanvasPattern;
 
-export class AppContext2D {
+export function initCanvasContextSystem(world: World): void {
+    const { canvas } = world.readData<AppCanvasData>("app-canvas");
+
+    const context = canvas.getContext("2d") as CanvasRenderingContext2D | OffscreenCanvasRenderingContext2D | null;
+
+    if (context === null) {
+        throwError("Unable to create app rendering context");
+    }
+
+    const plugin = new AppContextPlugin(context);
+
+    world.setPlugin<AppContextPlugin>(plugin);
+}
+
+export class AppContextPlugin implements WorldPlugin {
+    public readonly pluginId = "app-context";
+
     private context: CanvasRenderingContext2D | OffscreenCanvasRenderingContext2D;
 
     public constructor(context: CanvasRenderingContext2D | OffscreenCanvasRenderingContext2D) {
@@ -22,14 +41,14 @@ export class AppContext2D {
         return this.context.canvas;
     }
 
-    public static fromCanvas(canvas: HTMLCanvasElement): AppContext2D | undefined {
+    public static fromCanvas(canvas: HTMLCanvasElement): AppContextPlugin | undefined {
         const context = canvas.getContext("2d") as CanvasRenderingContext2D | null;
 
         if (context === null) {
             return undefined;
         }
 
-        return new AppContext2D(context);
+        return new AppContextPlugin(context);
     }
 
     public blitImage(image: Image2, dx: number, dy: number): void {
@@ -50,15 +69,12 @@ export class AppContext2D {
     }
 
     public createLinePattern(d: number, style: CanvasStyle = "#000000"): CanvasPattern | null {
-        const canvas = document.createElement("canvas");
+        const canvas = new OffscreenCanvas(d, d);
         const context = canvas.getContext("2d");
 
         if (context === null) {
             return null;
         }
-
-        canvas.width = d;
-        canvas.height = d;
 
         context.fillStyle = style;
 
@@ -426,5 +442,15 @@ export class AppContext2D {
         }
 
         ctx.closePath();
+    }
+}
+
+export class AppContextModule implements WorldModule {
+    public readonly moduleId = "canvas-context";
+
+    public setup(world: World): void {
+        world.registerPlugin<AppContextPlugin>("app-context");
+
+        world.addSystem<DefaultSystemStage>({ stage: "start-pre", fn: initCanvasContextSystem });
     }
 }

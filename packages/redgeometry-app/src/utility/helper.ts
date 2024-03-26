@@ -1,22 +1,18 @@
+import {
+    BooleanOperator,
+    JoinType,
+    WindingOperator,
+    type CustomWindingOperator,
+} from "redgeometry/src/core/path-options";
+import { Polygon2 } from "redgeometry/src/primitives/polygon";
+
 import { Path2 } from "redgeometry/src/core/path";
 import type { Box2 } from "redgeometry/src/primitives/box";
 import { ColorRgba } from "redgeometry/src/primitives/color";
 import { Edge2 } from "redgeometry/src/primitives/edge";
 import { Point2 } from "redgeometry/src/primitives/point";
-import { Polygon2 } from "redgeometry/src/primitives/polygon";
 import type { Interval } from "redgeometry/src/utility/interval";
 import type { Random } from "redgeometry/src/utility/random";
-
-export type RandomRoofOptions = {
-    dangerousAreaCount: Interval;
-    objectHeight: Interval;
-    objectWidth: Interval;
-    obstacleCount: Interval;
-    roofHeight: Interval;
-    roofPointCount: Interval;
-    roofDiscardProbability: Interval;
-    roofBox: Box2;
-};
 
 export function createPath(random: Random, generator: number, count: number, width: number, height: number): Path2 {
     const path = Path2.createEmpty();
@@ -229,4 +225,47 @@ export function nextPointTupleFromBox(random: Random, box: Box2): [number, numbe
     const y = random.nextFloatBetween(box.y0, box.y1);
 
     return [x, y];
+}
+
+export function getBooleanOperator(value: string): BooleanOperator {
+    switch (value) {
+        case "intersection":
+            return BooleanOperator.Intersection;
+        case "exclusion":
+            return BooleanOperator.Exclusion;
+        case "awithoutb":
+            return BooleanOperator.AWithoutB;
+        case "bwithouta":
+            return BooleanOperator.BWithoutA;
+        default:
+            return BooleanOperator.Union;
+    }
+}
+
+export function getJoin(value: string): JoinType {
+    switch (value) {
+        case "miter":
+            return JoinType.Miter;
+        case "miterclip":
+            return JoinType.MiterClip;
+        case "round":
+            return JoinType.Round;
+        default:
+            return JoinType.Bevel;
+    }
+}
+
+export function getWindingRule(value: string): WindingOperator | CustomWindingOperator {
+    switch (value) {
+        case "evenodd":
+            return WindingOperator.EvenOdd;
+        case "positive":
+            return WindingOperator.Positive;
+        case "negative":
+            return WindingOperator.Negative;
+        case "absgeqtwo":
+            return (wind: number) => Math.abs(wind) > 2;
+        default:
+            return WindingOperator.NonZero;
+    }
 }

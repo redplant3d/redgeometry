@@ -1,9 +1,9 @@
-import type { WorldModule, WorldModuleId } from "redgeometry/src/ecs/types";
+import type { WorldModule } from "redgeometry/src/ecs/types";
 import type { World } from "redgeometry/src/ecs/world";
 import { assert } from "redgeometry/src/utility/debug";
 
 export type GPUInitData = {
-    dataId: "gpuInit";
+    dataId: "gpu-init";
     alphaMode: GPUCanvasAlphaMode;
     context: GPUCanvasContext;
     deviceDescriptor: GPUDeviceDescriptor | undefined;
@@ -20,12 +20,10 @@ export type GPUData = {
 };
 
 export class GPUModule implements WorldModule {
-    public get moduleId(): WorldModuleId {
-        return "gpu";
-    }
+    public readonly moduleId = "gpu";
 
     public setup(world: World): void {
-        world.registerData<GPUInitData>("gpuInit");
+        world.registerData<GPUInitData>("gpu-init");
         world.registerData<GPUData>("gpu");
 
         world.addSystem({ stage: "start-post", fn: startGPUSystem, awaitMode: "dependency" });
@@ -33,7 +31,7 @@ export class GPUModule implements WorldModule {
 }
 
 export async function startGPUSystem(world: World): Promise<void> {
-    const { gpu, requestAdapterOptions, deviceDescriptor, context } = world.readData<GPUInitData>("gpuInit");
+    const { gpu, requestAdapterOptions, deviceDescriptor, context } = world.readData<GPUInitData>("gpu-init");
     assert(gpu !== undefined, "No GPU found");
 
     const adapter = await gpu.requestAdapter(requestAdapterOptions);

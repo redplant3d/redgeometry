@@ -2,159 +2,232 @@ import { Mesh2, type MeshFace2 } from "redgeometry/src/core/mesh";
 import { Path2 } from "redgeometry/src/core/path";
 import { DEFAULT_PATH_QUALITY_OPTIONS } from "redgeometry/src/core/path-options";
 import { PathOverlay2 } from "redgeometry/src/core/path-overlay";
+import type { WorldOptions } from "redgeometry/src/ecs/app";
+import type { DefaultSystemStage, WorldModule } from "redgeometry/src/ecs/types";
+import { DEFAULT_WORLD_SCHEDULES, type World } from "redgeometry/src/ecs/world";
 import { ColorRgba } from "redgeometry/src/primitives/color";
 import { Edge2 } from "redgeometry/src/primitives/edge";
 import { Polygon2 } from "redgeometry/src/primitives/polygon";
 import { arrayEquals } from "redgeometry/src/utility/array";
 import { assertDebug } from "redgeometry/src/utility/debug";
 import { RandomXSR128 } from "redgeometry/src/utility/random";
-import type { AppContext2D } from "../context.js";
-import { createPolygonPair } from "../data.js";
-import { ComboBoxInputElement, RangeInputElement } from "../input.js";
-import type { AppLauncher, AppPart } from "../launcher.js";
-import { getWindingRule } from "../utility.js";
-
+import type { AppContextPlugin } from "../ecs/app-context.js";
+import { AppContextModule } from "../ecs/app-context.js";
+import { AppMainModule, AppRemoteModule, type AppMainData, type AppStateData } from "../ecs/app.js";
+import { createPolygonPair, getWindingRule } from "../utility/helper.js";
+import { ComboBoxInputElement, RangeInputElement } from "../utility/input.js";
 type PathOverlayTagEntry = { tag: number[]; faces: MeshFace2[] };
 
-export class PathOverlayAppPart implements AppPart {
-    private context: AppContext2D;
-    private launcher: AppLauncher;
-    private mesh: Mesh2;
-    private polygonA: Polygon2;
-    private polygonB: Polygon2;
-    private tagEntries: PathOverlayTagEntry[];
+type AppPartMainData = {
+    dataId: "app-part-main";
+    inputParameter: RangeInputElement;
+    inputWind: ComboBoxInputElement;
+};
 
-    public inputParameter: RangeInputElement;
-    public inputWind: ComboBoxInputElement;
+type AppPartRemoteData = {
+    dataId: "app-part-remote";
+    mesh: Mesh2;
+    polygonA: Polygon2;
+    polygonB: Polygon2;
+    tagEntries: PathOverlayTagEntry[];
+};
 
-    public constructor(launcher: AppLauncher, context: AppContext2D) {
-        this.launcher = launcher;
-        this.context = context;
+type AppPartStateData = {
+    dataId: "app-part-state";
+    parameter: number;
+    wind: string;
+};
 
-        this.inputParameter = new RangeInputElement("parameter", "0", "200", "100");
-        this.inputParameter.addEventListener("input", () => this.launcher.requestUpdate());
-        this.inputParameter.setStyle("width: 200px");
+function initMainSystem(world: World): void {
+    const { inputElements } = world.readData<AppMainData>("app-main");
 
-        this.inputWind = new ComboBoxInputElement("wind", "nonzero");
-        this.inputWind.addEventListener("input", () => this.launcher.requestUpdate(true));
-        this.inputWind.setOptionValues("nonzero", "evenodd", "positive", "negative", "absgeqtwo");
+    const inputParameter = new RangeInputElement("parameter", "0", "200", "100");
+    inputParameter.setStyle("width: 200px");
+    inputElements.push(inputParameter);
 
-        this.polygonA = Polygon2.createEmpty();
-        this.polygonB = Polygon2.createEmpty();
-        this.mesh = Mesh2.createEmpty();
-        this.tagEntries = [];
+    const inputWind = new ComboBoxInputElement("wind", "nonzero");
+    inputWind.setOptionValues("nonzero", "evenodd", "positive", "negative", "absgeqtwo");
+    inputElements.push(inputWind);
+
+    world.writeData<AppPartMainData>({
+        dataId: "app-part-main",
+        inputParameter,
+        inputWind,
+    });
+}
+
+function initRemoteSystem(world: World): void {
+    world.writeData<AppPartRemoteData>({
+        dataId: "app-part-remote",
+        polygonA: Polygon2.createEmpty(),
+        polygonB: Polygon2.createEmpty(),
+        mesh: Mesh2.createEmpty(),
+        tagEntries: [],
+    });
+}
+
+function writeStateSystem(world: World): void {
+    const { inputParameter, inputWind } = world.readData<AppPartMainData>("app-part-main");
+
+    const stateData: AppPartStateData = {
+        dataId: "app-part-state",
+        parameter: inputParameter.getInt(),
+        wind: inputWind.getValue(),
+    };
+
+    world.writeData(stateData);
+
+    const channel = world.getChannel("remote");
+    channel.queueData(stateData);
+}
+
+function updateSystem(world: World): void {
+    const { parameter, wind } = world.readData<AppPartStateData>("app-part-state");
+    const { seed, generator } = world.readData<AppStateData>("app-state");
+
+    const ctx = world.getPlugin<AppContextPlugin>("app-context");
+
+    const offset = 2 * (parameter - 100);
+
+    const random = RandomXSR128.fromSeedLcg(seed);
+    const [width, height] = ctx.getSize(false);
+
+    const [polygonA, polygonB] = createPolygonPair(random, generator, offset, width, height);
+
+    const clip = new PathOverlay2(DEFAULT_PATH_QUALITY_OPTIONS);
+
+    for (const edge of polygonA.getEdges()) {
+        clip.addEdge(edge, 0);
     }
 
-    public create(): void {
-        return;
+    for (const edge of polygonB.getEdges()) {
+        clip.addEdge(edge, 1);
     }
 
-    public render(): void {
-        this.context.clear();
+    clip.addEdge(Edge2.fromXY(325, 175, 350, 175), 2);
+    clip.addEdge(Edge2.fromXY(350, 175, 350, 225), 2);
+    clip.addEdge(Edge2.fromXY(350, 225, 325, 225), 2);
+    clip.addEdge(Edge2.fromXY(325, 225, 325, 175), 2);
 
-        const styles: string[] = [];
-        const step = 1 / this.tagEntries.length;
-        for (let h = 0; h < 1; h += step) {
-            const c = ColorRgba.fromHSV(h, 0.25, 1, 1);
-            styles.push(c.style());
-        }
+    clip.addEdge(Edge2.fromXY(300, 275, 375, 275), 3);
+    clip.addEdge(Edge2.fromXY(375, 275, 375, 325), 3);
+    clip.addEdge(Edge2.fromXY(375, 325, 300, 325), 3);
+    clip.addEdge(Edge2.fromXY(300, 325, 300, 275), 3);
 
-        for (const face of this.mesh.getFaces()) {
-            const tag = face.data as number[];
+    const mesh = Mesh2.createEmpty();
 
-            if (tag.length === 0) {
-                continue;
-            }
+    clip.process(mesh, getWindingRule(wind));
 
-            const path = Path2.createEmpty();
-            face.writeToPath(path);
+    const tagEntries = createTagEntries(mesh);
 
-            const idx = this.tagEntries.findIndex((c) => arrayEquals(c.tag, tag));
+    world.writeData<AppPartRemoteData>({
+        dataId: "app-part-remote",
+        polygonA,
+        polygonB,
+        mesh,
+        tagEntries,
+    });
+}
 
-            if (idx < 0) {
-                continue;
-            }
+function renderSystem(world: World): void {
+    const { mesh, tagEntries } = world.readData<AppPartRemoteData>("app-part-remote");
 
-            this.context.fillPath(path, styles[idx]);
-        }
+    const ctx = world.getPlugin<AppContextPlugin>("app-context");
 
-        this.context.drawMeshEdges(this.mesh, "#888888", 0.5);
+    ctx.clear();
+
+    const styles: string[] = [];
+    const step = 1 / tagEntries.length;
+    for (let h = 0; h < 1; h += step) {
+        const c = ColorRgba.fromHSV(h, 0.25, 1, 1);
+        styles.push(c.style());
     }
 
-    public reset(): void {
-        this.polygonA = Polygon2.createEmpty();
-        this.polygonB = Polygon2.createEmpty();
-        this.mesh = Mesh2.createEmpty();
+    for (const face of mesh.getFaces()) {
+        const tag = face.data as number[];
+
+        if (tag.length === 0) {
+            continue;
+        }
+
+        const path = Path2.createEmpty();
+        face.writeToPath(path);
+
+        const idx = tagEntries.findIndex((c) => arrayEquals(c.tag, tag));
+
+        if (idx < 0) {
+            continue;
+        }
+
+        ctx.fillPath(path, styles[idx]);
     }
 
-    public update(_delta: number): void {
-        this.reset();
+    ctx.drawMeshEdges(mesh, "#888888", 0.5);
+}
 
-        const seed = this.launcher.inputSeed.getInt();
-        const generator = this.launcher.inputGenerator.getInt();
-        const offset = 2 * (this.inputParameter.getInt() - 100);
+function createTagEntries(mesh: Mesh2): PathOverlayTagEntry[] {
+    const entries: PathOverlayTagEntry[] = [];
 
-        const random = RandomXSR128.fromSeedLcg(seed);
-        const [width, height] = this.context.getSize(false);
+    for (const face of mesh.getFaces()) {
+        assertDebug(face.data !== undefined, "Face data must not be undefined");
 
-        [this.polygonA, this.polygonB] = createPolygonPair(random, generator, offset, width, height);
+        const tag = face.data as number[];
+        const entry = entries.find((e) => arrayEquals(e.tag, tag));
 
-        const clip = new PathOverlay2(DEFAULT_PATH_QUALITY_OPTIONS);
-
-        for (const edge of this.polygonA.getEdges()) {
-            clip.addEdge(edge, 0);
+        if (entry !== undefined) {
+            entry.faces.push(face);
+        } else {
+            entries.push({ tag, faces: [face] });
         }
-
-        for (const edge of this.polygonB.getEdges()) {
-            clip.addEdge(edge, 1);
-        }
-
-        clip.addEdge(Edge2.fromXY(325, 175, 350, 175), 2);
-        clip.addEdge(Edge2.fromXY(350, 175, 350, 225), 2);
-        clip.addEdge(Edge2.fromXY(350, 225, 325, 225), 2);
-        clip.addEdge(Edge2.fromXY(325, 225, 325, 175), 2);
-
-        clip.addEdge(Edge2.fromXY(300, 275, 375, 275), 3);
-        clip.addEdge(Edge2.fromXY(375, 275, 375, 325), 3);
-        clip.addEdge(Edge2.fromXY(375, 325, 300, 325), 3);
-        clip.addEdge(Edge2.fromXY(300, 325, 300, 275), 3);
-
-        const mesh = Mesh2.createEmpty();
-
-        clip.process(mesh, getWindingRule(this.inputWind.getValue()));
-
-        this.updateTagEntries(mesh);
-
-        this.mesh = mesh;
     }
 
-    public updateLayout(): void {
-        this.launcher.addAppInput(this.inputParameter);
-        this.launcher.addAppInput(this.inputWind);
+    for (const entry of entries) {
+        if (entry.tag.length > 0) {
+            mesh.monotonizeFaces(entry.faces);
+        }
     }
 
-    private updateTagEntries(mesh: Mesh2): void {
-        const entries: PathOverlayTagEntry[] = [];
+    return entries;
+}
 
-        for (const face of mesh.getFaces()) {
-            assertDebug(face.data !== undefined, "Face data must not be undefined");
+class AppPartMainModule implements WorldModule {
+    public readonly moduleId = "app-part-main";
 
-            const tag = face.data as number[];
-            const entry = entries.find((e) => arrayEquals(e.tag, tag));
+    public setup(world: World): void {
+        world.registerData<AppPartMainData>("app-part-main");
+        world.registerData<AppPartStateData>("app-part-state");
 
-            if (entry !== undefined) {
-                entry.faces.push(face);
-            } else {
-                entries.push({ tag, faces: [face] });
-            }
-        }
+        world.addSystems<DefaultSystemStage>({ stage: "start", fns: [initMainSystem, writeStateSystem] });
+        world.addSystems<DefaultSystemStage>({ stage: "update", fns: [writeStateSystem] });
 
-        for (const entry of entries) {
-            if (entry.tag.length > 0) {
-                mesh.monotonizeFaces(entry.faces);
-            }
-        }
-
-        this.tagEntries = entries;
+        world.addDependency<DefaultSystemStage>({ stage: "start", seq: [initMainSystem, writeStateSystem] });
     }
 }
+
+class AppPartRemoteModule implements WorldModule {
+    public readonly moduleId = "app-part-remote";
+
+    public setup(world: World): void {
+        world.addModules([new AppContextModule()]);
+
+        world.registerData<AppPartRemoteData>("app-part-remote");
+        world.registerData<AppPartStateData>("app-part-state");
+
+        world.addSystems<DefaultSystemStage>({ stage: "start", fns: [initRemoteSystem] });
+        world.addSystems<DefaultSystemStage>({ stage: "update", fns: [updateSystem, renderSystem] });
+
+        world.addDependency<DefaultSystemStage>({ stage: "update", seq: [updateSystem, renderSystem] });
+    }
+}
+
+export const PATH_OVERLAY_MAIN_WORLD: WorldOptions = {
+    id: "main",
+    modules: [new AppMainModule(), new AppPartMainModule()],
+    schedules: DEFAULT_WORLD_SCHEDULES,
+};
+
+export const PATH_OVERLAY_REMOTE_WORLD: WorldOptions = {
+    id: "remote",
+    modules: [new AppRemoteModule(), new AppPartRemoteModule()],
+    schedules: DEFAULT_WORLD_SCHEDULES,
+};

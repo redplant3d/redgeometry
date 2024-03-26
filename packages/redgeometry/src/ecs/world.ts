@@ -70,20 +70,20 @@ export enum ChangeFlags {
     Deleted = 4,
 }
 
-export const DEFAULT_START_SCHEDULE: WorldScheduleOptions = {
-    id: "start",
-    stages: [{ id: "start-pre" }, { id: "start" }, { id: "start-post" }],
-};
-
-export const DEFAULT_UPDATE_SCHEDULE: WorldScheduleOptions = {
-    id: "update",
-    stages: [{ id: "update-pre" }, { id: "update" }, { id: "update-post" }],
-};
-
-export const DEFAULT_STOP_SCHEDULE: WorldScheduleOptions = {
-    id: "stop",
-    stages: [{ id: "stop-pre" }, { id: "stop" }, { id: "stop-post" }],
-};
+export const DEFAULT_WORLD_SCHEDULES: WorldScheduleOptions<DefaultWorldScheduleId, DefaultSystemStage>[] = [
+    {
+        id: "start",
+        stages: [{ id: "start-pre" }, { id: "start" }, { id: "start-post" }],
+    },
+    {
+        id: "update",
+        stages: [{ id: "update-pre" }, { id: "update" }, { id: "update-post" }],
+    },
+    {
+        id: "stop",
+        stages: [{ id: "stop-pre" }, { id: "stop" }, { id: "stop-post" }],
+    },
+];
 
 /**
  * Represents an instance context for entities and systems.
@@ -344,12 +344,12 @@ export class World {
         this.events.set(eventId, []);
     }
 
-    public registerPlugin<T extends WorldPlugin>(plugin: T): void {
-        if (this.plugins.has(plugin.pluginId)) {
-            log.warn("World already has plugin '{}' and will be overwritten", plugin.pluginId);
+    public registerPlugin<T extends WorldPlugin>(pluginId: WorldPluginIdOf<T>): void {
+        if (this.plugins.has(pluginId)) {
+            log.warn("World already has plugin '{}' and will be overwritten", pluginId);
         }
 
-        this.plugins.set(plugin.pluginId, plugin);
+        this.plugins.set(pluginId, undefined);
     }
 
     public registerSerializable<T extends Serializable>(ClassType: SerializableConstructor<T>): void {
@@ -388,6 +388,14 @@ export class World {
 
     public setParent(entity: EntityId, parent: EntityId): void {
         this.ecStorage.setParent(entity, parent);
+    }
+
+    public setPlugin<T extends WorldPlugin>(plugin: T): void {
+        if (!this.plugins.has(plugin.pluginId)) {
+            throwError("World plugin '{}' is not registered", plugin.pluginId);
+        }
+
+        this.plugins.set(plugin.pluginId, plugin);
     }
 
     /**

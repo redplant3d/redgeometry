@@ -2,116 +2,189 @@ import { Mesh2 } from "redgeometry/src/core/mesh";
 import { Path2 } from "redgeometry/src/core/path";
 import { PathClip2 } from "redgeometry/src/core/path-clip";
 import { DEFAULT_PATH_QUALITY_OPTIONS } from "redgeometry/src/core/path-options";
+import type { WorldOptions } from "redgeometry/src/ecs/app";
+import type { DefaultSystemStage, WorldModule } from "redgeometry/src/ecs/types";
+import { DEFAULT_WORLD_SCHEDULES, type World } from "redgeometry/src/ecs/world";
 import { Polygon2 } from "redgeometry/src/primitives/polygon";
 import { RandomXSR128 } from "redgeometry/src/utility/random";
-import type { AppContext2D } from "../context.js";
-import { createPolygonPair } from "../data.js";
-import { ComboBoxInputElement, RangeInputElement } from "../input.js";
-import type { AppLauncher, AppPart } from "../launcher.js";
-import { getBooleanOperator, getWindingRule } from "../utility.js";
+import type { AppContextPlugin } from "../ecs/app-context.js";
+import { AppContextModule } from "../ecs/app-context.js";
+import { AppMainModule, AppRemoteModule, type AppMainData, type AppStateData } from "../ecs/app.js";
+import { createPolygonPair, getBooleanOperator, getWindingRule } from "../utility/helper.js";
+import { ComboBoxInputElement, RangeInputElement } from "../utility/input.js";
 
-export class PathClipAppPart implements AppPart {
-    private chains: Path2;
-    private context: AppContext2D;
-    private faces: Path2;
-    private launcher: AppLauncher;
-    private polygonA: Polygon2;
-    private polygonB: Polygon2;
+type AppPartMainData = {
+    dataId: "app-part-main";
+    inputBoolOp: ComboBoxInputElement;
+    inputParameter: RangeInputElement;
+    inputWindA: ComboBoxInputElement;
+    inputWindB: ComboBoxInputElement;
+};
 
-    public inputBoolOp: ComboBoxInputElement;
-    public inputParameter: RangeInputElement;
-    public inputWindA: ComboBoxInputElement;
-    public inputWindB: ComboBoxInputElement;
+type AppPartRemoteData = {
+    dataId: "app-part-remote";
+    chains: Path2;
+    faces: Path2;
+    polygonA: Polygon2;
+    polygonB: Polygon2;
+};
 
-    public constructor(launcher: AppLauncher, context: AppContext2D) {
-        this.launcher = launcher;
-        this.context = context;
+type AppPartStateData = {
+    dataId: "app-part-state";
+    parameter: number;
+    boolOp: string;
+    windA: string;
+    windB: string;
+};
 
-        this.inputParameter = new RangeInputElement("parameter", "0", "200", "100");
-        this.inputParameter.addEventListener("input", () => this.launcher.requestUpdate());
-        this.inputParameter.setStyle("width: 200px");
+function initMainSystem(world: World): void {
+    const { inputElements } = world.readData<AppMainData>("app-main");
 
-        this.inputBoolOp = new ComboBoxInputElement("boolOp", "union");
-        this.inputBoolOp.addEventListener("input", () => this.launcher.requestUpdate(true));
-        this.inputBoolOp.setOptionValues("union", "intersection", "exclusion", "awithoutb", "bwithouta");
+    const inputParameter = new RangeInputElement("parameter", "0", "200", "100");
+    inputParameter.setStyle("width: 200px");
+    inputElements.push(inputParameter);
 
-        this.inputWindA = new ComboBoxInputElement("windA", "nonzero");
-        this.inputWindA.addEventListener("input", () => this.launcher.requestUpdate(true));
-        this.inputWindA.setOptionValues("nonzero", "evenodd", "positive", "negative", "absgeqtwo");
+    const inputBoolOp = new ComboBoxInputElement("boolOp", "union");
+    inputBoolOp.setOptionValues("union", "intersection", "exclusion", "awithoutb", "bwithouta");
+    inputElements.push(inputBoolOp);
 
-        this.inputWindB = new ComboBoxInputElement("windB", "nonzero");
-        this.inputWindB.addEventListener("input", () => this.launcher.requestUpdate(true));
-        this.inputWindB.setOptionValues("nonzero", "evenodd", "positive", "negative", "absgeqtwo");
+    const inputWindA = new ComboBoxInputElement("windA", "nonzero");
+    inputWindA.setOptionValues("nonzero", "evenodd", "positive", "negative", "absgeqtwo");
+    inputElements.push(inputWindA);
 
-        this.polygonA = Polygon2.createEmpty();
-        this.polygonB = Polygon2.createEmpty();
+    const inputWindB = new ComboBoxInputElement("windB", "nonzero");
+    inputWindB.setOptionValues("nonzero", "evenodd", "positive", "negative", "absgeqtwo");
+    inputElements.push(inputWindB);
 
-        this.chains = Path2.createEmpty();
-        this.faces = Path2.createEmpty();
+    world.writeData<AppPartMainData>({
+        dataId: "app-part-main",
+        inputParameter,
+        inputBoolOp,
+        inputWindA,
+        inputWindB,
+    });
+}
+
+function initRemoteSystem(world: World): void {
+    world.writeData<AppPartRemoteData>({
+        dataId: "app-part-remote",
+        polygonA: Polygon2.createEmpty(),
+        polygonB: Polygon2.createEmpty(),
+        chains: Path2.createEmpty(),
+        faces: Path2.createEmpty(),
+    });
+}
+
+function writeStateSystem(world: World): void {
+    const { inputParameter, inputBoolOp, inputWindA, inputWindB } = world.readData<AppPartMainData>("app-part-main");
+
+    const stateData: AppPartStateData = {
+        dataId: "app-part-state",
+        parameter: inputParameter.getInt(),
+        boolOp: inputBoolOp.getValue(),
+        windA: inputWindA.getValue(),
+        windB: inputWindB.getValue(),
+    };
+
+    world.writeData(stateData);
+
+    const channel = world.getChannel("remote");
+    channel.queueData(stateData);
+}
+
+function updateSystem(world: World): void {
+    const { parameter, boolOp, windA, windB } = world.readData<AppPartStateData>("app-part-state");
+    const { seed, generator } = world.readData<AppStateData>("app-state");
+
+    const ctx = world.getPlugin<AppContextPlugin>("app-context");
+
+    const offset = 2 * (parameter - 100);
+
+    const random = RandomXSR128.fromSeedLcg(seed);
+    const [width, height] = ctx.getSize(false);
+
+    const [polygonA, polygonB] = createPolygonPair(random, generator, offset, width, height);
+
+    const clip = new PathClip2(DEFAULT_PATH_QUALITY_OPTIONS);
+
+    for (const edge of polygonA.getEdges()) {
+        clip.addEdge(edge, 0);
     }
 
-    public create(): void {
-        return;
+    for (const edge of polygonB.getEdges()) {
+        clip.addEdge(edge, 1);
     }
 
-    public render(): void {
-        this.context.clear();
-        this.context.fillPolygon(this.polygonA, "#00FF0022");
-        this.context.fillPolygon(this.polygonB, "#0000FF22");
+    const mesh = Mesh2.createEmpty();
+    clip.process(mesh, {
+        booleanOperator: getBooleanOperator(boolOp),
+        windingOperatorA: getWindingRule(windA),
+        windingOperatorB: getWindingRule(windB),
+    });
 
-        const pattern = this.context.createLinePattern(6, "#FF0000") ?? "#FF000022";
+    world.writeData<AppPartRemoteData>({
+        dataId: "app-part-remote",
+        chains: mesh.getChainsPath(),
+        faces: mesh.getFacesPath(),
+        polygonA,
+        polygonB,
+    });
+}
 
-        this.context.fillPath(this.faces, pattern);
-        this.context.drawPath(this.faces, "#FF3333", 1.5);
-        this.context.drawPath(this.chains, "#3333FF", 1.5);
-    }
+function renderSystem(world: World): void {
+    const { polygonA, polygonB, chains, faces } = world.readData<AppPartRemoteData>("app-part-remote");
 
-    public reset(): void {
-        this.polygonA = Polygon2.createEmpty();
-        this.polygonB = Polygon2.createEmpty();
+    const ctx = world.getPlugin<AppContextPlugin>("app-context");
 
-        this.chains = Path2.createEmpty();
-        this.faces = Path2.createEmpty();
-    }
+    ctx.clear();
+    ctx.fillPolygon(polygonA, "#00FF0022");
+    ctx.fillPolygon(polygonB, "#0000FF22");
 
-    public update(_delta: number): void {
-        const seed = this.launcher.inputSeed.getInt();
-        const generator = this.launcher.inputGenerator.getInt();
-        const offset = 2 * (this.inputParameter.getInt() - 100);
+    const pattern = ctx.createLinePattern(6, "#FF0000") ?? "#FF000022";
 
-        const random = RandomXSR128.fromSeedLcg(seed);
-        const [width, height] = this.context.getSize(false);
+    ctx.fillPath(faces, pattern);
+    ctx.drawPath(faces, "#FF3333", 1.5);
+    ctx.drawPath(chains, "#3333FF", 1.5);
+}
 
-        [this.polygonA, this.polygonB] = createPolygonPair(random, generator, offset, width, height);
+class AppPartMainModule implements WorldModule {
+    public readonly moduleId = "app-part-main";
 
-        const clip = new PathClip2(DEFAULT_PATH_QUALITY_OPTIONS);
+    public setup(world: World): void {
+        world.registerData<AppPartMainData>("app-part-main");
+        world.registerData<AppPartStateData>("app-part-state");
 
-        for (const edge of this.polygonA.getEdges()) {
-            clip.addEdge(edge, 0);
-        }
+        world.addSystems<DefaultSystemStage>({ stage: "start", fns: [initMainSystem, writeStateSystem] });
+        world.addSystems<DefaultSystemStage>({ stage: "update", fns: [writeStateSystem] });
 
-        for (const edge of this.polygonB.getEdges()) {
-            clip.addEdge(edge, 1);
-        }
-
-        this.faces.clear();
-        this.chains.clear();
-
-        const mesh = Mesh2.createEmpty();
-        clip.process(mesh, {
-            booleanOperator: getBooleanOperator(this.inputBoolOp.getValue()),
-            windingOperatorA: getWindingRule(this.inputWindA.getValue()),
-            windingOperatorB: getWindingRule(this.inputWindB.getValue()),
-        });
-
-        this.faces = mesh.getFacesPath();
-        this.chains = mesh.getChainsPath();
-    }
-
-    public updateLayout(): void {
-        this.launcher.addAppInput(this.inputParameter);
-        this.launcher.addAppInput(this.inputBoolOp);
-        this.launcher.addAppInput(this.inputWindA);
-        this.launcher.addAppInput(this.inputWindB);
+        world.addDependency<DefaultSystemStage>({ stage: "start", seq: [initMainSystem, writeStateSystem] });
     }
 }
+
+class AppPartRemoteModule implements WorldModule {
+    public readonly moduleId = "app-part-remote";
+
+    public setup(world: World): void {
+        world.addModules([new AppContextModule()]);
+
+        world.registerData<AppPartRemoteData>("app-part-remote");
+        world.registerData<AppPartStateData>("app-part-state");
+
+        world.addSystems<DefaultSystemStage>({ stage: "start", fns: [initRemoteSystem] });
+        world.addSystems<DefaultSystemStage>({ stage: "update", fns: [updateSystem, renderSystem] });
+
+        world.addDependency<DefaultSystemStage>({ stage: "update", seq: [updateSystem, renderSystem] });
+    }
+}
+
+export const PATH_CLIP_MAIN_WORLD: WorldOptions = {
+    id: "main",
+    modules: [new AppMainModule(), new AppPartMainModule()],
+    schedules: DEFAULT_WORLD_SCHEDULES,
+};
+
+export const PATH_CLIP_REMOTE_WORLD: WorldOptions = {
+    id: "remote",
+    modules: [new AppRemoteModule(), new AppPartRemoteModule()],
+    schedules: DEFAULT_WORLD_SCHEDULES,
+};

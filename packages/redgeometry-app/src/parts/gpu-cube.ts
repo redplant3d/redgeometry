@@ -1,117 +1,41 @@
 import type { WorldOptions } from "redgeometry/src/ecs/app";
-import type {
-    DefaultSystemStage,
-    DefaultWorldScheduleId,
-    EntityId,
-    WorldModule,
-    WorldModuleId,
-} from "redgeometry/src/ecs/types";
-import type { World } from "redgeometry/src/ecs/world";
-import { DEFAULT_START_SCHEDULE, DEFAULT_STOP_SCHEDULE, DEFAULT_UPDATE_SCHEDULE } from "redgeometry/src/ecs/world";
+import type { DefaultSystemStage, EntityId, WorldModule } from "redgeometry/src/ecs/types";
+import { DEFAULT_WORLD_SCHEDULES, type World } from "redgeometry/src/ecs/world";
 import { Matrix4 } from "redgeometry/src/primitives/matrix";
 import { Point3 } from "redgeometry/src/primitives/point";
 import { Quaternion, RotationOrder } from "redgeometry/src/primitives/quaternion";
 import { Vector3 } from "redgeometry/src/primitives/vector";
 import { throwError } from "redgeometry/src/utility/debug";
 import { RandomXSR128, type Random } from "redgeometry/src/utility/random";
-import { createRandomColor, createRandomSeed } from "../data.js";
 import {
     AppMainModule,
     AppRemoteModule,
     type AppCanvasData,
-    type AppData,
-    type AppInputElementData,
+    type AppMainData,
+    type AppStateData,
     type WindowResizeEvent,
 } from "../ecs/app.js";
-import type { AssetData, AssetId } from "../ecs/asset.js";
+import type { AssetId, AssetPlugin } from "../ecs/asset.js";
 import type { CameraBundle, CameraComponent } from "../ecs/camera.js";
 import { GPUModule, type GPUData, type GPUInitData } from "../ecs/gpu.js";
-import {
-    InputReceiverModule,
-    InputSenderModule,
-    KeyboardButtons,
-    MouseButtons,
-    type InputData,
-    type InputSenderData,
-} from "../ecs/input.js";
+import { KeyboardButtons, KeyboardInputPlugin, MouseButtons, MouseInputPlugin } from "../ecs/input.js";
 import type { Material } from "../ecs/material.js";
 import { MeshRenderModule, type Mesh, type MeshBundle, type MeshRenderStateData } from "../ecs/mesh.js";
 import type { SceneData } from "../ecs/scene.js";
-import { TimeModule, type TimeData } from "../ecs/time.js";
+import { type TimeData } from "../ecs/time.js";
 import { Visibility, type TransformComponent } from "../ecs/transform.js";
-import { ButtonInputElement, ComboBoxInputElement, RangeInputElement, TextBoxInputElement } from "../input.js";
+import { createRandomColor } from "../utility/helper.js";
+import { ComboBoxInputElement, RangeInputElement } from "../utility/input.js";
 
-class MainModule implements WorldModule {
-    public get moduleId(): WorldModuleId {
-        return "main";
-    }
-
-    public setup(world: World): void {
-        world.registerData<AppMainData>("appMain");
-        world.registerData<AppStateData>("appState");
-        world.registerEvent<AppCommandEvent>("appCommand");
-
-        world.addSystem<DefaultSystemStage>({ stage: "start", fn: addInputElementsSystem });
-        world.addSystem<DefaultSystemStage>({ stage: "start", fn: writeStateSystem });
-        world.addSystem<DefaultSystemStage>({ stage: "start", fn: initMainSystem, awaitMode: "dependency" });
-        world.addSystem<DefaultSystemStage>({ stage: "start", fn: waitSystem });
-
-        world.addSystem<DefaultSystemStage>({ stage: "update", fn: writeStateSystem });
-        world.addSystem<DefaultSystemStage>({ stage: "update", fn: mainSystem, awaitMode: "dependency" });
-        world.addSystem<DefaultSystemStage>({ stage: "update", fn: waitSystem });
-
-        world.addDependency<DefaultSystemStage>({
-            stage: "start",
-            seq: [addInputElementsSystem, writeStateSystem, initMainSystem, waitSystem],
-        });
-        world.addDependency<DefaultSystemStage>({
-            stage: "update",
-            seq: [writeStateSystem, mainSystem, waitSystem],
-        });
-    }
-}
-
-class RemoteModule implements WorldModule {
-    public get moduleId(): WorldModuleId {
-        return "remote";
-    }
-
-    public setup(world: World): void {
-        world.registerData<AppRemoteData>("appRemote");
-        world.registerData<AppStateData>("appState");
-        world.registerEvent<AppCommandEvent>("appCommand");
-
-        world.addSystem<DefaultSystemStage>({ stage: "start", fn: initRemoteSystem });
-        world.addSystem<DefaultSystemStage>({ stage: "start", fn: initAssetSystem });
-
-        world.addSystem<DefaultSystemStage>({ stage: "update", fn: cameraMoveSystem });
-        world.addSystem<DefaultSystemStage>({ stage: "update", fn: beginFrameSystem });
-        world.addSystem<DefaultSystemStage>({ stage: "update", fn: spawnSystem });
-
-        world.addDependency<DefaultSystemStage>({
-            stage: "start",
-            seq: [initRemoteSystem, initAssetSystem],
-        });
-        world.addDependency<DefaultSystemStage>({
-            stage: "update",
-            seq: [cameraMoveSystem, beginFrameSystem, spawnSystem],
-        });
-    }
-}
-
-type AppMainData = {
-    dataId: "appMain";
+type AppPartMainData = {
+    dataId: "app-part-main";
     countRange: RangeInputElement;
     fovRange: RangeInputElement;
-    generatorTextBox: TextBoxInputElement;
-    randomizeButton: ButtonInputElement;
-    seedTextBox: TextBoxInputElement;
     transformComboBox: ComboBoxInputElement;
-    updateButton: ButtonInputElement;
 };
 
-type AppRemoteData = {
-    dataId: "appRemote";
+type AppPartRemoteData = {
+    dataId: "app-part-remote";
     count: number;
     random: Random;
     materialHandles: AssetId<Material>[];
@@ -119,52 +43,43 @@ type AppRemoteData = {
     parentEntity: EntityId | undefined;
 };
 
-type AppStateData = {
-    dataId: "appState";
+type AppPartStateData = {
+    dataId: "app-part-state";
     count: number;
     fov: number;
-    seed: number;
     transform: string;
-};
-
-type AppCommandEvent = {
-    eventId: "appCommand";
-    type: "randomize" | "update";
 };
 
 type TestComponent = {
     componentId: "test";
 };
 
-function waitSystem(): void {}
+function initMainSystem(world: World): void {
+    const { inputElements } = world.readData<AppMainData>("app-main");
 
-function initMainSystem(world: World): Promise<void> {
-    const appData = world.readData<AppData>("app");
-    const appStateData = world.readData<AppStateData>("appState");
-    const appCanvasData = world.readData<AppCanvasData>("appCanvas");
+    const fovRange = new RangeInputElement("fov", "30", "150", "65");
+    fovRange.setStyle("width: 200px");
+    inputElements.push(fovRange);
 
-    world.writeData<InputSenderData>({
-        dataId: "inputSender",
-        receiverId: WEBGPU_TEST_REMOTE_WORLD.id,
-        keyboardEventHandler: self,
-        mouseEventHandler: appData.canvas,
+    const countRange = new RangeInputElement("count", "0", "1000000", "15000");
+    countRange.setStyle("width: 200px");
+    inputElements.push(countRange);
+
+    const transformComboBox = new ComboBoxInputElement("transform", "none");
+    transformComboBox.setOptionValues("none", "rotate");
+    inputElements.push(transformComboBox);
+
+    world.writeData<AppPartMainData>({
+        dataId: "app-part-main",
+        countRange,
+        fovRange,
+        transformComboBox,
     });
-
-    const channel = world.getChannel(WEBGPU_TEST_REMOTE_WORLD.id);
-    channel.queueData<AppStateData>(appStateData);
-
-    if (appCanvasData.canvas instanceof OffscreenCanvas) {
-        channel.queueData<AppCanvasData>(appCanvasData, [appCanvasData.canvas]);
-    } else {
-        channel.queueData<AppCanvasData>(appCanvasData);
-    }
-
-    return channel.runScheduleAsync<DefaultWorldScheduleId>("start");
 }
 
 function initRemoteSystem(world: World): void {
-    const { canvas } = world.readData<AppCanvasData>("appCanvas");
-    const { seed } = world.readData<AppStateData>("appState");
+    const { canvas } = world.readData<AppCanvasData>("app-canvas");
+    const { seed } = world.readData<AppStateData>("app-state");
 
     const context = canvas.getContext("webgpu") as GPUCanvasContext | null;
 
@@ -173,7 +88,7 @@ function initRemoteSystem(world: World): void {
     }
 
     world.writeData<GPUInitData>({
-        dataId: "gpuInit",
+        dataId: "gpu-init",
         alphaMode: "premultiplied",
         context,
         deviceDescriptor: undefined,
@@ -181,8 +96,8 @@ function initRemoteSystem(world: World): void {
         requestAdapterOptions: undefined,
     });
 
-    world.writeData<AppRemoteData>({
-        dataId: "appRemote",
+    world.writeData<AppPartRemoteData>({
+        dataId: "app-part-remote",
         count: 0,
         random: RandomXSR128.fromSeedLcg(seed),
         materialHandles: [],
@@ -212,92 +127,32 @@ function initRemoteSystem(world: World): void {
     });
 }
 
-function addInputElementsSystem(world: World): void {
-    const seed = createRandomSeed();
-
-    const { inputElements } = world.readData<AppInputElementData>("appInputElement");
-
-    const randomizeButton = new ButtonInputElement("randomize", "randomize");
-    randomizeButton.addEventListener("click", () => {
-        world.queueEvent<AppCommandEvent>({ eventId: "appCommand", type: "randomize" });
-    });
-    inputElements.push(randomizeButton);
-
-    const seedTextBox = new TextBoxInputElement("seed", seed.toString());
-    seedTextBox.setStyle("width: 80px");
-    inputElements.push(seedTextBox);
-
-    const generatorTextBox = new TextBoxInputElement("generator", "0");
-    generatorTextBox.setStyle("width: 25px");
-    inputElements.push(generatorTextBox);
-
-    const updateButton = new ButtonInputElement("update", "update");
-    updateButton.addEventListener("click", () => {
-        world.queueEvent<AppCommandEvent>({ eventId: "appCommand", type: "update" });
-    });
-    inputElements.push(updateButton);
-
-    const fovRange = new RangeInputElement("fov", "30", "150", "65");
-    fovRange.setStyle("width: 200px");
-    inputElements.push(fovRange);
-
-    const countRange = new RangeInputElement("count", "0", "1000000", "15000");
-    countRange.setStyle("width: 200px");
-    inputElements.push(countRange);
-
-    const transformComboBox = new ComboBoxInputElement("transform", "none");
-    transformComboBox.setOptionValues("none", "rotate");
-    inputElements.push(transformComboBox);
-
-    world.writeData<AppMainData>({
-        dataId: "appMain",
-        countRange,
-        fovRange,
-        generatorTextBox,
-        randomizeButton,
-        seedTextBox,
-        transformComboBox,
-        updateButton,
-    });
-}
-
 function writeStateSystem(world: World): void {
-    const appMainData = world.readData<AppMainData>("appMain");
+    const appMainData = world.readData<AppPartMainData>("app-part-main");
 
-    world.writeData<AppStateData>({
-        dataId: "appState",
+    const stateData: AppPartStateData = {
+        dataId: "app-part-state",
         count: appMainData.countRange.getInt(),
         fov: appMainData.fovRange.getInt(),
-        seed: appMainData.seedTextBox.getInt(),
         transform: appMainData.transformComboBox.getValue(),
-    });
-}
+    };
 
-function mainSystem(world: World): Promise<void> {
-    const timeData = world.readData<TimeData>("time");
-    const appStateData = world.readData<AppStateData>("appState");
-    const windowResizeEvents = world.readEvents<WindowResizeEvent>("windowResize");
-    const appCommandEvents = world.readEvents<AppCommandEvent>("appCommand");
+    world.writeData(stateData);
 
-    const channel = world.getChannel(WEBGPU_TEST_REMOTE_WORLD.id);
-    channel.queueData(timeData);
-    channel.queueData(appStateData);
-    channel.queueEvents(windowResizeEvents);
-    channel.queueEvents(appCommandEvents);
-
-    return channel.runScheduleAsync<DefaultWorldScheduleId>("update");
+    const channel = world.getChannel("remote");
+    channel.queueData(stateData);
 }
 
 function beginFrameSystem(world: World): void {
     const { context, device, gpu } = world.readData<GPUData>("gpu");
-    const { transform } = world.readData<AppStateData>("appState");
+    const { transform } = world.readData<AppPartStateData>("app-part-state");
     const { time } = world.readData<TimeData>("time");
-    const { parentEntity } = world.readData<AppRemoteData>("appRemote");
+    const { parentEntity } = world.readData<AppPartRemoteData>("app-part-remote");
 
-    const windowResizeEvent = world.readLatestEvent<WindowResizeEvent>("windowResize");
+    const windowResizeEvent = world.readLatestEvent<WindowResizeEvent>("window-resize");
 
     if (windowResizeEvent !== undefined) {
-        const { alphaMode } = world.readData<GPUInitData>("gpuInit");
+        const { alphaMode } = world.readData<GPUInitData>("gpu-init");
 
         context.configure({ alphaMode, device, format: gpu.getPreferredCanvasFormat() });
 
@@ -321,13 +176,14 @@ function beginFrameSystem(world: World): void {
 }
 
 function initAssetSystem(world: World): void {
-    const appRemoteData = world.readData<AppRemoteData>("appRemote");
-    const assetData = world.readData<AssetData>("asset");
+    const appRemoteData = world.readData<AppPartRemoteData>("app-part-remote");
+
+    const asset = world.getPlugin<AssetPlugin>("asset");
 
     const { random } = appRemoteData;
 
     for (let i = 0; i < 25; i++) {
-        const materialHandle = assetData.materials.add({
+        const materialHandle = asset.materials.add({
             color: createRandomColor(random, 0.5, 1, 1),
         });
         appRemoteData.materialHandles.push(materialHandle);
@@ -340,7 +196,7 @@ function initAssetSystem(world: World): void {
         1, -1, -1, 1, -1, 1, -1, -1, 1, -1, -1, -1,
     ];
 
-    const meshHandle = assetData.meshes.add({
+    const meshHandle = asset.meshes.add({
         vertices: { type: "number", array: cubeVertices },
     });
 
@@ -356,8 +212,8 @@ function initAssetSystem(world: World): void {
 }
 
 function spawnSystem(world: World): void {
-    const appRemoteData = world.readData<AppRemoteData>("appRemote");
-    const appStateData = world.readData<AppStateData>("appState");
+    const appRemoteData = world.readData<AppPartRemoteData>("app-part-remote");
+    const appStateData = world.readData<AppPartStateData>("app-part-state");
 
     const currCount = appRemoteData.count;
     const nextCount = appStateData.count;
@@ -423,11 +279,13 @@ function spawnSystem(world: World): void {
 }
 
 function cameraMoveSystem(world: World): void {
-    const { keyboard, mouse } = world.readData<InputData>("input");
-    const { fov } = world.readData<AppStateData>("appState");
+    const { fov } = world.readData<AppPartStateData>("app-part-state");
     const { mainCamera } = world.readData<SceneData>("scene");
     const { context } = world.readData<GPUData>("gpu");
     const { delta } = world.readData<TimeData>("time");
+
+    const keyboard = world.getPlugin<KeyboardInputPlugin>("keyboard-input");
+    const mouse = world.getPlugin<MouseInputPlugin>("mouse-input");
 
     const camera = world.getComponent<CameraComponent>(mainCamera, "camera");
     const transform = world.getComponent<TransformComponent>(mainCamera, "transform");
@@ -492,20 +350,60 @@ function cameraMoveSystem(world: World): void {
     camera.projection = camProj;
 }
 
-export const WEBGPU_TEST_MAIN_WORLD: WorldOptions = {
+class AppPartMainModule implements WorldModule {
+    public readonly moduleId = "main";
+
+    public setup(world: World): void {
+        world.registerData<AppPartMainData>("app-part-main");
+        world.registerData<AppPartStateData>("app-part-state");
+
+        world.addSystem<DefaultSystemStage>({ stage: "start", fn: initMainSystem });
+        world.addSystem<DefaultSystemStage>({ stage: "start", fn: writeStateSystem });
+
+        world.addSystem<DefaultSystemStage>({ stage: "update", fn: writeStateSystem });
+
+        world.addDependency<DefaultSystemStage>({
+            stage: "start",
+            seq: [initMainSystem, writeStateSystem],
+        });
+    }
+}
+
+class AppPartRemoteModule implements WorldModule {
+    public readonly moduleId = "remote";
+
+    public setup(world: World): void {
+        world.addModules([new GPUModule(), new MeshRenderModule()]);
+
+        world.registerData<AppPartRemoteData>("app-part-remote");
+        world.registerData<AppPartStateData>("app-part-state");
+
+        world.addSystem<DefaultSystemStage>({ stage: "start", fn: initRemoteSystem });
+        world.addSystem<DefaultSystemStage>({ stage: "start", fn: initAssetSystem });
+
+        world.addSystem<DefaultSystemStage>({ stage: "update", fn: cameraMoveSystem });
+        world.addSystem<DefaultSystemStage>({ stage: "update", fn: beginFrameSystem });
+        world.addSystem<DefaultSystemStage>({ stage: "update", fn: spawnSystem });
+
+        world.addDependency<DefaultSystemStage>({
+            stage: "start",
+            seq: [initRemoteSystem, initAssetSystem],
+        });
+        world.addDependency<DefaultSystemStage>({
+            stage: "update",
+            seq: [cameraMoveSystem, beginFrameSystem, spawnSystem],
+        });
+    }
+}
+
+export const GPU_CUBE_MAIN_WORLD: WorldOptions = {
     id: "main",
-    modules: [new AppMainModule(), new MainModule(), new InputSenderModule(), new TimeModule()],
-    schedules: [DEFAULT_START_SCHEDULE, DEFAULT_UPDATE_SCHEDULE, DEFAULT_STOP_SCHEDULE],
+    modules: [new AppMainModule(), new AppPartMainModule()],
+    schedules: DEFAULT_WORLD_SCHEDULES,
 };
 
-export const WEBGPU_TEST_REMOTE_WORLD: WorldOptions = {
+export const GPU_CUBE_REMOTE_WORLD: WorldOptions = {
     id: "remote",
-    modules: [
-        new AppRemoteModule(),
-        new RemoteModule(),
-        new InputReceiverModule(),
-        new GPUModule(),
-        new MeshRenderModule(),
-    ],
-    schedules: [DEFAULT_START_SCHEDULE, DEFAULT_UPDATE_SCHEDULE, DEFAULT_STOP_SCHEDULE],
+    modules: [new AppRemoteModule(), new AppPartRemoteModule()],
+    schedules: DEFAULT_WORLD_SCHEDULES,
 };

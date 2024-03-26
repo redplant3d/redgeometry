@@ -1,17 +1,11 @@
-import { Box2 } from "redgeometry/src/primitives/box";
-import { log } from "redgeometry/src/utility/debug";
-import { RandomXSR128 } from "redgeometry/src/utility/random";
 import type { Immutable } from "redgeometry/src/utility/types";
-import type { AppContext2D } from "../context.js";
-import { RangeInputElement, TextBoxInputElement } from "../input.js";
-import type { AppLauncher, AppPart } from "../launcher.js";
 
-enum NodeType {
+export enum NodeType {
     Internal,
     Leaf,
 }
 
-type InternalNode<T> = {
+export type InternalNode<T> = {
     type: NodeType.Internal;
     parent: InternalNode<T> | undefined;
     length: number;
@@ -19,7 +13,7 @@ type InternalNode<T> = {
     children: Node<T>[];
 };
 
-type LeafNode<T> = {
+export type LeafNode<T> = {
     type: NodeType.Leaf;
     parent: InternalNode<T> | undefined;
     length: number;
@@ -27,118 +21,9 @@ type LeafNode<T> = {
     next: LeafNode<T> | undefined;
 };
 
-type Node<T> = LeafNode<T> | InternalNode<T>;
+export type Node<T> = LeafNode<T> | InternalNode<T>;
 
-export class BPlusTreeAppPart implements AppPart {
-    private bPlusTree: BPlusTree<number>;
-    private context: AppContext2D;
-    private launcher: AppLauncher;
-
-    public inputBranchSize: RangeInputElement;
-    public inputCount: RangeInputElement;
-    public inputLeafSize: RangeInputElement;
-
-    public constructor(launcher: AppLauncher, context: AppContext2D) {
-        this.launcher = launcher;
-        this.context = context;
-
-        this.inputBranchSize = new TextBoxInputElement("branchsize", "4");
-        this.inputBranchSize.setStyle("width: 40px");
-
-        this.inputLeafSize = new TextBoxInputElement("leafsize", "16");
-        this.inputLeafSize.setStyle("width: 40px");
-
-        this.inputCount = new RangeInputElement("count", "0", "128", "32");
-        this.inputCount.addEventListener("input", () => this.launcher.requestUpdate());
-        this.inputCount.setStyle("width: 200px");
-
-        const comp = (a: number, b: number): number => Math.floor(a) - Math.floor(b);
-        this.bPlusTree = new BPlusTree<number>(comp);
-    }
-
-    public create(): void {
-        return;
-    }
-
-    public render(): void {
-        this.context.clear();
-        this.drawBPlusTree(this.context, this.bPlusTree);
-    }
-
-    public reset(): void {
-        return;
-    }
-
-    public update(_delta: number): void {
-        const seed = this.launcher.inputSeed.getInt();
-        const branchSize = this.inputBranchSize.getInt();
-        const leafSize = this.inputLeafSize.getInt();
-        const count = this.inputCount.getInt();
-
-        const random = RandomXSR128.fromSeedLcg(seed);
-
-        const comp = (a: number, b: number): number => Math.floor(a) - Math.floor(b);
-        const bptree = new BPlusTree<number>(comp, branchSize, leafSize);
-
-        for (let i = 1; i <= count; i++) {
-            const val = random.nextIntBetween(0, 10) + 0.003 * i;
-            // const val = random.nextIntBetween(0, 10);
-
-            if (i === count) {
-                bptree.add(val);
-            } else {
-                bptree.add(val);
-            }
-        }
-
-        // log.infoDebug("Values: {}", bptree.toArray());
-        log.assertFn(() => bptree.validate(comp), "Validation failed");
-
-        this.bPlusTree = bptree;
-    }
-
-    public updateLayout(): void {
-        this.launcher.addAppInput(this.inputBranchSize);
-        this.launcher.addAppInput(this.inputLeafSize);
-        this.launcher.addAppInput(this.inputCount);
-    }
-
-    private drawBPlusTree(ctx: AppContext2D, bptree: BPlusTree<number>): void {
-        const boxWidth = 26 * 2.5;
-        const boxHeight = 26;
-        const boxOffset = 20;
-        const boxPadding = 10;
-
-        printNode(bptree.getRootNode(), 0, 0);
-
-        function printNode(node: Immutable<Node<number>>, x: number, y: number): number {
-            let yNext = y;
-            if (node.type === NodeType.Internal) {
-                drawValues(node.keys, x, yNext, "#FF8888");
-                for (const child of node.children) {
-                    yNext = printNode(child, x + 1, yNext + 1);
-                }
-            } else {
-                drawValues(node.values, x, yNext, "#8888FF");
-            }
-            return yNext;
-        }
-
-        function drawValues(values: Immutable<number[]>, x: number, y: number, color: string): void {
-            let xNext = x;
-            for (const value of values) {
-                const xCoord = boxOffset + xNext * (boxWidth + boxPadding);
-                const yCoord = boxOffset + y * (boxHeight + boxPadding);
-                const box = Box2.fromXYWH(xCoord, yCoord, boxWidth, boxHeight);
-                ctx.fillBox(box, color);
-                ctx.fillText(value.toFixed(3), box.getCenter(), "#FFFFFF");
-                xNext++;
-            }
-        }
-    }
-}
-
-class BPlusTree<T> {
+export class BPlusTree<T> {
     private branchSize: number;
     private compareFn: (a: T, b: T) => number;
     private leafSize: number;

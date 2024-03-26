@@ -1,28 +1,22 @@
-import type { DefaultSystemStage, WorldId, WorldModule, WorldModuleId } from "redgeometry/src/ecs/types";
+import type { DefaultSystemStage, WorldId, WorldModule, WorldPlugin } from "redgeometry/src/ecs/types";
 import type { World } from "redgeometry/src/ecs/world";
 import { assertUnreachable } from "redgeometry/src/utility/debug";
 
 export type InputSenderData = {
-    dataId: "inputSender";
+    dataId: "input-sender";
     keyboardEventHandler: GlobalEventHandlers;
     mouseEventHandler: GlobalEventHandlers;
     receiverId: WorldId;
 };
 
-export type InputData = {
-    dataId: "input";
-    keyboard: KeyboardInput;
-    mouse: MouseInput;
-};
-
 export type InputEventsData = {
-    dataId: "inputEvents";
+    dataId: "input-events";
     keyboardEvents: InputKeyboardEventType[];
     mouseEvents: InputMouseEventType[];
 };
 
 export type InputDataEvent = {
-    eventId: "inputData";
+    eventId: "input-data";
     keyboardEvents: InputKeyboardEventType[];
     mouseEvents: InputMouseEventType[];
 };
@@ -40,8 +34,6 @@ export type InputMouseEventType = {
     pageY: number;
     screenX: number;
     screenY: number;
-    x: number;
-    y: number;
 };
 
 export type InputKeyboardEventType = {
@@ -71,6 +63,17 @@ export enum MouseButtons {
     Mouse5,
 }
 
+type InputMousePosition = {
+    clientX: number;
+    clientY: number;
+    offsetX: number;
+    offsetY: number;
+    pageX: number;
+    pageY: number;
+    screenX: number;
+    screenY: number;
+};
+
 enum ButtonState {
     None,
     Pressed,
@@ -96,38 +99,8 @@ const KEYBOARD_BUTTONS_LOOKUP: Record<string, KeyboardButtons> = {
     ShiftLeft: KeyboardButtons.ShiftLeft,
 };
 
-export class InputSenderModule implements WorldModule {
-    public get moduleId(): WorldModuleId {
-        return "input-sender";
-    }
-
-    public setup(world: World): void {
-        world.registerData<InputEventsData>("inputEvents");
-        world.registerData<InputSenderData>("inputSender");
-
-        world.addSystem<DefaultSystemStage>({ stage: "start-post", fn: startInputSenderSystem });
-
-        world.addSystem<DefaultSystemStage>({ stage: "update-pre", fn: updateInputSenderSystem });
-    }
-}
-
-export class InputReceiverModule implements WorldModule {
-    public get moduleId(): WorldModuleId {
-        return "input-receiver";
-    }
-
-    public setup(world: World): void {
-        world.registerEvent<InputDataEvent>("inputData");
-        world.registerData<InputData>("input");
-
-        world.addSystem<DefaultSystemStage>({ stage: "start-pre", fn: startInputReceiverSystem });
-
-        world.addSystem<DefaultSystemStage>({ stage: "update-pre", fn: updateInputReceiverSystem });
-    }
-}
-
 export function startInputSenderSystem(world: World): void {
-    const { keyboardEventHandler, mouseEventHandler } = world.readData<InputSenderData>("inputSender");
+    const { keyboardEventHandler, mouseEventHandler } = world.readData<InputSenderData>("input-sender");
 
     const keyboardEvents: InputKeyboardEventType[] = [];
     const mouseEvents: InputMouseEventType[] = [];
@@ -172,8 +145,6 @@ export function startInputSenderSystem(world: World): void {
             pageY: ev.pageY,
             screenX: ev.screenX,
             screenY: ev.screenY,
-            x: ev.x,
-            y: ev.y,
         });
     };
 
@@ -186,19 +157,19 @@ export function startInputSenderSystem(world: World): void {
     mouseEventHandler.addEventListener("mouseup", mouseFn);
 
     world.writeData<InputEventsData>({
-        dataId: "inputEvents",
+        dataId: "input-events",
         keyboardEvents,
         mouseEvents,
     });
 }
 
 export function updateInputSenderSystem(world: World): void {
-    const { receiverId } = world.readData<InputSenderData>("inputSender");
+    const { receiverId } = world.readData<InputSenderData>("input-sender");
     const channel = world.getChannel(receiverId);
 
-    const { keyboardEvents, mouseEvents } = world.readData<InputEventsData>("inputEvents");
+    const { keyboardEvents, mouseEvents } = world.readData<InputEventsData>("input-events");
     channel.queueEvent<InputDataEvent>({
-        eventId: "inputData",
+        eventId: "input-data",
         keyboardEvents: [...keyboardEvents],
         mouseEvents: [...mouseEvents],
     });
@@ -208,27 +179,31 @@ export function updateInputSenderSystem(world: World): void {
 }
 
 export function startInputReceiverSystem(world: World): void {
-    world.writeData<InputData>({
-        dataId: "input",
-        keyboard: new KeyboardInput(),
-        mouse: new MouseInput(),
-    });
+    const keyboardInputPlugin = new KeyboardInputPlugin();
+    world.setPlugin<KeyboardInputPlugin>(keyboardInputPlugin);
+
+    const mouseInputPlugin = new MouseInputPlugin();
+    world.setPlugin<MouseInputPlugin>(mouseInputPlugin);
 }
 
 export function updateInputReceiverSystem(world: World): void {
-    const events = world.readEvents<InputDataEvent>("inputData");
-    const data = world.readData<InputData>("input");
+    const events = world.readEvents<InputDataEvent>("input-data");
 
-    data.keyboard.clear();
-    data.mouse.clear();
+    const keyboardInputPlugin = world.getPlugin<KeyboardInputPlugin>("keyboard-input");
+    const mouseInputPlugin = world.getPlugin<MouseInputPlugin>("mouse-input");
+
+    keyboardInputPlugin.clear();
+    mouseInputPlugin.clear();
 
     for (const ev of events) {
-        data.keyboard.applyEvents(ev.keyboardEvents);
-        data.mouse.applyEvents(ev.mouseEvents);
+        keyboardInputPlugin.applyEvents(ev.keyboardEvents);
+        mouseInputPlugin.applyEvents(ev.mouseEvents);
     }
 }
 
-export class KeyboardInput {
+export class KeyboardInputPlugin implements WorldPlugin {
+    public readonly pluginId = "keyboard-input";
+
     private states: Map<KeyboardButtons, { code: string; state: ButtonState }>;
 
     public events: InputKeyboardEventType[];
@@ -320,16 +295,37 @@ export class KeyboardInput {
     }
 }
 
-export class MouseInput {
+export class MouseInputPlugin implements WorldPlugin {
+    public readonly pluginId = "mouse-input";
+
     private states: Map<MouseButtons, { code: string; state: ButtonState }>;
+    private cursorPosition: InputMousePosition;
 
     public events: InputMouseEventType[];
 
     public constructor() {
         this.states = new Map();
         this.events = [];
+        this.cursorPosition = {
+            clientX: 0,
+            clientY: 0,
+            offsetX: 0,
+            offsetY: 0,
+            pageX: 0,
+            pageY: 0,
+            screenX: 0,
+            screenY: 0,
+        };
 
         this.initialize();
+    }
+
+    public getPosition(): InputMousePosition {
+        return this.cursorPosition;
+    }
+
+    public moveTo(cursorPosition: InputMousePosition): void {
+        this.cursorPosition = cursorPosition;
     }
 
     public applyEvents(mouseEvents: InputMouseEventType[]): void {
@@ -352,6 +348,17 @@ export class MouseInput {
                     break;
                 }
             }
+
+            this.moveTo({
+                clientX: ev.clientX,
+                clientY: ev.clientY,
+                offsetX: ev.offsetX,
+                offsetY: ev.offsetY,
+                pageX: ev.pageX,
+                pageY: ev.pageY,
+                screenX: ev.screenX,
+                screenY: ev.screenY,
+            });
         }
     }
 
@@ -406,5 +413,31 @@ export class MouseInput {
         }
 
         key.state = ButtonState.Released;
+    }
+}
+
+export class InputSenderModule implements WorldModule {
+    public readonly moduleId = "input-sender";
+
+    public setup(world: World): void {
+        world.registerData<InputEventsData>("input-events");
+        world.registerData<InputSenderData>("input-sender");
+
+        world.addSystem<DefaultSystemStage>({ stage: "start-post", fn: startInputSenderSystem });
+        world.addSystem<DefaultSystemStage>({ stage: "update-pre", fn: updateInputSenderSystem });
+    }
+}
+
+export class InputReceiverModule implements WorldModule {
+    public readonly moduleId = "input-receiver";
+
+    public setup(world: World): void {
+        world.registerPlugin<MouseInputPlugin>("mouse-input");
+        world.registerPlugin<KeyboardInputPlugin>("keyboard-input");
+
+        world.registerEvent<InputDataEvent>("input-data");
+
+        world.addSystem<DefaultSystemStage>({ stage: "start-pre", fn: startInputReceiverSystem });
+        world.addSystem<DefaultSystemStage>({ stage: "update-pre", fn: updateInputReceiverSystem });
     }
 }

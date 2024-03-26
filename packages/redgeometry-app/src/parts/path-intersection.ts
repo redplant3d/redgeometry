@@ -1,61 +1,134 @@
 import { Path2 } from "redgeometry/src/core/path";
+import type { WorldOptions } from "redgeometry/src/ecs/app";
+import type { DefaultSystemStage, WorldModule } from "redgeometry/src/ecs/types";
+import { DEFAULT_WORLD_SCHEDULES, type World } from "redgeometry/src/ecs/world";
 import { Bezier2Curve2 } from "redgeometry/src/primitives/bezier";
 import { Point2 } from "redgeometry/src/primitives/point";
-import type { AppContext2D } from "../context.js";
-import { RangeInputElement } from "../input.js";
-import type { AppLauncher, AppPart } from "../launcher.js";
+import type { AppContextPlugin } from "../ecs/app-context.js";
+import { AppContextModule } from "../ecs/app-context.js";
+import { AppMainModule, AppRemoteModule, type AppMainData } from "../ecs/app.js";
+import { RangeInputElement } from "../utility/input.js";
 
-export class PathIntersectionAppPart implements AppPart {
-    private context: AppContext2D;
-    private launcher: AppLauncher;
-    private path: Path2;
-    private points: Point2[];
+type AppPartMainData = {
+    dataId: "app-part-main";
+    inputParameter: RangeInputElement;
+};
 
-    public inputParameter: RangeInputElement;
+type AppPartRemoteData = {
+    dataId: "app-part-remote";
+    path: Path2;
+    points: Point2[];
+};
 
-    public constructor(launcher: AppLauncher, context: AppContext2D) {
-        this.launcher = launcher;
-        this.context = context;
+type AppPartStateData = {
+    dataId: "app-part-state";
+    parameter: number;
+};
 
-        this.inputParameter = new RangeInputElement("parameter", "0", "200", "100");
-        this.inputParameter.addEventListener("input", () => this.launcher.requestUpdate());
-        this.inputParameter.setStyle("width: 200px");
+function initMainSystem(world: World): void {
+    const { inputElements } = world.readData<AppMainData>("app-main");
 
-        this.path = Path2.createEmpty();
-        this.points = [];
-    }
+    const inputParameter = new RangeInputElement("parameter", "0", "200", "100");
+    inputParameter.setStyle("width: 200px");
+    inputElements.push(inputParameter);
 
-    public create(): void {
-        return;
-    }
+    world.writeData<AppPartMainData>({
+        dataId: "app-part-main",
+        inputParameter,
+    });
+}
 
-    public render(): void {
-        this.context.clear();
-        this.context.drawPath(this.path);
-        this.context.fillPoints(this.points, "#FF0000", 5);
-    }
+function initRemoteSystem(world: World): void {
+    world.writeData<AppPartRemoteData>({
+        dataId: "app-part-remote",
+        path: Path2.createEmpty(),
+        points: [],
+    });
+}
 
-    public reset(): void {
-        this.path = Path2.createEmpty();
-        this.points = [];
-    }
+function writeStateSystem(world: World): void {
+    const { inputParameter } = world.readData<AppPartMainData>("app-part-main");
 
-    public update(_delta: number): void {
-        const offset = this.inputParameter.getInt();
+    const stateData: AppPartStateData = {
+        dataId: "app-part-state",
+        parameter: inputParameter.getInt(),
+    };
 
-        const c1 = new Bezier2Curve2(new Point2(100, 150), new Point2(300, 400), new Point2(600, 250));
-        const c2 = new Bezier2Curve2(new Point2(100, 500), new Point2(300, 100), new Point2(500, 100 + 3 * offset));
+    world.writeData(stateData);
 
-        this.points = [];
-        this.path = Path2.createEmpty();
+    const channel = world.getChannel("remote");
+    channel.queueData(stateData);
+}
 
-        c1.intersectQuad(c2, this.points);
+function updateSystem(world: World): void {
+    const { parameter } = world.readData<AppPartStateData>("app-part-state");
 
-        this.path.addCurveSplines(c1);
-        this.path.addCurveSplines(c2);
-    }
+    const c1 = new Bezier2Curve2(new Point2(100, 150), new Point2(300, 400), new Point2(600, 250));
+    const c2 = new Bezier2Curve2(new Point2(100, 500), new Point2(300, 100), new Point2(500, 100 + 3 * parameter));
 
-    public updateLayout(): void {
-        this.launcher.addAppInput(this.inputParameter);
+    const points: Point2[] = [];
+    const path = Path2.createEmpty();
+
+    c1.intersectQuad(c2, points);
+
+    path.addCurveSplines(c1);
+    path.addCurveSplines(c2);
+
+    world.writeData<AppPartRemoteData>({
+        dataId: "app-part-remote",
+        path,
+        points,
+    });
+}
+
+function renderSystem(world: World): void {
+    const { path, points } = world.readData<AppPartRemoteData>("app-part-remote");
+
+    const ctx = world.getPlugin<AppContextPlugin>("app-context");
+
+    ctx.clear();
+    ctx.drawPath(path);
+    ctx.fillPoints(points, "#FF0000", 5);
+}
+
+class AppPartMainModule implements WorldModule {
+    public readonly moduleId = "app-part-main";
+
+    public setup(world: World): void {
+        world.registerData<AppPartMainData>("app-part-main");
+        world.registerData<AppPartStateData>("app-part-state");
+
+        world.addSystems<DefaultSystemStage>({ stage: "start", fns: [initMainSystem, writeStateSystem] });
+        world.addSystems<DefaultSystemStage>({ stage: "update", fns: [writeStateSystem] });
+
+        world.addDependency<DefaultSystemStage>({ stage: "start", seq: [initMainSystem, writeStateSystem] });
     }
 }
+
+class AppPartRemoteModule implements WorldModule {
+    public readonly moduleId = "app-part-remote";
+
+    public setup(world: World): void {
+        world.addModules([new AppContextModule()]);
+
+        world.registerData<AppPartRemoteData>("app-part-remote");
+        world.registerData<AppPartStateData>("app-part-state");
+
+        world.addSystems<DefaultSystemStage>({ stage: "start", fns: [initRemoteSystem] });
+        world.addSystems<DefaultSystemStage>({ stage: "update", fns: [updateSystem, renderSystem] });
+
+        world.addDependency<DefaultSystemStage>({ stage: "update", seq: [updateSystem, renderSystem] });
+    }
+}
+
+export const PATH_INTERSECTION_MAIN_WORLD: WorldOptions = {
+    id: "main",
+    modules: [new AppMainModule(), new AppPartMainModule()],
+    schedules: DEFAULT_WORLD_SCHEDULES,
+};
+
+export const PATH_INTERSECTION_REMOTE_WORLD: WorldOptions = {
+    id: "remote",
+    modules: [new AppRemoteModule(), new AppPartRemoteModule()],
+    schedules: DEFAULT_WORLD_SCHEDULES,
+};
