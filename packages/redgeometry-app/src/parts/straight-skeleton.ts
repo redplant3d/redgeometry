@@ -7,10 +7,11 @@ import { Box2 } from "redgeometry/src/primitives/box";
 import { RandomXSR128 } from "redgeometry/src/utility/random";
 import type { AppContextPlugin } from "../ecs/app-context.js";
 import { AppContextModule } from "../ecs/app-context.js";
-import { AppMainModule, AppRemoteModule, type AppMainData, type AppStateData } from "../ecs/app.js";
-import { createSimplePolygon } from "../utility/helper.js";
-import { RangeInputElement } from "../utility/input.js";
-import { Skeleton } from "../utility/straight-skeleton.js";
+import type { AppInputData } from "../ecs/app-input.js";
+import { RangeInputElement } from "../ecs/app-input.js";
+import { AppMainModule, AppRemoteModule, type AppStateData } from "../ecs/app.js";
+import { createRandomPolygonSimple } from "../utility/helper.js";
+import { StraightSkeleton } from "../utility/straight-skeleton.js";
 
 type AppPartMainData = {
     dataId: "app-part-main";
@@ -21,7 +22,7 @@ type AppPartRemoteData = {
     dataId: "app-part-remote";
     mesh: Mesh2;
     meshOriginal: Mesh2;
-    skeleton: Skeleton;
+    skeleton: StraightSkeleton;
 };
 
 type AppPartStateData = {
@@ -30,7 +31,7 @@ type AppPartStateData = {
 };
 
 function initMainSystem(world: World): void {
-    const { inputElements } = world.readData<AppMainData>("app-main");
+    const { inputElements } = world.readData<AppInputData>("app-input");
 
     const inputTime = new RangeInputElement("time", "0", "500", "50");
     inputTime.setStyle("width: 200px");
@@ -47,7 +48,7 @@ function initRemoteSystem(world: World): void {
         dataId: "app-part-remote",
         mesh: Mesh2.createEmpty(),
         meshOriginal: Mesh2.createEmpty(),
-        skeleton: new Skeleton(),
+        skeleton: new StraightSkeleton(),
     });
 }
 
@@ -78,7 +79,7 @@ function updateSystem(world: World): void {
     const tmax = time;
 
     // const path = createSimplePolygon(random, box, generator, 0.5, 0.25).toPath();
-    const path = createSimplePolygon(random, box, generator, 1, 0).toPath();
+    const path = createRandomPolygonSimple(random, box, generator, 1, 0).toPath();
     // const path = createSimplePolygon(random, box, generator, 0.05, 0.95).toPath();
 
     // path.clear();
@@ -97,7 +98,7 @@ function updateSystem(world: World): void {
 
     mesh.triangulate(false);
 
-    const skeleton = new Skeleton();
+    const skeleton = new StraightSkeleton();
     skeleton.initializeMesh(mesh);
     skeleton.createStraightSkeleton(mesh, tmax);
 

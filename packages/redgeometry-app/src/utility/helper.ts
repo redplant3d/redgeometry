@@ -1,20 +1,67 @@
+import { Mesh2 } from "redgeometry/src/core/mesh";
+import { Path2 } from "redgeometry/src/core/path";
+import { PathClip2 } from "redgeometry/src/core/path-clip";
 import {
     BooleanOperator,
+    DEFAULT_PATH_QUALITY_OPTIONS,
     JoinType,
     WindingOperator,
     type CustomWindingOperator,
 } from "redgeometry/src/core/path-options";
-import { Polygon2 } from "redgeometry/src/primitives/polygon";
-
-import { Path2 } from "redgeometry/src/core/path";
 import type { Box2 } from "redgeometry/src/primitives/box";
 import { ColorRgba } from "redgeometry/src/primitives/color";
 import { Edge2 } from "redgeometry/src/primitives/edge";
 import { Point2 } from "redgeometry/src/primitives/point";
-import type { Interval } from "redgeometry/src/utility/interval";
+import { Polygon2 } from "redgeometry/src/primitives/polygon";
 import type { Random } from "redgeometry/src/utility/random";
 
-export function createPath(random: Random, generator: number, count: number, width: number, height: number): Path2 {
+export function createRandomColor(random: Random, s: number, v: number, a: number): ColorRgba {
+    return ColorRgba.fromHSV(random.nextFloat(), s, v, a);
+}
+
+export function createRandomEdge(random: Random, box: Box2): Edge2 {
+    const p0 = createRandomPoint(random, box);
+    const p1 = createRandomPoint(random, box);
+
+    return new Edge2(p0, p1);
+}
+
+export function createRandomMesh(
+    random: Random,
+    generator: number,
+    offset: number,
+    width: number,
+    height: number,
+): Mesh2 {
+    const [polygonA, polygonB] = createRandomPolygonPair(random, generator, offset, width, height);
+
+    const clip = new PathClip2(DEFAULT_PATH_QUALITY_OPTIONS);
+
+    for (const edge of polygonA.getEdges()) {
+        clip.addEdge(edge, 0);
+    }
+
+    for (const edge of polygonB.getEdges()) {
+        clip.addEdge(edge, 1);
+    }
+
+    const mesh = Mesh2.createEmpty();
+    clip.process(mesh, {
+        booleanOperator: BooleanOperator.Exclusion,
+        windingOperatorA: WindingOperator.NonZero,
+        windingOperatorB: WindingOperator.NonZero,
+    });
+
+    return mesh;
+}
+
+export function createRandomPath(
+    random: Random,
+    generator: number,
+    count: number,
+    width: number,
+    height: number,
+): Path2 {
     const path = Path2.createEmpty();
 
     path.moveTo(new Point2(width * random.nextFloat(), height * random.nextFloat()));
@@ -57,7 +104,14 @@ export function createPath(random: Random, generator: number, count: number, wid
     return path;
 }
 
-export function createPolygonPair(
+export function createRandomPoint(random: Random, box: Box2): Point2 {
+    const x = random.nextFloatBetween(box.x0, box.x1);
+    const y = random.nextFloatBetween(box.y0, box.y1);
+
+    return new Point2(x, y);
+}
+
+export function createRandomPolygonPair(
     random: Random,
     generator: number,
     offset: number,
@@ -163,7 +217,7 @@ export function createPolygonPair(
     return [polygonA, polygonB];
 }
 
-export function createSimplePolygon(
+export function createRandomPolygonSimple(
     random: Random,
     box: Box2,
     count: number,
@@ -190,41 +244,8 @@ export function createSimplePolygon(
     return result;
 }
 
-export function createEdge(random: Random, box: Box2): Edge2 {
-    const p0 = nextPointFromBox(random, box);
-    const p1 = nextPointFromBox(random, box);
-
-    return new Edge2(p0, p1);
-}
-
-export function createRandomColor(random: Random, s: number, v: number, a: number): ColorRgba {
-    return ColorRgba.fromHSV(random.nextFloat(), s, v, a);
-}
-
 export function createRandomSeed(): number {
     return (0xffffff * Math.random()) | 0;
-}
-
-export function nextFloatBetweenInterval(random: Random, i: Interval): number {
-    return random.nextFloatBetween(i.a, i.b);
-}
-
-export function nextIntBetweenInterval(random: Random, i: Interval): number {
-    return random.nextIntBetween(i.a, i.b);
-}
-
-export function nextPointFromBox(random: Random, box: Box2): Point2 {
-    const x = random.nextFloatBetween(box.x0, box.x1);
-    const y = random.nextFloatBetween(box.y0, box.y1);
-
-    return new Point2(x, y);
-}
-
-export function nextPointTupleFromBox(random: Random, box: Box2): [number, number] {
-    const x = random.nextFloatBetween(box.x0, box.x1);
-    const y = random.nextFloatBetween(box.y0, box.y1);
-
-    return [x, y];
 }
 
 export function getBooleanOperator(value: string): BooleanOperator {
@@ -242,7 +263,7 @@ export function getBooleanOperator(value: string): BooleanOperator {
     }
 }
 
-export function getJoin(value: string): JoinType {
+export function getJoinType(value: string): JoinType {
     switch (value) {
         case "miter":
             return JoinType.Miter;
@@ -255,7 +276,7 @@ export function getJoin(value: string): JoinType {
     }
 }
 
-export function getWindingRule(value: string): WindingOperator | CustomWindingOperator {
+export function getWindingOperator(value: string): WindingOperator | CustomWindingOperator {
     switch (value) {
         case "evenodd":
             return WindingOperator.EvenOdd;

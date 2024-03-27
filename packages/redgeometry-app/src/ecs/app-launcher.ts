@@ -2,7 +2,7 @@ import type { WorldModule } from "redgeometry/src/ecs/types";
 import type { World } from "redgeometry/src/ecs/world";
 
 export type AppLauncherData = {
-    dataId: "appLauncher";
+    dataId: "app-launcher";
     appPartId: string;
     appPartIds: string[];
 };
@@ -19,9 +19,10 @@ export class AppLauncherModule implements WorldModule {
     }
 
     public setup(world: World): void {
-        world.registerData<AppLauncherData>("appLauncher");
+        world.registerData<AppLauncherData>("app-launcher");
+
         world.writeData<AppLauncherData>({
-            dataId: "appLauncher",
+            dataId: "app-launcher",
             appPartIds: this.appPartIds,
             appPartId: this.appPartId,
         });

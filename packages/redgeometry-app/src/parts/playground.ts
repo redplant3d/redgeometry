@@ -5,8 +5,9 @@ import { log } from "redgeometry/src/utility/debug";
 import { RandomXSR128 } from "redgeometry/src/utility/random";
 import type { AppContextPlugin } from "../ecs/app-context.js";
 import { AppContextModule } from "../ecs/app-context.js";
-import { AppMainModule, AppRemoteModule, type AppMainData, type AppStateData } from "../ecs/app.js";
-import { RangeInputElement } from "../utility/input.js";
+import type { AppInputData } from "../ecs/app-input.js";
+import { RangeInputElement } from "../ecs/app-input.js";
+import { AppMainModule, AppRemoteModule, type AppStateData } from "../ecs/app.js";
 
 type AppPartMainData = {
     dataId: "app-part-main";
@@ -25,7 +26,7 @@ type AppPartStateData = {
 };
 
 function initMainSystem(world: World): void {
-    const { inputElements } = world.readData<AppMainData>("app-main");
+    const { inputElements } = world.readData<AppInputData>("app-input");
 
     const inputParam1 = new RangeInputElement("param1", "1", "100", "50");
     inputParam1.setStyle("width: 200px");

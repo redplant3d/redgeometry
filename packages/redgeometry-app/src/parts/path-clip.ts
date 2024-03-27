@@ -9,9 +9,10 @@ import { Polygon2 } from "redgeometry/src/primitives/polygon";
 import { RandomXSR128 } from "redgeometry/src/utility/random";
 import type { AppContextPlugin } from "../ecs/app-context.js";
 import { AppContextModule } from "../ecs/app-context.js";
-import { AppMainModule, AppRemoteModule, type AppMainData, type AppStateData } from "../ecs/app.js";
-import { createPolygonPair, getBooleanOperator, getWindingRule } from "../utility/helper.js";
-import { ComboBoxInputElement, RangeInputElement } from "../utility/input.js";
+import type { AppInputData } from "../ecs/app-input.js";
+import { ComboBoxInputElement, RangeInputElement } from "../ecs/app-input.js";
+import { AppMainModule, AppRemoteModule, type AppStateData } from "../ecs/app.js";
+import { createRandomPolygonPair, getBooleanOperator, getWindingOperator } from "../utility/helper.js";
 
 type AppPartMainData = {
     dataId: "app-part-main";
@@ -38,7 +39,7 @@ type AppPartStateData = {
 };
 
 function initMainSystem(world: World): void {
-    const { inputElements } = world.readData<AppMainData>("app-main");
+    const { inputElements } = world.readData<AppInputData>("app-input");
 
     const inputParameter = new RangeInputElement("parameter", "0", "200", "100");
     inputParameter.setStyle("width: 200px");
@@ -103,7 +104,7 @@ function updateSystem(world: World): void {
     const random = RandomXSR128.fromSeedLcg(seed);
     const [width, height] = ctx.getSize(false);
 
-    const [polygonA, polygonB] = createPolygonPair(random, generator, offset, width, height);
+    const [polygonA, polygonB] = createRandomPolygonPair(random, generator, offset, width, height);
 
     const clip = new PathClip2(DEFAULT_PATH_QUALITY_OPTIONS);
 
@@ -118,8 +119,8 @@ function updateSystem(world: World): void {
     const mesh = Mesh2.createEmpty();
     clip.process(mesh, {
         booleanOperator: getBooleanOperator(boolOp),
-        windingOperatorA: getWindingRule(windA),
-        windingOperatorB: getWindingRule(windB),
+        windingOperatorA: getWindingOperator(windA),
+        windingOperatorB: getWindingOperator(windB),
     });
 
     world.writeData<AppPartRemoteData>({

@@ -7,8 +7,9 @@ import { Point2, Point3 } from "redgeometry/src/primitives/point";
 import { Quaternion, RotationOrder } from "redgeometry/src/primitives/quaternion";
 import type { AppContextPlugin } from "../ecs/app-context.js";
 import { AppContextModule } from "../ecs/app-context.js";
-import { AppMainModule, AppRemoteModule, type AppMainData } from "../ecs/app.js";
-import { ComboBoxInputElement, RangeInputElement, TextBoxInputElement } from "../utility/input.js";
+import type { AppInputData } from "../ecs/app-input.js";
+import { ComboBoxInputElement, RangeInputElement, TextBoxInputElement } from "../ecs/app-input.js";
+import { AppMainModule, AppRemoteModule } from "../ecs/app.js";
 
 type AppPartMainData = {
     dataId: "app-part-main";
@@ -30,7 +31,7 @@ type AppPartStateData = {
 };
 
 function initMainSystem(world: World): void {
-    const { inputElements } = world.readData<AppMainData>("app-main");
+    const { inputElements } = world.readData<AppInputData>("app-input");
 
     const inputCount = new TextBoxInputElement("count", "10");
     inputCount.setStyle("width: 80px");

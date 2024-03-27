@@ -7,9 +7,10 @@ import { RandomXSR128 } from "redgeometry/src/utility/random";
 import type { Immutable } from "redgeometry/src/utility/types";
 import type { AppContextPlugin } from "../ecs/app-context.js";
 import { AppContextModule } from "../ecs/app-context.js";
-import { AppMainModule, AppRemoteModule, type AppMainData, type AppStateData } from "../ecs/app.js";
+import type { AppInputData } from "../ecs/app-input.js";
+import { RangeInputElement, TextBoxInputElement } from "../ecs/app-input.js";
+import { AppMainModule, AppRemoteModule, type AppStateData } from "../ecs/app.js";
 import { BPlusTree, NodeType, type Node } from "../utility/bplus-tree.js";
-import { RangeInputElement, TextBoxInputElement } from "../utility/input.js";
 
 type AppPartMainData = {
     dataId: "app-part-main";
@@ -20,7 +21,7 @@ type AppPartMainData = {
 
 type AppPartRemoteData = {
     dataId: "app-part-remote";
-    bPlusTree: BPlusTree<number>;
+    bplusTree: BPlusTree<number>;
 };
 
 type AppPartStateData = {
@@ -31,7 +32,7 @@ type AppPartStateData = {
 };
 
 function initMainSystem(world: World): void {
-    const { inputElements } = world.readData<AppMainData>("app-main");
+    const { inputElements } = world.readData<AppInputData>("app-input");
 
     const inputBranchSize = new TextBoxInputElement("branchsize", "4");
     inputBranchSize.setStyle("width: 40px");
@@ -58,7 +59,7 @@ function initRemoteSystem(world: World): void {
 
     world.writeData<AppPartRemoteData>({
         dataId: "app-part-remote",
-        bPlusTree: new BPlusTree<number>(comp),
+        bplusTree: new BPlusTree<number>(comp),
     });
 }
 
@@ -103,12 +104,12 @@ function updateSystem(world: World): void {
 
     world.writeData<AppPartRemoteData>({
         dataId: "app-part-remote",
-        bPlusTree: bptree,
+        bplusTree: bptree,
     });
 }
 
 function renderSystem(world: World): void {
-    const { bPlusTree } = world.readData<AppPartRemoteData>("app-part-remote");
+    const { bplusTree: bPlusTree } = world.readData<AppPartRemoteData>("app-part-remote");
 
     const ctx = world.getPlugin<AppContextPlugin>("app-context");
 

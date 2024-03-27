@@ -6,9 +6,10 @@ import { DEFAULT_WORLD_SCHEDULES, type World } from "redgeometry/src/ecs/world";
 import { RandomXSR128 } from "redgeometry/src/utility/random";
 import type { AppContextPlugin } from "../ecs/app-context.js";
 import { AppContextModule } from "../ecs/app-context.js";
-import { AppMainModule, AppRemoteModule, type AppMainData, type AppStateData } from "../ecs/app.js";
-import { createPath, getJoin } from "../utility/helper.js";
-import { ComboBoxInputElement, RangeInputElement, TextBoxInputElement } from "../utility/input.js";
+import type { AppInputData } from "../ecs/app-input.js";
+import { ComboBoxInputElement, RangeInputElement, TextBoxInputElement } from "../ecs/app-input.js";
+import { AppMainModule, AppRemoteModule, type AppStateData } from "../ecs/app.js";
+import { createRandomPath, getJoinType } from "../utility/helper.js";
 
 type AppPartMainData = {
     dataId: "app-part-main";
@@ -35,7 +36,7 @@ type AppPartStateData = {
 };
 
 function initMainSystem(world: World): void {
-    const { inputElements } = world.readData<AppMainData>("app-main");
+    const { inputElements } = world.readData<AppInputData>("app-input");
 
     const inputCount = new TextBoxInputElement("count", "10");
     inputCount.setStyle("width: 80px");
@@ -103,7 +104,7 @@ function updateSystem(world: World): void {
     const random = RandomXSR128.fromSeedLcg(seed);
     const [canvasWidth, canvasHeight] = ctx.getSize(false);
 
-    const path = createPath(random, generator, count, canvasWidth, canvasHeight);
+    const path = createRandomPath(random, generator, count, canvasWidth, canvasHeight);
     // path.close();
 
     let output: Path2 | undefined;
@@ -125,7 +126,7 @@ function updateSystem(world: World): void {
         case "offset": {
             output = path.offset({
                 distance: param1 - 50,
-                join: getJoin(join),
+                join: getJoinType(join),
                 miterLimit: param2 / 10,
             });
             break;
@@ -140,7 +141,7 @@ function updateSystem(world: World): void {
         case "stroke": {
             output = path.stroke({
                 caps: ROUND_CAPS,
-                join: getJoin(join),
+                join: getJoinType(join),
                 miterLimit: param2 / 10,
                 width: param1,
             });
@@ -151,7 +152,7 @@ function updateSystem(world: World): void {
                 caps: ROUND_CAPS,
                 dashArray: [2 * param1, param1],
                 dashOffset: 10 * param2,
-                join: getJoin(join),
+                join: getJoinType(join),
                 width: 50,
             });
             break;

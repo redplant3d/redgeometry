@@ -3,7 +3,7 @@ import type { World } from "redgeometry/src/ecs/world";
 import type { Matrix4 } from "redgeometry/src/primitives/matrix";
 import { type Float32Buffer, type NumberBuffer } from "redgeometry/src/utility/buffer";
 import { assertDebug, log } from "redgeometry/src/utility/debug";
-import { gpuCreateBuffer } from "../utility/buffer.js";
+import { gpuCreateBuffer } from "../utility/gpu.js";
 import { AssetModule, AssetPlugin, type AssetId } from "./asset.js";
 import { cameraSystem, type CameraComponent } from "./camera.js";
 import { startGPUSystem, type GPUData } from "./gpu.js";
@@ -56,7 +56,7 @@ type MeshRenderEntry = {
 };
 
 export type MeshRenderStateData = {
-    dataId: "meshRenderState";
+    dataId: "mesh-render-state";
     depthTexture: GPUTexture;
     entries: Map<EntityId, MeshRenderEntry>;
     materialEntries: Map<AssetId<Material>, MaterialEntry>;
@@ -70,7 +70,7 @@ export class MeshRenderModule implements WorldModule {
     public setup(world: World): void {
         world.addModules([new AssetModule()]);
 
-        world.registerData<MeshRenderStateData>("meshRenderState");
+        world.registerData<MeshRenderStateData>("mesh-render-state");
         world.registerData<SceneData>("scene");
 
         world.addSystem<DefaultSystemStage>({ stage: "start-post", fn: startMeshRenderSystem });
@@ -109,7 +109,7 @@ export function startMeshRenderSystem(world: World): void {
     });
 
     world.writeData<MeshRenderStateData>({
-        dataId: "meshRenderState",
+        dataId: "mesh-render-state",
         depthTexture,
         entries,
         materialEntries,
@@ -120,7 +120,7 @@ export function startMeshRenderSystem(world: World): void {
 
 export function meshRenderSystem(world: World): void {
     const gpuData = world.readData<GPUData>("gpu");
-    const stateData = world.readData<MeshRenderStateData>("meshRenderState");
+    const stateData = world.readData<MeshRenderStateData>("mesh-render-state");
 
     const asset = world.getPlugin<AssetPlugin>("asset");
 

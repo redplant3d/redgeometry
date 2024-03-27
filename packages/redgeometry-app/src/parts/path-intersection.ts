@@ -6,8 +6,9 @@ import { Bezier2Curve2 } from "redgeometry/src/primitives/bezier";
 import { Point2 } from "redgeometry/src/primitives/point";
 import type { AppContextPlugin } from "../ecs/app-context.js";
 import { AppContextModule } from "../ecs/app-context.js";
-import { AppMainModule, AppRemoteModule, type AppMainData } from "../ecs/app.js";
-import { RangeInputElement } from "../utility/input.js";
+import type { AppInputData } from "../ecs/app-input.js";
+import { RangeInputElement } from "../ecs/app-input.js";
+import { AppMainModule, AppRemoteModule } from "../ecs/app.js";
 
 type AppPartMainData = {
     dataId: "app-part-main";
@@ -26,7 +27,7 @@ type AppPartStateData = {
 };
 
 function initMainSystem(world: World): void {
-    const { inputElements } = world.readData<AppMainData>("app-main");
+    const { inputElements } = world.readData<AppInputData>("app-input");
 
     const inputParameter = new RangeInputElement("parameter", "0", "200", "100");
     inputParameter.setStyle("width: 200px");

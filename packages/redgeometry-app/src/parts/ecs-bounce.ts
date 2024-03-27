@@ -7,15 +7,16 @@ import { Vector2 } from "redgeometry/src/primitives/vector";
 import { log } from "redgeometry/src/utility/debug";
 import { RandomXSR128, type Random } from "redgeometry/src/utility/random";
 import { AppContextModule, AppContextPlugin } from "../ecs/app-context.js";
-import { AppMainModule, AppRemoteModule, type AppMainData, type AppStateData } from "../ecs/app.js";
+import type { AppInputData } from "../ecs/app-input.js";
+import { ButtonInputElement, RangeInputElement } from "../ecs/app-input.js";
+import { AppMainModule, AppRemoteModule, type AppStateData } from "../ecs/app.js";
 import { type TimeData } from "../ecs/time.js";
-import { ButtonInputElement, RangeInputElement } from "../utility/input.js";
 
 type AppPartMainData = {
     dataId: "app-part-main";
-    countRange: RangeInputElement;
-    loadButton: ButtonInputElement;
-    saveButton: ButtonInputElement;
+    inputCount: RangeInputElement;
+    inputLoad: ButtonInputElement;
+    inputSave: ButtonInputElement;
 };
 
 type AppPartRemoteData = {
@@ -52,29 +53,29 @@ type ObjectComponent = {
 };
 
 function initMainSystem(world: World): void {
-    const { inputElements } = world.readData<AppMainData>("app-main");
+    const { inputElements } = world.readData<AppInputData>("app-input");
 
-    const countRange = new RangeInputElement("count", "0", "1000", "10");
-    countRange.setStyle("width: 200px");
-    inputElements.push(countRange);
+    const inputCount = new RangeInputElement("count", "0", "1000", "10");
+    inputCount.setStyle("width: 200px");
+    inputElements.push(inputCount);
 
-    const saveButton = new ButtonInputElement("save", "save");
-    saveButton.addEventListener("click", () =>
+    const inputSave = new ButtonInputElement("save", "save");
+    inputSave.addEventListener("click", () =>
         world.queueEvent<AppPartCommandEvent>({ eventId: "app-part-command", command: "save" }),
     );
-    inputElements.push(saveButton);
+    inputElements.push(inputSave);
 
-    const loadButton = new ButtonInputElement("load", "load");
-    loadButton.addEventListener("click", () =>
+    const inputLoad = new ButtonInputElement("load", "load");
+    inputLoad.addEventListener("click", () =>
         world.queueEvent<AppPartCommandEvent>({ eventId: "app-part-command", command: "load" }),
     );
-    inputElements.push(loadButton);
+    inputElements.push(inputLoad);
 
     world.writeData<AppPartMainData>({
         dataId: "app-part-main",
-        countRange,
-        saveButton,
-        loadButton,
+        inputCount,
+        inputSave,
+        inputLoad,
     });
 }
 
@@ -94,7 +95,7 @@ function writeStateSystem(world: World): void {
 
     const stateData: AppPartStateData = {
         dataId: "app-part-state",
-        count: inputData.countRange.getInt(),
+        count: inputData.inputCount.getInt(),
     };
 
     world.writeData(stateData);

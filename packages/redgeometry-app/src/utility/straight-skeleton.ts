@@ -1,13 +1,9 @@
 import { Mesh2, MeshEdge2, type MeshFace2 } from "redgeometry/src/core/mesh";
-import { PathClip2 } from "redgeometry/src/core/path-clip";
-import { BooleanOperator, DEFAULT_PATH_QUALITY_OPTIONS, WindingOperator } from "redgeometry/src/core/path-options";
 import { Edge2 } from "redgeometry/src/primitives/edge";
 import { Point2 } from "redgeometry/src/primitives/point";
 import type { Vector2 } from "redgeometry/src/primitives/vector";
 import { assertDebug, log } from "redgeometry/src/utility/debug";
-import { type Random } from "redgeometry/src/utility/random";
 import { RootType, solveLinear, solveQuadratic, type Root1, type Root2 } from "redgeometry/src/utility/solve";
-import { createPolygonPair } from "./helper.js";
 
 export enum KineticEventType {
     EdgeEvent,
@@ -16,14 +12,108 @@ export enum KineticEventType {
     FullEvent,
 }
 
-export class Skeleton {
+export class KineticVertex {
+    public n1: Vector2;
+    public n2: Vector2;
+    public orig: Point2;
+    public t0: number;
+    public t1: number;
+    public vel: Vector2;
+
+    public constructor(orig: Point2, n1: Vector2, n2: Vector2, t0: number) {
+        this.orig = orig;
+        this.vel = KineticVertex.getVelocity(n1, n2);
+        this.n1 = n1;
+        this.n2 = n2;
+        this.t0 = t0;
+        this.t1 = Number.POSITIVE_INFINITY;
+    }
+
+    public static createFrom(e: MeshEdge2): KineticVertex {
+        const orig = e.p0;
+
+        const e1 = KineticVertex.getWavefrontEdgeCw(e);
+        const e2 = KineticVertex.getWavefrontEdgeCcw(e);
+
+        const n1 = e1.p1.sub(e1.p0).unit().normal().neg();
+        const n2 = e2.p0.sub(e2.p1).unit().normal().neg();
+
+        return new KineticVertex(orig, n1, n2, 0);
+    }
+
+    public static getVelocity(n1: Vector2, n2: Vector2): Vector2 {
+        const k = n1.add(n2);
+        return k.mul(2).div(k.lenSq());
+    }
+
+    public static getWavefrontEdgeCcw(e: MeshEdge2): MeshEdge2 {
+        let curr = e;
+
+        do {
+            if (curr.face === undefined && curr.sym.face !== undefined) {
+                return curr;
+            }
+
+            curr = curr.onext;
+        } while (curr !== e);
+
+        log.error("Fallback (ccw)");
+
+        return e;
+    }
+
+    public static getWavefrontEdgeCw(e: MeshEdge2): MeshEdge2 {
+        let curr = e;
+
+        do {
+            if (curr.face !== undefined && curr.sym.face === undefined) {
+                return curr;
+            }
+
+            curr = curr.oprev;
+        } while (curr !== e);
+
+        log.error("Fallback (cw)");
+
+        return e;
+    }
+
+    public getPositionAt(t: number): Point2 {
+        return this.orig.addMul(this.vel, t - this.t0);
+    }
+}
+
+export class KineticEvent {
+    public e: MeshEdge2;
+    public t1: number;
+    public type: KineticEventType;
+
+    public constructor(type: KineticEventType, e: MeshEdge2, t1: number) {
+        this.type = type;
+        this.e = e;
+        this.t1 = t1;
+    }
+
+    public static compareFace(f1: MeshFace2, f2: MeshFace2): number {
+        const ev1 = f1.data as KineticEvent;
+        const ev2 = f2.data as KineticEvent;
+
+        const t1 = ev1.t1;
+        const t2 = ev2.t1;
+
+        // Separate postive and negative parameter values, such that it starts with the positive ones
+        if (t1 < 0 === t2 < 0) {
+            return t1 - t2;
+        } else {
+            return t2;
+        }
+    }
+}
+
+export class StraightSkeleton {
     private vertices: KineticVertex[];
 
     constructor() {
-        this.vertices = [];
-    }
-
-    public reset(): void {
         this.vertices = [];
     }
 
@@ -61,6 +151,18 @@ export class Skeleton {
                 this.updateFaceEvent(face);
             }
         }
+    }
+
+    public getVertexEdges(): Edge2[] {
+        const edges: Edge2[] = [];
+
+        for (const vtx of this.vertices) {
+            const p0 = vtx.getPositionAt(vtx.t0);
+            const p1 = vtx.getPositionAt(vtx.t1);
+            edges.push(new Edge2(p0, p1));
+        }
+
+        return edges;
     }
 
     public initializeMesh(mesh: Mesh2): void {
@@ -221,29 +323,6 @@ export class Skeleton {
         }
     }
 
-    private getRandomMesh(random: Random, generator: number, offset: number, width: number, height: number): Mesh2 {
-        const [polygonA, polygonB] = createPolygonPair(random, generator, offset, width, height);
-
-        const clip = new PathClip2(DEFAULT_PATH_QUALITY_OPTIONS);
-
-        for (const edge of polygonA.getEdges()) {
-            clip.addEdge(edge, 0);
-        }
-
-        for (const edge of polygonB.getEdges()) {
-            clip.addEdge(edge, 1);
-        }
-
-        const mesh = Mesh2.createEmpty();
-        clip.process(mesh, {
-            booleanOperator: BooleanOperator.Exclusion,
-            windingOperatorA: WindingOperator.NonZero,
-            windingOperatorB: WindingOperator.NonZero,
-        });
-
-        return mesh;
-    }
-
     /**
      * Compute the time parameter where the triangle area is zero
      */
@@ -272,18 +351,6 @@ export class Skeleton {
             // Get the extremum/minimum of the triangle area instead
             return { type: RootType.One, x: solveLinear(2 * a, b) };
         }
-    }
-
-    public getVertexEdges(): Edge2[] {
-        const edges: Edge2[] = [];
-
-        for (const vtx of this.vertices) {
-            const p0 = vtx.getPositionAt(vtx.t0);
-            const p1 = vtx.getPositionAt(vtx.t1);
-            edges.push(new Edge2(p0, p1));
-        }
-
-        return edges;
     }
 
     private handleEvent(ev: KineticEvent): void {
@@ -655,103 +722,5 @@ export class Skeleton {
             curr.data = vtx;
             curr = curr.oprev;
         } while (curr !== e);
-    }
-}
-
-export class KineticVertex {
-    public n1: Vector2;
-    public n2: Vector2;
-    public orig: Point2;
-    public t0: number;
-    public t1: number;
-    public vel: Vector2;
-
-    public constructor(orig: Point2, n1: Vector2, n2: Vector2, t0: number) {
-        this.orig = orig;
-        this.vel = KineticVertex.getVelocity(n1, n2);
-        this.n1 = n1;
-        this.n2 = n2;
-        this.t0 = t0;
-        this.t1 = Number.POSITIVE_INFINITY;
-    }
-
-    public static createFrom(e: MeshEdge2): KineticVertex {
-        const orig = e.p0;
-
-        const e1 = KineticVertex.getWavefrontEdgeCw(e);
-        const e2 = KineticVertex.getWavefrontEdgeCcw(e);
-
-        const n1 = e1.p1.sub(e1.p0).unit().normal().neg();
-        const n2 = e2.p0.sub(e2.p1).unit().normal().neg();
-
-        return new KineticVertex(orig, n1, n2, 0);
-    }
-
-    public static getVelocity(n1: Vector2, n2: Vector2): Vector2 {
-        const k = n1.add(n2);
-        return k.mul(2).div(k.lenSq());
-    }
-
-    public static getWavefrontEdgeCcw(e: MeshEdge2): MeshEdge2 {
-        let curr = e;
-
-        do {
-            if (curr.face === undefined && curr.sym.face !== undefined) {
-                return curr;
-            }
-
-            curr = curr.onext;
-        } while (curr !== e);
-
-        log.error("Fallback (ccw)");
-
-        return e;
-    }
-
-    public static getWavefrontEdgeCw(e: MeshEdge2): MeshEdge2 {
-        let curr = e;
-
-        do {
-            if (curr.face !== undefined && curr.sym.face === undefined) {
-                return curr;
-            }
-
-            curr = curr.oprev;
-        } while (curr !== e);
-
-        log.error("Fallback (cw)");
-
-        return e;
-    }
-
-    public getPositionAt(t: number): Point2 {
-        return this.orig.addMul(this.vel, t - this.t0);
-    }
-}
-
-export class KineticEvent {
-    public e: MeshEdge2;
-    public t1: number;
-    public type: KineticEventType;
-
-    public constructor(type: KineticEventType, e: MeshEdge2, t1: number) {
-        this.type = type;
-        this.e = e;
-        this.t1 = t1;
-    }
-
-    public static compareFace(f1: MeshFace2, f2: MeshFace2): number {
-        const ev1 = f1.data as KineticEvent;
-        const ev2 = f2.data as KineticEvent;
-
-        const t1 = ev1.t1;
-        const t2 = ev2.t1;
-
-        // Separate postive and negative parameter values, such that it starts with the positive ones
-        if (t1 < 0 === t2 < 0) {
-            return t1 - t2;
-        } else {
-            return t2;
-        }
     }
 }

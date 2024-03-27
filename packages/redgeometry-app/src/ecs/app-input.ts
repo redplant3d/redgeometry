@@ -1,4 +1,39 @@
+import type { DefaultSystemStage, WorldModule } from "redgeometry/src/ecs/types";
+import type { World } from "redgeometry/src/ecs/world";
 import { throwError } from "redgeometry/src/utility/debug";
+
+export type AppInputData = {
+    dataId: "app-input";
+    inputElements: AppInputElement[];
+    paramsContainer: HTMLElement;
+};
+
+export function startInputElementsSystem(world: World): void {
+    const { inputElements, paramsContainer } = world.readData<AppInputData>("app-input");
+
+    for (const inputElement of inputElements) {
+        inputElement.register(paramsContainer);
+    }
+}
+
+export function stopInputElementsSystem(world: World): void {
+    const { inputElements } = world.readData<AppInputData>("app-input");
+
+    for (const inputElement of inputElements) {
+        inputElement.unregister();
+    }
+}
+
+export class AppInputModule implements WorldModule {
+    public readonly moduleId = "app-input";
+
+    public setup(world: World): void {
+        world.registerData<AppInputData>("app-input");
+
+        world.addSystem<DefaultSystemStage>({ stage: "start-post", fn: startInputElementsSystem });
+        world.addSystem<DefaultSystemStage>({ stage: "stop-pre", fn: stopInputElementsSystem });
+    }
+}
 
 type InputElementEvent = {
     type: string;

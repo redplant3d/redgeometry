@@ -7,11 +7,12 @@ import { Quaternion, RotationOrder } from "redgeometry/src/primitives/quaternion
 import { Vector3 } from "redgeometry/src/primitives/vector";
 import { throwError } from "redgeometry/src/utility/debug";
 import { RandomXSR128, type Random } from "redgeometry/src/utility/random";
+import type { AppInputData } from "../ecs/app-input.js";
+import { ComboBoxInputElement, RangeInputElement } from "../ecs/app-input.js";
 import {
     AppMainModule,
     AppRemoteModule,
     type AppCanvasData,
-    type AppMainData,
     type AppStateData,
     type WindowResizeEvent,
 } from "../ecs/app.js";
@@ -25,13 +26,12 @@ import type { SceneData } from "../ecs/scene.js";
 import { type TimeData } from "../ecs/time.js";
 import { Visibility, type TransformComponent } from "../ecs/transform.js";
 import { createRandomColor } from "../utility/helper.js";
-import { ComboBoxInputElement, RangeInputElement } from "../utility/input.js";
 
 type AppPartMainData = {
     dataId: "app-part-main";
-    countRange: RangeInputElement;
-    fovRange: RangeInputElement;
-    transformComboBox: ComboBoxInputElement;
+    inputCount: RangeInputElement;
+    inputFOV: RangeInputElement;
+    inputTransform: ComboBoxInputElement;
 };
 
 type AppPartRemoteData = {
@@ -55,25 +55,25 @@ type TestComponent = {
 };
 
 function initMainSystem(world: World): void {
-    const { inputElements } = world.readData<AppMainData>("app-main");
+    const { inputElements } = world.readData<AppInputData>("app-input");
 
-    const fovRange = new RangeInputElement("fov", "30", "150", "65");
-    fovRange.setStyle("width: 200px");
-    inputElements.push(fovRange);
+    const inputFOV = new RangeInputElement("fov", "30", "150", "65");
+    inputFOV.setStyle("width: 200px");
+    inputElements.push(inputFOV);
 
-    const countRange = new RangeInputElement("count", "0", "1000000", "15000");
-    countRange.setStyle("width: 200px");
-    inputElements.push(countRange);
+    const inputCount = new RangeInputElement("count", "0", "1000000", "15000");
+    inputCount.setStyle("width: 200px");
+    inputElements.push(inputCount);
 
-    const transformComboBox = new ComboBoxInputElement("transform", "none");
-    transformComboBox.setOptionValues("none", "rotate");
-    inputElements.push(transformComboBox);
+    const inputTransform = new ComboBoxInputElement("transform", "none");
+    inputTransform.setOptionValues("none", "rotate");
+    inputElements.push(inputTransform);
 
     world.writeData<AppPartMainData>({
         dataId: "app-part-main",
-        countRange,
-        fovRange,
-        transformComboBox,
+        inputCount,
+        inputFOV,
+        inputTransform,
     });
 }
 
@@ -132,9 +132,9 @@ function writeStateSystem(world: World): void {
 
     const stateData: AppPartStateData = {
         dataId: "app-part-state",
-        count: appMainData.countRange.getInt(),
-        fov: appMainData.fovRange.getInt(),
-        transform: appMainData.transformComboBox.getValue(),
+        count: appMainData.inputCount.getInt(),
+        fov: appMainData.inputFOV.getInt(),
+        transform: appMainData.inputTransform.getValue(),
     };
 
     world.writeData(stateData);
@@ -156,7 +156,7 @@ function beginFrameSystem(world: World): void {
 
         context.configure({ alphaMode, device, format: gpu.getPreferredCanvasFormat() });
 
-        const meshRenderStateData = world.readData<MeshRenderStateData>("meshRenderState");
+        const meshRenderStateData = world.readData<MeshRenderStateData>("mesh-render-state");
         meshRenderStateData.depthTexture = device.createTexture({
             size: [windowResizeEvent.width, windowResizeEvent.height],
             format: "depth24plus",

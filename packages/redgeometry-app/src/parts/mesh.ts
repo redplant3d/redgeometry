@@ -10,9 +10,10 @@ import type { Point2 } from "redgeometry/src/primitives/point";
 import { RandomXSR128 } from "redgeometry/src/utility/random";
 import type { AppContextPlugin } from "../ecs/app-context.js";
 import { AppContextModule } from "../ecs/app-context.js";
-import { AppMainModule, AppRemoteModule, type AppMainData, type AppStateData } from "../ecs/app.js";
-import { nextPointFromBox } from "../utility/helper.js";
-import { RangeInputElement } from "../utility/input.js";
+import type { AppInputData } from "../ecs/app-input.js";
+import { RangeInputElement } from "../ecs/app-input.js";
+import { AppMainModule, AppRemoteModule, type AppStateData } from "../ecs/app.js";
+import { createRandomPoint } from "../utility/helper.js";
 
 type AppPartMainData = {
     dataId: "app-part-main";
@@ -31,7 +32,7 @@ type AppPartStateData = {
 };
 
 function initMainSystem(world: World): void {
-    const { inputElements } = world.readData<AppMainData>("app-main");
+    const { inputElements } = world.readData<AppInputData>("app-input");
 
     const inputCount = new RangeInputElement("count", "0", "50", "1");
     inputCount.setStyle("width: 200px");
@@ -75,9 +76,9 @@ function updateSystem(world: World): void {
     const [canvasWidth, canvasHeight] = ctx.getSize(false);
     const box = new Box2(0, 0, canvasWidth, canvasHeight);
 
-    const p0 = nextPointFromBox(random, box);
-    const p1 = nextPointFromBox(random, box);
-    const p2 = nextPointFromBox(random, box);
+    const p0 = createRandomPoint(random, box);
+    const p1 = createRandomPoint(random, box);
+    const p2 = createRandomPoint(random, box);
 
     const points: Point2[] = [];
 

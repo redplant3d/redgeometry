@@ -8,14 +8,15 @@ import { Point2 } from "redgeometry/src/primitives/point";
 import { RandomXSR128 } from "redgeometry/src/utility/random";
 import type { AppContextPlugin } from "../ecs/app-context.js";
 import { AppContextModule } from "../ecs/app-context.js";
-import { AppMainModule, AppRemoteModule, type AppMainData, type AppStateData } from "../ecs/app.js";
+import type { AppInputData } from "../ecs/app-input.js";
+import { TextBoxInputElement } from "../ecs/app-input.js";
+import { AppMainModule, AppRemoteModule, type AppStateData } from "../ecs/app.js";
 import type { MouseInputPlugin } from "../ecs/input.js";
-import { createPath } from "../utility/helper.js";
-import { TextBoxInputElement } from "../utility/input.js";
+import { createRandomPath } from "../utility/helper.js";
 
 type AppPartMainData = {
     dataId: "app-part-main";
-    countTextBox: TextBoxInputElement;
+    inputCount: TextBoxInputElement;
 };
 
 type AppPartRemoteData = {
@@ -31,15 +32,15 @@ type AppPartStateData = {
 };
 
 function initMainSystem(world: World): void {
-    const { inputElements } = world.readData<AppMainData>("app-main");
+    const { inputElements } = world.readData<AppInputData>("app-input");
 
-    const inputCountTextBox = new TextBoxInputElement("count", "100");
-    inputCountTextBox.setStyle("width: 80px");
-    inputElements.push(inputCountTextBox);
+    const inputCount = new TextBoxInputElement("count", "100");
+    inputCount.setStyle("width: 80px");
+    inputElements.push(inputCount);
 
     world.writeData<AppPartMainData>({
         dataId: "app-part-main",
-        countTextBox: inputCountTextBox,
+        inputCount,
     });
 }
 
@@ -53,7 +54,7 @@ function initRemoteSystem(world: World): void {
 }
 
 function writeStateSystem(world: World): void {
-    const { countTextBox } = world.readData<AppPartMainData>("app-part-main");
+    const { inputCount: countTextBox } = world.readData<AppPartMainData>("app-part-main");
 
     const stateData: AppPartStateData = {
         dataId: "app-part-state",
@@ -76,7 +77,7 @@ function updateSystem(world: World): void {
     const random = RandomXSR128.fromSeedLcg(seed);
     const [canvasWidth, canvasHeight] = ctx.getSize(false);
 
-    const path = createPath(random, generator, count, canvasWidth, canvasHeight);
+    const path = createRandomPath(random, generator, count, canvasWidth, canvasHeight);
     path.close();
 
     const mousePos = mouse.getPosition();

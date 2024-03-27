@@ -446,7 +446,7 @@ export class AppContextPlugin implements WorldPlugin {
 }
 
 export class AppContextModule implements WorldModule {
-    public readonly moduleId = "canvas-context";
+    public readonly moduleId = "app-context";
 
     public setup(world: World): void {
         world.registerPlugin<AppContextPlugin>("app-context");

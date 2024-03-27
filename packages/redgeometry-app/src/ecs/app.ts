@@ -1,12 +1,14 @@
 import type { DefaultSystemStage, DefaultWorldScheduleId, WorldModule } from "redgeometry/src/ecs/types";
 import type { World } from "redgeometry/src/ecs/world";
-import { createRandomSeed } from "../utility/helper.js";
 import {
+    AppInputModule,
     ButtonInputElement,
     ComboBoxInputElement,
     TextBoxInputElement,
-    type AppInputElement,
-} from "../utility/input.js";
+    startInputElementsSystem,
+    type AppInputData,
+} from "../ecs/app-input.js";
+import { createRandomSeed } from "../utility/helper.js";
 import type { AppLauncherData } from "./app-launcher.js";
 import { InputReceiverModule, InputSenderModule, type InputSenderData } from "./input.js";
 import { TimeModule, TimePlugin, type TimeData } from "./time.js";
@@ -15,9 +17,7 @@ export type AppMainData = {
     dataId: "app-main";
     canvas: HTMLCanvasElement;
     canvasContainer: HTMLElement;
-    paramsContainer: HTMLElement;
     urlSearchParams: URLSearchParams;
-    inputElements: AppInputElement[];
 };
 
 export type AppMainInputData = {
@@ -81,8 +81,12 @@ export function initAppMainPreSystem(world: World): void {
         dataId: "app-main",
         canvas,
         canvasContainer,
-        paramsContainer,
         urlSearchParams,
+    });
+
+    world.writeData<AppInputData>({
+        dataId: "app-input",
+        paramsContainer,
         inputElements: [],
     });
 
@@ -113,8 +117,8 @@ export function initAppMainPreSystem(world: World): void {
 export function addAppInputsSystem(world: World): void {
     const seed = createRandomSeed();
 
-    const { inputElements } = world.readData<AppMainData>("app-main");
-    const { appPartIds, appPartId } = world.readData<AppLauncherData>("appLauncher");
+    const { inputElements } = world.readData<AppInputData>("app-input");
+    const { appPartIds, appPartId } = world.readData<AppLauncherData>("app-launcher");
 
     const inputAppComboBox = new ComboBoxInputElement("app-main", appPartId);
     inputAppComboBox.setOptionValues(...appPartIds);
@@ -163,14 +167,6 @@ export function writeAppStateSystem(world: World): void {
     });
 }
 
-export function initInputElementsSystem(world: World): void {
-    const { inputElements, paramsContainer } = world.readData<AppMainData>("app-main");
-
-    for (const inputElement of inputElements) {
-        inputElement.register(paramsContainer);
-    }
-}
-
 export async function initAppMainPostSystem(world: World): Promise<void> {
     const channel = world.getChannel("remote");
 
@@ -211,15 +207,16 @@ export async function appMainSystem(world: World): Promise<void> {
     timePlugin.requestAnimationFrame(world);
 }
 
-export function deinitInputElementsSystem(world: World): void {
-    const { inputElements } = world.readData<AppMainData>("app-main");
-
-    for (const inputElement of inputElements) {
-        inputElement.unregister();
-    }
+export function initAppRemoteSystem(world: World): void {
+    world.writeData<TimeData>({
+        dataId: "time",
+        delta: 0,
+        frame: 0,
+        time: 0,
+    });
 }
 
-export function resizeWindowSystem(world: World): void {
+export function resizeCanvasSystem(world: World): void {
     const windowResizeEvent = world.readLatestEvent<WindowResizeEvent>("window-resize");
 
     if (windowResizeEvent !== undefined) {
@@ -247,7 +244,7 @@ export class AppMainModule implements WorldModule {
     public readonly moduleId = "app-main-input";
 
     public setup(world: World): void {
-        world.addModules([new InputSenderModule(), new TimeModule()]);
+        world.addModules([new AppInputModule(), new TimeModule(), new InputSenderModule()]);
 
         world.registerData<AppMainData>("app-main");
         world.registerData<AppMainInputData>("app-main-input");
@@ -260,7 +257,6 @@ export class AppMainModule implements WorldModule {
         world.addSystem<DefaultSystemStage>({ stage: "start-pre", fn: initAppMainPreSystem });
         world.addSystem<DefaultSystemStage>({ stage: "start-pre", fn: addAppInputsSystem });
         world.addSystem<DefaultSystemStage>({ stage: "start-pre", fn: writeAppStateSystem });
-        world.addSystem<DefaultSystemStage>({ stage: "start-post", fn: initInputElementsSystem });
         world.addSystem<DefaultSystemStage>({ stage: "start-post", fn: initAppMainPostSystem });
         world.addSystem<DefaultSystemStage>({ stage: "update-pre", fn: writeAppStateSystem });
         world.addSystem<DefaultSystemStage>({ stage: "update-post", fn: appMainSystem });
@@ -271,7 +267,7 @@ export class AppMainModule implements WorldModule {
         });
         world.addDependency({
             stage: "start-post",
-            seq: [initInputElementsSystem, initAppMainPostSystem],
+            seq: [startInputElementsSystem, initAppMainPostSystem],
         });
     }
 }
@@ -289,6 +285,7 @@ export class AppRemoteModule implements WorldModule {
         world.registerEvent<AppCommandEvent>("app-command");
         world.registerEvent<WindowResizeEvent>("window-resize");
 
-        world.addSystem<DefaultSystemStage>({ stage: "update-pre", fn: resizeWindowSystem });
+        world.addSystem<DefaultSystemStage>({ stage: "start-pre", fn: initAppRemoteSystem });
+        world.addSystem<DefaultSystemStage>({ stage: "update-pre", fn: resizeCanvasSystem });
     }
 }

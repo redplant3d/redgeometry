@@ -7,9 +7,10 @@ import { Image2 } from "redgeometry/src/render/image";
 import { RandomXSR128 } from "redgeometry/src/utility/random";
 import type { AppContextPlugin } from "../ecs/app-context.js";
 import { AppContextModule } from "../ecs/app-context.js";
-import { AppMainModule, AppRemoteModule, type AppMainData, type AppStateData } from "../ecs/app.js";
-import { createPath } from "../utility/helper.js";
-import { RangeInputElement, TextBoxInputElement } from "../utility/input.js";
+import type { AppInputData } from "../ecs/app-input.js";
+import { RangeInputElement, TextBoxInputElement } from "../ecs/app-input.js";
+import { AppMainModule, AppRemoteModule, type AppStateData } from "../ecs/app.js";
+import { createRandomPath } from "../utility/helper.js";
 
 type AppPartMainData = {
     dataId: "app-part-main";
@@ -31,7 +32,7 @@ type AppPartStateData = {
 };
 
 function initMainSystem(world: World): void {
-    const { inputElements } = world.readData<AppMainData>("app-main");
+    const { inputElements } = world.readData<AppInputData>("app-input");
 
     const inputCount = new TextBoxInputElement("count", "10");
     inputCount.setStyle("width: 80px");
@@ -83,7 +84,7 @@ function updateSystem(world: World): void {
 
     const random = RandomXSR128.fromSeedLcg(seed);
 
-    const path = createPath(random, generator, count, size, size);
+    const path = createRandomPath(random, generator, count, size, size);
     path.close();
 
     image.resize(size, size);
