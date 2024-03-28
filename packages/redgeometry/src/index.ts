@@ -18,6 +18,7 @@ export * from "./primitives/matrix.js";
 export * from "./primitives/point.js";
 export * from "./primitives/polygon.js";
 export * from "./primitives/quaternion.js";
+export * from "./primitives/ray.js";
 export * from "./primitives/vector.js";
 export * from "./utility/array.js";
 export * from "./utility/buffer.js";
