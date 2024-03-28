@@ -2,28 +2,34 @@ import type { DefaultSystemStage, WorldId, WorldModule, WorldPlugin } from "redg
 import type { World } from "redgeometry/src/ecs/world";
 import { assertUnreachable } from "redgeometry/src/utility/debug";
 
-export type InputSenderData = {
-    dataId: "input-sender";
-    keyboardEventHandler: GlobalEventHandlers;
-    mouseEventHandler: GlobalEventHandlers;
-    receiverId: WorldId;
+export type InputInitData = {
+    dataId: "input-init";
+    keyboardEventHandler: GlobalEventHandlers | undefined;
+    mouseEventHandler: GlobalEventHandlers | undefined;
+    receiverIds: WorldId[];
 };
 
-export type InputEventsData = {
-    dataId: "input-events";
-    keyboardEvents: InputKeyboardEventType[];
-    mouseEvents: InputMouseEventType[];
+type InputCaptureData = {
+    dataId: "input-capture";
+    keyboardButtonEvents: InputKeyboardButtonEvent[];
+    mouseButtonEvents: InputMouseButtonEvent[];
+    mouseMotionEvents: InputMouseMotionEvent[];
+    mouseWheelEvents: InputMouseWheelEvent[];
 };
 
-export type InputDataEvent = {
-    eventId: "input-data";
-    keyboardEvents: InputKeyboardEventType[];
-    mouseEvents: InputMouseEventType[];
+export type InputKeyboardButtonEvent = {
+    eventId: "input-keyboard-button";
+    type: "keyup" | "keydown";
+    code: string;
+    isComposing: boolean;
+    key: string;
+    location: number;
+    repeat: boolean;
 };
 
-export type InputMouseEventType = {
-    type: string;
-    button: number;
+export type InputMouseMotionEvent = {
+    eventId: "input-mouse-motion";
+    type: "mouseenter" | "mouseleave" | "mousemove" | "mouseout" | "mouseover";
     clientX: number;
     clientY: number;
     movementX: number;
@@ -36,13 +42,29 @@ export type InputMouseEventType = {
     screenY: number;
 };
 
-export type InputKeyboardEventType = {
-    type: "keydown" | "keyup";
+export type InputMouseButtonEvent = {
+    eventId: "input-mouse-button";
+    type: "mousedown" | "mouseup";
+    button: number;
+};
+
+export type InputMouseWheelEvent = {
+    eventId: "input-mouse-wheel";
+    type: "wheel";
+    deltaX: number;
+    deltaY: number;
+    deltaZ: number;
+    deltaMode: number;
+};
+
+export type InputMouseCursorPosition = {
+    x: number;
+    y: number;
+};
+
+type CodeState = {
     code: string;
-    isComposing: boolean;
-    key: string;
-    location: number;
-    repeat: boolean;
+    state: ButtonState;
 };
 
 export enum KeyboardButtons {
@@ -62,17 +84,6 @@ export enum MouseButtons {
     Mouse4,
     Mouse5,
 }
-
-type InputMousePosition = {
-    clientX: number;
-    clientY: number;
-    offsetX: number;
-    offsetY: number;
-    pageX: number;
-    pageY: number;
-    screenX: number;
-    screenY: number;
-};
 
 enum ButtonState {
     None,
@@ -99,126 +110,156 @@ const KEYBOARD_BUTTONS_LOOKUP: Record<string, KeyboardButtons> = {
     ShiftLeft: KeyboardButtons.ShiftLeft,
 };
 
-export function startInputSenderSystem(world: World): void {
-    const { keyboardEventHandler, mouseEventHandler } = world.readData<InputSenderData>("input-sender");
+export function startInputSystem(world: World): void {
+    const { keyboardEventHandler, mouseEventHandler } = world.readData<InputInitData>("input-init");
 
-    const keyboardEvents: InputKeyboardEventType[] = [];
-    const mouseEvents: InputMouseEventType[] = [];
+    // Gather event data to avoid new input events triggering in the middle of schedules
+    const keyboardButtonEvents: InputKeyboardButtonEvent[] = [];
+    const mouseButtonEvents: InputMouseButtonEvent[] = [];
+    const mouseMotionEvents: InputMouseMotionEvent[] = [];
+    const mouseWheelEvents: InputMouseWheelEvent[] = [];
 
-    const keyDownFn = (ev: KeyboardEvent): void => {
-        keyboardEvents.push({
-            type: "keydown",
-            code: ev.code,
-            isComposing: ev.isComposing,
-            key: ev.key,
-            location: ev.location,
-            repeat: ev.repeat,
-        });
-    };
+    if (keyboardEventHandler !== undefined) {
+        const keyboardButtonDownFn = (ev: KeyboardEvent): void => {
+            keyboardButtonEvents.push({
+                eventId: "input-keyboard-button",
+                type: "keydown",
+                code: ev.code,
+                isComposing: ev.isComposing,
+                key: ev.key,
+                location: ev.location,
+                repeat: ev.repeat,
+            });
+        };
 
-    keyboardEventHandler.addEventListener("keydown", keyDownFn);
+        keyboardEventHandler.addEventListener("keydown", keyboardButtonDownFn);
 
-    const keyUpFn = (ev: KeyboardEvent): void => {
-        keyboardEvents.push({
-            type: "keyup",
-            code: ev.code,
-            isComposing: ev.isComposing,
-            key: ev.key,
-            location: ev.location,
-            repeat: ev.repeat,
-        });
-    };
+        const keyboardButtonUpFn = (ev: KeyboardEvent): void => {
+            keyboardButtonEvents.push({
+                eventId: "input-keyboard-button",
+                type: "keyup",
+                code: ev.code,
+                isComposing: ev.isComposing,
+                key: ev.key,
+                location: ev.location,
+                repeat: ev.repeat,
+            });
+        };
 
-    keyboardEventHandler.addEventListener("keyup", keyUpFn);
-
-    const mouseFn = (ev: MouseEvent): void => {
-        mouseEvents.push({
-            type: ev.type,
-            button: ev.button,
-            clientX: ev.clientX,
-            clientY: ev.clientY,
-            movementX: ev.movementX,
-            movementY: ev.movementY,
-            offsetX: ev.offsetX,
-            offsetY: ev.offsetY,
-            pageX: ev.pageX,
-            pageY: ev.pageY,
-            screenX: ev.screenX,
-            screenY: ev.screenY,
-        });
-    };
-
-    mouseEventHandler.addEventListener("mousedown", mouseFn);
-    mouseEventHandler.addEventListener("mouseenter", mouseFn);
-    mouseEventHandler.addEventListener("mouseleave", mouseFn);
-    mouseEventHandler.addEventListener("mousemove", mouseFn);
-    mouseEventHandler.addEventListener("mouseout", mouseFn);
-    mouseEventHandler.addEventListener("mouseover", mouseFn);
-    mouseEventHandler.addEventListener("mouseup", mouseFn);
-
-    world.writeData<InputEventsData>({
-        dataId: "input-events",
-        keyboardEvents,
-        mouseEvents,
-    });
-}
-
-export function updateInputSenderSystem(world: World): void {
-    const { receiverId } = world.readData<InputSenderData>("input-sender");
-    const channel = world.getChannel(receiverId);
-
-    const { keyboardEvents, mouseEvents } = world.readData<InputEventsData>("input-events");
-    channel.queueEvent<InputDataEvent>({
-        eventId: "input-data",
-        keyboardEvents: [...keyboardEvents],
-        mouseEvents: [...mouseEvents],
-    });
-
-    mouseEvents.length = 0;
-    keyboardEvents.length = 0;
-}
-
-export function startInputReceiverSystem(world: World): void {
-    const keyboardInputPlugin = new KeyboardInputPlugin();
-    world.setPlugin<KeyboardInputPlugin>(keyboardInputPlugin);
-
-    const mouseInputPlugin = new MouseInputPlugin();
-    world.setPlugin<MouseInputPlugin>(mouseInputPlugin);
-}
-
-export function updateInputReceiverSystem(world: World): void {
-    const events = world.readEvents<InputDataEvent>("input-data");
-
-    const keyboardInputPlugin = world.getPlugin<KeyboardInputPlugin>("keyboard-input");
-    const mouseInputPlugin = world.getPlugin<MouseInputPlugin>("mouse-input");
-
-    keyboardInputPlugin.clear();
-    mouseInputPlugin.clear();
-
-    for (const ev of events) {
-        keyboardInputPlugin.applyEvents(ev.keyboardEvents);
-        mouseInputPlugin.applyEvents(ev.mouseEvents);
+        keyboardEventHandler.addEventListener("keyup", keyboardButtonUpFn);
     }
+
+    if (mouseEventHandler !== undefined) {
+        const mouseButtonFn = (ev: MouseEvent): void => {
+            mouseButtonEvents.push({
+                eventId: "input-mouse-button",
+                type: ev.type as "mousedown" | "mouseup",
+                button: ev.button,
+            });
+        };
+
+        mouseEventHandler.addEventListener("mousedown", mouseButtonFn);
+        mouseEventHandler.addEventListener("mouseup", mouseButtonFn);
+
+        const mouseMotionFn = (ev: MouseEvent): void => {
+            mouseMotionEvents.push({
+                eventId: "input-mouse-motion",
+                type: ev.type as "mouseenter" | "mouseleave" | "mousemove" | "mouseout" | "mouseover",
+                clientX: ev.clientX,
+                clientY: ev.clientY,
+                movementX: ev.movementX,
+                movementY: ev.movementY,
+                offsetX: ev.offsetX,
+                offsetY: ev.offsetY,
+                pageX: ev.pageX,
+                pageY: ev.pageY,
+                screenX: ev.screenX,
+                screenY: ev.screenY,
+            });
+        };
+
+        mouseEventHandler.addEventListener("mouseenter", mouseMotionFn);
+        mouseEventHandler.addEventListener("mouseleave", mouseMotionFn);
+        mouseEventHandler.addEventListener("mousemove", mouseMotionFn);
+        mouseEventHandler.addEventListener("mouseout", mouseMotionFn);
+        mouseEventHandler.addEventListener("mouseover", mouseMotionFn);
+
+        const mouseWheelFn = (ev: WheelEvent): void => {
+            mouseWheelEvents.push({
+                eventId: "input-mouse-wheel",
+                type: "wheel",
+                deltaX: ev.deltaX,
+                deltaY: ev.deltaY,
+                deltaZ: ev.deltaZ,
+                deltaMode: ev.deltaMode,
+            });
+        };
+
+        mouseEventHandler.addEventListener("wheel", mouseWheelFn);
+    }
+
+    world.writeData<InputCaptureData>({
+        dataId: "input-capture",
+        keyboardButtonEvents,
+        mouseButtonEvents,
+        mouseMotionEvents,
+        mouseWheelEvents,
+    });
+
+    const keyboardPlugin = new KeyboardPlugin();
+    keyboardPlugin.initialize();
+    world.setPlugin<KeyboardPlugin>(keyboardPlugin);
+
+    const mousePlugin = new MousePlugin();
+    mousePlugin.initialize();
+    world.setPlugin<MousePlugin>(mousePlugin);
 }
 
-export class KeyboardInputPlugin implements WorldPlugin {
-    public readonly pluginId = "keyboard-input";
+export function updateInputSystem(world: World): void {
+    const optionsData = world.readData<InputInitData>("input-init");
+    const captureData = world.readData<InputCaptureData>("input-capture");
 
-    private states: Map<KeyboardButtons, { code: string; state: ButtonState }>;
+    // Propagate events to a receiver
+    for (const id of optionsData.receiverIds) {
+        const channel = world.getChannel(id);
+        channel.queueEvents(captureData.keyboardButtonEvents);
+        channel.queueEvents(captureData.mouseButtonEvents);
+        channel.queueEvents(captureData.mouseMotionEvents);
+        channel.queueEvents(captureData.mouseWheelEvents);
+    }
 
-    public events: InputKeyboardEventType[];
+    // Reset event capture data
+    captureData.keyboardButtonEvents.length = 0;
+    captureData.mouseButtonEvents.length = 0;
+    captureData.mouseMotionEvents.length = 0;
+    captureData.mouseWheelEvents.length = 0;
+
+    // Update keyboard plugin
+    const keyboardPlugin = world.getPlugin<KeyboardPlugin>("keyboard");
+    const keyboardButtonEvents = world.readEvents<InputKeyboardButtonEvent>("input-keyboard-button");
+    keyboardPlugin.clear();
+    keyboardPlugin.applyEvents(keyboardButtonEvents);
+
+    // Update mouse plugin
+    const mousePlugin = world.getPlugin<MousePlugin>("mouse");
+    const mouseButtonEvents = world.readEvents<InputMouseButtonEvent>("input-mouse-button");
+    const mouseMotionEvents = world.readEvents<InputMouseMotionEvent>("input-mouse-motion");
+    const mouseWheelEvents = world.readEvents<InputMouseWheelEvent>("input-mouse-wheel");
+    mousePlugin.clear();
+    mousePlugin.applyEvents(mouseButtonEvents, mouseMotionEvents, mouseWheelEvents);
+}
+
+export class KeyboardPlugin implements WorldPlugin {
+    private states: Map<KeyboardButtons, CodeState>;
+
+    public readonly pluginId = "keyboard";
 
     public constructor() {
         this.states = new Map();
-        this.events = [];
-
-        this.initialize();
     }
 
-    public applyEvents(keyboardEvents: InputKeyboardEventType[]): void {
-        this.events = keyboardEvents;
-
-        for (const ev of keyboardEvents) {
+    public applyEvents(buttonEvents: InputKeyboardButtonEvent[]): void {
+        for (const ev of buttonEvents) {
             const code = KEYBOARD_BUTTONS_LOOKUP[ev.code] as KeyboardButtons | undefined;
 
             if (code === undefined) {
@@ -295,43 +336,24 @@ export class KeyboardInputPlugin implements WorldPlugin {
     }
 }
 
-export class MouseInputPlugin implements WorldPlugin {
-    public readonly pluginId = "mouse-input";
+export class MousePlugin implements WorldPlugin {
+    private cursorPosition: InputMouseCursorPosition;
+    private states: Map<MouseButtons, CodeState>;
 
-    private states: Map<MouseButtons, { code: string; state: ButtonState }>;
-    private cursorPosition: InputMousePosition;
-
-    public events: InputMouseEventType[];
+    public readonly pluginId = "mouse";
 
     public constructor() {
+        this.cursorPosition = { x: -1, y: -1 };
+
         this.states = new Map();
-        this.events = [];
-        this.cursorPosition = {
-            clientX: 0,
-            clientY: 0,
-            offsetX: 0,
-            offsetY: 0,
-            pageX: 0,
-            pageY: 0,
-            screenX: 0,
-            screenY: 0,
-        };
-
-        this.initialize();
     }
 
-    public getPosition(): InputMousePosition {
-        return this.cursorPosition;
-    }
-
-    public moveTo(cursorPosition: InputMousePosition): void {
-        this.cursorPosition = cursorPosition;
-    }
-
-    public applyEvents(mouseEvents: InputMouseEventType[]): void {
-        this.events = mouseEvents;
-
-        for (const ev of mouseEvents) {
+    public applyEvents(
+        buttonEvents: InputMouseButtonEvent[],
+        motionEvents: InputMouseMotionEvent[],
+        _wheelEvents: InputMouseWheelEvent[],
+    ): void {
+        for (const ev of buttonEvents) {
             const code = MOUSE_BUTTONS_LOOKUP[ev.button] as MouseButtons | undefined;
 
             if (code === undefined) {
@@ -348,17 +370,10 @@ export class MouseInputPlugin implements WorldPlugin {
                     break;
                 }
             }
+        }
 
-            this.moveTo({
-                clientX: ev.clientX,
-                clientY: ev.clientY,
-                offsetX: ev.offsetX,
-                offsetY: ev.offsetY,
-                pageX: ev.pageX,
-                pageY: ev.pageY,
-                screenX: ev.screenX,
-                screenY: ev.screenY,
-            });
+        for (const ev of motionEvents) {
+            this.moveCursorTo({ x: ev.offsetX, y: ev.offsetY });
         }
     }
 
@@ -370,6 +385,10 @@ export class MouseInputPlugin implements WorldPlugin {
                 value.state = ButtonState.Pressing;
             }
         }
+    }
+
+    public getCursorPosition(): InputMouseCursorPosition {
+        return this.cursorPosition;
     }
 
     public initialize(): void {
@@ -391,6 +410,10 @@ export class MouseInputPlugin implements WorldPlugin {
     public isReleased(button: MouseButtons): boolean {
         const key = this.states.get(button);
         return key !== undefined ? key.state === ButtonState.Released : false;
+    }
+
+    public moveCursorTo(position: InputMouseCursorPosition): void {
+        this.cursorPosition = position;
     }
 
     public press(button: MouseButtons): void {
@@ -416,28 +439,22 @@ export class MouseInputPlugin implements WorldPlugin {
     }
 }
 
-export class InputSenderModule implements WorldModule {
-    public readonly moduleId = "input-sender";
-
-    public setup(world: World): void {
-        world.registerData<InputEventsData>("input-events");
-        world.registerData<InputSenderData>("input-sender");
-
-        world.addSystem<DefaultSystemStage>({ stage: "start-post", fn: startInputSenderSystem });
-        world.addSystem<DefaultSystemStage>({ stage: "update-pre", fn: updateInputSenderSystem });
-    }
-}
-
-export class InputReceiverModule implements WorldModule {
+export class InputModule implements WorldModule {
     public readonly moduleId = "input-receiver";
 
     public setup(world: World): void {
-        world.registerPlugin<MouseInputPlugin>("mouse-input");
-        world.registerPlugin<KeyboardInputPlugin>("keyboard-input");
+        world.registerPlugin<MousePlugin>("mouse");
+        world.registerPlugin<KeyboardPlugin>("keyboard");
 
-        world.registerEvent<InputDataEvent>("input-data");
+        world.registerData<InputCaptureData>("input-capture");
+        world.registerData<InputInitData>("input-init");
 
-        world.addSystem<DefaultSystemStage>({ stage: "start-pre", fn: startInputReceiverSystem });
-        world.addSystem<DefaultSystemStage>({ stage: "update-pre", fn: updateInputReceiverSystem });
+        world.registerEvent<InputKeyboardButtonEvent>("input-keyboard-button");
+        world.registerEvent<InputMouseMotionEvent>("input-mouse-motion");
+        world.registerEvent<InputMouseButtonEvent>("input-mouse-button");
+        world.registerEvent<InputMouseWheelEvent>("input-mouse-wheel");
+
+        world.addSystem<DefaultSystemStage>({ stage: "start-post", fn: startInputSystem });
+        world.addSystem<DefaultSystemStage>({ stage: "update-pre", fn: updateInputSystem });
     }
 }

@@ -19,7 +19,13 @@ import {
 import type { AssetId, AssetPlugin } from "../ecs/asset.js";
 import type { CameraBundle, CameraComponent } from "../ecs/camera.js";
 import { GPUModule, type GPUData, type GPUInitData } from "../ecs/gpu.js";
-import { KeyboardButtons, KeyboardInputPlugin, MouseButtons, MouseInputPlugin } from "../ecs/input.js";
+import {
+    KeyboardButtons,
+    KeyboardPlugin,
+    MouseButtons,
+    MousePlugin,
+    type InputMouseMotionEvent,
+} from "../ecs/input.js";
 import type { Material } from "../ecs/material.js";
 import { MeshRenderModule, type Mesh, type MeshBundle, type MeshRenderStateData } from "../ecs/mesh.js";
 import type { SceneData } from "../ecs/scene.js";
@@ -284,8 +290,8 @@ function cameraMoveSystem(world: World): void {
     const { context } = world.readData<GPUData>("gpu");
     const { delta } = world.readData<TimeData>("time");
 
-    const keyboard = world.getPlugin<KeyboardInputPlugin>("keyboard-input");
-    const mouse = world.getPlugin<MouseInputPlugin>("mouse-input");
+    const keyboard = world.getPlugin<KeyboardPlugin>("keyboard");
+    const mouse = world.getPlugin<MousePlugin>("mouse");
 
     const camera = world.getComponent<CameraComponent>(mainCamera, "camera");
     const transform = world.getComponent<TransformComponent>(mainCamera, "transform");
@@ -320,17 +326,17 @@ function cameraMoveSystem(world: World): void {
     }
 
     if (mouse.isPressing(MouseButtons.Mouse3)) {
-        let offsetX = 0;
-        let offsetY = 0;
+        let dx = 0;
+        let dy = 0;
 
-        for (const ev of mouse.events) {
-            offsetX -= ev.movementX;
-            offsetY -= ev.movementY;
+        for (const ev of world.readEvents<InputMouseMotionEvent>("input-mouse-motion")) {
+            dx -= ev.movementX;
+            dy -= ev.movementY;
         }
 
         const sens = 1 / 250;
-        const yaw = sens * offsetX;
-        const pitch = sens * offsetY;
+        const yaw = sens * dx;
+        const pitch = sens * dy;
 
         camRot = camRot.rotateYPre(yaw).rotateX(pitch);
     }

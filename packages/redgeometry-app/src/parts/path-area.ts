@@ -11,7 +11,7 @@ import { AppContextModule } from "../ecs/app-context.js";
 import type { AppInputData } from "../ecs/app-input.js";
 import { TextBoxInputElement } from "../ecs/app-input.js";
 import { AppMainModule, AppRemoteModule, type AppStateData } from "../ecs/app.js";
-import type { MouseInputPlugin } from "../ecs/input.js";
+import type { MousePlugin } from "../ecs/input.js";
 import { createRandomPath } from "../utility/helper.js";
 
 type AppPartMainData = {
@@ -71,8 +71,8 @@ function updateSystem(world: World): void {
     const { count } = world.readData<AppPartStateData>("app-part-state");
     const { seed, generator } = world.readData<AppStateData>("app-state");
 
-    const mouse = world.getPlugin<MouseInputPlugin>("mouse-input");
     const ctx = world.getPlugin<AppContextPlugin>("app-context");
+    const mouse = world.getPlugin<MousePlugin>("mouse");
 
     const random = RandomXSR128.fromSeedLcg(seed);
     const [canvasWidth, canvasHeight] = ctx.getSize(false);
@@ -80,8 +80,7 @@ function updateSystem(world: World): void {
     const path = createRandomPath(random, generator, count, canvasWidth, canvasHeight);
     path.close();
 
-    const mousePos = mouse.getPosition();
-    const p = new Point2(mousePos.offsetX, mousePos.offsetY);
+    const p = Point2.fromObject(mouse.getCursorPosition());
 
     world.writeData<AppPartRemoteData>({
         dataId: "app-part-remote",

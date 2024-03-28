@@ -10,7 +10,7 @@ import {
 } from "../ecs/app-input.js";
 import { createRandomSeed } from "../utility/helper.js";
 import type { AppLauncherData } from "./app-launcher.js";
-import { InputReceiverModule, InputSenderModule, type InputSenderData } from "./input.js";
+import { InputModule, type InputInitData } from "./input.js";
 import { TimeModule, TimePlugin, type TimeData } from "./time.js";
 
 export type AppMainData = {
@@ -106,11 +106,11 @@ export function initAppMainPreSystem(world: World): void {
         });
     });
 
-    world.writeData<InputSenderData>({
-        dataId: "input-sender",
-        receiverId: "remote",
+    world.writeData<InputInitData>({
+        dataId: "input-init",
         keyboardEventHandler: self,
         mouseEventHandler: canvas,
+        receiverIds: ["remote"],
     });
 }
 
@@ -214,6 +214,13 @@ export function initAppRemoteSystem(world: World): void {
         frame: 0,
         time: 0,
     });
+
+    world.writeData<InputInitData>({
+        dataId: "input-init",
+        keyboardEventHandler: undefined,
+        mouseEventHandler: undefined,
+        receiverIds: [],
+    });
 }
 
 export function resizeCanvasSystem(world: World): void {
@@ -244,7 +251,7 @@ export class AppMainModule implements WorldModule {
     public readonly moduleId = "app-main-input";
 
     public setup(world: World): void {
-        world.addModules([new AppInputModule(), new TimeModule(), new InputSenderModule()]);
+        world.addModules([new AppInputModule(), new TimeModule(), new InputModule()]);
 
         world.registerData<AppMainData>("app-main");
         world.registerData<AppMainInputData>("app-main-input");
@@ -276,7 +283,7 @@ export class AppRemoteModule implements WorldModule {
     public readonly moduleId = "app-remote";
 
     public setup(world: World): void {
-        world.addModules([new InputReceiverModule()]);
+        world.addModules([new InputModule()]);
 
         world.registerData<AppCanvasData>("app-canvas");
         world.registerData<AppStateData>("app-state");
