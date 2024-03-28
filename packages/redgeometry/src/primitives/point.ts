@@ -97,7 +97,7 @@ export class Point2 {
     }
 
     public isFinite(): boolean {
-        return Number.isFinite(this.x) && Number.isFinite(this.x);
+        return Number.isFinite(this.x) && Number.isFinite(this.y);
     }
 
     public isZero(): boolean {
@@ -217,7 +217,7 @@ export class Point3 {
     }
 
     public isFinite(): boolean {
-        return Number.isFinite(this.x) && Number.isFinite(this.x) && Number.isFinite(this.y);
+        return Number.isFinite(this.x) && Number.isFinite(this.y) && Number.isFinite(this.z);
     }
 
     public lerp(p1: Point3, t: number): Point3 {

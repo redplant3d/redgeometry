@@ -1,4 +1,5 @@
 import { Point2, Point3 } from "./point.js";
+import type { Ray2, Ray3 } from "./ray.js";
 
 export class Box2 {
     public x0: number;
@@ -76,6 +77,27 @@ export class Box2 {
 
     public intersectsInclusive(b: Box2): boolean {
         return this.x0 <= b.x1 && this.x1 >= b.x0 && this.y0 <= b.y1 && this.y1 >= b.y0;
+    }
+
+    public intersectsRay(ray: Ray2): boolean {
+        let tmin = Number.NEGATIVE_INFINITY;
+        let tmax = Number.POSITIVE_INFINITY;
+
+        let d = 1 / ray.v.x;
+        let t0 = (this.x0 - ray.p.x) * d;
+        let t1 = (this.x1 - ray.p.x) * d;
+
+        tmin = Math.max(Math.min(t0, t1), tmin);
+        tmax = Math.min(Math.max(t0, t1), tmax);
+
+        d = 1 / ray.v.y;
+        t0 = (this.y0 - ray.p.y) * d;
+        t1 = (this.y1 - ray.p.y) * d;
+
+        tmin = Math.max(Math.min(t0, t1), tmin);
+        tmax = Math.min(Math.max(t0, t1), tmax);
+
+        return tmin < tmax;
     }
 
     public isEmpty(): boolean {
@@ -197,6 +219,34 @@ export class Box3 {
             this.z0 <= b.z1 &&
             this.z1 >= b.z0
         );
+    }
+
+    public intersectsRay(ray: Ray3): boolean {
+        let tmin = Number.NEGATIVE_INFINITY;
+        let tmax = Number.POSITIVE_INFINITY;
+
+        let d = 1 / ray.v.x;
+        let t0 = (this.x0 - ray.p.x) * d;
+        let t1 = (this.x1 - ray.p.x) * d;
+
+        tmin = Math.max(Math.min(t0, t1), tmin);
+        tmax = Math.min(Math.max(t0, t1), tmax);
+
+        d = 1 / ray.v.y;
+        t0 = (this.y0 - ray.p.y) * d;
+        t1 = (this.y1 - ray.p.y) * d;
+
+        tmin = Math.max(Math.min(t0, t1), tmin);
+        tmax = Math.min(Math.max(t0, t1), tmax);
+
+        d = 1 / ray.v.z;
+        t0 = (this.z0 - ray.p.z) * d;
+        t1 = (this.z1 - ray.p.z) * d;
+
+        tmin = Math.max(Math.min(t0, t1), tmin);
+        tmax = Math.min(Math.max(t0, t1), tmax);
+
+        return tmin < tmax;
     }
 
     public isEmpty(): boolean {

@@ -120,6 +120,10 @@ export class Vector2 {
         return this.x === v.x && this.y === v.y;
     }
 
+    public isFinite(): boolean {
+        return Number.isFinite(this.x) && Number.isFinite(this.y);
+    }
+
     public isZero(): boolean {
         return this.x === 0 && this.y === 0;
     }
@@ -280,6 +284,10 @@ export class Vector3 {
 
     public eq(v: Vector3): boolean {
         return this.x === v.x && this.y === v.y && this.z === v.z;
+    }
+
+    public isFinite(): boolean {
+        return Number.isFinite(this.x) && Number.isFinite(this.y) && Number.isFinite(this.z);
     }
 
     public isZero(): boolean {

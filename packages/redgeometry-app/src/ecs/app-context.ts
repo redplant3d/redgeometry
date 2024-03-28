@@ -6,6 +6,7 @@ import type { Box2 } from "redgeometry/src/primitives/box";
 import type { Edge2 } from "redgeometry/src/primitives/edge";
 import { Point2 } from "redgeometry/src/primitives/point";
 import type { Polygon2 } from "redgeometry/src/primitives/polygon";
+import type { Ray2 } from "redgeometry/src/primitives/ray";
 import type { Image2 } from "redgeometry/src/render/image";
 import { assertUnreachable, throwError } from "redgeometry/src/utility/debug";
 import type { Random } from "redgeometry/src/utility/random";
@@ -29,9 +30,9 @@ export function initCanvasContextSystem(world: World): void {
 }
 
 export class AppContextPlugin implements WorldPlugin {
-    public readonly pluginId = "app-context";
-
     private context: CanvasRenderingContext2D | OffscreenCanvasRenderingContext2D;
+
+    public readonly pluginId = "app-context";
 
     public constructor(context: CanvasRenderingContext2D | OffscreenCanvasRenderingContext2D) {
         this.context = context;
@@ -177,6 +178,20 @@ export class AppContextPlugin implements WorldPlugin {
         ctx.beginPath();
 
         this.addPolygon(ctx, poly);
+
+        ctx.save();
+        ctx.lineJoin = "round";
+        ctx.lineWidth = width;
+        ctx.strokeStyle = style;
+        ctx.stroke();
+        ctx.restore();
+    }
+
+    public drawRay(edge: Ray2, style: CanvasStyle = "#000000", width = 1): void {
+        const ctx = this.context;
+        ctx.beginPath();
+        ctx.moveTo(edge.p.x, edge.p.y);
+        ctx.lineTo(edge.p.x + edge.v.x, edge.p.y + edge.v.y);
 
         ctx.save();
         ctx.lineJoin = "round";
