@@ -10,7 +10,7 @@ import { startGPUSystem, type GPUData } from "./gpu.js";
 import type { Material, MaterialComponent } from "./material.js";
 import type { SceneData } from "./scene.js";
 import MESH_WGSL from "./shader/mesh.wgsl";
-import { transformSystem, type GlobalComponent, type TransformComponent } from "./transform.js";
+import { transformSystem, type ComputedTransformComponent, type TransformComponent } from "./transform.js";
 
 export type MeshBundle = [MeshComponent, MaterialComponent, TransformComponent];
 export const MESH_BUNDLE_IDS = ["mesh", "material", "transform"] satisfies ComponentIdsOf<MeshBundle>;
@@ -128,16 +128,16 @@ export function meshRenderSystem(world: World): void {
     for (const entity of world.getEntitiesChanged()) {
         const mesh = world.getComponent<MeshComponent>(entity, "mesh");
         const material = world.getComponent<MaterialComponent>(entity, "material");
-        const global = world.getComponent<GlobalComponent>(entity, "global");
+        const computedTransform = world.getComponent<ComputedTransformComponent>(entity, "computed-transform");
 
         let entry = stateData.entries.get(entity);
 
-        if (mesh !== undefined && material !== undefined && global !== undefined) {
+        if (mesh !== undefined && material !== undefined && computedTransform !== undefined) {
             if (entry === undefined) {
                 entry = createMeshEntry(gpuData.device, stateData, asset, entity, mesh, material);
             }
 
-            updateMeshEntry(stateData, entry, global);
+            updateMeshEntry(stateData, entry, computedTransform);
         } else {
             if (entry !== undefined) {
                 destroyMeshEntry(stateData, entry);
@@ -436,7 +436,11 @@ function destroyMeshEntry(stateData: MeshRenderStateData, entry: MeshRenderEntry
     }
 }
 
-function updateMeshEntry(stateData: MeshRenderStateData, entry: MeshRenderEntry, globalComp: GlobalComponent): void {
+function updateMeshEntry(
+    stateData: MeshRenderStateData,
+    entry: MeshRenderEntry,
+    computedTransform: ComputedTransformComponent,
+): void {
     const materialEntry = stateData.materialEntries.get(entry.materialId);
     assertDebug(materialEntry !== undefined);
 
@@ -445,7 +449,7 @@ function updateMeshEntry(stateData: MeshRenderStateData, entry: MeshRenderEntry,
 
     // Copy transform data
     const destData = meshEntry.transformsBufferStaging.array;
-    const srcData = globalComp.transform.elements;
+    const srcData = computedTransform.global.elements;
     const destIdx = 12 * entry.instanceIdx;
 
     destData.set(srcData, destIdx);

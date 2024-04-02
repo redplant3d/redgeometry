@@ -19,13 +19,13 @@ export type TransformComponent = {
     visible: Visibility;
 };
 
-export type GlobalComponent = {
-    componentId: "global";
-    transform: Matrix4A;
+export type ComputedTransformComponent = {
+    componentId: "computed-transform";
+    global: Matrix4A;
     visible: Visibility;
 };
 
-export type TransformEntry = {
+type TransformEntry = {
     entityId: EntityId;
     depth: number;
 };
@@ -43,15 +43,15 @@ export function transformSystem(world: World): void {
             continue;
         }
 
-        let global = world.getComponent<GlobalComponent>(entityId, "global");
+        let computedTransform = world.getComponent<ComputedTransformComponent>(entityId, "computed-transform");
 
-        if (global === undefined) {
-            global = {
-                componentId: "global",
-                transform: Matrix4A.createIdentity(),
+        if (computedTransform === undefined) {
+            computedTransform = {
+                componentId: "computed-transform",
+                global: Matrix4A.createIdentity(),
                 visible: Visibility.Inherit,
             };
-            world.setComponent<GlobalComponent>(entityId, global);
+            world.setComponent<ComputedTransformComponent>(entityId, computedTransform);
         }
 
         hiearchySelector.select(entityId);
@@ -69,10 +69,10 @@ export function transformSystem(world: World): void {
     entriesChanged.sort((e1, e2) => e1.depth - e2.depth);
 
     for (const entry of entriesChanged) {
-        const global = world.getComponent<GlobalComponent>(entry.entityId, "global");
-        const local = world.getComponent<TransformComponent>(entry.entityId, "transform");
+        const transform = world.getComponent<TransformComponent>(entry.entityId, "transform");
+        const computed = world.getComponent<ComputedTransformComponent>(entry.entityId, "computed-transform");
 
-        if (global === undefined || local === undefined) {
+        if (transform === undefined || computed === undefined) {
             continue;
         }
 
@@ -81,40 +81,40 @@ export function transformSystem(world: World): void {
         const parent = hiearchySelector.getParent();
 
         if (parent !== undefined) {
-            const parentGlobal = world.getComponent<GlobalComponent>(parent, "global");
+            const parentComputed = world.getComponent<ComputedTransformComponent>(parent, "computed-transform");
 
-            if (parentGlobal === undefined) {
+            if (parentComputed === undefined) {
                 continue;
             }
 
-            global.transform.copyFrom(parentGlobal.transform);
+            computed.global.copyFrom(parentComputed.global);
 
-            if (local.visible === Visibility.Inherit) {
-                global.visible = parentGlobal.visible;
+            if (transform.visible === Visibility.Inherit) {
+                computed.visible = parentComputed.visible;
             } else {
-                global.visible = local.visible;
+                computed.visible = transform.visible;
             }
         } else {
-            global.transform.set(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0);
-            global.visible = local.visible;
+            computed.global.set(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0);
+            computed.visible = transform.visible;
         }
 
-        const t = local.translation;
+        const t = transform.translation;
         if (!t.eq(Point3.ZERO)) {
-            global.transform.translatePre(t.x, t.y, t.z);
+            computed.global.translatePre(t.x, t.y, t.z);
         }
 
-        const r = local.rotation;
+        const r = transform.rotation;
         if (!r.eq(Quaternion.IDENTITY)) {
-            global.transform.rotatePre(r.a, r.b, r.c, r.d);
+            computed.global.rotatePre(r.a, r.b, r.c, r.d);
         }
 
-        const s = local.scale;
+        const s = transform.scale;
         if (!s.eq(Vector3.ONE)) {
-            global.transform.scalePre(s.x, s.y, s.z);
+            computed.global.scalePre(s.x, s.y, s.z);
         }
 
-        world.updateComponent<GlobalComponent>(entry.entityId, "global");
+        world.updateComponent<ComputedTransformComponent>(entry.entityId, "computed-transform");
     }
 }
 
