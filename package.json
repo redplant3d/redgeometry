@@ -44,9 +44,7 @@
             "@typescript-eslint"
         ],
         "rules": {
-            "eqeqeq": [
-                "warn"
-            ],
+            "eqeqeq": "warn",
             "@typescript-eslint/explicit-function-return-type": [
                 "warn",
                 {
@@ -59,12 +57,8 @@
                     "ignoreRestArgs": true
                 }
             ],
-            "@typescript-eslint/no-unnecessary-condition": [
-                "warn"
-            ],
-            "@typescript-eslint/no-unused-expressions": [
-                "warn"
-            ],
+            "@typescript-eslint/no-unnecessary-condition": "warn",
+            "@typescript-eslint/no-unused-expressions": "warn",
             "@typescript-eslint/no-unused-vars": [
                 "warn",
                 {
