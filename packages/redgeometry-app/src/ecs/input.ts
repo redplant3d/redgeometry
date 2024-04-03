@@ -219,7 +219,7 @@ export function updateInputSystem(world: World): void {
     const optionsData = world.readData<InputInitData>("input-init");
     const captureData = world.readData<InputCaptureData>("input-capture");
 
-    // Propagate events to a receiver
+    // Propagate events
     for (const id of optionsData.receiverIds) {
         const channel = world.getChannel(id);
         channel.queueEvents(captureData.keyboardButtonEvents);

@@ -11,7 +11,7 @@ import {
 import { createRandomSeed } from "../utility/helper.js";
 import type { AppLauncherData } from "./app-launcher.js";
 import { InputModule, type InputInitData } from "./input.js";
-import { TimeModule, TimePlugin, type TimeData } from "./time.js";
+import { TimeModule, type AnimationFrameEvent, type TimeInitData } from "./time.js";
 
 export type AppMainData = {
     dataId: "app-main";
@@ -106,6 +106,11 @@ export function initAppMainPreSystem(world: World): void {
         });
     });
 
+    world.writeData<TimeInitData>({
+        dataId: "time-init",
+        receiverIds: ["remote"],
+    });
+
     world.writeData<InputInitData>({
         dataId: "input-init",
         keyboardEventHandler: self,
@@ -182,15 +187,14 @@ export async function initAppMainPostSystem(world: World): Promise<void> {
 
     await channel.runScheduleAsync("start");
 
-    const timePlugin = world.getPlugin<TimePlugin>("time");
-    timePlugin.requestAnimationFrame(world);
+    requestAnimationFrame((time) => {
+        world.writeEvent<AnimationFrameEvent>({ eventId: "animation-frame", time });
+        world.runSchedule<DefaultWorldScheduleId>("update");
+    });
 }
 
 export async function appMainSystem(world: World): Promise<void> {
     const channel = world.getChannel("remote");
-
-    const timeData = world.readData<TimeData>("time");
-    channel.queueData(timeData);
 
     const windowResizeEvents = world.readEvents<WindowResizeEvent>("window-resize");
     channel.queueEvents(windowResizeEvents);
@@ -203,16 +207,16 @@ export async function appMainSystem(world: World): Promise<void> {
 
     await channel.runScheduleAsync<DefaultWorldScheduleId>("update");
 
-    const timePlugin = world.getPlugin<TimePlugin>("time");
-    timePlugin.requestAnimationFrame(world);
+    requestAnimationFrame((time) => {
+        world.writeEvent<AnimationFrameEvent>({ eventId: "animation-frame", time });
+        world.runSchedule<DefaultWorldScheduleId>("update");
+    });
 }
 
 export function initAppRemoteSystem(world: World): void {
-    world.writeData<TimeData>({
-        dataId: "time",
-        delta: 0,
-        frame: 0,
-        time: 0,
+    world.writeData<TimeInitData>({
+        dataId: "time-init",
+        receiverIds: [],
     });
 
     world.writeData<InputInitData>({
@@ -251,7 +255,7 @@ export class AppMainModule implements WorldModule {
     public readonly moduleId = "app-main-input";
 
     public setup(world: World): void {
-        world.addModules([new AppInputModule(), new TimeModule(), new InputModule()]);
+        world.addModules([new TimeModule(), new InputModule(), new AppInputModule()]);
 
         world.registerData<AppMainData>("app-main");
         world.registerData<AppMainInputData>("app-main-input");
@@ -283,11 +287,10 @@ export class AppRemoteModule implements WorldModule {
     public readonly moduleId = "app-remote";
 
     public setup(world: World): void {
-        world.addModules([new InputModule()]);
+        world.addModules([new TimeModule(), new InputModule()]);
 
         world.registerData<AppCanvasData>("app-canvas");
         world.registerData<AppStateData>("app-state");
-        world.registerData<TimeData>("time");
 
         world.registerEvent<AppCommandEvent>("app-command");
         world.registerEvent<WindowResizeEvent>("window-resize");
