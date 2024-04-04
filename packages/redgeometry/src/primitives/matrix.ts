@@ -1972,67 +1972,125 @@ export class Matrix4 {
         ]);
     }
 
-    public static fromOrthographic(
-        left: number,
-        right: number,
-        top: number,
-        bottom: number,
-        near: number,
-        far: number,
-    ): Matrix4 {
-        // OpenGL orthographic projection matrix
-        const w = right - left;
-        const h = top - bottom;
-        const d = far - near;
+    /**
+     * Returns a right-handed orthographic projection matrix with a depth range of `[0, 1]`.
+     */
+    public static fromOrthographicSized(width: number, height: number, near: number, far: number): Matrix4 {
+        // Formula derived from `D3DXMatrixOrthoRH`
+        const dxInv = 1 / width;
+        const dyInv = 1 / height;
+        const dzInv = 1 / (near - far);
 
         // | e0   0    0  0 |
         // |  0  e5    0  0 |
         // |  0   0  e10  0 |
-        // | e3  e7  e11  1 |
-        const e0 = 2 / w;
-        const e3 = -(right + left) / w;
-        const e5 = 2 / h;
-        const e7 = -(top + bottom) / h;
-        const e10 = -2 / d;
-        const e11 = -(far + near) / d;
+        // |  0   0  e11  1 |
+        const e0 = 2 * dxInv;
+        const e5 = 2 * dyInv;
+        const e10 = dzInv;
+        const e11 = near * dzInv;
 
-        return new Matrix4([e0, 0, 0, e3, 0, e5, 0, e7, 0, 0, e10, e11, 0, 0, 0, 1]);
+        return new Matrix4([e0, 0, 0, 0, 0, e5, 0, 0, 0, 0, e10, e11, 0, 0, 0, 1]);
     }
 
-    public static fromPerspective(
-        left: number,
-        right: number,
-        top: number,
-        bottom: number,
-        near: number,
-        far: number,
-    ): Matrix4 {
-        // OpenGL perspective projection matrix
-        const w = right - left;
-        const h = top - bottom;
-        const d = far - near;
+    /**
+     * Returns a right-handed orthographic projection matrix with a depth range of `[-1, 1]`.
+     */
+    public static fromOrthographicSizedGL(width: number, height: number, near: number, far: number): Matrix4 {
+        const dxInv = 1 / width;
+        const dyInv = 1 / height;
+        const dzInv = 1 / (near - far);
 
-        // |  e0   0    0   0 |
-        // |   0  e5    0   0 |
-        // |  e2  e6  e10  -1 |
-        // |   0   0  e11   0 |
-        const e0 = (2 * near) / w;
-        const e2 = (right + left) / w;
-        const e5 = (2 * near) / h;
-        const e6 = (top + bottom) / h;
-        const e10 = (near + far) / d;
-        const e11 = (2 * near * far) / d;
+        // | e0   0    0  0 |
+        // |  0  e5    0  0 |
+        // |  0   0  e10  0 |
+        // |  0   0  e11  1 |
+        const e0 = 2 * dxInv;
+        const e5 = 2 * dyInv;
+        const e10 = 2 * dzInv;
+        const e11 = (far + near) * dzInv;
 
-        return new Matrix4([e0, 0, e2, 0, 0, e5, e6, 0, 0, 0, e10, e11, 0, 0, -1, 0]);
+        return new Matrix4([e0, 0, 0, 0, 0, e5, 0, 0, 0, 0, e10, e11, 0, 0, 0, 1]);
     }
 
-    public static fromPerspectiveFrustum(fovy: number, aspect: number, near: number, far: number): Matrix4 {
-        const top = near * Math.tan(fovy * (Math.PI / 360));
-        const height = 2 * top;
-        const width = aspect * height;
-        const left = -0.5 * width;
+    /**
+     * Returns a right-handed perspective projection matrix with a depth range of `[0, 1]`.
+     */
+    public static fromPerspective(fovY: number, aspectRatio: number, near: number, far: number): Matrix4 {
+        // Formula derived from `D3DXMatrixPerspectiveFovRH`
+        const fInv = 1 / Math.tan(0.5 * fovY);
+        const dzInv = 1 / (near - far);
 
-        return Matrix4.fromPerspective(left, left + width, top, top - height, near, far);
+        // | e0   0    0   0 |
+        // |  0  e5    0   0 |
+        // |  0   0  e10  -1 |
+        // |  0   0  e11   0 |
+        const e0 = fInv / aspectRatio;
+        const e5 = fInv;
+        const e10 = far * dzInv;
+        const e11 = near * far * dzInv;
+
+        return new Matrix4([e0, 0, 0, 0, 0, e5, 0, 0, 0, 0, e10, e11, 0, 0, -1, 0]);
+    }
+
+    /**
+     * Returns a right-handed perspective projection matrix with a depth range of `[-1, 1]`.
+     */
+    public static fromPerspectiveGL(fovY: number, aspectRatio: number, near: number, far: number): Matrix4 {
+        const fInv = 1 / Math.tan(0.5 * fovY);
+        const dzInv = 1 / (near - far);
+
+        // | e0   0    0   0 |
+        // |  0  e5    0   0 |
+        // |  0   0  e10  -1 |
+        // |  0   0  e11   0 |
+        const e0 = fInv / aspectRatio;
+        const e5 = fInv;
+        const e10 = (far + near) * dzInv;
+        const e11 = 2 * far * near * dzInv;
+
+        return new Matrix4([e0, 0, 0, 0, 0, e5, 0, 0, 0, 0, e10, e11, 0, 0, -1, 0]);
+    }
+
+    /**
+     * Returns a right-handed perspective projection matrix with a depth range of `[0, 1]`.
+     */
+    public static fromPerspectiveSized(width: number, height: number, near: number, far: number): Matrix4 {
+        // Formula derived from `D3DXMatrixPerspectiveRH`
+        const dxInv = 1 / width;
+        const dyInv = 1 / height;
+        const dzInv = 1 / (near - far);
+
+        // | e0   0    0   0 |
+        // |  0  e5    0   0 |
+        // |  0   0  e10  -1 |
+        // |  0   0  e11   0 |
+        const e0 = 2 * near * dxInv;
+        const e5 = 2 * near * dyInv;
+        const e10 = far * dzInv;
+        const e11 = near * far * dzInv;
+
+        return new Matrix4([e0, 0, 0, 0, 0, e5, 0, 0, 0, 0, e10, e11, 0, 0, -1, 0]);
+    }
+
+    /**
+     * Returns a right-handed perspective projection matrix with a depth range of `[-1, 1]`.
+     */
+    public static fromPerspectiveSizedGL(width: number, height: number, near: number, far: number): Matrix4 {
+        const dxInv = 1 / width;
+        const dyInv = 1 / height;
+        const dzInv = 1 / (near - far);
+
+        // | e0   0    0   0 |
+        // |  0  e5    0   0 |
+        // |  0   0  e10  -1 |
+        // |  0   0  e11   0 |
+        const e0 = 2 * near * dxInv;
+        const e5 = 2 * near * dyInv;
+        const e10 = (far + near) * dzInv;
+        const e11 = 2 * far * near * dzInv;
+
+        return new Matrix4([e0, 0, 0, 0, 0, e5, 0, 0, 0, 0, e10, e11, 0, 0, -1, 0]);
     }
 
     /**

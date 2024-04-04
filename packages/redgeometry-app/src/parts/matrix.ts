@@ -85,38 +85,37 @@ function updateSystem(world: World): void {
 
     const edges = createCube();
 
-    const w = 0.5 * canvasWidth;
-    const h = 0.5 * canvasHeight;
-    const s = 0.2 * Math.min(canvasWidth, canvasHeight);
-    const d = (rotation * Math.PI) / 180;
-
-    let mat: Matrix4 | undefined;
-
     // Projection
+    let matProj: Matrix4 | undefined;
+
     if (projection === "orthographic") {
-        mat = Matrix4.fromOrthographic(-1, 1, 1, -1, -10, 1000);
+        matProj = Matrix4.fromOrthographicSized(5, 5, 1, 10);
     } else {
-        mat = Matrix4.fromPerspective(-1, 1, 1, -1, -10, 1000);
+        matProj = Matrix4.fromPerspectiveSized(1, 1, 1, 10);
     }
 
-    mat.scale(s, s, s);
-    mat.translate(w, h, 0);
+    // NDC to screen
+    const w = 0.5 * canvasWidth;
+    const h = 0.5 * canvasHeight;
+    const s = 0.5 * Math.min(canvasWidth, canvasHeight);
 
-    // View
-    mat.translatePre(0, 0, -10);
+    matProj.scale(s, s, s);
+    matProj.translate(w, h, 0);
 
-    // Model
+    // Model view
+    const d = (rotation * Math.PI) / 180;
     const q = Quaternion.fromRotationEuler(1.1 * d, 1.3 * d, 1.7 * d, RotationOrder.ZYX);
-    mat.rotatePre(q.a, q.b, q.c, q.d);
 
-    // log.infoDebug("*********");
-    // for (const e of this.edges) {
-    //     log.infoDebug("{}", e);
-    // }
+    const matView = Matrix4.createIdentity();
+    matView.rotate(q.a, q.b, q.c, q.d);
+    matView.translate(0, 0, -5);
+
+    // View to screen coordinates
+    matView.mul(matProj);
 
     world.writeData<AppPartRemoteData>({
         dataId: "app-part-remote",
-        edges: transformEdges(edges, mat),
+        edges: transformEdges(edges, matView),
     });
 }
 

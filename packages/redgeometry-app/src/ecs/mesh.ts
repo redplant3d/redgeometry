@@ -158,7 +158,7 @@ export function meshRenderSystem(world: World): void {
 
     const depthStencilAttachment: GPURenderPassDepthStencilAttachment = {
         view: stateData.depthTexture.createView(),
-        depthClearValue: 0,
+        depthClearValue: 1,
         depthLoadOp: "clear",
         depthStoreOp: "store",
     };
@@ -287,7 +287,7 @@ function createRenderPipelineState(device: GPUDevice, ctx: GPUPipelineContext): 
         primitive: { topology: "triangle-list" },
         depthStencil: {
             depthWriteEnabled: true,
-            depthCompare: "greater",
+            depthCompare: "less",
             format: "depth24plus",
         },
         layout: ctx.pipelineLayout,

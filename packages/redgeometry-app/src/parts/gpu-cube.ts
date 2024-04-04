@@ -346,12 +346,9 @@ function cameraMoveSystem(world: World): void {
 
     world.updateComponent<TransformComponent>(mainCamera, "transform");
 
+    const fovRad = fov * (Math.PI / 180);
     const aspect = context.canvas.width / context.canvas.height;
-    const camProj = Matrix4.fromPerspectiveFrustum(fov, aspect, 0.01, 2000);
-
-    // Transform `z` from [-1, 1] to [0, 1]
-    camProj.translate(0, 0, 1);
-    camProj.scale(1, 1, 0.5);
+    const camProj = Matrix4.fromPerspective(fovRad, aspect, 0.1, 100);
 
     camera.projection = camProj;
 }
