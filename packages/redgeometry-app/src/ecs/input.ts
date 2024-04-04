@@ -216,11 +216,17 @@ export function startInputSystem(world: World): void {
 }
 
 export function updateInputSystem(world: World): void {
-    const optionsData = world.readData<InputInitData>("input-init");
+    const initData = world.readData<InputInitData>("input-init");
     const captureData = world.readData<InputCaptureData>("input-capture");
 
+    // Write events
+    world.writeEvents(captureData.keyboardButtonEvents);
+    world.writeEvents(captureData.mouseButtonEvents);
+    world.writeEvents(captureData.mouseMotionEvents);
+    world.writeEvents(captureData.mouseWheelEvents);
+
     // Propagate events
-    for (const id of optionsData.receiverIds) {
+    for (const id of initData.receiverIds) {
         const channel = world.getChannel(id);
         channel.queueEvents(captureData.keyboardButtonEvents);
         channel.queueEvents(captureData.mouseButtonEvents);
