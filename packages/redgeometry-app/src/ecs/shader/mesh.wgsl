@@ -24,11 +24,12 @@ var<uniform> color: vec4f;
 
 @vertex
 fn vertex_main(vtxIn: VertexIn, matIn: TransformIn) -> VertexOut {
-    var pos = vec4f(vtxIn.position, 1.0);
-    var model = mat4x4f(matIn.col0, matIn.col1, matIn.col2, vec4f(0, 0, 0, 1));
+    var object_pos = vec4f(vtxIn.position, 1.0);
+    var world = mat3x4f(matIn.col0, matIn.col1, matIn.col2);
+    var world_pos = vec4f(object_pos * world, 1.0);
 
     var vtxOut: VertexOut;
-    vtxOut.position = pos * model * viewProjection;
+    vtxOut.position = world_pos * viewProjection;
 
     return vtxOut;
 }
