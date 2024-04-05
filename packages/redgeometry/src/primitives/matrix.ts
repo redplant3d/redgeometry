@@ -2262,6 +2262,125 @@ export class Matrix4 {
         );
     }
 
+    public getDeterminant(): number {
+        const e = this.elements;
+
+        const a1 = e[10] * (e[0] * e[5] - e[1] * e[4]);
+        const a2 = e[9] * (e[0] * e[6] - e[2] * e[4]);
+        const a3 = e[8] * (e[1] * e[6] - e[2] * e[5]);
+        const a = e[15] * (a1 - a2 + a3);
+
+        const b1 = e[11] * (e[0] * e[5] - e[1] * e[4]);
+        const b2 = e[9] * (e[0] * e[7] - e[3] * e[4]);
+        const b3 = e[8] * (e[1] * e[7] - e[3] * e[5]);
+        const b = e[14] * (b1 - b2 + b3);
+
+        const c1 = e[11] * (e[0] * e[6] - e[2] * e[4]);
+        const c2 = e[10] * (e[0] * e[7] - e[3] * e[4]);
+        const c3 = e[8] * (e[2] * e[7] - e[3] * e[6]);
+        const c = e[13] * (c1 - c2 + c3);
+
+        const d1 = e[11] * (e[1] * e[6] - e[2] * e[5]);
+        const d2 = e[10] * (e[1] * e[7] - e[3] * e[5]);
+        const d3 = e[9] * (e[2] * e[7] - e[3] * e[6]);
+        const d = e[12] * (d1 - d2 + d3);
+
+        return a - b + c - d;
+    }
+
+    public getInverse(): Matrix4 {
+        const det = this.getDeterminant();
+
+        if (det === 0) {
+            return Matrix4.createIdentity();
+        }
+
+        const detInv = 1 / det;
+        const e = this.elements;
+
+        const e0a = e[15] * (e[5] * e[10] - e[6] * e[9]);
+        const e0b = e[14] * (e[5] * e[11] - e[7] * e[9]);
+        const e0c = e[13] * (e[6] * e[11] - e[7] * e[10]);
+        const e0 = detInv * (e0a - e0b + e0c);
+
+        const e1a = e[15] * (e[2] * e[9] - e[1] * e[10]);
+        const e1b = e[14] * (e[3] * e[9] - e[1] * e[11]);
+        const e1c = e[13] * (e[3] * e[10] - e[2] * e[11]);
+        const e1 = detInv * (e1a - e1b + e1c);
+
+        const e2a = e[15] * (e[1] * e[6] - e[2] * e[5]);
+        const e2b = e[14] * (e[1] * e[7] - e[3] * e[5]);
+        const e2c = e[13] * (e[2] * e[7] - e[3] * e[6]);
+        const e2 = detInv * (e2a - e2b + e2c);
+
+        const e3a = e[11] * (e[2] * e[5] - e[1] * e[6]);
+        const e3b = e[10] * (e[3] * e[5] - e[1] * e[7]);
+        const e3c = e[9] * (e[3] * e[6] - e[2] * e[7]);
+        const e3 = detInv * (e3a - e3b + e3c);
+
+        const e4a = e[15] * (e[6] * e[8] - e[4] * e[10]);
+        const e4b = e[14] * (e[7] * e[8] - e[4] * e[11]);
+        const e4c = e[12] * (e[7] * e[10] - e[6] * e[11]);
+        const e4 = detInv * (e4a - e4b + e4c);
+
+        const e5a = e[15] * (e[0] * e[10] - e[2] * e[8]);
+        const e5b = e[14] * (e[0] * e[11] - e[3] * e[8]);
+        const e5c = e[12] * (e[2] * e[11] - e[3] * e[10]);
+        const e5 = detInv * (e5a - e5b + e5c);
+
+        const e6a = e[15] * (e[2] * e[4] - e[0] * e[6]);
+        const e6b = e[14] * (e[3] * e[4] - e[0] * e[7]);
+        const e6c = e[12] * (e[3] * e[6] - e[2] * e[7]);
+        const e6 = detInv * (e6a - e6b + e6c);
+
+        const e7a = e[11] * (e[0] * e[6] - e[2] * e[4]);
+        const e7b = e[10] * (e[0] * e[7] - e[3] * e[4]);
+        const e7c = e[8] * (e[2] * e[7] - e[3] * e[6]);
+        const e7 = detInv * (e7a - e7b + e7c);
+
+        const e8a = e[15] * (e[4] * e[9] - e[5] * e[8]);
+        const e8b = e[13] * (e[4] * e[11] - e[7] * e[8]);
+        const e8c = e[12] * (e[5] * e[11] - e[7] * e[9]);
+        const e8 = detInv * (e8a - e8b + e8c);
+
+        const e9a = e[15] * (e[1] * e[8] - e[0] * e[9]);
+        const e9b = e[13] * (e[3] * e[8] - e[0] * e[11]);
+        const e9c = e[12] * (e[3] * e[9] - e[1] * e[11]);
+        const e9 = detInv * (e9a - e9b + e9c);
+
+        const e10a = e[15] * (e[0] * e[5] - e[1] * e[4]);
+        const e10b = e[13] * (e[0] * e[7] - e[3] * e[4]);
+        const e10c = e[12] * (e[1] * e[7] - e[3] * e[5]);
+        const e10 = detInv * (e10a - e10b + e10c);
+
+        const e11a = e[11] * (e[1] * e[4] - e[0] * e[5]);
+        const e11b = e[9] * (e[3] * e[4] - e[0] * e[7]);
+        const e11c = e[8] * (e[3] * e[5] - e[1] * e[7]);
+        const e11 = detInv * (e11a - e11b + e11c);
+
+        const e12a = e[14] * (e[5] * e[8] - e[4] * e[9]);
+        const e12b = e[13] * (e[6] * e[8] - e[4] * e[10]);
+        const e12c = e[12] * (e[6] * e[9] - e[5] * e[10]);
+        const e12 = detInv * (e12a - e12b + e12c);
+
+        const e13a = e[14] * (e[0] * e[9] - e[1] * e[8]);
+        const e13b = e[13] * (e[0] * e[10] - e[2] * e[8]);
+        const e13c = e[12] * (e[1] * e[10] - e[2] * e[9]);
+        const e13 = detInv * (e13a - e13b + e13c);
+
+        const e14a = e[14] * (e[1] * e[4] - e[0] * e[5]);
+        const e14b = e[13] * (e[2] * e[4] - e[0] * e[6]);
+        const e14c = e[12] * (e[2] * e[5] - e[1] * e[6]);
+        const e14 = detInv * (e14a - e14b + e14c);
+
+        const e15a = e[10] * (e[0] * e[5] - e[1] * e[4]);
+        const e15b = e[9] * (e[0] * e[6] - e[2] * e[4]);
+        const e15c = e[8] * (e[1] * e[6] - e[2] * e[5]);
+        const e15 = detInv * (e15a - e15b + e15c);
+
+        return new Matrix4([e0, e1, e2, e3, e4, e5, e6, e7, e8, e9, e10, e11, e12, e13, e14, e15]);
+    }
+
     /**
      * ```
      *                  | e0  e4   e8  e12 |

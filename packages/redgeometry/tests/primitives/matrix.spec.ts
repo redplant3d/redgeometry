@@ -256,6 +256,19 @@ test("Matrix4A - translate", () => {
     expect(mat1).toEqual(mat4);
 });
 
+test("Matrix4 - inverse", () => {
+    const q = Quaternion.fromRotationAngleX(Math.PI);
+    const mat = Matrix4.createIdentity();
+    mat.translate(1, 2, 3);
+    mat.scale(4, 4, 4);
+    mat.rotate(q.a, q.b, q.c, q.d);
+
+    const matInv = mat.getInverse();
+    mat.mulPre(matInv);
+
+    expect(mat).toEqual(Matrix4.createIdentity());
+});
+
 test("Matrix4 - mapPoint", () => {
     const mat = Matrix4.createIdentity();
     const p = new Point3(1, 2, 3);
