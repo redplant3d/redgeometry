@@ -20,14 +20,16 @@ export function cameraSystem(world: World): void {
             continue;
         }
 
+        const mat = camera.viewProjection;
+
         const computedTransform = world.getComponent<ComputedTransformComponent>(entity, "computed-transform");
 
         if (computedTransform !== undefined) {
-            const matInv = computedTransform.global.getInverse();
-            camera.viewProjection.set(...matInv.elements, 0, 0, 0, 1);
-            camera.viewProjection.mul(camera.projection);
+            const e = computedTransform.global.getInverse().elements;
+            mat.set(e[0], e[1], e[2], 0, e[3], e[4], e[5], 0, e[6], e[7], e[8], 0, e[9], e[10], e[11], 1);
+            mat.mulSet(camera.projection, mat);
         } else {
-            camera.viewProjection.copyFrom(camera.projection);
+            mat.copyFrom(camera.projection);
         }
     }
 }

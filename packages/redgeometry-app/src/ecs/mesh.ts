@@ -236,9 +236,10 @@ function createPipelineContext(device: GPUDevice, format: GPUTextureFormat): GPU
             {
                 attributes: [
                     // Model transform matrix columns
-                    { shaderLocation: 1, offset: 0, format: "float32x4" },
-                    { shaderLocation: 2, offset: 16, format: "float32x4" },
-                    { shaderLocation: 3, offset: 32, format: "float32x4" },
+                    { shaderLocation: 1, offset: 0, format: "float32x3" },
+                    { shaderLocation: 2, offset: 12, format: "float32x3" },
+                    { shaderLocation: 3, offset: 24, format: "float32x3" },
+                    { shaderLocation: 4, offset: 36, format: "float32x3" },
                 ],
                 arrayStride: 48,
                 stepMode: "instance",

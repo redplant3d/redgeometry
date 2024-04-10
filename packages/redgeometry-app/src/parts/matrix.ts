@@ -111,7 +111,7 @@ function updateSystem(world: World): void {
     matView.translate(0, 0, -5);
 
     // View to screen coordinates
-    matView.mul(matProj);
+    matView.mulSet(matProj, matView);
 
     world.writeData<AppPartRemoteData>({
         dataId: "app-part-remote",

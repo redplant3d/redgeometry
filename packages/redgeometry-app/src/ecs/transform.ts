@@ -95,7 +95,7 @@ export function transformSystem(world: World): void {
                 computed.visible = transform.visible;
             }
         } else {
-            computed.global.set(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0);
+            computed.global.set(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0);
             computed.visible = transform.visible;
         }
 

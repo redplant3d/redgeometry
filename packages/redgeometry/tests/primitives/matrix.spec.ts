@@ -13,9 +13,11 @@ test("Matrix3A - inverse", () => {
     mat.rotate(c.a, c.b);
 
     const matInv = mat.getInverse();
-    mat.mulPre(matInv);
+    const mat1 = mat.mul(matInv);
+    const mat2 = matInv.mul(mat);
 
-    expect(mat).toEqual(Matrix3A.createIdentity());
+    expect(mat1).toEqual(Matrix3A.createIdentity());
+    expect(mat2).toEqual(Matrix3A.createIdentity());
 });
 
 test("Matrix3A - mapPoint", () => {
@@ -84,9 +86,11 @@ test("Matrix3 - inverse", () => {
     mat.rotate(c.a, c.b);
 
     const matInv = mat.getInverse();
-    mat.mulPre(matInv);
+    const mat1 = mat.mul(matInv);
+    const mat2 = matInv.mul(mat);
 
-    expect(mat).toEqual(Matrix3.createIdentity());
+    expect(mat1).toEqual(Matrix3.createIdentity());
+    expect(mat2).toEqual(Matrix3.createIdentity());
 });
 
 test("Matrix3 - mapPoint", () => {
@@ -155,9 +159,11 @@ test("Matrix4A - inverse", () => {
     mat.rotate(q.a, q.b, q.c, q.d);
 
     const matInv = mat.getInverse();
-    mat.mulPre(matInv);
+    const mat1 = mat.mul(matInv);
+    const mat2 = matInv.mul(mat);
 
-    expect(mat).toEqual(Matrix4A.createIdentity());
+    expect(mat1).toEqual(Matrix4A.createIdentity());
+    expect(mat2).toEqual(Matrix4A.createIdentity());
 });
 
 test("Matrix4A - mapPoint", () => {
@@ -264,9 +270,11 @@ test("Matrix4 - inverse", () => {
     mat.rotate(q.a, q.b, q.c, q.d);
 
     const matInv = mat.getInverse();
-    mat.mulPre(matInv);
+    const mat1 = mat.mul(matInv);
+    const mat2 = matInv.mul(mat);
 
-    expect(mat).toEqual(Matrix4.createIdentity());
+    expect(mat1).toEqual(Matrix4.createIdentity());
+    expect(mat2).toEqual(Matrix4.createIdentity());
 });
 
 test("Matrix4 - mapPoint", () => {
