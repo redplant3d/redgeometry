@@ -1,6 +1,12 @@
 import { getMaxEigenvalueSym2x2, getMaxEigenvalueSym3x3 } from "../internal/matrix.js";
+import type { FixedSizeArray } from "../utility/types.js";
 import { Point2, Point3 } from "./point.js";
 import { Vector2, Vector3 } from "./vector.js";
+
+export type MatrixElements3A = FixedSizeArray<number, 6>;
+export type MatrixElements3 = FixedSizeArray<number, 9>;
+export type MatrixElements4A = FixedSizeArray<number, 12>;
+export type MatrixElements4 = FixedSizeArray<number, 16>;
 
 export enum MatrixType {
     Affine,
@@ -16,7 +22,7 @@ export enum MatrixType {
  * ```
  */
 export class Matrix3A {
-    public readonly elements: [number, number, number, number, number, number];
+    public readonly elements: MatrixElements3A;
 
     /**
      * ```
@@ -25,7 +31,7 @@ export class Matrix3A {
      * |  0   0   1 |
      * ```
      */
-    public constructor(elements: [number, number, number, number, number, number]) {
+    public constructor(elements: MatrixElements3A) {
         this.elements = elements;
     }
 
@@ -438,7 +444,7 @@ export class Matrix3A {
  * ```
  */
 export class Matrix3 {
-    public readonly elements: [number, number, number, number, number, number, number, number, number];
+    public readonly elements: MatrixElements3;
 
     /**
      * ```
@@ -447,7 +453,7 @@ export class Matrix3 {
      * | e2  e5  e8 |
      * ```
      */
-    public constructor(elements: [number, number, number, number, number, number, number, number, number]) {
+    public constructor(elements: MatrixElements3) {
         this.elements = elements;
     }
 
@@ -976,20 +982,7 @@ export class Matrix3 {
  * ```
  */
 export class Matrix4A {
-    public readonly elements: [
-        number,
-        number,
-        number,
-        number,
-        number,
-        number,
-        number,
-        number,
-        number,
-        number,
-        number,
-        number,
-    ];
+    public readonly elements: MatrixElements4A;
 
     /**
      * ```
@@ -999,9 +992,7 @@ export class Matrix4A {
      * |  0   0   0    1 |
      * ```
      */
-    public constructor(
-        elements: [number, number, number, number, number, number, number, number, number, number, number, number],
-    ) {
+    public constructor(elements: MatrixElements4A) {
         this.elements = elements;
     }
 
@@ -1631,24 +1622,7 @@ export class Matrix4A {
  * ```
  */
 export class Matrix4 {
-    public readonly elements: [
-        number,
-        number,
-        number,
-        number,
-        number,
-        number,
-        number,
-        number,
-        number,
-        number,
-        number,
-        number,
-        number,
-        number,
-        number,
-        number,
-    ];
+    public readonly elements: MatrixElements4;
 
     /**
      * ```
@@ -1658,26 +1632,7 @@ export class Matrix4 {
      * | e3  e7  e11  e15 |
      * ```
      */
-    public constructor(
-        elements: [
-            number,
-            number,
-            number,
-            number,
-            number,
-            number,
-            number,
-            number,
-            number,
-            number,
-            number,
-            number,
-            number,
-            number,
-            number,
-            number,
-        ],
-    ) {
+    public constructor(elements: MatrixElements4) {
         this.elements = elements;
     }
 

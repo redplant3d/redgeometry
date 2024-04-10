@@ -1,6 +1,10 @@
+import type { FixedSizeArrayBuilder } from "../internal/types.js";
+
 export type Constructor<T> = {
     new (...args: never[]): T;
 };
+
+export type FixedSizeArray<T, N extends number> = FixedSizeArrayBuilder<T, N, []>;
 
 export type Immutable<T> = {
     readonly [K in keyof T]: Immutable<T[K]>;
