@@ -105,6 +105,61 @@ export class Quaternion {
         }
     }
 
+    public static fromRotationMatrix(
+        q0: number,
+        q1: number,
+        q2: number,
+        q3: number,
+        q4: number,
+        q5: number,
+        q6: number,
+        q7: number,
+        q8: number,
+    ): Quaternion {
+        // q0 = qa^2 + qb^2 - qc^2 - qd^2
+        // q4 = qa^2 - qb^2 + qc^2 - qd^2
+        // q5 = qa^2 - qb^2 - qc^2 + qd^2
+        if (q0 >= 0) {
+            // qa^2 + qb^2 >= qc^2 + qd^2
+            if (q4 + q8 >= 0) {
+                // 2 qa^2 >= 2 qb^2
+                const a = 1 + q0 + q4 + q8;
+                const b = q5 - q7;
+                const c = q6 - q2;
+                const d = q1 - q3;
+                const f = 0.5 / Math.sqrt(a);
+                return new Quaternion(f * a, f * b, f * c, f * d);
+            } else {
+                // 2 qb^2 > 2 qa^2
+                const a = q5 - q7;
+                const b = 1 + q0 - q4 - q8;
+                const c = q3 + q1;
+                const d = q6 + q2;
+                const f = 0.5 / Math.sqrt(b);
+                return new Quaternion(f * a, f * b, f * c, f * d);
+            }
+        } else {
+            // qc^2 + qd^2 > qa^2 + qb^2
+            if (q4 - q8 >= 0) {
+                // 2 qc^2 >= 2 qd^2
+                const a = q6 - q2;
+                const b = q3 + q1;
+                const c = 1 - q0 + q4 - q8;
+                const d = q7 + q5;
+                const f = 0.5 / Math.sqrt(c);
+                return new Quaternion(f * a, f * b, f * c, f * d);
+            } else {
+                // 2 qd^2 > 2 qc^2
+                const a = q1 - q3;
+                const b = q6 + q2;
+                const c = q7 + q5;
+                const d = 1 - q0 - q4 + q8;
+                const f = 0.5 / Math.sqrt(d);
+                return new Quaternion(f * a, f * b, f * c, f * d);
+            }
+        }
+    }
+
     public add(q: Quaternion): Quaternion {
         return new Quaternion(this.a + q.a, this.b + q.b, this.c + q.c, this.d + q.d);
     }

@@ -1,6 +1,8 @@
 import { getMaxEigenvalueSym2x2, getMaxEigenvalueSym3x3 } from "../internal/matrix.js";
 import type { FixedSizeArray } from "../utility/types.js";
+import { Complex } from "./complex.js";
 import { Point2, Point3 } from "./point.js";
+import { Quaternion } from "./quaternion.js";
 import { Vector2, Vector3 } from "./vector.js";
 
 export type MatrixElements3A = FixedSizeArray<number, 6>;
@@ -123,6 +125,25 @@ export class Matrix3A {
             eb[4] === ea[4] &&
             eb[5] === ea[5]
         );
+    }
+
+    public extractSRT(): { s: Vector2; r: Complex; t: Point2 } {
+        const e = this.elements;
+
+        let sx = Math.sqrt(e[0] * e[0] + e[1] * e[1]);
+        const sy = Math.sqrt(e[2] * e[2] + e[3] * e[3]);
+
+        if (this.getDeterminant() < 0) {
+            sx = -sx;
+        }
+
+        const fx = 1 / sx;
+
+        const s = new Vector2(sx, sy);
+        const r = new Complex(fx * e[0], fx * e[1]);
+        const t = new Point2(e[4], e[5]);
+
+        return { s, r, t };
     }
 
     public getDeterminant(): number {
@@ -596,6 +617,25 @@ export class Matrix3 {
             eb[7] === ea[7] &&
             eb[8] === ea[8]
         );
+    }
+
+    public extractSRT(): { s: Vector2; r: Complex; t: Point2 } {
+        const e = this.elements;
+
+        let sx = Math.sqrt(e[0] * e[0] + e[1] * e[1] + e[2] * e[2]);
+        const sy = Math.sqrt(e[3] * e[3] + e[4] * e[4] + e[5] * e[5]);
+
+        if (this.getDeterminant() < 0) {
+            sx = -sx;
+        }
+
+        const fx = 1 / sx;
+
+        const s = new Vector2(sx, sy);
+        const r = new Complex(fx * e[0], fx * e[1]);
+        const t = new Point2(e[6], e[7]);
+
+        return { s, r, t };
     }
 
     public getDeterminant(): number {
@@ -1143,6 +1183,38 @@ export class Matrix4A {
             eb[10] === ea[10] &&
             eb[11] === ea[11]
         );
+    }
+
+    public extractSRT(): { s: Vector3; r: Quaternion; t: Point3 } {
+        const e = this.elements;
+
+        let sx = Math.sqrt(e[0] * e[0] + e[1] * e[1] + e[2] * e[2]);
+        const sy = Math.sqrt(e[3] * e[3] + e[4] * e[4] + e[5] * e[5]);
+        const sz = Math.sqrt(e[6] * e[6] + e[7] * e[7] + e[8] * e[8]);
+
+        if (this.getDeterminant() < 0) {
+            sx = -sx;
+        }
+
+        const fx = 1 / sx;
+        const fy = 1 / sy;
+        const fz = 1 / sz;
+
+        const s = new Vector3(sx, sy, sz);
+        const r = Quaternion.fromRotationMatrix(
+            fx * e[0],
+            fx * e[1],
+            fx * e[2],
+            fy * e[3],
+            fy * e[4],
+            fy * e[5],
+            fz * e[6],
+            fz * e[7],
+            fz * e[8],
+        );
+        const t = new Point3(e[9], e[10], e[11]);
+
+        return { s, r, t };
     }
 
     public getDeterminant(): number {
@@ -1964,6 +2036,38 @@ export class Matrix4 {
             eb[14] === ea[14] &&
             eb[15] === ea[15]
         );
+    }
+
+    public extractSRT(): { s: Vector3; r: Quaternion; t: Point3 } {
+        const e = this.elements;
+
+        let sx = Math.sqrt(e[0] * e[0] + e[1] * e[1] + e[2] * e[2] + e[3] * e[3]);
+        const sy = Math.sqrt(e[4] * e[4] + e[5] * e[5] + e[6] * e[6] + e[7] * e[7]);
+        const sz = Math.sqrt(e[8] * e[8] + e[9] * e[9] + e[10] * e[10] + e[11] * e[11]);
+
+        if (this.getDeterminant() < 0) {
+            sx = -sx;
+        }
+
+        const fx = 1 / sx;
+        const fy = 1 / sy;
+        const fz = 1 / sz;
+
+        const s = new Vector3(sx, sy, sz);
+        const r = Quaternion.fromRotationMatrix(
+            fx * e[0],
+            fx * e[1],
+            fx * e[2],
+            fy * e[4],
+            fy * e[5],
+            fy * e[6],
+            fz * e[8],
+            fz * e[9],
+            fz * e[10],
+        );
+        const t = new Point3(e[12], e[13], e[14]);
+
+        return { s, r, t };
     }
 
     public getDeterminant(): number {

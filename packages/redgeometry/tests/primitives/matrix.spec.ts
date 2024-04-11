@@ -2,15 +2,37 @@ import { expect, test } from "vitest";
 import { Complex } from "../../src/index.js";
 import { Matrix3, Matrix3A, Matrix4, Matrix4A } from "../../src/primitives/matrix.js";
 import { Point2, Point3 } from "../../src/primitives/point.js";
-import { Quaternion } from "../../src/primitives/quaternion.js";
+import { Quaternion, RotationOrder } from "../../src/primitives/quaternion.js";
 import { Vector2, Vector3 } from "../../src/primitives/vector.js";
 
+test("Matrix3A - extract", () => {
+    const v = new Vector2(1, 2);
+    const z = Complex.fromRotationAngle(3);
+    const p = new Point2(4, 5);
+
+    const mat = Matrix3A.createIdentity();
+    mat.scale(v.x, v.y);
+    mat.rotate(z.a, z.b);
+    mat.translate(p.x, p.y);
+
+    const { s, r, t } = mat.extractSRT();
+
+    expect(s.x).toBeCloseTo(v.x, 15);
+    expect(s.y).toBeCloseTo(v.y, 15);
+
+    expect(r.a).toBeCloseTo(z.a, 15);
+    expect(r.b).toBeCloseTo(z.b, 15);
+
+    expect(t.x).toBeCloseTo(p.x, 15);
+    expect(t.y).toBeCloseTo(p.y, 15);
+});
+
 test("Matrix3A - inverse", () => {
-    const c = Complex.fromRotationAngle(Math.PI);
+    const z = Complex.fromRotationAngle(Math.PI);
     const mat = Matrix3A.createIdentity();
     mat.translate(1, 2);
     mat.scale(4, 4);
-    mat.rotate(c.a, c.b);
+    mat.rotate(z.a, z.b);
 
     const matInv = mat.getInverse();
     const mat1 = mat.mul(matInv);
@@ -39,14 +61,14 @@ test("Matrix3A - mapVector", () => {
 });
 
 test("Matrix3A - rotate", () => {
-    const c = Complex.fromRotationAngle(1);
+    const z = Complex.fromRotationAngle(1);
     const mat1 = Matrix3A.createIdentity();
     const mat2 = Matrix3A.createIdentity();
     const mat3 = Matrix3A.createIdentity();
 
-    mat1.rotate(c.a, c.b);
-    mat2.rotatePre(c.a, c.b);
-    mat3.rotateSet(c.a, c.b);
+    mat1.rotate(z.a, z.b);
+    mat2.rotatePre(z.a, z.b);
+    mat3.rotateSet(z.a, z.b);
 
     expect(mat1).toEqual(mat2);
     expect(mat2).toEqual(mat3);
@@ -78,12 +100,34 @@ test("Matrix3A - translate", () => {
     expect(mat2).toEqual(mat3);
 });
 
+test("Matrix3 - extract", () => {
+    const v = new Vector2(1, 2);
+    const z = Complex.fromRotationAngle(3);
+    const p = new Point2(4, 5);
+
+    const mat = Matrix3.createIdentity();
+    mat.scale(v.x, v.y);
+    mat.rotate(z.a, z.b);
+    mat.translate(p.x, p.y);
+
+    const { s, r, t } = mat.extractSRT();
+
+    expect(s.x).toBeCloseTo(v.x, 15);
+    expect(s.y).toBeCloseTo(v.y, 15);
+
+    expect(r.a).toBeCloseTo(z.a, 15);
+    expect(r.b).toBeCloseTo(z.b, 15);
+
+    expect(t.x).toBeCloseTo(p.x, 15);
+    expect(t.y).toBeCloseTo(p.y, 15);
+});
+
 test("Matrix3 - inverse", () => {
-    const c = Complex.fromRotationAngle(Math.PI);
+    const z = Complex.fromRotationAngle(Math.PI);
     const mat = Matrix3.createIdentity();
     mat.translate(1, 2);
     mat.scale(4, 4);
-    mat.rotate(c.a, c.b);
+    mat.rotate(z.a, z.b);
 
     const matInv = mat.getInverse();
     const mat1 = mat.mul(matInv);
@@ -112,14 +156,14 @@ test("Matrix3 - mapVector", () => {
 });
 
 test("Matrix3 - rotate", () => {
-    const c = Complex.fromRotationAngle(1);
+    const z = Complex.fromRotationAngle(1);
     const mat1 = Matrix3.createIdentity();
     const mat2 = Matrix3.createIdentity();
     const mat3 = Matrix3.createIdentity();
 
-    mat1.rotate(c.a, c.b);
-    mat2.rotatePre(c.a, c.b);
-    mat3.rotateSet(c.a, c.b);
+    mat1.rotate(z.a, z.b);
+    mat2.rotatePre(z.a, z.b);
+    mat3.rotateSet(z.a, z.b);
 
     expect(mat1).toEqual(mat2);
     expect(mat2).toEqual(mat3);
@@ -149,6 +193,32 @@ test("Matrix3 - translate", () => {
 
     expect(mat1).toEqual(mat2);
     expect(mat2).toEqual(mat3);
+});
+
+test("Matrix4A - extract", () => {
+    const v = new Vector3(1, 2, 3);
+    const q = Quaternion.fromRotationEuler(4, 5, 6, RotationOrder.XYZ);
+    const p = new Point3(7, 8, 9);
+
+    const mat = Matrix4A.createIdentity();
+    mat.scale(v.x, v.y, v.z);
+    mat.rotate(q.a, q.b, q.c, q.d);
+    mat.translate(p.x, p.y, p.z);
+
+    const { s, r, t } = mat.extractSRT();
+
+    expect(s.x).toBeCloseTo(v.x, 15);
+    expect(s.y).toBeCloseTo(v.y, 15);
+    expect(s.z).toBeCloseTo(v.z, 15);
+
+    expect(r.a).toBeCloseTo(q.a, 15);
+    expect(r.b).toBeCloseTo(q.b, 15);
+    expect(r.c).toBeCloseTo(q.c, 15);
+    expect(r.d).toBeCloseTo(q.d, 15);
+
+    expect(t.x).toBeCloseTo(p.x, 15);
+    expect(t.y).toBeCloseTo(p.y, 15);
+    expect(t.z).toBeCloseTo(p.z, 15);
 });
 
 test("Matrix4A - inverse", () => {
@@ -260,6 +330,32 @@ test("Matrix4A - translate", () => {
     expect(mat1).toEqual(mat2);
     expect(mat1).toEqual(mat3);
     expect(mat1).toEqual(mat4);
+});
+
+test("Matrix4 - extract", () => {
+    const v = new Vector3(1, 2, 3);
+    const q = Quaternion.fromRotationEuler(4, 5, 6, RotationOrder.XYZ);
+    const p = new Point3(7, 8, 9);
+
+    const mat = Matrix4.createIdentity();
+    mat.scale(v.x, v.y, v.z);
+    mat.rotate(q.a, q.b, q.c, q.d);
+    mat.translate(p.x, p.y, p.z);
+
+    const { s, r, t } = mat.extractSRT();
+
+    expect(s.x).toBeCloseTo(v.x, 15);
+    expect(s.y).toBeCloseTo(v.y, 15);
+    expect(s.z).toBeCloseTo(v.z, 15);
+
+    expect(r.a).toBeCloseTo(q.a, 15);
+    expect(r.b).toBeCloseTo(q.b, 15);
+    expect(r.c).toBeCloseTo(q.c, 15);
+    expect(r.d).toBeCloseTo(q.d, 15);
+
+    expect(t.x).toBeCloseTo(p.x, 15);
+    expect(t.y).toBeCloseTo(p.y, 15);
+    expect(t.z).toBeCloseTo(p.z, 15);
 });
 
 test("Matrix4 - inverse", () => {
