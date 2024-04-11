@@ -101,16 +101,31 @@ export class Matrix3A {
         return new Matrix3A([...this.elements]);
     }
 
-    public copyFrom(mat: Matrix3A): void {
+    public copyFrom(mat: Matrix3A | Matrix3): void {
         const ea = this.elements;
-        const eb = mat.elements;
 
-        ea[0] = eb[0];
-        ea[1] = eb[1];
-        ea[2] = eb[2];
-        ea[3] = eb[3];
-        ea[4] = eb[4];
-        ea[5] = eb[5];
+        if (mat.type === MatrixType.Affine) {
+            const eb = mat.elements;
+            ea[0] = eb[0];
+            ea[1] = eb[1];
+            ea[2] = eb[2];
+            ea[3] = eb[3];
+            ea[4] = eb[4];
+            ea[5] = eb[5];
+        } else {
+            const eb = mat.elements;
+            ea[0] = eb[0];
+            ea[1] = eb[1];
+            ea[2] = eb[3];
+            ea[3] = eb[4];
+            ea[4] = eb[6];
+            ea[5] = eb[7];
+        }
+    }
+
+    public determinant(): number {
+        const e = this.elements;
+        return e[0] * e[3] - e[1] * e[2];
     }
 
     public eq(mat: Matrix3A): boolean {
@@ -133,7 +148,7 @@ export class Matrix3A {
         let sx = Math.sqrt(e[0] * e[0] + e[1] * e[1]);
         const sy = Math.sqrt(e[2] * e[2] + e[3] * e[3]);
 
-        if (this.getDeterminant() < 0) {
+        if (this.determinant() < 0) {
             sx = -sx;
         }
 
@@ -146,13 +161,22 @@ export class Matrix3A {
         return { s, r, t };
     }
 
-    public getDeterminant(): number {
+    public getMaxScale(): number {
         const e = this.elements;
-        return e[0] * e[3] - e[1] * e[2];
+
+        // Compute elements of `S^2 = M * M^T`
+        const s11 = e[0] * e[0] + e[2] * e[2];
+        const s12 = e[0] * e[1] + e[2] * e[3];
+        const s22 = e[1] * e[1] + e[3] * e[3];
+
+        // The eigenvalue of `S^2` is the squared eigenvalue of the singular values of `M`
+        const eig = getMaxEigenvalueSym2x2(s11, s12, s22);
+
+        return Math.sqrt(eig);
     }
 
-    public getInverse(): Matrix3A {
-        const det = this.getDeterminant();
+    public inverse(): Matrix3A {
+        const det = this.determinant();
 
         if (det === 0) {
             return Matrix3A.createIdentity();
@@ -169,20 +193,6 @@ export class Matrix3A {
         const e5 = -(e[4] * e1 + e[5] * e3);
 
         return new Matrix3A([e0, e1, e2, e3, e4, e5]);
-    }
-
-    public getMaxScale(): number {
-        const e = this.elements;
-
-        // Compute elements of `S^2 = M * M^T`
-        const s11 = e[0] * e[0] + e[2] * e[2];
-        const s12 = e[0] * e[1] + e[2] * e[3];
-        const s22 = e[1] * e[1] + e[3] * e[3];
-
-        // The eigenvalue of `S^2` is the squared eigenvalue of the singular values of `M`
-        const eig = getMaxEigenvalueSym2x2(s11, s12, s22);
-
-        return Math.sqrt(eig);
     }
 
     /**
@@ -587,19 +597,42 @@ export class Matrix3 {
         return new Matrix3([...this.elements]);
     }
 
-    public copyFrom(mat: Matrix3): void {
+    public copyFrom(mat: Matrix3 | Matrix3A): void {
         const ea = this.elements;
-        const eb = mat.elements;
 
-        ea[0] = eb[0];
-        ea[1] = eb[1];
-        ea[2] = eb[2];
-        ea[3] = eb[3];
-        ea[4] = eb[4];
-        ea[5] = eb[5];
-        ea[6] = eb[6];
-        ea[7] = eb[7];
-        ea[8] = eb[8];
+        if (mat.type === MatrixType.Projective) {
+            const eb = mat.elements;
+            ea[0] = eb[0];
+            ea[1] = eb[1];
+            ea[2] = eb[2];
+            ea[3] = eb[3];
+            ea[4] = eb[4];
+            ea[5] = eb[5];
+            ea[6] = eb[6];
+            ea[7] = eb[7];
+            ea[8] = eb[8];
+        } else {
+            const eb = mat.elements;
+            ea[0] = eb[0];
+            ea[1] = eb[1];
+            ea[2] = 0;
+            ea[3] = eb[2];
+            ea[4] = eb[3];
+            ea[5] = 0;
+            ea[6] = eb[4];
+            ea[7] = eb[5];
+            ea[8] = 1;
+        }
+    }
+
+    public determinant(): number {
+        const e = this.elements;
+
+        const a = e[8] * (e[0] * e[4] - e[1] * e[3]);
+        const b = e[5] * (e[0] * e[7] - e[1] * e[6]);
+        const c = e[2] * (e[3] * e[7] - e[4] * e[6]);
+
+        return a - b + c;
     }
 
     public eq(mat: Matrix3): boolean {
@@ -625,7 +658,7 @@ export class Matrix3 {
         let sx = Math.sqrt(e[0] * e[0] + e[1] * e[1] + e[2] * e[2]);
         const sy = Math.sqrt(e[3] * e[3] + e[4] * e[4] + e[5] * e[5]);
 
-        if (this.getDeterminant() < 0) {
+        if (this.determinant() < 0) {
             sx = -sx;
         }
 
@@ -638,18 +671,8 @@ export class Matrix3 {
         return { s, r, t };
     }
 
-    public getDeterminant(): number {
-        const e = this.elements;
-
-        const a = e[8] * (e[0] * e[4] - e[1] * e[3]);
-        const b = e[5] * (e[0] * e[7] - e[1] * e[6]);
-        const c = e[2] * (e[3] * e[7] - e[4] * e[6]);
-
-        return a - b + c;
-    }
-
-    public getInverse(): Matrix3 {
-        const det = this.getDeterminant();
+    public inverse(): Matrix3 {
+        const det = this.determinant();
 
         if (det === 0) {
             return Matrix3.createIdentity();
@@ -1010,6 +1033,11 @@ export class Matrix3 {
     public translateSet(tx: number, ty: number): void {
         this.set(1, 0, 0, 0, 1, 0, tx, ty, 1);
     }
+
+    public transpose(): Matrix3 {
+        const e = this.elements;
+        return new Matrix3([e[0], e[3], e[6], e[1], e[4], e[7], e[2], e[5], e[8]]);
+    }
 }
 
 /**
@@ -1147,22 +1175,48 @@ export class Matrix4A {
         return new Matrix4A([...this.elements]);
     }
 
-    public copyFrom(mat: Matrix4A): void {
+    public copyFrom(mat: Matrix4 | Matrix4A): void {
         const ea = this.elements;
-        const eb = mat.elements;
 
-        ea[0] = eb[0];
-        ea[1] = eb[1];
-        ea[2] = eb[2];
-        ea[3] = eb[3];
-        ea[4] = eb[4];
-        ea[5] = eb[5];
-        ea[6] = eb[6];
-        ea[7] = eb[7];
-        ea[8] = eb[8];
-        ea[9] = eb[9];
-        ea[10] = eb[10];
-        ea[11] = eb[11];
+        if (mat.type === MatrixType.Affine) {
+            const eb = mat.elements;
+            ea[0] = eb[0];
+            ea[1] = eb[1];
+            ea[2] = eb[2];
+            ea[3] = eb[3];
+            ea[4] = eb[4];
+            ea[5] = eb[5];
+            ea[6] = eb[6];
+            ea[7] = eb[7];
+            ea[8] = eb[8];
+            ea[9] = eb[9];
+            ea[10] = eb[10];
+            ea[11] = eb[11];
+        } else {
+            const eb = mat.elements;
+            ea[0] = eb[0];
+            ea[1] = eb[1];
+            ea[2] = eb[2];
+            ea[3] = eb[4];
+            ea[4] = eb[5];
+            ea[5] = eb[6];
+            ea[6] = eb[8];
+            ea[7] = eb[9];
+            ea[8] = eb[10];
+            ea[9] = eb[12];
+            ea[10] = eb[13];
+            ea[11] = eb[14];
+        }
+    }
+
+    public determinant(): number {
+        const e = this.elements;
+
+        const a = e[8] * (e[0] * e[4] - e[1] * e[3]);
+        const b = e[5] * (e[0] * e[7] - e[1] * e[6]);
+        const c = e[2] * (e[3] * e[7] - e[4] * e[6]);
+
+        return a - b + c;
     }
 
     public eq(mat: Matrix4A): boolean {
@@ -1192,7 +1246,7 @@ export class Matrix4A {
         const sy = Math.sqrt(e[3] * e[3] + e[4] * e[4] + e[5] * e[5]);
         const sz = Math.sqrt(e[6] * e[6] + e[7] * e[7] + e[8] * e[8]);
 
-        if (this.getDeterminant() < 0) {
+        if (this.determinant() < 0) {
             sx = -sx;
         }
 
@@ -1217,18 +1271,25 @@ export class Matrix4A {
         return { s, r, t };
     }
 
-    public getDeterminant(): number {
+    public getMaxScale(): number {
         const e = this.elements;
 
-        const a = e[8] * (e[0] * e[4] - e[1] * e[3]);
-        const b = e[5] * (e[0] * e[7] - e[1] * e[6]);
-        const c = e[2] * (e[3] * e[7] - e[4] * e[6]);
+        // Compute elements of `S^2 = M * M^T`
+        const s11 = e[0] * e[0] + e[3] * e[3] + e[6] * e[6];
+        const s12 = e[0] * e[1] + e[3] * e[4] + e[6] * e[7];
+        const s13 = e[0] * e[2] + e[3] * e[5] + e[6] * e[8];
+        const s22 = e[1] * e[1] + e[4] * e[4] + e[7] * e[7];
+        const s23 = e[1] * e[2] + e[4] * e[5] + e[7] * e[8];
+        const s33 = e[2] * e[2] + e[5] * e[5] + e[8] * e[8];
 
-        return a - b + c;
+        // The eigenvalue of `S^2` is the squared eigenvalue of the singular values of `M`
+        const eig = getMaxEigenvalueSym3x3(s11, s12, s13, s22, s23, s33);
+
+        return Math.sqrt(eig);
     }
 
-    public getInverse(): Matrix4A {
-        const det = this.getDeterminant();
+    public inverse(): Matrix4A {
+        const det = this.determinant();
 
         if (det === 0) {
             return Matrix4A.createIdentity();
@@ -1251,23 +1312,6 @@ export class Matrix4A {
         const e11 = -(e[9] * e2 + e[10] * e5 + e[11] * e8);
 
         return new Matrix4A([e0, e1, e2, e3, e4, e5, e6, e7, e8, e9, e10, e11]);
-    }
-
-    public getMaxScale(): number {
-        const e = this.elements;
-
-        // Compute elements of `S^2 = M * M^T`
-        const s11 = e[0] * e[0] + e[3] * e[3] + e[6] * e[6];
-        const s12 = e[0] * e[1] + e[3] * e[4] + e[6] * e[7];
-        const s13 = e[0] * e[2] + e[3] * e[5] + e[6] * e[8];
-        const s22 = e[1] * e[1] + e[4] * e[4] + e[7] * e[7];
-        const s23 = e[1] * e[2] + e[4] * e[5] + e[7] * e[8];
-        const s33 = e[2] * e[2] + e[5] * e[5] + e[8] * e[8];
-
-        // The eigenvalue of `S^2` is the squared eigenvalue of the singular values of `M`
-        const eig = getMaxEigenvalueSym3x3(s11, s12, s13, s22, s23, s33);
-
-        return Math.sqrt(eig);
     }
 
     /**
@@ -1992,26 +2036,72 @@ export class Matrix4 {
         return new Matrix4([...this.elements]);
     }
 
-    public copyFrom(mat: Matrix4): void {
+    public copyFrom(mat: Matrix4 | Matrix4A): void {
         const ea = this.elements;
-        const eb = mat.elements;
 
-        ea[0] = eb[0];
-        ea[1] = eb[1];
-        ea[2] = eb[2];
-        ea[3] = eb[3];
-        ea[4] = eb[4];
-        ea[5] = eb[5];
-        ea[6] = eb[6];
-        ea[7] = eb[7];
-        ea[8] = eb[8];
-        ea[9] = eb[9];
-        ea[10] = eb[10];
-        ea[11] = eb[11];
-        ea[12] = eb[12];
-        ea[13] = eb[13];
-        ea[14] = eb[14];
-        ea[15] = eb[15];
+        if (mat.type === MatrixType.Projective) {
+            const eb = mat.elements;
+            ea[0] = eb[0];
+            ea[1] = eb[1];
+            ea[2] = eb[2];
+            ea[3] = eb[3];
+            ea[4] = eb[4];
+            ea[5] = eb[5];
+            ea[6] = eb[6];
+            ea[7] = eb[7];
+            ea[8] = eb[8];
+            ea[9] = eb[9];
+            ea[10] = eb[10];
+            ea[11] = eb[11];
+            ea[12] = eb[12];
+            ea[13] = eb[13];
+            ea[14] = eb[14];
+            ea[15] = eb[15];
+        } else {
+            const eb = mat.elements;
+            ea[0] = eb[0];
+            ea[1] = eb[1];
+            ea[2] = eb[2];
+            ea[3] = 0;
+            ea[4] = eb[3];
+            ea[5] = eb[4];
+            ea[6] = eb[5];
+            ea[7] = 0;
+            ea[8] = eb[6];
+            ea[9] = eb[7];
+            ea[10] = eb[8];
+            ea[11] = 0;
+            ea[12] = eb[9];
+            ea[13] = eb[10];
+            ea[14] = eb[11];
+            ea[15] = 1;
+        }
+    }
+
+    public determinant(): number {
+        const e = this.elements;
+
+        const a1 = e[10] * (e[0] * e[5] - e[1] * e[4]);
+        const a2 = e[9] * (e[0] * e[6] - e[2] * e[4]);
+        const a3 = e[8] * (e[1] * e[6] - e[2] * e[5]);
+        const a = e[15] * (a1 - a2 + a3);
+
+        const b1 = e[11] * (e[0] * e[5] - e[1] * e[4]);
+        const b2 = e[9] * (e[0] * e[7] - e[3] * e[4]);
+        const b3 = e[8] * (e[1] * e[7] - e[3] * e[5]);
+        const b = e[14] * (b1 - b2 + b3);
+
+        const c1 = e[11] * (e[0] * e[6] - e[2] * e[4]);
+        const c2 = e[10] * (e[0] * e[7] - e[3] * e[4]);
+        const c3 = e[8] * (e[2] * e[7] - e[3] * e[6]);
+        const c = e[13] * (c1 - c2 + c3);
+
+        const d1 = e[11] * (e[1] * e[6] - e[2] * e[5]);
+        const d2 = e[10] * (e[1] * e[7] - e[3] * e[5]);
+        const d3 = e[9] * (e[2] * e[7] - e[3] * e[6]);
+        const d = e[12] * (d1 - d2 + d3);
+
+        return a - b + c - d;
     }
 
     public eq(mat: Matrix4): boolean {
@@ -2045,7 +2135,7 @@ export class Matrix4 {
         const sy = Math.sqrt(e[4] * e[4] + e[5] * e[5] + e[6] * e[6] + e[7] * e[7]);
         const sz = Math.sqrt(e[8] * e[8] + e[9] * e[9] + e[10] * e[10] + e[11] * e[11]);
 
-        if (this.getDeterminant() < 0) {
+        if (this.determinant() < 0) {
             sx = -sx;
         }
 
@@ -2070,34 +2160,8 @@ export class Matrix4 {
         return { s, r, t };
     }
 
-    public getDeterminant(): number {
-        const e = this.elements;
-
-        const a1 = e[10] * (e[0] * e[5] - e[1] * e[4]);
-        const a2 = e[9] * (e[0] * e[6] - e[2] * e[4]);
-        const a3 = e[8] * (e[1] * e[6] - e[2] * e[5]);
-        const a = e[15] * (a1 - a2 + a3);
-
-        const b1 = e[11] * (e[0] * e[5] - e[1] * e[4]);
-        const b2 = e[9] * (e[0] * e[7] - e[3] * e[4]);
-        const b3 = e[8] * (e[1] * e[7] - e[3] * e[5]);
-        const b = e[14] * (b1 - b2 + b3);
-
-        const c1 = e[11] * (e[0] * e[6] - e[2] * e[4]);
-        const c2 = e[10] * (e[0] * e[7] - e[3] * e[4]);
-        const c3 = e[8] * (e[2] * e[7] - e[3] * e[6]);
-        const c = e[13] * (c1 - c2 + c3);
-
-        const d1 = e[11] * (e[1] * e[6] - e[2] * e[5]);
-        const d2 = e[10] * (e[1] * e[7] - e[3] * e[5]);
-        const d3 = e[9] * (e[2] * e[7] - e[3] * e[6]);
-        const d = e[12] * (d1 - d2 + d3);
-
-        return a - b + c - d;
-    }
-
-    public getInverse(): Matrix4 {
-        const det = this.getDeterminant();
+    public inverse(): Matrix4 {
+        const det = this.determinant();
 
         if (det === 0) {
             return Matrix4.createIdentity();
@@ -2690,5 +2754,27 @@ export class Matrix4 {
      */
     public translateSet(tx: number, ty: number, tz: number): void {
         this.set(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, tx, ty, tz, 1);
+    }
+
+    public transpose(): Matrix4 {
+        const e = this.elements;
+        return new Matrix4([
+            e[0],
+            e[4],
+            e[8],
+            e[12],
+            e[1],
+            e[5],
+            e[9],
+            e[13],
+            e[2],
+            e[6],
+            e[10],
+            e[14],
+            e[3],
+            e[7],
+            e[11],
+            e[15],
+        ]);
     }
 }
