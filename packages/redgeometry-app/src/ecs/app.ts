@@ -128,7 +128,7 @@ export function addAppInputsSystem(world: World): void {
     const inputAppComboBox = new ComboBoxInputElement("app-main", appPartId);
     inputAppComboBox.setOptionValues(...appPartIds);
     inputAppComboBox.addEventListener("input", () => {
-        window.location.replace(`/?app=${inputAppComboBox.getValue()}`);
+        window.location.replace(`?app=${inputAppComboBox.getValue()}`);
     });
     inputElements.push(inputAppComboBox);
 
