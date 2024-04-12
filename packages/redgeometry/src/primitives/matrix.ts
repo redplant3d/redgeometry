@@ -1092,6 +1092,60 @@ export class Matrix4A {
         return new Matrix4A([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
     }
 
+    /**
+     * Returns a right-handed orthographic projection matrix with a depth range of `[0, 1]`.
+     *
+     * Values taken from `glm::orthoRH_NO`.
+     */
+    public static fromOrthographicFrustum(
+        left: number,
+        right: number,
+        bottom: number,
+        top: number,
+        near: number,
+        far: number,
+    ): Matrix4A {
+        // | e0   0   0   e9 |
+        // |  0  e4   0  e10 |
+        // |  0   0  e8  e11 |
+        // |  0   0   0    1 |
+        const e0 = 2 / (right - left);
+        const e4 = 2 / (top - bottom);
+        const e8 = 1 / (near - far);
+        const e9 = (left + right) / (left - right);
+        const e10 = (bottom + top) / (bottom - top);
+        const e11 = near / (near - far);
+
+        return new Matrix4A([e0, 0, 0, 0, e4, 0, 0, 0, e8, e9, e10, e11]);
+    }
+
+    /**
+     * Returns a right-handed orthographic projection matrix with a depth range of `[-1, 1]`.
+     *
+     * Values taken from `glm::orthoRH_ZO`.
+     */
+    public static fromOrthographicFrustumGL(
+        left: number,
+        right: number,
+        bottom: number,
+        top: number,
+        near: number,
+        far: number,
+    ): Matrix4A {
+        // | e0   0   0   e9 |
+        // |  0  e4   0  e10 |
+        // |  0   0  e8  e11 |
+        // |  0   0   0    1 |
+        const e0 = 2 / (right - left);
+        const e4 = 2 / (top - bottom);
+        const e8 = 2 / (near - far);
+        const e9 = (left + right) / (left - right);
+        const e10 = (bottom + top) / (bottom - top);
+        const e11 = (near + far) / (near - far);
+
+        return new Matrix4A([e0, 0, 0, 0, e4, 0, 0, 0, e8, e9, e10, e11]);
+    }
+
     public static fromArray(elements: ArrayLike<number>, offset = 0): Matrix4A {
         const e = elements;
         const i = offset;
@@ -1806,121 +1860,148 @@ export class Matrix4 {
 
     /**
      * Returns a right-handed orthographic projection matrix with a depth range of `[0, 1]`.
+     *
+     * Values taken from `glm::orthoRH_NO`.
      */
-    public static fromOrthographicSized(width: number, height: number, near: number, far: number): Matrix4 {
-        // Formula derived from `D3DXMatrixOrthoRH`
-        const dxInv = 1 / width;
-        const dyInv = 1 / height;
-        const dzInv = 1 / (near - far);
-
-        // | e0   0    0    0 |
-        // |  0  e5    0    0 |
+    public static fromOrthographicFrustum(
+        left: number,
+        right: number,
+        bottom: number,
+        top: number,
+        near: number,
+        far: number,
+    ): Matrix4 {
+        // | e0   0    0  e12 |
+        // |  0  e5    0  e13 |
         // |  0   0  e10  e14 |
         // |  0   0    0    1 |
-        const e0 = 2 * dxInv;
-        const e5 = 2 * dyInv;
-        const e10 = dzInv;
-        const e14 = near * dzInv;
+        const e0 = 2 / (right - left);
+        const e5 = 2 / (top - bottom);
+        const e10 = 1 / (near - far);
+        const e12 = (left + right) / (left - right);
+        const e13 = (bottom + top) / (bottom - top);
+        const e14 = near / (near - far);
 
-        return new Matrix4([e0, 0, 0, 0, 0, e5, 0, 0, 0, 0, e10, 0, 0, 0, e14, 1]);
+        return new Matrix4([e0, 0, 0, 0, 0, e5, 0, 0, 0, 0, e10, 0, e12, e13, e14, 1]);
     }
 
     /**
      * Returns a right-handed orthographic projection matrix with a depth range of `[-1, 1]`.
+     *
+     * Values taken from `glm::orthoRH_ZO`.
      */
-    public static fromOrthographicSizedGL(width: number, height: number, near: number, far: number): Matrix4 {
-        const dxInv = 1 / width;
-        const dyInv = 1 / height;
-        const dzInv = 1 / (near - far);
-
-        // | e0   0    0    0 |
-        // |  0  e5    0    0 |
+    public static fromOrthographicFrustumGL(
+        left: number,
+        right: number,
+        bottom: number,
+        top: number,
+        near: number,
+        far: number,
+    ): Matrix4 {
+        // | e0   0    0  e12 |
+        // |  0  e5    0  e13 |
         // |  0   0  e10  e14 |
         // |  0   0    0    1 |
-        const e0 = 2 * dxInv;
-        const e5 = 2 * dyInv;
-        const e10 = 2 * dzInv;
-        const e14 = (far + near) * dzInv;
+        const e0 = 2 / (right - left);
+        const e5 = 2 / (top - bottom);
+        const e10 = 2 / (near - far);
+        const e12 = (left + right) / (left - right);
+        const e13 = (bottom + top) / (bottom - top);
+        const e14 = (near + far) / (near - far);
 
-        return new Matrix4([e0, 0, 0, 0, 0, e5, 0, 0, 0, 0, e10, 0, 0, 0, e14, 1]);
+        return new Matrix4([e0, 0, 0, 0, 0, e5, 0, 0, 0, 0, e10, 0, e12, e13, e14, 1]);
     }
 
     /**
      * Returns a right-handed perspective projection matrix with a depth range of `[0, 1]`.
+     *
+     * Values taken from `glm::perspectiveRH_ZO`.
      */
     public static fromPerspective(fovY: number, aspectRatio: number, near: number, far: number): Matrix4 {
-        // Formula derived from `D3DXMatrixPerspectiveFovRH`
-        const fInv = 1 / Math.tan(0.5 * fovY);
-        const dzInv = 1 / (near - far);
+        const cot = 1 / Math.tan(0.5 * fovY);
 
         // | e0   0    0    0 |
         // |  0  e5    0    0 |
         // |  0   0  e10  e14 |
         // |  0   0   -1    0 |
-        const e0 = fInv / aspectRatio;
-        const e5 = fInv;
-        const e10 = far * dzInv;
-        const e14 = near * far * dzInv;
-
-        return new Matrix4([e0, 0, 0, 0, 0, e5, 0, 0, 0, 0, e10, -1, 0, 0, e14, 0]);
-    }
-
-    /**
-     * Returns a right-handed perspective projection matrix with a depth range of `[-1, 1]`.
-     */
-    public static fromPerspectiveGL(fovY: number, aspectRatio: number, near: number, far: number): Matrix4 {
-        const fInv = 1 / Math.tan(0.5 * fovY);
-        const dzInv = 1 / (near - far);
-
-        // | e0   0    0    0 |
-        // |  0  e5    0    0 |
-        // |  0   0  e10  e14 |
-        // |  0   0   -1    0 |
-        const e0 = fInv / aspectRatio;
-        const e5 = fInv;
-        const e10 = (far + near) * dzInv;
-        const e14 = 2 * far * near * dzInv;
+        const e0 = cot / aspectRatio;
+        const e5 = cot;
+        const e10 = far / (near - far);
+        const e14 = (near * far) / (near - far);
 
         return new Matrix4([e0, 0, 0, 0, 0, e5, 0, 0, 0, 0, e10, -1, 0, 0, e14, 0]);
     }
 
     /**
      * Returns a right-handed perspective projection matrix with a depth range of `[0, 1]`.
+     *
+     * Values taken from `glm::frustumRH_ZO`.
      */
-    public static fromPerspectiveSized(width: number, height: number, near: number, far: number): Matrix4 {
-        // Formula derived from `D3DXMatrixPerspectiveRH`
-        const dxInv = 1 / width;
-        const dyInv = 1 / height;
-        const dzInv = 1 / (near - far);
-
-        // | e0   0    0    0 |
-        // |  0  e5    0    0 |
+    public static fromPerspectiveFrustum(
+        left: number,
+        right: number,
+        bottom: number,
+        top: number,
+        near: number,
+        far: number,
+    ): Matrix4 {
+        // | e0   0   e8    0 |
+        // |  0  e5   e9    0 |
         // |  0   0  e10  e14 |
         // |  0   0   -1    0 |
-        const e0 = 2 * near * dxInv;
-        const e5 = 2 * near * dyInv;
-        const e10 = far * dzInv;
-        const e14 = near * far * dzInv;
+        const e0 = (2 * near) / (right - left);
+        const e5 = (2 * near) / (top - bottom);
+        const e8 = (left + right) / (right - left);
+        const e9 = (bottom + top) / (top - bottom);
+        const e10 = far / (near - far);
+        const e14 = (near * far) / (near - far);
 
-        return new Matrix4([e0, 0, 0, 0, 0, e5, 0, 0, 0, 0, e10, -1, 0, 0, e14, 0]);
+        return new Matrix4([e0, 0, 0, 0, 0, e5, 0, 0, e8, e9, e10, -1, 0, 0, e14, 0]);
     }
 
     /**
      * Returns a right-handed perspective projection matrix with a depth range of `[-1, 1]`.
+     *
+     * Values taken from `glm::frustumRH_NO`.
      */
-    public static fromPerspectiveSizedGL(width: number, height: number, near: number, far: number): Matrix4 {
-        const dxInv = 1 / width;
-        const dyInv = 1 / height;
-        const dzInv = 1 / (near - far);
+    public static fromPerspectiveFrustumGL(
+        left: number,
+        right: number,
+        bottom: number,
+        top: number,
+        near: number,
+        far: number,
+    ): Matrix4 {
+        // | e0   0   e8    0 |
+        // |  0  e5   e9    0 |
+        // |  0   0  e10  e14 |
+        // |  0   0   -1    0 |
+        const e0 = (2 * near) / (right - left);
+        const e5 = (2 * near) / (top - bottom);
+        const e8 = (left + right) / (right - left);
+        const e9 = (bottom + top) / (top - bottom);
+        const e10 = (near + far) / (near - far);
+        const e14 = (2 * near * far) / (near - far);
+
+        return new Matrix4([e0, 0, 0, 0, 0, e5, 0, 0, e8, e9, e10, -1, 0, 0, e14, 0]);
+    }
+
+    /**
+     * Returns a right-handed perspective projection matrix with a depth range of `[-1, 1]`.
+     *
+     * Values taken from `glm::perspectiveRH_NO`.
+     */
+    public static fromPerspectiveGL(fovY: number, aspectRatio: number, near: number, far: number): Matrix4 {
+        const cot = 1 / Math.tan(0.5 * fovY);
 
         // | e0   0    0    0 |
         // |  0  e5    0    0 |
         // |  0   0  e10  e14 |
         // |  0   0   -1    0 |
-        const e0 = 2 * near * dxInv;
-        const e5 = 2 * near * dyInv;
-        const e10 = (far + near) * dzInv;
-        const e14 = 2 * far * near * dzInv;
+        const e0 = cot / aspectRatio;
+        const e5 = cot;
+        const e10 = (near + far) / (near - far);
+        const e14 = (2 * far * near) / (near - far);
 
         return new Matrix4([e0, 0, 0, 0, 0, e5, 0, 0, 0, 0, e10, -1, 0, 0, e14, 0]);
     }

@@ -89,9 +89,9 @@ function updateSystem(world: World): void {
     let matProj: Matrix4 | undefined;
 
     if (projection === "orthographic") {
-        matProj = Matrix4.fromOrthographicSized(5, 5, 1, 10);
+        matProj = Matrix4.fromOrthographicFrustum(-2.5, 2.5, -2.5, 2.5, 1, 10);
     } else {
-        matProj = Matrix4.fromPerspectiveSized(1, 1, 1, 10);
+        matProj = Matrix4.fromPerspectiveFrustum(-0.5, 0.5, -0.5, 0.5, 1, 10);
     }
 
     // NDC to screen
