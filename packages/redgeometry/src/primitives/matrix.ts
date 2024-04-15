@@ -1,4 +1,3 @@
-import { getMaxEigenvalueSym2x2, getMaxEigenvalueSym3x3 } from "../internal/matrix.js";
 import type { FixedSizeArray } from "../utility/types.js";
 import { Complex } from "./complex.js";
 import { Point2, Point3 } from "./point.js";
@@ -167,20 +166,6 @@ export class Matrix3A {
         const t = new Point2(e[4], e[5]);
 
         return { s, r, t };
-    }
-
-    public getMaxScale(): number {
-        const e = this.elements;
-
-        // Compute elements of `S^2 = M * M^T`
-        const s11 = e[0] * e[0] + e[2] * e[2];
-        const s12 = e[0] * e[1] + e[2] * e[3];
-        const s22 = e[1] * e[1] + e[3] * e[3];
-
-        // The eigenvalue of `S^2` is the squared eigenvalue of the singular values of `M`
-        const eig = getMaxEigenvalueSym2x2(s11, s12, s22);
-
-        return Math.sqrt(eig);
     }
 
     /**
@@ -1364,23 +1349,6 @@ export class Matrix4A {
         const t = new Point3(e[9], e[10], e[11]);
 
         return { s, r, t };
-    }
-
-    public getMaxScale(): number {
-        const e = this.elements;
-
-        // Compute elements of `S^2 = M * M^T`
-        const s11 = e[0] * e[0] + e[3] * e[3] + e[6] * e[6];
-        const s12 = e[0] * e[1] + e[3] * e[4] + e[6] * e[7];
-        const s13 = e[0] * e[2] + e[3] * e[5] + e[6] * e[8];
-        const s22 = e[1] * e[1] + e[4] * e[4] + e[7] * e[7];
-        const s23 = e[1] * e[2] + e[4] * e[5] + e[7] * e[8];
-        const s33 = e[2] * e[2] + e[5] * e[5] + e[8] * e[8];
-
-        // The eigenvalue of `S^2` is the squared eigenvalue of the singular values of `M`
-        const eig = getMaxEigenvalueSym3x3(s11, s12, s13, s22, s23, s33);
-
-        return Math.sqrt(eig);
     }
 
     /**
