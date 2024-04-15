@@ -203,48 +203,6 @@ export class Quaternion {
 
     /**
      * ```
-     * | a |   |  0 |   |  a |
-     * | b | * | px | * | -b |
-     * | c |   | py |   | -c |
-     * | d |   | pz |   | -d |
-     * ```
-     */
-    public mapPoint(p: Point3): Point3 {
-        const a = this.b * p.x + this.c * p.y + this.d * p.z;
-        const b = this.a * p.x + this.c * p.z - this.d * p.y;
-        const c = this.a * p.y - this.b * p.z + this.d * p.x;
-        const d = this.a * p.z + this.b * p.y - this.c * p.x;
-
-        return new Point3(
-            a * this.b + b * this.a - c * this.d + d * this.c,
-            a * this.c + b * this.d + c * this.a - d * this.b,
-            a * this.d - b * this.c + c * this.b + d * this.a,
-        );
-    }
-
-    /**
-     * ```
-     * | a |   |  0 |   |  a |
-     * | b | * | vx | * | -b |
-     * | c |   | vy |   | -c |
-     * | d |   | vz |   | -d |
-     * ```
-     */
-    public mapVector(v: Vector3): Vector3 {
-        const a = this.b * v.x + this.c * v.y + this.d * v.z;
-        const b = this.a * v.x + this.c * v.z - this.d * v.y;
-        const c = this.a * v.y - this.b * v.z + this.d * v.x;
-        const d = this.a * v.z + this.b * v.y - this.c * v.x;
-
-        return new Vector3(
-            a * this.b + b * this.a - c * this.d + d * this.c,
-            a * this.c + b * this.d + c * this.a - d * this.b,
-            a * this.d - b * this.c + c * this.b + d * this.a,
-        );
-    }
-
-    /**
-     * ```
      * | a |   | qa |
      * | b | * | qb |
      * | c |   | qc |
@@ -274,6 +232,48 @@ export class Quaternion {
             q.a * this.b + q.b * this.a + q.c * this.d - q.d * this.c,
             q.a * this.c - q.b * this.d + q.c * this.a + q.d * this.b,
             q.a * this.d + q.b * this.c - q.c * this.b + q.d * this.a,
+        );
+    }
+
+    /**
+     * ```
+     * | a |   |  0 |   |  a |
+     * | b | * | px | * | -b |
+     * | c |   | py |   | -c |
+     * | d |   | pz |   | -d |
+     * ```
+     */
+    public mulPt(p: Point3): Point3 {
+        const a = this.b * p.x + this.c * p.y + this.d * p.z;
+        const b = this.a * p.x + this.c * p.z - this.d * p.y;
+        const c = this.a * p.y - this.b * p.z + this.d * p.x;
+        const d = this.a * p.z + this.b * p.y - this.c * p.x;
+
+        return new Point3(
+            a * this.b + b * this.a - c * this.d + d * this.c,
+            a * this.c + b * this.d + c * this.a - d * this.b,
+            a * this.d - b * this.c + c * this.b + d * this.a,
+        );
+    }
+
+    /**
+     * ```
+     * | a |   |  0 |   |  a |
+     * | b | * | vx | * | -b |
+     * | c |   | vy |   | -c |
+     * | d |   | vz |   | -d |
+     * ```
+     */
+    public mulVec(v: Vector3): Vector3 {
+        const a = this.b * v.x + this.c * v.y + this.d * v.z;
+        const b = this.a * v.x + this.c * v.z - this.d * v.y;
+        const c = this.a * v.y - this.b * v.z + this.d * v.x;
+        const d = this.a * v.z + this.b * v.y - this.c * v.x;
+
+        return new Vector3(
+            a * this.b + b * this.a - c * this.d + d * this.c,
+            a * this.c + b * this.d + c * this.a - d * this.b,
+            a * this.d - b * this.c + c * this.b + d * this.a,
         );
     }
 

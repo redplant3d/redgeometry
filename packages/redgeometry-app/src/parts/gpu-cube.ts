@@ -320,7 +320,7 @@ function cameraMoveSystem(world: World): void {
 
     if (!v.eq(Vector3.ZERO)) {
         v = v.unitOrZero().mul(delta * vel);
-        v = camRot.mapVector(v);
+        v = camRot.mulVec(v);
 
         camPos = camPos.add(v);
     }

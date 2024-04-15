@@ -324,7 +324,7 @@ export class Polygon2 {
     public transform(mat: Matrix3 | Matrix3A): void {
         const points = this.points;
         for (let i = 0; i < points.length; i++) {
-            points[i] = mat.mapPoint(points[i]);
+            points[i] = mat.mulPt(points[i]);
         }
     }
 }

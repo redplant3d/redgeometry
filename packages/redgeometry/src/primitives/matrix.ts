@@ -101,11 +101,14 @@ export class Matrix3A {
         return new Matrix3A([...this.elements]);
     }
 
+    /**
+     * Copies values from `mat` into this matrix.
+     */
     public copyFrom(mat: Matrix3A | Matrix3): void {
-        const ea = this.elements;
-
         if (mat.type === MatrixType.Affine) {
+            const ea = this.elements;
             const eb = mat.elements;
+
             ea[0] = eb[0];
             ea[1] = eb[1];
             ea[2] = eb[2];
@@ -113,7 +116,9 @@ export class Matrix3A {
             ea[4] = eb[4];
             ea[5] = eb[5];
         } else {
+            const ea = this.elements;
             const eb = mat.elements;
+
             ea[0] = eb[0];
             ea[1] = eb[1];
             ea[2] = eb[3];
@@ -123,6 +128,9 @@ export class Matrix3A {
         }
     }
 
+    /**
+     * Returns the determinant of the matrix.
+     */
     public determinant(): number {
         const e = this.elements;
         return e[0] * e[3] - e[1] * e[2];
@@ -175,6 +183,9 @@ export class Matrix3A {
         return Math.sqrt(eig);
     }
 
+    /**
+     * Returns the inverse of the matrix.
+     */
     public inverse(): Matrix3A {
         const det = this.determinant();
 
@@ -193,38 +204,6 @@ export class Matrix3A {
         const e5 = -(e[4] * e1 + e[5] * e3);
 
         return new Matrix3A([e0, e1, e2, e3, e4, e5]);
-    }
-
-    /**
-     * ```
-     * | e0  e2  e4 |   | x |
-     * | e1  e3  e5 | * | y |
-     * |  0   0   1 |   | 1 |
-     * ```
-     */
-    public mapPoint(p: Point2): Point2 {
-        const e = this.elements;
-
-        const x = e[0] * p.x + e[2] * p.y + e[4];
-        const y = e[1] * p.x + e[3] * p.y + e[5];
-
-        return new Point2(x, y);
-    }
-
-    /**
-     * ```
-     * | e0  e2  e4 |   | x |
-     * | e1  e3  e5 | * | y |
-     * |  0   0   1 |   | 1 |
-     * ```
-     */
-    public mapVector(v: Vector2): Vector2 {
-        const e = this.elements;
-
-        const x = e[0] * v.x + e[2] * v.y + e[4];
-        const y = e[1] * v.x + e[3] * v.y + e[5];
-
-        return new Vector2(x, y);
     }
 
     /**
@@ -252,6 +231,22 @@ export class Matrix3A {
 
     /**
      * ```
+     * | e0  e2  e4 |   | x |
+     * | e1  e3  e5 | * | y |
+     * |  0   0   1 |   | 1 |
+     * ```
+     */
+    public mulPt(p: Point2): Point2 {
+        const e = this.elements;
+
+        const x = e[0] * p.x + e[2] * p.y + e[4];
+        const y = e[1] * p.x + e[3] * p.y + e[5];
+
+        return new Point2(x, y);
+    }
+
+    /**
+     * ```
      * | ea0  ea2  ea4 |   | eb0  eb2  eb4 |
      * | ea1  ea3  ea5 | * | eb1  eb3  eb5 |
      * |   0    0    1 |   |   0    0    1 |
@@ -271,6 +266,22 @@ export class Matrix3A {
         const e5 = ea[1] * eb[4] + ea[3] * eb[5] + ea[5];
 
         this.set(e0, e1, e2, e3, e4, e5);
+    }
+
+    /**
+     * ```
+     * | e0  e2  e4 |   | x |
+     * | e1  e3  e5 | * | y |
+     * |  0   0   1 |   | 1 |
+     * ```
+     */
+    public mulVec(v: Vector2): Vector2 {
+        const e = this.elements;
+
+        const x = e[0] * v.x + e[2] * v.y + e[4];
+        const y = e[1] * v.x + e[3] * v.y + e[5];
+
+        return new Vector2(x, y);
     }
 
     /**
@@ -464,6 +475,14 @@ export class Matrix3A {
     public translateSet(tx: number, ty: number): void {
         this.set(1, 0, 0, 1, tx, ty);
     }
+
+    /**
+     * Returns the transpose of the matrix.
+     */
+    public transpose(): Matrix3 {
+        const e = this.elements;
+        return new Matrix3([e[0], e[2], e[4], e[1], e[3], e[5], 0, 0, 1]);
+    }
 }
 
 /**
@@ -597,11 +616,14 @@ export class Matrix3 {
         return new Matrix3([...this.elements]);
     }
 
-    public copyFrom(mat: Matrix3 | Matrix3A): void {
-        const ea = this.elements;
-
+    /**
+     * Copies values from `mat` into this matrix.
+     */
+    public copyFrom(mat: Matrix3A | Matrix3): void {
         if (mat.type === MatrixType.Projective) {
+            const ea = this.elements;
             const eb = mat.elements;
+
             ea[0] = eb[0];
             ea[1] = eb[1];
             ea[2] = eb[2];
@@ -612,7 +634,9 @@ export class Matrix3 {
             ea[7] = eb[7];
             ea[8] = eb[8];
         } else {
+            const ea = this.elements;
             const eb = mat.elements;
+
             ea[0] = eb[0];
             ea[1] = eb[1];
             ea[2] = 0;
@@ -625,6 +649,9 @@ export class Matrix3 {
         }
     }
 
+    /**
+     * Returns the determinant of the matrix.
+     */
     public determinant(): number {
         const e = this.elements;
 
@@ -671,6 +698,9 @@ export class Matrix3 {
         return { s, r, t };
     }
 
+    /**
+     * Returns the inverse of the matrix.
+     */
     public inverse(): Matrix3 {
         const det = this.determinant();
 
@@ -692,40 +722,6 @@ export class Matrix3 {
         const e8 = detInv * (e[0] * e[4] - e[1] * e[3]);
 
         return new Matrix3([e0, e1, e2, e3, e4, e5, e6, e7, e8]);
-    }
-
-    /**
-     * ```
-     * | e0  e3  e6 |   | x |
-     * | e1  e4  e7 | * | y |
-     * | e2  e5  e8 |   | 1 |
-     * ```
-     */
-    public mapPoint(p: Point2): Point2 {
-        const e = this.elements;
-
-        const x = e[0] * p.x + e[3] * p.y + e[6];
-        const y = e[1] * p.x + e[4] * p.y + e[7];
-        const w = e[2] * p.x + e[5] * p.y + e[8];
-
-        return Point2.fromXYW(x, y, w);
-    }
-
-    /**
-     * ```
-     * | e0  e3  e6 |   | x |
-     * | e1  e4  e7 | * | y |
-     * | e2  e5  e8 |   | 1 |
-     * ```
-     */
-    public mapVector(v: Vector2): Vector2 {
-        const e = this.elements;
-
-        const x = e[0] * v.x + e[3] * v.y + e[6];
-        const y = e[1] * v.x + e[4] * v.y + e[7];
-        const w = e[2] * v.x + e[5] * v.y + e[8];
-
-        return Vector2.fromXYW(x, y, w);
     }
 
     /**
@@ -756,6 +752,23 @@ export class Matrix3 {
 
     /**
      * ```
+     * | e0  e3  e6 |   | x |
+     * | e1  e4  e7 | * | y |
+     * | e2  e5  e8 |   | 1 |
+     * ```
+     */
+    public mulPt(p: Point2): Point2 {
+        const e = this.elements;
+
+        const x = e[0] * p.x + e[3] * p.y + e[6];
+        const y = e[1] * p.x + e[4] * p.y + e[7];
+        const w = e[2] * p.x + e[5] * p.y + e[8];
+
+        return Point2.fromXYW(x, y, w);
+    }
+
+    /**
+     * ```
      * | ea0  ea3  ea6 |   | eb0  eb3  eb6 |
      * | ea1  ea4  ea7 | * | eb1  eb4  eb7 |
      * | ea2  ea5  ea8 |   | eb2  eb5  eb8 |
@@ -778,6 +791,23 @@ export class Matrix3 {
         const e8 = ea[2] * eb[6] + ea[5] * eb[7] + ea[8] * eb[8];
 
         this.set(e0, e1, e2, e3, e4, e5, e6, e7, e8);
+    }
+
+    /**
+     * ```
+     * | e0  e3  e6 |   | x |
+     * | e1  e4  e7 | * | y |
+     * | e2  e5  e8 |   | 1 |
+     * ```
+     */
+    public mulVec(v: Vector2): Vector2 {
+        const e = this.elements;
+
+        const x = e[0] * v.x + e[3] * v.y + e[6];
+        const y = e[1] * v.x + e[4] * v.y + e[7];
+        const w = e[2] * v.x + e[5] * v.y + e[8];
+
+        return Vector2.fromXYW(x, y, w);
     }
 
     /**
@@ -1034,6 +1064,9 @@ export class Matrix3 {
         this.set(1, 0, 0, 0, 1, 0, tx, ty, 1);
     }
 
+    /**
+     * Returns the transpose of the matrix.
+     */
     public transpose(): Matrix3 {
         const e = this.elements;
         return new Matrix3([e[0], e[3], e[6], e[1], e[4], e[7], e[2], e[5], e[8]]);
@@ -1092,10 +1125,30 @@ export class Matrix4A {
         return new Matrix4A([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
     }
 
+    public static fromArray(elements: ArrayLike<number>, offset = 0): Matrix4A {
+        const e = elements;
+        const i = offset;
+
+        return new Matrix4A([
+            e[i + 0],
+            e[i + 1],
+            e[i + 2],
+            e[i + 3],
+            e[i + 4],
+            e[i + 5],
+            e[i + 6],
+            e[i + 7],
+            e[i + 8],
+            e[i + 9],
+            e[i + 10],
+            e[i + 11],
+        ]);
+    }
+
     /**
      * Returns a right-handed orthographic projection matrix with a depth range of `[0, 1]`.
      *
-     * Values taken from `glm::orthoRH_NO`.
+     * Values equal to `glm::orthoRH_NO`.
      */
     public static fromOrthographicFrustum(
         left: number,
@@ -1122,7 +1175,7 @@ export class Matrix4A {
     /**
      * Returns a right-handed orthographic projection matrix with a depth range of `[-1, 1]`.
      *
-     * Values taken from `glm::orthoRH_ZO`.
+     * Values equal to `glm::orthoRH_ZO`.
      */
     public static fromOrthographicFrustumGL(
         left: number,
@@ -1144,26 +1197,6 @@ export class Matrix4A {
         const e11 = (near + far) / (near - far);
 
         return new Matrix4A([e0, 0, 0, 0, e4, 0, 0, 0, e8, e9, e10, e11]);
-    }
-
-    public static fromArray(elements: ArrayLike<number>, offset = 0): Matrix4A {
-        const e = elements;
-        const i = offset;
-
-        return new Matrix4A([
-            e[i + 0],
-            e[i + 1],
-            e[i + 2],
-            e[i + 3],
-            e[i + 4],
-            e[i + 5],
-            e[i + 6],
-            e[i + 7],
-            e[i + 8],
-            e[i + 9],
-            e[i + 10],
-            e[i + 11],
-        ]);
     }
 
     /**
@@ -1229,11 +1262,14 @@ export class Matrix4A {
         return new Matrix4A([...this.elements]);
     }
 
-    public copyFrom(mat: Matrix4 | Matrix4A): void {
-        const ea = this.elements;
-
+    /**
+     * Copies values from `mat` into this matrix.
+     */
+    public copyFrom(mat: Matrix4A | Matrix4): void {
         if (mat.type === MatrixType.Affine) {
+            const ea = this.elements;
             const eb = mat.elements;
+
             ea[0] = eb[0];
             ea[1] = eb[1];
             ea[2] = eb[2];
@@ -1247,7 +1283,9 @@ export class Matrix4A {
             ea[10] = eb[10];
             ea[11] = eb[11];
         } else {
+            const ea = this.elements;
             const eb = mat.elements;
+
             ea[0] = eb[0];
             ea[1] = eb[1];
             ea[2] = eb[2];
@@ -1263,6 +1301,9 @@ export class Matrix4A {
         }
     }
 
+    /**
+     * Returns the determinant of the matrix.
+     */
     public determinant(): number {
         const e = this.elements;
 
@@ -1342,6 +1383,9 @@ export class Matrix4A {
         return Math.sqrt(eig);
     }
 
+    /**
+     * Returns the inverse of the matrix.
+     */
     public inverse(): Matrix4A {
         const det = this.determinant();
 
@@ -1366,42 +1410,6 @@ export class Matrix4A {
         const e11 = -(e[9] * e2 + e[10] * e5 + e[11] * e8);
 
         return new Matrix4A([e0, e1, e2, e3, e4, e5, e6, e7, e8, e9, e10, e11]);
-    }
-
-    /**
-     * ```
-     * | e0  e3  e6   e9 |   | x |
-     * | e1  e4  e7  e10 | * | y |
-     * | e2  e5  e8  e11 |   | z |
-     * |  0   0   0    1 |   | 1 |
-     * ```
-     */
-    public mapPoint(p: Point3): Point3 {
-        const e = this.elements;
-
-        const x = e[0] * p.x + e[3] * p.y + e[6] * p.z + e[9];
-        const y = e[1] * p.x + e[4] * p.y + e[7] * p.z + e[10];
-        const z = e[2] * p.x + e[5] * p.y + e[8] * p.z + e[11];
-
-        return new Point3(x, y, z);
-    }
-
-    /**
-     * ```
-     * | e0  e3  e6   e9 |   | x |
-     * | e1  e4  e7  e10 | * | y |
-     * | e2  e5  e8  e11 |   | z |
-     * |  0   0   0    1 |   | 1 |
-     * ```
-     */
-    public mapVector(v: Vector3): Vector3 {
-        const e = this.elements;
-
-        const x = e[0] * v.x + e[3] * v.y + e[6] * v.z + e[9];
-        const y = e[1] * v.x + e[4] * v.y + e[7] * v.z + e[10];
-        const z = e[2] * v.x + e[5] * v.y + e[8] * v.z + e[11];
-
-        return new Vector3(x, y, z);
     }
 
     /**
@@ -1437,6 +1445,24 @@ export class Matrix4A {
 
     /**
      * ```
+     * | e0  e3  e6   e9 |   | x |
+     * | e1  e4  e7  e10 | * | y |
+     * | e2  e5  e8  e11 |   | z |
+     * |  0   0   0    1 |   | 1 |
+     * ```
+     */
+    public mulPt(p: Point3): Point3 {
+        const e = this.elements;
+
+        const x = e[0] * p.x + e[3] * p.y + e[6] * p.z + e[9];
+        const y = e[1] * p.x + e[4] * p.y + e[7] * p.z + e[10];
+        const z = e[2] * p.x + e[5] * p.y + e[8] * p.z + e[11];
+
+        return new Point3(x, y, z);
+    }
+
+    /**
+     * ```
      * | ea0  ea3  ea6   ea9 |   | eb0  eb3  eb6   eb9 |
      * | ea1  ea4  ea7  ea10 | * | eb1  eb4  eb7  ea10 |
      * | ea2  ea5  ea8  ea11 |   | eb2  eb5  eb8  eb11 |
@@ -1464,6 +1490,24 @@ export class Matrix4A {
         const e11 = ea[2] * eb[9] + ea[5] * eb[10] + ea[8] * eb[11] + ea[11];
 
         this.set(e0, e1, e2, e3, e4, e5, e6, e7, e8, e9, e10, e11);
+    }
+
+    /**
+     * ```
+     * | e0  e3  e6   e9 |   | x |
+     * | e1  e4  e7  e10 | * | y |
+     * | e2  e5  e8  e11 |   | z |
+     * |  0   0   0    1 |   | 1 |
+     * ```
+     */
+    public mulVec(v: Vector3): Vector3 {
+        const e = this.elements;
+
+        const x = e[0] * v.x + e[3] * v.y + e[6] * v.z + e[9];
+        const y = e[1] * v.x + e[4] * v.y + e[7] * v.z + e[10];
+        const z = e[2] * v.x + e[5] * v.y + e[8] * v.z + e[11];
+
+        return new Vector3(x, y, z);
     }
 
     /**
@@ -1780,6 +1824,14 @@ export class Matrix4A {
     public translateSet(tx: number, ty: number, tz: number): void {
         this.set(1, 0, 0, 0, 1, 0, 0, 0, 1, tx, ty, tz);
     }
+
+    /**
+     * Returns the transpose of the matrix.
+     */
+    public transpose(): Matrix4 {
+        const e = this.elements;
+        return new Matrix4([e[0], e[3], e[6], e[9], e[1], e[4], e[7], e[10], e[2], e[5], e[8], e[11], 0, 0, 0, 1]);
+    }
 }
 
 /**
@@ -1861,7 +1913,7 @@ export class Matrix4 {
     /**
      * Returns a right-handed orthographic projection matrix with a depth range of `[0, 1]`.
      *
-     * Values taken from `glm::orthoRH_NO`.
+     * Values equal to `glm::orthoRH_NO`.
      */
     public static fromOrthographicFrustum(
         left: number,
@@ -1888,7 +1940,7 @@ export class Matrix4 {
     /**
      * Returns a right-handed orthographic projection matrix with a depth range of `[-1, 1]`.
      *
-     * Values taken from `glm::orthoRH_ZO`.
+     * Values equal to `glm::orthoRH_ZO`.
      */
     public static fromOrthographicFrustumGL(
         left: number,
@@ -1915,7 +1967,7 @@ export class Matrix4 {
     /**
      * Returns a right-handed perspective projection matrix with a depth range of `[0, 1]`.
      *
-     * Values taken from `glm::perspectiveRH_ZO`.
+     * Values equal to `glm::perspectiveRH_ZO`.
      */
     public static fromPerspective(fovY: number, aspectRatio: number, near: number, far: number): Matrix4 {
         const cot = 1 / Math.tan(0.5 * fovY);
@@ -1935,7 +1987,7 @@ export class Matrix4 {
     /**
      * Returns a right-handed perspective projection matrix with a depth range of `[0, 1]`.
      *
-     * Values taken from `glm::frustumRH_ZO`.
+     * Values equal to `glm::frustumRH_ZO`.
      */
     public static fromPerspectiveFrustum(
         left: number,
@@ -1962,7 +2014,7 @@ export class Matrix4 {
     /**
      * Returns a right-handed perspective projection matrix with a depth range of `[-1, 1]`.
      *
-     * Values taken from `glm::frustumRH_NO`.
+     * Values equal to `glm::frustumRH_NO`.
      */
     public static fromPerspectiveFrustumGL(
         left: number,
@@ -1989,7 +2041,7 @@ export class Matrix4 {
     /**
      * Returns a right-handed perspective projection matrix with a depth range of `[-1, 1]`.
      *
-     * Values taken from `glm::perspectiveRH_NO`.
+     * Values equal to `glm::perspectiveRH_NO`.
      */
     public static fromPerspectiveGL(fovY: number, aspectRatio: number, near: number, far: number): Matrix4 {
         const cot = 1 / Math.tan(0.5 * fovY);
@@ -2117,11 +2169,14 @@ export class Matrix4 {
         return new Matrix4([...this.elements]);
     }
 
-    public copyFrom(mat: Matrix4 | Matrix4A): void {
-        const ea = this.elements;
-
+    /**
+     * Copies values from `mat` into this matrix.
+     */
+    public copyFrom(mat: Matrix4A | Matrix4): void {
         if (mat.type === MatrixType.Projective) {
+            const ea = this.elements;
             const eb = mat.elements;
+
             ea[0] = eb[0];
             ea[1] = eb[1];
             ea[2] = eb[2];
@@ -2139,7 +2194,9 @@ export class Matrix4 {
             ea[14] = eb[14];
             ea[15] = eb[15];
         } else {
+            const ea = this.elements;
             const eb = mat.elements;
+
             ea[0] = eb[0];
             ea[1] = eb[1];
             ea[2] = eb[2];
@@ -2159,6 +2216,9 @@ export class Matrix4 {
         }
     }
 
+    /**
+     * Returns the determinant of the matrix.
+     */
     public determinant(): number {
         const e = this.elements;
 
@@ -2241,6 +2301,9 @@ export class Matrix4 {
         return { s, r, t };
     }
 
+    /**
+     * Returns the inverse of the matrix.
+     */
     public inverse(): Matrix4 {
         const det = this.determinant();
 
@@ -2336,44 +2399,6 @@ export class Matrix4 {
 
     /**
      * ```
-     * | e0  e4   e8  e12 |   | x |
-     * | e1  e5   e9  e13 | * | y |
-     * | e2  e6  e10  e14 |   | z |
-     * | e3  e7  e11  e15 |   | 1 |
-     * ```
-     */
-    public mapPoint(p: Point3): Point3 {
-        const e = this.elements;
-
-        const x = e[0] * p.x + e[4] * p.y + e[8] * p.z + e[12];
-        const y = e[1] * p.x + e[5] * p.y + e[9] * p.z + e[13];
-        const z = e[2] * p.x + e[6] * p.y + e[10] * p.z + e[14];
-        const w = e[3] * p.x + e[7] * p.y + e[11] * p.z + e[15];
-
-        return Point3.fromXYZW(x, y, z, w);
-    }
-
-    /**
-     * ```
-     * | e0  e4   e8  e12 |   | x |
-     * | e1  e5   e9  e13 | * | y |
-     * | e2  e6  e10  e14 |   | z |
-     * | e3  e7  e11  e15 |   | 1 |
-     * ```
-     */
-    public mapVector(v: Vector3): Vector3 {
-        const e = this.elements;
-
-        const x = e[0] * v.x + e[4] * v.y + e[8] * v.z + e[12];
-        const y = e[1] * v.x + e[5] * v.y + e[9] * v.z + e[13];
-        const z = e[2] * v.x + e[6] * v.y + e[10] * v.z + e[14];
-        const w = e[3] * v.x + e[7] * v.y + e[11] * v.z + e[15];
-
-        return Vector3.fromXYZW(x, y, z, w);
-    }
-
-    /**
-     * ```
      * | ea0  ea4   ea8  ea12 |   | eb0  eb4   eb8  eb12 |
      * | ea1  ea5   ea9  ea13 | * | eb1  eb5   eb9  eb13 |
      * | ea2  ea6  ea10  ea14 |   | eb2  eb6  eb10  eb14 |
@@ -2409,6 +2434,25 @@ export class Matrix4 {
 
     /**
      * ```
+     * | e0  e4   e8  e12 |   | x |
+     * | e1  e5   e9  e13 | * | y |
+     * | e2  e6  e10  e14 |   | z |
+     * | e3  e7  e11  e15 |   | 1 |
+     * ```
+     */
+    public mulPt(p: Point3): Point3 {
+        const e = this.elements;
+
+        const x = e[0] * p.x + e[4] * p.y + e[8] * p.z + e[12];
+        const y = e[1] * p.x + e[5] * p.y + e[9] * p.z + e[13];
+        const z = e[2] * p.x + e[6] * p.y + e[10] * p.z + e[14];
+        const w = e[3] * p.x + e[7] * p.y + e[11] * p.z + e[15];
+
+        return Point3.fromXYZW(x, y, z, w);
+    }
+
+    /**
+     * ```
      * | ea0  ea4   ea8  ea12 |   | eb0  eb4   eb8  eb12 |
      * | ea1  ea5   ea9  ea13 | * | eb1  eb5   eb9  eb13 |
      * | ea2  ea6  ea10  ea14 |   | eb2  eb6  eb10  eb14 |
@@ -2440,6 +2484,25 @@ export class Matrix4 {
         const e15 = ea[3] * eb[12] + ea[7] * eb[13] + ea[11] * eb[14] + ea[15] * eb[15];
 
         this.set(e0, e1, e2, e3, e4, e5, e6, e7, e8, e9, e10, e11, e12, e13, e14, e15);
+    }
+
+    /**
+     * ```
+     * | e0  e4   e8  e12 |   | x |
+     * | e1  e5   e9  e13 | * | y |
+     * | e2  e6  e10  e14 |   | z |
+     * | e3  e7  e11  e15 |   | 1 |
+     * ```
+     */
+    public mulVec(v: Vector3): Vector3 {
+        const e = this.elements;
+
+        const x = e[0] * v.x + e[4] * v.y + e[8] * v.z + e[12];
+        const y = e[1] * v.x + e[5] * v.y + e[9] * v.z + e[13];
+        const z = e[2] * v.x + e[6] * v.y + e[10] * v.z + e[14];
+        const w = e[3] * v.x + e[7] * v.y + e[11] * v.z + e[15];
+
+        return Vector3.fromXYZW(x, y, z, w);
     }
 
     /**
@@ -2837,6 +2900,9 @@ export class Matrix4 {
         this.set(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, tx, ty, tz, 1);
     }
 
+    /**
+     * Returns the transpose of the matrix.
+     */
     public transpose(): Matrix4 {
         const e = this.elements;
         return new Matrix4([

@@ -59,11 +59,21 @@ export class Complex {
 
     /**
      * ```
+     * | a | * | ca |
+     * | b |   | cb |
+     * ```
+     */
+    public mul(z: Complex): Complex {
+        return new Complex(this.a * z.a - this.b * z.b, this.a * z.b + this.b * z.a);
+    }
+
+    /**
+     * ```
      * | a | * | px |
      * | b |   | py |
      * ```
      */
-    public mapPoint(p: Point2): Point2 {
+    public mulPt(p: Point2): Point2 {
         return new Point2(this.a * p.x - this.b * p.y, this.a * p.y + this.b * p.x);
     }
 
@@ -73,18 +83,8 @@ export class Complex {
      * | b |   | vy |
      * ```
      */
-    public mapVector(v: Vector2): Vector2 {
+    public mulVec(v: Vector2): Vector2 {
         return new Vector2(this.a * v.x - this.b * v.y, this.a * v.y + this.b * v.x);
-    }
-
-    /**
-     * ```
-     * | a | * | ca |
-     * | b |   | cb |
-     * ```
-     */
-    public mul(z: Complex): Complex {
-        return new Complex(this.a * z.a - this.b * z.b, this.a * z.b + this.b * z.a);
     }
 
     public rotate(a: number): Complex {
