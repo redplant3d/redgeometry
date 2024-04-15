@@ -11,7 +11,6 @@ await buildHelper(
         bundle: true,
         define: { REDGEOMETRY_DEBUG: "false" },
         entryPoints: ["./src/index.ts"],
-        loader: { ".wgsl": "text" },
         metafile: true,
         minify: true,
         sourcemap: true,
