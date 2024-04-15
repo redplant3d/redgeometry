@@ -1,16 +1,16 @@
-import type { WorldOptions } from "redgeometry/src/ecs/app";
-import type { DefaultSystemStage, WorldModule } from "redgeometry/src/ecs/types";
-import { DEFAULT_WORLD_SCHEDULES, type World } from "redgeometry/src/ecs/world";
 import { Box2 } from "redgeometry/src/primitives/box";
 import { Image2 } from "redgeometry/src/render/image";
 import { assertUnreachable } from "redgeometry/src/utility/debug";
 import { RandomXSR128, type Random } from "redgeometry/src/utility/random";
 import { clamp } from "redgeometry/src/utility/scalar";
-import type { AppContextPlugin } from "../ecs/app-context.js";
-import { AppContextModule } from "../ecs/app-context.js";
-import type { AppInputData } from "../ecs/app-input.js";
-import { ComboBoxInputElement, RangeInputElement } from "../ecs/app-input.js";
-import { AppMainModule, AppRemoteModule, type AppStateData } from "../ecs/app.js";
+import type { AppContextPlugin } from "../ecs-modules/app-context.js";
+import { AppContextModule } from "../ecs-modules/app-context.js";
+import type { AppInputData } from "../ecs-modules/app-input.js";
+import { ComboBoxInputElement, RangeInputElement } from "../ecs-modules/app-input.js";
+import { AppMainModule, AppRemoteModule, type AppStateData } from "../ecs-modules/app.js";
+import type { WorldOptions } from "../ecs/app.js";
+import type { DefaultSystemStage, WorldModule } from "../ecs/types.js";
+import { DEFAULT_WORLD_SCHEDULES, type World } from "../ecs/world.js";
 
 const SOBOL_XOR_1 = [
     0x00000000, 0x00000001, 0x00000001, 0x00000007, 0x00000001, 0x00000013, 0x00000015, 0x0000007f, 0x00000001,

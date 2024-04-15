@@ -1,7 +1,7 @@
-import { App, type AppContext, type WorldGroupOptions } from "redgeometry/src/ecs/app";
-import type { DefaultWorldScheduleId, WorldId } from "redgeometry/src/ecs/types";
 import { throwError } from "redgeometry/src/utility/debug";
-import { AppLauncherModule } from "../ecs/app-launcher.js";
+import { AppLauncherModule } from "../ecs-modules/app-launcher.js";
+import { App, type AppContext, type WorldGroupOptions } from "../ecs/app.js";
+import type { DefaultWorldScheduleId, WorldId } from "../ecs/types.js";
 
 export type AppPartId = string;
 

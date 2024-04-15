@@ -1,4 +1,4 @@
-import { LocalAppContext, WebAppContext } from "redgeometry/src/ecs/app";
+import { LocalAppContext, WebAppContext } from "./ecs/app.js";
 import { BPLUS_TREE_MAIN_WORLD, BPLUS_TREE_REMOTE_WORLD } from "./parts/bplus-tree.js";
 import { ECS_MAIN_WORLD, ECS_REMOTE_WORLD } from "./parts/ecs-bounce.js";
 import { GPU_CUBE_MAIN_WORLD, GPU_CUBE_REMOTE_WORLD } from "./parts/gpu-cube.js";

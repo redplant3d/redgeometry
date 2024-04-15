@@ -1,6 +1,6 @@
-import type { WorldModule } from "redgeometry/src/ecs/types";
-import type { World } from "redgeometry/src/ecs/world";
 import { assert } from "redgeometry/src/utility/debug";
+import type { WorldModule } from "../ecs/types.js";
+import type { World } from "../ecs/world.js";
 
 export type GPUInitData = {
     dataId: "gpu-init";

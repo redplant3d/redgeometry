@@ -1,4 +1,4 @@
-import { assertDebug, log } from "../utility/debug.js";
+import { assertDebug, log } from "redgeometry/src/utility/debug";
 import type {
     System,
     SystemArgs,

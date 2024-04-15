@@ -1,6 +1,6 @@
-import type { DefaultSystemStage, WorldId, WorldModule, WorldPlugin } from "redgeometry/src/ecs/types";
-import type { World } from "redgeometry/src/ecs/world";
 import { assertUnreachable } from "redgeometry/src/utility/debug";
+import type { DefaultSystemStage, WorldId, WorldModule, WorldPlugin } from "../ecs/types.js";
+import type { World } from "../ecs/world.js";
 
 export type InputInitData = {
     dataId: "input-init";

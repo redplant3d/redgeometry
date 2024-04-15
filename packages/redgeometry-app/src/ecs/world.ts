@@ -1,10 +1,10 @@
+import { DEFAULT_SERIALIZATION_MAPPING, SerializationMap } from "redgeometry/src/internal/serialize";
+import { log, throwError } from "redgeometry/src/utility/debug";
 import {
     EntityComponentIterator,
     EntityComponentStorage,
     EntityHierarchySelector,
-} from "../internal/ecs-storage-sparse.js";
-import { DEFAULT_SERIALIZATION_MAPPING, SerializationMap } from "../internal/serialize.js";
-import { log, throwError } from "../utility/debug.js";
+} from "../utility/ecs-storage-sparse.js";
 import {
     SystemSchedule,
     type SystemDependencyOptions,

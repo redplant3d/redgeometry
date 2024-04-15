@@ -1,9 +1,9 @@
-import type { EntityId } from "redgeometry/src/ecs/types";
-import type { EntityHierarchySelector, World } from "redgeometry/src/ecs/world";
 import { Matrix4A } from "redgeometry/src/primitives/matrix";
 import { Point3 } from "redgeometry/src/primitives/point";
 import { Quaternion } from "redgeometry/src/primitives/quaternion";
 import { Vector3 } from "redgeometry/src/primitives/vector";
+import type { EntityId } from "../ecs/types.js";
+import type { EntityHierarchySelector, World } from "../ecs/world.js";
 
 export enum Visibility {
     Inherit,

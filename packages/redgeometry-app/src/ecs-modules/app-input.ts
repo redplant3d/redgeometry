@@ -1,6 +1,6 @@
-import type { DefaultSystemStage, WorldModule } from "redgeometry/src/ecs/types";
-import type { World } from "redgeometry/src/ecs/world";
 import { throwError } from "redgeometry/src/utility/debug";
+import type { DefaultSystemStage, WorldModule } from "../ecs/types.js";
+import type { World } from "../ecs/world.js";
 
 export type AppInputData = {
     dataId: "app-input";

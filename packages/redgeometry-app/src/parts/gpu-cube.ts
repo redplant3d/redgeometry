@@ -1,36 +1,36 @@
-import type { WorldOptions } from "redgeometry/src/ecs/app";
-import type { DefaultSystemStage, EntityId, WorldModule } from "redgeometry/src/ecs/types";
-import { DEFAULT_WORLD_SCHEDULES, type World } from "redgeometry/src/ecs/world";
 import { Matrix4 } from "redgeometry/src/primitives/matrix";
 import { Point3 } from "redgeometry/src/primitives/point";
 import { Quaternion, RotationOrder } from "redgeometry/src/primitives/quaternion";
 import { Vector3 } from "redgeometry/src/primitives/vector";
 import { throwError } from "redgeometry/src/utility/debug";
 import { RandomXSR128, type Random } from "redgeometry/src/utility/random";
-import type { AppInputData } from "../ecs/app-input.js";
-import { ComboBoxInputElement, RangeInputElement } from "../ecs/app-input.js";
+import type { AppInputData } from "../ecs-modules/app-input.js";
+import { ComboBoxInputElement, RangeInputElement } from "../ecs-modules/app-input.js";
 import {
     AppMainModule,
     AppRemoteModule,
     type AppCanvasData,
     type AppStateData,
     type WindowResizeEvent,
-} from "../ecs/app.js";
-import type { AssetId, AssetPlugin } from "../ecs/asset.js";
-import type { CameraBundle, CameraComponent } from "../ecs/camera.js";
-import { GPUModule, type GPUData, type GPUInitData } from "../ecs/gpu.js";
+} from "../ecs-modules/app.js";
+import type { AssetId, AssetPlugin } from "../ecs-modules/asset.js";
+import type { CameraBundle, CameraComponent } from "../ecs-modules/camera.js";
+import { GPUModule, type GPUData, type GPUInitData } from "../ecs-modules/gpu.js";
 import {
     KeyboardButtons,
     KeyboardPlugin,
     MouseButtons,
     MousePlugin,
     type InputMouseMotionEvent,
-} from "../ecs/input.js";
-import type { Material } from "../ecs/material.js";
-import { MeshRenderModule, type Mesh, type MeshBundle, type MeshRenderStateData } from "../ecs/mesh.js";
-import type { SceneData } from "../ecs/scene.js";
-import { type TimeData } from "../ecs/time.js";
-import { Visibility, type TransformComponent } from "../ecs/transform.js";
+} from "../ecs-modules/input.js";
+import type { Material } from "../ecs-modules/material.js";
+import { MeshRenderModule, type Mesh, type MeshBundle, type MeshRenderStateData } from "../ecs-modules/mesh.js";
+import type { SceneData } from "../ecs-modules/scene.js";
+import { type TimeData } from "../ecs-modules/time.js";
+import { Visibility, type TransformComponent } from "../ecs-modules/transform.js";
+import type { WorldOptions } from "../ecs/app.js";
+import type { DefaultSystemStage, EntityId, WorldModule } from "../ecs/types.js";
+import { DEFAULT_WORLD_SCHEDULES, type World } from "../ecs/world.js";
 import { createRandomColor } from "../utility/helper.js";
 
 type AppPartMainData = {

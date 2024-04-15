@@ -1,4 +1,4 @@
-import type { Nominal } from "../utility/types.js";
+import type { Nominal } from "redgeometry/src/utility/types";
 import type { World } from "./world.js";
 
 // Entity

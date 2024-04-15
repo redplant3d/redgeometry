@@ -1,15 +1,15 @@
-import type { WorldOptions } from "redgeometry/src/ecs/app";
-import type { DefaultSystemStage, WorldModule } from "redgeometry/src/ecs/types";
-import { DEFAULT_WORLD_SCHEDULES, type World } from "redgeometry/src/ecs/world";
 import { Edge2, Edge3 } from "redgeometry/src/primitives/edge";
 import { Matrix4 } from "redgeometry/src/primitives/matrix";
 import { Point2, Point3 } from "redgeometry/src/primitives/point";
 import { Quaternion, RotationOrder } from "redgeometry/src/primitives/quaternion";
-import type { AppContextPlugin } from "../ecs/app-context.js";
-import { AppContextModule } from "../ecs/app-context.js";
-import type { AppInputData } from "../ecs/app-input.js";
-import { ComboBoxInputElement, RangeInputElement, TextBoxInputElement } from "../ecs/app-input.js";
-import { AppMainModule, AppRemoteModule } from "../ecs/app.js";
+import type { AppContextPlugin } from "../ecs-modules/app-context.js";
+import { AppContextModule } from "../ecs-modules/app-context.js";
+import type { AppInputData } from "../ecs-modules/app-input.js";
+import { ComboBoxInputElement, RangeInputElement, TextBoxInputElement } from "../ecs-modules/app-input.js";
+import { AppMainModule, AppRemoteModule } from "../ecs-modules/app.js";
+import type { WorldOptions } from "../ecs/app.js";
+import type { DefaultSystemStage, WorldModule } from "../ecs/types.js";
+import { DEFAULT_WORLD_SCHEDULES, type World } from "../ecs/world.js";
 
 type AppPartMainData = {
     dataId: "app-part-main";

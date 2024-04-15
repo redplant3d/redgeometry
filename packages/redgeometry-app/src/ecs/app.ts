@@ -1,301 +1,281 @@
-import type { DefaultSystemStage, DefaultWorldScheduleId, WorldModule } from "redgeometry/src/ecs/types";
-import type { World } from "redgeometry/src/ecs/world";
+import { assertDebug, log, throwError } from "redgeometry/src/utility/debug";
 import {
-    AppInputModule,
-    ButtonInputElement,
-    ComboBoxInputElement,
-    TextBoxInputElement,
-    startInputElementsSystem,
-    type AppInputData,
-} from "../ecs/app-input.js";
-import { createRandomSeed } from "../utility/helper.js";
-import type { AppLauncherData } from "./app-launcher.js";
-import { InputModule, type InputInitData } from "./input.js";
-import { TimeModule, type AnimationFrameEvent, type TimeInitData } from "./time.js";
+    LocalAppRemote,
+    WebAppRemoteChild,
+    WebAppRemoteParent,
+    WorldChannelLocal,
+    WorldChannelRemote,
+    WorldGroup,
+    type AppMessageRequestData,
+    type AppMessageRequestFn,
+    type AppMessageResponseData,
+    type AppMessageResponseFn,
+    type WorldGroupChild,
+    type WorldGroupParent,
+} from "../utility/ecs-app.js";
+import type {
+    DefaultSystemStage,
+    DefaultWorldScheduleId,
+    SystemStage,
+    WorldGroupId,
+    WorldId,
+    WorldModule,
+    WorldScheduleId,
+} from "./types.js";
+import { World, type WorldScheduleOptions } from "./world.js";
 
-export type AppMainData = {
-    dataId: "app-main";
-    canvas: HTMLCanvasElement;
-    canvasContainer: HTMLElement;
-    urlSearchParams: URLSearchParams;
+export type WorldOptions<
+    T extends WorldScheduleId = DefaultWorldScheduleId,
+    U extends SystemStage = DefaultSystemStage,
+> = {
+    id: WorldId;
+    modules: WorldModule[];
+    schedules: WorldScheduleOptions<T, U>[];
 };
 
-export type AppMainInputData = {
-    dataId: "app-main-input";
-    appComboBox: ComboBoxInputElement;
-    randomizeButton: ButtonInputElement;
-    seedTextBox: TextBoxInputElement;
-    generatorTextBox: TextBoxInputElement;
-    updateButton: ButtonInputElement;
+export type WorldGroupOptions = {
+    id: WorldGroupId;
+    parent: WorldGroupId | undefined;
+    worlds: WorldOptions<WorldScheduleId, SystemStage>[];
+    workerScriptURL?: URL | string;
 };
 
-export type AppCanvasData = {
-    dataId: "app-canvas";
-    canvas: HTMLCanvasElement | OffscreenCanvas;
-};
+export interface AppContext {
+    readonly isMain: boolean;
+    readonly isWorker: boolean;
+    readonly selfName: string | undefined;
 
-export type AppStateData = {
-    dataId: "app-state";
-    generator: number;
-    seed: number;
-};
-
-export type AppCommandEvent = {
-    eventId: "app-command";
-    command: "randomize" | "update";
-};
-
-export type WindowResizeEvent = {
-    eventId: "window-resize";
-    width: number;
-    height: number;
-};
-
-export function initAppMainPreSystem(world: World): void {
-    const urlSearchParams = new URLSearchParams(window.location.search);
-    const parent = document.body;
-
-    // Container
-    const paramsContainer = createElement("div", {
-        id: "params",
-        style: "height: 30px",
-    });
-    const canvasContainer = createElement("div", {
-        id: "canvasContainer",
-        style: "border: 1px solid black; position:absolute; top:40px; right:10px; bottom:10px; left:10px;",
-    });
-
-    parent.appendChild(paramsContainer);
-    parent.appendChild(canvasContainer);
-
-    const canvas = createElement("canvas", { id: "canvas2D" });
-
-    world.writeData<AppCanvasData>({
-        dataId: "app-canvas",
-        canvas: canvas.transferControlToOffscreen(),
-    });
-
-    canvasContainer.appendChild(canvas);
-
-    world.writeData<AppMainData>({
-        dataId: "app-main",
-        canvas,
-        canvasContainer,
-        urlSearchParams,
-    });
-
-    world.writeData<AppInputData>({
-        dataId: "app-input",
-        paramsContainer,
-        inputElements: [],
-    });
-
-    world.writeEvent<WindowResizeEvent>({
-        eventId: "window-resize",
-        width: canvasContainer.clientWidth,
-        height: canvasContainer.clientHeight,
-    });
-
-    window.addEventListener("resize", () => {
-        const { canvasContainer } = world.readData<AppMainData>("app-main");
-
-        world.queueEvent<WindowResizeEvent>({
-            eventId: "window-resize",
-            width: canvasContainer.clientWidth,
-            height: canvasContainer.clientHeight,
-        });
-    });
-
-    world.writeData<TimeInitData>({
-        dataId: "time-init",
-        receiverIds: ["remote"],
-    });
-
-    world.writeData<InputInitData>({
-        dataId: "input-init",
-        keyboardEventHandler: self,
-        mouseEventHandler: canvas,
-        receiverIds: ["remote"],
-    });
+    createRemoteChild(
+        requestSenderId: WorldGroupId,
+        requestReceiverId: WorldGroupId,
+        scriptURL: URL | string | undefined,
+    ): AppRemoteChild;
+    createRemoteParent(responseSenderId: WorldGroupId, responseReceiverId: WorldGroupId): AppRemoteParent;
+    isValidGroup(groupOptions: WorldGroupOptions): boolean;
 }
 
-export function addAppInputsSystem(world: World): void {
-    const seed = createRandomSeed();
+export interface AppRemoteChild {
+    readonly requestReceiverId: WorldGroupId;
+    readonly requestSenderId: WorldGroupId;
 
-    const { inputElements } = world.readData<AppInputData>("app-input");
-    const { appPartIds, appPartId } = world.readData<AppLauncherData>("app-launcher");
-
-    const inputAppComboBox = new ComboBoxInputElement("app-main", appPartId);
-    inputAppComboBox.setOptionValues(...appPartIds);
-    inputAppComboBox.addEventListener("input", () => {
-        window.location.replace(`?app=${inputAppComboBox.getValue()}`);
-    });
-    inputElements.push(inputAppComboBox);
-
-    const randomizeButton = new ButtonInputElement("randomize", "randomize");
-    randomizeButton.addEventListener("click", () => {
-        world.queueEvent<AppCommandEvent>({ eventId: "app-command", command: "randomize" });
-    });
-    inputElements.push(randomizeButton);
-
-    const seedTextBox = new TextBoxInputElement("seed", seed.toString());
-    seedTextBox.setStyle("width: 80px");
-    inputElements.push(seedTextBox);
-
-    const generatorTextBox = new TextBoxInputElement("generator", "0");
-    generatorTextBox.setStyle("width: 25px");
-    inputElements.push(generatorTextBox);
-
-    const updateButton = new ButtonInputElement("update", "update");
-    updateButton.addEventListener("click", () => {
-        world.queueEvent<AppCommandEvent>({ eventId: "app-command", command: "update" });
-    });
-    inputElements.push(updateButton);
-
-    world.writeData<AppMainInputData>({
-        dataId: "app-main-input",
-        appComboBox: inputAppComboBox,
-        randomizeButton,
-        seedTextBox,
-        generatorTextBox,
-        updateButton,
-    });
+    sendRequest(data: AppMessageRequestData, transfer: Transferable[]): void;
+    sendRequestAsync(data: AppMessageRequestData, transfer: Transferable[]): Promise<void>;
+    setReceiveResponseFn(fn: AppMessageResponseFn): void;
 }
 
-export function writeAppStateSystem(world: World): void {
-    const { generatorTextBox, seedTextBox } = world.readData<AppMainInputData>("app-main-input");
+export interface AppRemoteParent {
+    readonly responseReceiverId: WorldGroupId;
+    readonly responseSenderId: WorldGroupId;
 
-    world.writeData<AppStateData>({
-        dataId: "app-state",
-        seed: seedTextBox.getInt(),
-        generator: generatorTextBox.getInt(),
-    });
+    sendResponse(requestMessageId: number, data: AppMessageResponseData[], transfer: Transferable[]): void;
+    setReceiveRequestFn(fn: AppMessageRequestFn): void;
 }
 
-export async function initAppMainPostSystem(world: World): Promise<void> {
-    const channel = world.getChannel("remote");
+export class App {
+    private context: AppContext;
+    private groupMap: Map<WorldGroupId, WorldGroup>;
+    private groupOptionsMap: Map<WorldGroupId, WorldGroupOptions>;
 
-    const appStateData = world.readData<AppStateData>("app-state");
-    channel.queueData<AppStateData>(appStateData);
+    public constructor(context: AppContext) {
+        this.context = context;
 
-    const appCanvasData = world.readData<AppCanvasData>("app-canvas");
-    if (appCanvasData.canvas instanceof OffscreenCanvas) {
-        channel.queueData<AppCanvasData>(appCanvasData, [appCanvasData.canvas]);
-    } else {
-        channel.queueData<AppCanvasData>(appCanvasData);
+        this.groupOptionsMap = new Map();
+        this.groupMap = new Map();
     }
 
-    await channel.runScheduleAsync("start");
+    public addWorldGroup(options: WorldGroupOptions): void {
+        const { id, parent } = options;
 
-    requestAnimationFrame((time) => {
-        world.writeEvent<AnimationFrameEvent>({ eventId: "animation-frame", time });
-        world.runSchedule<DefaultWorldScheduleId>("update");
-    });
-}
+        if (parent !== undefined && !this.groupOptionsMap.has(parent)) {
+            throwError("Unable to find parent '{}'", parent);
+        }
 
-export async function appMainSystem(world: World): Promise<void> {
-    const channel = world.getChannel("remote");
+        if (this.groupOptionsMap.has(id)) {
+            log.warn("Group '{}' will be overwritten", id);
+        }
 
-    const windowResizeEvents = world.readEvents<WindowResizeEvent>("window-resize");
-    channel.queueEvents(windowResizeEvents);
+        this.groupOptionsMap.set(id, options);
+    }
 
-    const appStateData = world.readData<AppStateData>("app-state");
-    channel.queueData(appStateData);
+    public run<T extends WorldScheduleId>(worldId: WorldId, scheduleId: T): void {
+        const { context } = this;
 
-    const appCommandEvents = world.readEvents<AppCommandEvent>("app-command");
-    channel.queueEvents(appCommandEvents);
+        // Create world groups
+        for (const groupOptions of this.groupOptionsMap.values()) {
+            if (!context.isValidGroup(groupOptions)) {
+                continue;
+            }
 
-    await channel.runScheduleAsync<DefaultWorldScheduleId>("update");
+            const channels = this.createChannels(context, groupOptions);
+            const children = this.createChildren(context, groupOptions);
+            const parent = this.createParent(context, groupOptions);
 
-    requestAnimationFrame((time) => {
-        world.writeEvent<AnimationFrameEvent>({ eventId: "animation-frame", time });
-        world.runSchedule<DefaultWorldScheduleId>("update");
-    });
-}
+            const group = new WorldGroup(groupOptions.id, context, channels, children, parent);
+            group.init();
 
-export function initAppRemoteSystem(world: World): void {
-    world.writeData<TimeInitData>({
-        dataId: "time-init",
-        receiverIds: [],
-    });
+            this.groupMap.set(groupOptions.id, group);
+        }
 
-    world.writeData<InputInitData>({
-        dataId: "input-init",
-        keyboardEventHandler: undefined,
-        mouseEventHandler: undefined,
-        receiverIds: [],
-    });
-}
+        // Run startup world
+        for (const group of this.groupMap.values()) {
+            const channel = group.channelMap.get(worldId);
 
-export function resizeCanvasSystem(world: World): void {
-    const windowResizeEvent = world.readLatestEvent<WindowResizeEvent>("window-resize");
+            if (channel !== undefined) {
+                channel.world.runSchedule(scheduleId);
+            }
+        }
+    }
 
-    if (windowResizeEvent !== undefined) {
-        const { canvas } = world.readData<AppCanvasData>("app-canvas");
+    private createChannels(context: AppContext, groupOptions: WorldGroupOptions): Map<WorldId, WorldChannelLocal> {
+        const channels = new Map<WorldId, WorldChannelLocal>();
 
-        canvas.width = windowResizeEvent.width;
-        canvas.height = windowResizeEvent.height;
+        for (const worldOptions of groupOptions.worlds) {
+            log.infoDebug("{} >> Created local world '{}'", groupOptions.id, worldOptions.id);
+
+            const world = new World();
+            world.addModules(worldOptions.modules);
+            world.addSchedules(worldOptions.schedules);
+            world.init();
+
+            const channel = new WorldChannelLocal(worldOptions.id, world);
+            channels.set(worldOptions.id, channel);
+        }
+
+        return channels;
+    }
+
+    private createChildren(context: AppContext, groupOptions: WorldGroupOptions): WorldGroupChild[] {
+        const children: WorldGroupChild[] = [];
+
+        for (const childGroupOptions of this.groupOptionsMap.values()) {
+            if (childGroupOptions.parent !== groupOptions.id) {
+                continue;
+            }
+
+            const remote = context.createRemoteChild(
+                groupOptions.id,
+                childGroupOptions.id,
+                childGroupOptions.workerScriptURL,
+            );
+            const channelMap = new Map<WorldId, WorldChannelRemote>();
+
+            for (const worldOptions of childGroupOptions.worlds) {
+                const channelRemote = new WorldChannelRemote(worldOptions.id, remote);
+                channelMap.set(worldOptions.id, channelRemote);
+            }
+
+            children.push({ remote, channelMap });
+        }
+
+        return children;
+    }
+
+    private createParent(context: AppContext, groupOptions: WorldGroupOptions): WorldGroupParent | undefined {
+        if (groupOptions.parent === undefined) {
+            return undefined;
+        }
+
+        const parentGroupOption = this.groupOptionsMap.get(groupOptions.parent);
+        assertDebug(parentGroupOption !== undefined);
+
+        const remote = context.createRemoteParent(groupOptions.id, parentGroupOption.id);
+        const channelMap = new Map<WorldId, WorldChannelRemote>();
+
+        for (const worldOptions of parentGroupOption.worlds) {
+            const channelRemote = new WorldChannelRemote(worldOptions.id, undefined);
+            channelMap.set(worldOptions.id, channelRemote);
+        }
+
+        return { remote, channelMap };
     }
 }
 
-function createElement<K extends keyof HTMLElementTagNameMap>(
-    tagName: K,
-    attributes?: Record<string, string>,
-): HTMLElementTagNameMap[K] {
-    const element = document.createElement(tagName);
+export class LocalAppContext implements AppContext {
+    private map: Map<WorldGroupId, LocalAppRemote>;
 
-    for (const qualifiedName in attributes) {
-        element.setAttribute(qualifiedName, attributes[qualifiedName]);
+    public readonly isMain: boolean;
+    public readonly isWorker: boolean;
+    public readonly selfName: string | undefined;
+
+    public constructor() {
+        const isMain = typeof window !== "undefined";
+        const isWorker = !isMain;
+        const selfName = isWorker ? self.name : undefined;
+
+        this.isMain = isMain;
+        this.isWorker = isWorker;
+        this.selfName = selfName;
+
+        this.map = new Map();
     }
 
-    return element;
-}
+    public createRemoteChild(
+        requestSenderId: WorldGroupId,
+        requestReceiverId: WorldGroupId,
+        _scriptURL: URL | string | undefined,
+    ): AppRemoteChild {
+        const remote = new LocalAppRemote(requestSenderId, requestReceiverId);
+        this.map.set(requestReceiverId, remote);
+        return remote;
+    }
 
-export class AppMainModule implements WorldModule {
-    public readonly moduleId = "app-main-input";
+    public createRemoteParent(responseSenderId: WorldGroupId, _responseReceiverId: WorldGroupId): AppRemoteParent {
+        const parentRemote = this.map.get(responseSenderId);
 
-    public setup(world: World): void {
-        world.addModules([new TimeModule(), new InputModule(), new AppInputModule()]);
+        if (parentRemote === undefined) {
+            throwError("Unable to find parent remote");
+        }
 
-        world.registerData<AppMainData>("app-main");
-        world.registerData<AppMainInputData>("app-main-input");
-        world.registerData<AppCanvasData>("app-canvas");
-        world.registerData<AppStateData>("app-state");
+        return parentRemote;
+    }
 
-        world.registerEvent<AppCommandEvent>("app-command");
-        world.registerEvent<WindowResizeEvent>("window-resize");
-
-        world.addSystem<DefaultSystemStage>({ stage: "start-pre", fn: initAppMainPreSystem });
-        world.addSystem<DefaultSystemStage>({ stage: "start-pre", fn: addAppInputsSystem });
-        world.addSystem<DefaultSystemStage>({ stage: "start-pre", fn: writeAppStateSystem });
-        world.addSystem<DefaultSystemStage>({ stage: "start-post", fn: initAppMainPostSystem });
-        world.addSystem<DefaultSystemStage>({ stage: "update-pre", fn: writeAppStateSystem });
-        world.addSystem<DefaultSystemStage>({ stage: "update-post", fn: appMainSystem });
-
-        world.addDependency({
-            stage: "start-pre",
-            seq: [initAppMainPreSystem, addAppInputsSystem, writeAppStateSystem],
-        });
-        world.addDependency({
-            stage: "start-post",
-            seq: [startInputElementsSystem, initAppMainPostSystem],
-        });
+    public isValidGroup(_groupOptions: WorldGroupOptions): boolean {
+        return true;
     }
 }
 
-export class AppRemoteModule implements WorldModule {
-    public readonly moduleId = "app-remote";
+export class WebAppContext implements AppContext {
+    private defaultScriptURL: string | URL;
 
-    public setup(world: World): void {
-        world.addModules([new TimeModule(), new InputModule()]);
+    public readonly isMain: boolean;
+    public readonly isWorker: boolean;
+    public readonly selfName: string | undefined;
 
-        world.registerData<AppCanvasData>("app-canvas");
-        world.registerData<AppStateData>("app-state");
+    public constructor(defaultScriptURL: string | URL) {
+        this.defaultScriptURL = defaultScriptURL;
 
-        world.registerEvent<AppCommandEvent>("app-command");
-        world.registerEvent<WindowResizeEvent>("window-resize");
+        const isMain = typeof window !== "undefined";
+        const isWorker = !isMain;
+        const selfName = isWorker ? self.name : undefined;
 
-        world.addSystem<DefaultSystemStage>({ stage: "start-pre", fn: initAppRemoteSystem });
-        world.addSystem<DefaultSystemStage>({ stage: "update-pre", fn: resizeCanvasSystem });
+        this.isMain = isMain;
+        this.isWorker = isWorker;
+        this.selfName = selfName;
+    }
+
+    public createRemoteChild(
+        requestSenderId: WorldGroupId,
+        requestReceiverId: WorldGroupId,
+        scriptURL: URL | string | undefined,
+    ): AppRemoteChild {
+        return new WebAppRemoteChild(requestSenderId, requestReceiverId, scriptURL ?? this.defaultScriptURL);
+    }
+
+    public createRemoteParent(responseSenderId: WorldGroupId, responseReceiverId: WorldGroupId): AppRemoteParent {
+        return new WebAppRemoteParent(responseSenderId, responseReceiverId);
+    }
+
+    public isValidGroup(groupOptions: WorldGroupOptions): boolean {
+        const workerName = groupOptions.id;
+
+        if (this.selfName === workerName) {
+            return true;
+        }
+
+        if (this.selfName === undefined && groupOptions.parent === undefined) {
+            return true;
+        }
+
+        return false;
     }
 }

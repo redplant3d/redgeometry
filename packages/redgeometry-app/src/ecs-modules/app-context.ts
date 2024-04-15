@@ -1,7 +1,5 @@
 import type { Mesh2, MeshFace2 } from "redgeometry/src/core/mesh";
 import { PathCommandType, type Path2 } from "redgeometry/src/core/path";
-import type { DefaultSystemStage, WorldModule, WorldPlugin } from "redgeometry/src/ecs/types";
-import type { World } from "redgeometry/src/ecs/world";
 import type { Box2 } from "redgeometry/src/primitives/box";
 import type { Edge2 } from "redgeometry/src/primitives/edge";
 import { Point2 } from "redgeometry/src/primitives/point";
@@ -10,6 +8,8 @@ import type { Ray2 } from "redgeometry/src/primitives/ray";
 import type { Image2 } from "redgeometry/src/render/image";
 import { assertUnreachable, throwError } from "redgeometry/src/utility/debug";
 import type { Random } from "redgeometry/src/utility/random";
+import type { DefaultSystemStage, WorldModule, WorldPlugin } from "../ecs/types.js";
+import type { World } from "../ecs/world.js";
 import { createRandomColor } from "../utility/helper.js";
 import type { AppCanvasData } from "./app.js";
 

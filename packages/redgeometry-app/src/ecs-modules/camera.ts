@@ -1,6 +1,6 @@
-import type { ComponentIdsOf } from "redgeometry/src/ecs/types";
-import type { World } from "redgeometry/src/ecs/world";
 import type { Matrix4 } from "redgeometry/src/primitives/matrix";
+import type { ComponentIdsOf } from "../ecs/types.js";
+import type { World } from "../ecs/world.js";
 import type { ComputedTransformComponent, TransformComponent } from "./transform.js";
 
 export type CameraBundle = [CameraComponent, TransformComponent];
