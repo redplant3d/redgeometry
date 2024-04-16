@@ -44,8 +44,8 @@ export class PathFlattenIncremental2 implements PathFlatten2 {
         let cIdx = 0;
         let pIdx = 0;
 
-        let ps = Point2.ZERO;
-        let p0 = Point2.ZERO;
+        let ps = Point2.createZero();
+        let p0 = Point2.createZero();
 
         while (cIdx < commands.length) {
             const command = commands[cIdx++];
@@ -177,8 +177,8 @@ export class PathFlattenRecursive2 implements PathFlatten2 {
         let cIdx = 0;
         let pIdx = 0;
 
-        let ps = Point2.ZERO;
-        let p0 = Point2.ZERO;
+        let ps = Point2.createZero();
+        let p0 = Point2.createZero();
 
         while (cIdx < commands.length) {
             const command = commands[cIdx++];

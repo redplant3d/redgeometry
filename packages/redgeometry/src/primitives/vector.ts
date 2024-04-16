@@ -2,21 +2,40 @@ import { clamp } from "../utility/scalar.js";
 import { Point2, Point3 } from "./point.js";
 
 export class Vector2 {
-    /** Returns the vector `(1, 1)`. */
-    public static readonly ONE: Readonly<Vector2> = new Vector2(1, 1);
-    /** Returns the unit vector in the direction of the x-axis. */
-    public static readonly UNIT_X: Readonly<Vector2> = new Vector2(1, 0);
-    /** Returns the unit vector in the direction of the y-axis. */
-    public static readonly UNIT_Y: Readonly<Vector2> = new Vector2(0, 1);
-    /** Returns the vector `(0, 0)`. */
-    public static readonly ZERO: Readonly<Vector2> = new Vector2(0, 0);
-
     public x: number;
     public y: number;
 
     public constructor(x: number, y: number) {
         this.x = x;
         this.y = y;
+    }
+
+    /**
+     * Returns the vector `(1, 1)`.
+     */
+    public static createOne(): Vector2 {
+        return new Vector2(1, 1);
+    }
+
+    /**
+     * Returns the unit vector in the direction of the x-axis.
+     */
+    public static createUnitX(): Vector2 {
+        return new Vector2(1, 0);
+    }
+
+    /**
+     * Returns the unit vector in the direction of the y-axis.
+     */
+    public static createUnitY(): Vector2 {
+        return new Vector2(0, 1);
+    }
+
+    /**
+     * Returns the vector `(0, 0)`.
+     */
+    public static createZero(): Vector2 {
+        return new Vector2(0, 0);
     }
 
     public static fromArray(data: number[], offset = 0): Vector2 {
@@ -124,6 +143,10 @@ export class Vector2 {
         return Number.isFinite(this.x) && Number.isFinite(this.y);
     }
 
+    public isOne(): boolean {
+        return this.x === 1 && this.y === 1;
+    }
+
     public isZero(): boolean {
         return this.x === 0 && this.y === 0;
     }
@@ -179,22 +202,11 @@ export class Vector2 {
 
     public unitOrZero(): Vector2 {
         const len = this.len();
-        return len > 0 ? this.div(len) : Vector2.ZERO;
+        return len > 0 ? this.div(len) : Vector2.createZero();
     }
 }
 
 export class Vector3 {
-    /** Returns the vector `(1, 1, 1)`. */
-    public static readonly ONE: Readonly<Vector3> = new Vector3(1, 1, 1);
-    /** Returns the unit vector in the direction of the x-axis. */
-    public static readonly UNIT_X: Readonly<Vector3> = new Vector3(1, 0, 0);
-    /** Returns the unit vector in the direction of the y-axis. */
-    public static readonly UNIT_Y: Readonly<Vector3> = new Vector3(0, 1, 0);
-    /** Returns the unit vector in the direction of the z-axis. */
-    public static readonly UNIT_Z: Readonly<Vector3> = new Vector3(0, 0, 1);
-    /**  Returns the vector `(0, 0, 0)`. */
-    public static readonly ZERO: Readonly<Vector3> = new Vector3(0, 0, 0);
-
     public x: number;
     public y: number;
     public z: number;
@@ -203,6 +215,41 @@ export class Vector3 {
         this.x = x;
         this.y = y;
         this.z = z;
+    }
+
+    /**
+     * Returns the vector `(1, 1, 1)`.
+     */
+    public static createOne(): Vector3 {
+        return new Vector3(1, 1, 1);
+    }
+
+    /**
+     * Returns the unit vector in the direction of the x-axis.
+     */
+    public static createUnitX(): Vector3 {
+        return new Vector3(1, 0, 0);
+    }
+
+    /**
+     * Returns the unit vector in the direction of the y-axis.
+     */
+    public static createUnitY(): Vector3 {
+        return new Vector3(0, 1, 0);
+    }
+
+    /**
+     * Returns the unit vector in the direction of the z-axis.
+     */
+    public static createUnitZ(): Vector3 {
+        return new Vector3(0, 0, 1);
+    }
+
+    /**
+     * Returns the vector `(0, 0, 0)`.
+     */
+    public static createZero(): Vector3 {
+        return new Vector3(0, 0, 0);
     }
 
     public static fromArray(data: number[], offset = 0): Vector3 {
@@ -290,6 +337,10 @@ export class Vector3 {
         return Number.isFinite(this.x) && Number.isFinite(this.y) && Number.isFinite(this.z);
     }
 
+    public isOne(): boolean {
+        return this.x === 1 && this.y === 1 && this.z === 1;
+    }
+
     public isZero(): boolean {
         return this.x === 0 && this.y === 0 && this.z === 0;
     }
@@ -362,6 +413,6 @@ export class Vector3 {
 
     public unitOrZero(): Vector3 {
         const len = this.len();
-        return len > 0 ? this.div(len) : Vector3.ZERO;
+        return len > 0 ? this.div(len) : Vector3.createZero();
     }
 }

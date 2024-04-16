@@ -5,14 +5,16 @@ import { Vector2 } from "./vector.js";
  * A complex number to be used for 2D rotations.
  */
 export class Complex {
-    public static readonly IDENTITY: Readonly<Complex> = new Complex(1, 0);
-
     public a: number;
     public b: number;
 
     public constructor(a: number, b: number) {
         this.a = a;
         this.b = b;
+    }
+
+    public static createIdentity(): Complex {
+        return new Complex(1, 0);
     }
 
     public static fromArray(data: number[], offset = 0): Complex {
@@ -48,6 +50,10 @@ export class Complex {
     public inverse(): Complex {
         const d = this.lenSq();
         return new Complex(this.a / d, -this.b / d);
+    }
+
+    public isIdentity(): boolean {
+        return this.a === 1 && this.b === 0;
     }
 
     public len(): number {

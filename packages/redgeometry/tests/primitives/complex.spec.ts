@@ -12,8 +12,8 @@ test("Complex - inverse", () => {
     const z1 = z.mul(zInv);
     const z2 = zInv.mul(z);
 
-    expectToBeCloseComplex(z1, Complex.IDENTITY);
-    expectToBeCloseComplex(z2, Complex.IDENTITY);
+    expectToBeCloseComplex(z1, Complex.createIdentity());
+    expectToBeCloseComplex(z2, Complex.createIdentity());
 });
 
 test("Complex - rotate", () => {
@@ -22,7 +22,7 @@ test("Complex - rotate", () => {
 
     const z1 = z.rotate(-a);
 
-    expectToBeCloseComplex(z1, Complex.IDENTITY);
+    expectToBeCloseComplex(z1, Complex.createIdentity());
 });
 
 test("Quaternion - mulPt/mulVec", () => {

@@ -51,8 +51,8 @@ export class PathOffsetIncremental2 implements PathOffset2 {
         this.d = 0;
         this.join = JoinType.Bevel;
         this.miterLimit = 0;
-        this.ms = Vector2.ZERO;
-        this.ps = Point2.ZERO;
+        this.ms = Vector2.createZero();
+        this.ps = Point2.createZero();
     }
 
     public process(input: Path2, output: Path2, options: PathOffsetOptions): void {
@@ -73,7 +73,7 @@ export class PathOffsetIncremental2 implements PathOffset2 {
 
         // Current point and tangent
         let p0 = this.ps;
-        let m0 = Vector2.ZERO;
+        let m0 = Vector2.createZero();
 
         this.buffer.clear();
 
@@ -87,7 +87,7 @@ export class PathOffsetIncremental2 implements PathOffset2 {
                     }
 
                     p0 = points[pIdx++];
-                    m0 = Vector2.ZERO;
+                    m0 = Vector2.createZero();
 
                     this.ps = p0;
 
@@ -166,7 +166,7 @@ export class PathOffsetIncremental2 implements PathOffset2 {
                     }
 
                     p0 = this.ps;
-                    m0 = Vector2.ZERO;
+                    m0 = Vector2.createZero();
 
                     break;
                 }
@@ -343,8 +343,8 @@ export class PathOffsetRecursive2 implements PathOffset2 {
         this.d = 0;
         this.join = JoinType.Bevel;
         this.miterLimit = 0;
-        this.ms = Vector2.ZERO;
-        this.ps = Point2.ZERO;
+        this.ms = Vector2.createZero();
+        this.ps = Point2.createZero();
     }
 
     public process(input: Path2, output: Path2, options: PathOffsetOptions): void {
@@ -365,7 +365,7 @@ export class PathOffsetRecursive2 implements PathOffset2 {
 
         // Current point and tangent
         let p0 = this.ps;
-        let m0 = Vector2.ZERO;
+        let m0 = Vector2.createZero();
 
         this.buffer.clear();
 
@@ -379,7 +379,7 @@ export class PathOffsetRecursive2 implements PathOffset2 {
                     }
 
                     p0 = points[pIdx++];
-                    m0 = Vector2.ZERO;
+                    m0 = Vector2.createZero();
 
                     this.ps = p0;
 
@@ -458,7 +458,7 @@ export class PathOffsetRecursive2 implements PathOffset2 {
                     }
 
                     p0 = this.ps;
-                    m0 = Vector2.ZERO;
+                    m0 = Vector2.createZero();
 
                     break;
                 }

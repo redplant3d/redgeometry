@@ -19,8 +19,6 @@ export enum RotationOrder {
  * - https://danceswithcode.net/engineeringnotes/quaternions/quaternions.html
  */
 export class Quaternion {
-    public static readonly IDENTITY: Readonly<Quaternion> = new Quaternion(1, 0, 0, 0);
-
     public a: number;
     public b: number;
     public c: number;
@@ -31,6 +29,10 @@ export class Quaternion {
         this.b = b;
         this.c = c;
         this.d = d;
+    }
+
+    public static createIdentity(): Quaternion {
+        return new Quaternion(1, 0, 0, 0);
     }
 
     public static fromArray(data: number[], offset = 0): Quaternion {
@@ -192,6 +194,10 @@ export class Quaternion {
     public inverse(): Quaternion {
         const d = this.lenSq();
         return new Quaternion(this.a / d, -this.b / d, -this.c / d, -this.d / d);
+    }
+
+    public isIdentity(): boolean {
+        return this.a === 1 && this.b === 0 && this.c === 0 && this.d === 0;
     }
 
     public len(): number {

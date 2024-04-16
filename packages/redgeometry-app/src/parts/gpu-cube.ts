@@ -120,8 +120,8 @@ function initRemoteSystem(world: World): void {
         },
         {
             componentId: "transform",
-            scale: Vector3.ONE,
-            rotation: Quaternion.IDENTITY,
+            scale: Vector3.createOne(),
+            rotation: Quaternion.createIdentity(),
             translation: new Point3(0, 0, 15),
             visible: Visibility.Inherit,
         },
@@ -208,9 +208,9 @@ function initAssetSystem(world: World): void {
 
     appRemoteData.parentEntity = world.createEntity<[TransformComponent]>(undefined, {
         componentId: "transform",
-        rotation: Quaternion.IDENTITY,
-        scale: Vector3.ONE,
-        translation: Point3.ZERO,
+        rotation: Quaternion.createIdentity(),
+        scale: Vector3.createOne(),
+        translation: Point3.createZero(),
         visible: Visibility.Inherit,
     });
 
@@ -318,7 +318,7 @@ function cameraMoveSystem(world: World): void {
 
     let v = new Vector3(x, y, z);
 
-    if (!v.eq(Vector3.ZERO)) {
+    if (!v.isZero()) {
         v = v.unitOrZero().mul(delta * vel);
         v = camRot.mulVec(v);
 

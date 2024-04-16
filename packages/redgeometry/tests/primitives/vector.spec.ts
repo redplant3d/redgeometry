@@ -2,8 +2,8 @@ import { expect, test } from "vitest";
 import { Vector2 } from "../../src/primitives/vector.js";
 
 test("isBetweenCcw", () => {
-    const vx = Vector2.UNIT_X;
-    const vy = Vector2.UNIT_Y;
+    const vx = Vector2.createUnitX();
+    const vy = Vector2.createUnitY();
 
     const v1 = new Vector2(1, 1);
     const v2 = new Vector2(-1, -1);

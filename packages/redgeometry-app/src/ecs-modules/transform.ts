@@ -100,17 +100,17 @@ export function transformSystem(world: World): void {
         }
 
         const t = transform.translation;
-        if (!t.eq(Point3.ZERO)) {
+        if (!t.isZero()) {
             computed.global.translatePre(t.x, t.y, t.z);
         }
 
         const r = transform.rotation;
-        if (!r.eq(Quaternion.IDENTITY)) {
+        if (!r.isIdentity()) {
             computed.global.rotatePre(r.a, r.b, r.c, r.d);
         }
 
         const s = transform.scale;
-        if (!s.eq(Vector3.ONE)) {
+        if (!s.isOne()) {
             computed.global.scalePre(s.x, s.y, s.z);
         }
 

@@ -2,15 +2,19 @@ import { lerp, roundToPrecision } from "../utility/scalar.js";
 import { Vector2, Vector3 } from "./vector.js";
 
 export class Point2 {
-    /**  Returns the point `(0, 0)`.  */
-    public static readonly ZERO: Readonly<Point2> = new Point2(0, 0);
-
     public x: number;
     public y: number;
 
     public constructor(x: number, y: number) {
         this.x = x;
         this.y = y;
+    }
+
+    /**
+     * Returns the point `(0, 0)`.
+     */
+    public static createZero(): Point2 {
+        return new Point2(0, 0);
     }
 
     public static fromArray(data: number[], offset = 0): Point2 {
@@ -136,9 +140,6 @@ export class Point2 {
 }
 
 export class Point3 {
-    /** Returns the point `(0, 0, 0)`. */
-    public static readonly ZERO: Readonly<Point3> = new Point3(0, 0, 0);
-
     public x: number;
     public y: number;
     public z: number;
@@ -147,6 +148,13 @@ export class Point3 {
         this.x = x;
         this.y = y;
         this.z = z;
+    }
+
+    /**
+     * Returns the point `(0, 0, 0)`.
+     */
+    public static createZero(): Point3 {
+        return new Point3(0, 0, 0);
     }
 
     public static fromArray(data: number[], offset = 0): Point3 {
@@ -218,6 +226,10 @@ export class Point3 {
 
     public isFinite(): boolean {
         return Number.isFinite(this.x) && Number.isFinite(this.y) && Number.isFinite(this.z);
+    }
+
+    public isZero(): boolean {
+        return this.x === 0 && this.y === 0 && this.z === 0;
     }
 
     public lerp(p1: Point3, t: number): Point3 {

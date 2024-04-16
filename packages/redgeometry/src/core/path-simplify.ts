@@ -43,7 +43,7 @@ export class PathSimplifyIncremental2 implements PathSimplify2 {
         let cIdx = 0;
         let pIdx = 0;
 
-        let p0 = Point2.ZERO;
+        let p0 = Point2.createZero();
 
         while (cIdx < commands.length) {
             const command = commands[cIdx++];
@@ -157,7 +157,7 @@ export class PathSimplifyRecursive2 implements PathSimplify2 {
         let cIdx = 0;
         let pIdx = 0;
 
-        let p0 = Point2.ZERO;
+        let p0 = Point2.createZero();
 
         while (cIdx < commands.length) {
             const command = commands[cIdx++];

@@ -108,8 +108,8 @@ test("Quaternion - inverse", () => {
     const q1 = q.mul(qInv);
     const q2 = qInv.mul(q);
 
-    expectToBeCloseQuaternion(q1, Quaternion.IDENTITY);
-    expectToBeCloseQuaternion(q2, Quaternion.IDENTITY);
+    expectToBeCloseQuaternion(q1, Quaternion.createIdentity());
+    expectToBeCloseQuaternion(q2, Quaternion.createIdentity());
 });
 
 test("Quaternion - mulPt/mulVec", () => {
@@ -162,8 +162,8 @@ test("Quaternion - rotateX", () => {
     const q1 = q.rotateX(-a);
     const q2 = q.rotateXPre(-a);
 
-    expectToBeCloseQuaternion(q1, Quaternion.IDENTITY);
-    expectToBeCloseQuaternion(q2, Quaternion.IDENTITY);
+    expectToBeCloseQuaternion(q1, Quaternion.createIdentity());
+    expectToBeCloseQuaternion(q2, Quaternion.createIdentity());
 });
 
 test("Quaternion - rotateY", () => {
@@ -173,8 +173,8 @@ test("Quaternion - rotateY", () => {
     const q1 = q.rotateY(-a);
     const q2 = q.rotateYPre(-a);
 
-    expectToBeCloseQuaternion(q1, Quaternion.IDENTITY);
-    expectToBeCloseQuaternion(q2, Quaternion.IDENTITY);
+    expectToBeCloseQuaternion(q1, Quaternion.createIdentity());
+    expectToBeCloseQuaternion(q2, Quaternion.createIdentity());
 });
 
 test("Quaternion - rotateZ", () => {
@@ -184,6 +184,6 @@ test("Quaternion - rotateZ", () => {
     const q1 = q.rotateZ(-a);
     const q2 = q.rotateZPre(-a);
 
-    expectToBeCloseQuaternion(q1, Quaternion.IDENTITY);
-    expectToBeCloseQuaternion(q2, Quaternion.IDENTITY);
+    expectToBeCloseQuaternion(q1, Quaternion.createIdentity());
+    expectToBeCloseQuaternion(q2, Quaternion.createIdentity());
 });
