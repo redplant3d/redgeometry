@@ -3,10 +3,10 @@ import { Vector2, Vector3 } from "./vector.js";
 
 export class Point2 {
     /**  Returns the point `(0, 0)`.  */
-    public static readonly ZERO = new Point2(0, 0);
+    public static readonly ZERO: Readonly<Point2> = new Point2(0, 0);
 
-    public readonly x: number;
-    public readonly y: number;
+    public x: number;
+    public y: number;
 
     public constructor(x: number, y: number) {
         this.x = x;
@@ -137,11 +137,11 @@ export class Point2 {
 
 export class Point3 {
     /** Returns the point `(0, 0, 0)`. */
-    public static readonly ZERO = new Point3(0, 0, 0);
+    public static readonly ZERO: Readonly<Point3> = new Point3(0, 0, 0);
 
-    public readonly x: number;
-    public readonly y: number;
-    public readonly z: number;
+    public x: number;
+    public y: number;
+    public z: number;
 
     public constructor(x: number, y: number, z: number) {
         this.x = x;

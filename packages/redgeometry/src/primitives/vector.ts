@@ -3,16 +3,16 @@ import { Point2, Point3 } from "./point.js";
 
 export class Vector2 {
     /** Returns the vector `(1, 1)`. */
-    public static readonly ONE = new Vector2(1, 1);
+    public static readonly ONE: Readonly<Vector2> = new Vector2(1, 1);
     /** Returns the unit vector in the direction of the x-axis. */
-    public static readonly UNIT_X = new Vector2(1, 0);
+    public static readonly UNIT_X: Readonly<Vector2> = new Vector2(1, 0);
     /** Returns the unit vector in the direction of the y-axis. */
-    public static readonly UNIT_Y = new Vector2(0, 1);
+    public static readonly UNIT_Y: Readonly<Vector2> = new Vector2(0, 1);
     /** Returns the vector `(0, 0)`. */
-    public static readonly ZERO = new Vector2(0, 0);
+    public static readonly ZERO: Readonly<Vector2> = new Vector2(0, 0);
 
-    public readonly x: number;
-    public readonly y: number;
+    public x: number;
+    public y: number;
 
     public constructor(x: number, y: number) {
         this.x = x;
@@ -185,19 +185,19 @@ export class Vector2 {
 
 export class Vector3 {
     /** Returns the vector `(1, 1, 1)`. */
-    public static readonly ONE = new Vector3(1, 1, 1);
+    public static readonly ONE: Readonly<Vector3> = new Vector3(1, 1, 1);
     /** Returns the unit vector in the direction of the x-axis. */
-    public static readonly UNIT_X = new Vector3(1, 0, 0);
+    public static readonly UNIT_X: Readonly<Vector3> = new Vector3(1, 0, 0);
     /** Returns the unit vector in the direction of the y-axis. */
-    public static readonly UNIT_Y = new Vector3(0, 1, 0);
+    public static readonly UNIT_Y: Readonly<Vector3> = new Vector3(0, 1, 0);
     /** Returns the unit vector in the direction of the z-axis. */
-    public static readonly UNIT_Z = new Vector3(0, 0, 1);
+    public static readonly UNIT_Z: Readonly<Vector3> = new Vector3(0, 0, 1);
     /**  Returns the vector `(0, 0, 0)`. */
-    public static readonly ZERO = new Vector3(0, 0, 0);
+    public static readonly ZERO: Readonly<Vector3> = new Vector3(0, 0, 0);
 
-    public readonly x: number;
-    public readonly y: number;
-    public readonly z: number;
+    public x: number;
+    public y: number;
+    public z: number;
 
     public constructor(x: number, y: number, z: number) {
         this.x = x;

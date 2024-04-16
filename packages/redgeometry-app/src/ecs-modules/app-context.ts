@@ -444,16 +444,16 @@ export class AppContextPlugin implements WorldPlugin {
     }
 
     private addPolygon(ctx: CanvasRenderingContext2D | OffscreenCanvasRenderingContext2D, poly: Polygon2): void {
-        const vertices = poly.getPoints();
+        const points = poly.points;
 
-        if (vertices.length === 0) {
+        if (points.length === 0) {
             return;
         }
 
-        ctx.moveTo(vertices[0].x, vertices[0].y);
+        ctx.moveTo(points[0].x, points[0].y);
 
-        for (let i = 1; i < vertices.length; i++) {
-            ctx.lineTo(vertices[i].x, vertices[i].y);
+        for (let i = 1; i < points.length; i++) {
+            ctx.lineTo(points[i].x, points[i].y);
         }
 
         ctx.closePath();

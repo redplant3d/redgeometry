@@ -5,10 +5,10 @@ import { Vector2 } from "./vector.js";
  * A complex number to be used for 2D rotations.
  */
 export class Complex {
-    public readonly a: number;
-    public readonly b: number;
+    public static readonly IDENTITY: Readonly<Complex> = new Complex(1, 0);
 
-    public static IDENTITY = new Complex(1, 0);
+    public a: number;
+    public b: number;
 
     public constructor(a: number, b: number) {
         this.a = a;

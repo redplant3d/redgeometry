@@ -6,7 +6,7 @@ import type { Matrix3, Matrix3A } from "./matrix.js";
 import { Point2 } from "./point.js";
 
 export class Polygon2 {
-    private points: Point2[];
+    public points: Point2[];
 
     public constructor(points: Point2[]) {
         this.points = points;
@@ -243,10 +243,6 @@ export class Polygon2 {
         }
 
         return new Polygon2(points);
-    }
-
-    public getPoints(): readonly Point2[] {
-        return this.points;
     }
 
     public hasPoints(): boolean {

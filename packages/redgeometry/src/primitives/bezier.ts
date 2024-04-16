@@ -24,8 +24,8 @@ export enum CurveType {
 export type BezierCurve2 = Bezier1Curve2 | Bezier2Curve2 | Bezier3Curve2 | BezierRCurve2;
 
 export class Bezier1Curve2 {
-    public readonly p0: Point2;
-    public readonly p1: Point2;
+    public p0: Point2;
+    public p1: Point2;
 
     public constructor(p0: Point2, p1: Point2) {
         this.p0 = p0;
@@ -174,9 +174,9 @@ export class Bezier1Curve2 {
 }
 
 export class Bezier2Curve2 {
-    public readonly p0: Point2;
-    public readonly p1: Point2;
-    public readonly p2: Point2;
+    public p0: Point2;
+    public p1: Point2;
+    public p2: Point2;
 
     public constructor(p0: Point2, p1: Point2, p2: Point2) {
         this.p0 = p0;
@@ -508,10 +508,10 @@ export class Bezier2Curve2 {
 }
 
 export class Bezier3Curve2 {
-    public readonly p0: Point2;
-    public readonly p1: Point2;
-    public readonly p2: Point2;
-    public readonly p3: Point2;
+    public p0: Point2;
+    public p1: Point2;
+    public p2: Point2;
+    public p3: Point2;
 
     public constructor(p0: Point2, p1: Point2, p2: Point2, p3: Point2) {
         this.p0 = p0;
@@ -851,10 +851,10 @@ export class Bezier3Curve2 {
 }
 
 export class BezierRCurve2 {
-    public readonly p0: Point2;
-    public readonly p1: Point2;
-    public readonly p2: Point2;
-    public readonly w: number;
+    public p0: Point2;
+    public p1: Point2;
+    public p2: Point2;
+    public w: number;
 
     public constructor(p0: Point2, p1: Point2, p2: Point2, w: number) {
         this.p0 = p0;

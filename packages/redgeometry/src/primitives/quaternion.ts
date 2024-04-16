@@ -19,12 +19,12 @@ export enum RotationOrder {
  * - https://danceswithcode.net/engineeringnotes/quaternions/quaternions.html
  */
 export class Quaternion {
-    public readonly a: number;
-    public readonly b: number;
-    public readonly c: number;
-    public readonly d: number;
+    public static readonly IDENTITY: Readonly<Quaternion> = new Quaternion(1, 0, 0, 0);
 
-    public static IDENTITY = new Quaternion(1, 0, 0, 0);
+    public a: number;
+    public b: number;
+    public c: number;
+    public d: number;
 
     public constructor(a: number, b: number, c: number, d: number) {
         this.a = a;

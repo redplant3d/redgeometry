@@ -6,8 +6,8 @@ import { Point2, Point3 } from "./point.js";
 import type { Vector2, Vector3 } from "./vector.js";
 
 export class Edge2 {
-    public readonly p0: Point2;
-    public readonly p1: Point2;
+    public p0: Point2;
+    public p1: Point2;
 
     public constructor(p0: Point2, p1: Point2) {
         this.p0 = p0;
@@ -360,8 +360,8 @@ export class Edge2 {
 }
 
 export class Edge3 {
-    public readonly p0: Point3;
-    public readonly p1: Point3;
+    public p0: Point3;
+    public p1: Point3;
 
     public constructor(p0: Point3, p1: Point3) {
         this.p0 = p0;

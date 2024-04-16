@@ -2,8 +2,8 @@ import { Point2, Point3 } from "./point.js";
 import { Vector2, Vector3 } from "./vector.js";
 
 export class Ray2 {
-    public readonly p: Point2;
-    public readonly v: Vector2;
+    public p: Point2;
+    public v: Vector2;
 
     constructor(p: Point2, v: Vector2) {
         this.p = p;
@@ -64,8 +64,8 @@ export class Ray2 {
 }
 
 export class Ray3 {
-    public readonly p: Point3;
-    public readonly v: Vector3;
+    public p: Point3;
+    public v: Vector3;
 
     constructor(p: Point3, v: Vector3) {
         this.p = p;
