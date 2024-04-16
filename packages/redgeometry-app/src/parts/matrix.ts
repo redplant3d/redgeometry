@@ -104,7 +104,7 @@ function updateSystem(world: World): void {
 
     // Model view
     const d = (rotation * Math.PI) / 180;
-    const q = Quaternion.fromRotationEuler(1.1 * d, 1.3 * d, 1.7 * d, RotationOrder.ZYX);
+    const q = Quaternion.fromRotationEuler(1.1 * d, 1.3 * d, 1.7 * d, RotationOrder.XYZ);
 
     const matView = Matrix4.createIdentity();
     matView.rotate(q.a, q.b, q.c, q.d);

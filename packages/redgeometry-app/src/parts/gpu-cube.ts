@@ -175,7 +175,7 @@ function beginFrameSystem(world: World): void {
         const transformComp = world.getComponent<TransformComponent>(parentEntity, "transform");
 
         if (transformComp !== undefined) {
-            transformComp.rotation = Quaternion.fromRotationEuler(0, a, 0, RotationOrder.XYZ);
+            transformComp.rotation = Quaternion.fromRotationAngleY(a);
             world.updateComponent<TransformComponent>(parentEntity, "transform");
         }
     }
@@ -338,7 +338,7 @@ function cameraMoveSystem(world: World): void {
         const yaw = sens * dx;
         const pitch = sens * dy;
 
-        camRot = camRot.rotateYPre(yaw).rotateX(pitch);
+        camRot = camRot.rotateXPre(pitch).rotateY(yaw);
     }
 
     transform.rotation = camRot;

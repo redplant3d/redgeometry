@@ -46,7 +46,8 @@ export class Complex {
     }
 
     public inverse(): Complex {
-        return this.unit().conjugate();
+        const d = this.lenSq();
+        return new Complex(this.a / d, -this.b / d);
     }
 
     public len(): number {
@@ -59,8 +60,8 @@ export class Complex {
 
     /**
      * ```
-     * | a | * | ca |
-     * | b |   | cb |
+     * | a | * | za |
+     * | b |   | zb |
      * ```
      */
     public mul(z: Complex): Complex {
@@ -87,10 +88,10 @@ export class Complex {
         return new Vector2(this.a * v.x - this.b * v.y, this.a * v.y + this.b * v.x);
     }
 
-    public rotate(a: number): Complex {
-        const sin = Math.sin(a);
-        const cos = Math.cos(a);
-        return new Complex(this.a * cos - this.b * sin, this.b * cos + this.a * sin);
+    public rotate(angle: number): Complex {
+        const sin = Math.sin(angle);
+        const cos = Math.cos(angle);
+        return new Complex(cos * this.a - sin * this.b, cos * this.b + sin * this.a);
     }
 
     public sub(z: Complex): Complex {
@@ -106,7 +107,7 @@ export class Complex {
     }
 
     public unit(): Complex {
-        const len = this.len();
-        return new Complex(this.a / len, this.b / len);
+        const d = this.len();
+        return new Complex(this.a / d, this.b / d);
     }
 }

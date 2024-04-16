@@ -4,6 +4,14 @@ import { Matrix3, Matrix3A, Matrix4, Matrix4A } from "../../src/primitives/matri
 import { Point2, Point3 } from "../../src/primitives/point.js";
 import { Quaternion, RotationOrder } from "../../src/primitives/quaternion.js";
 import { Vector2, Vector3 } from "../../src/primitives/vector.js";
+import {
+    expectToBeCloseComplex,
+    expectToBeClosePoint2,
+    expectToBeClosePoint3,
+    expectToBeCloseQuaternion,
+    expectToBeCloseVector2,
+    expectToBeCloseVector3,
+} from "../expect.js";
 
 test("Matrix3A - extract", () => {
     const v = new Vector2(1, 2);
@@ -17,14 +25,9 @@ test("Matrix3A - extract", () => {
 
     const { s, r, t } = mat.extractSRT();
 
-    expect(s.x).toBeCloseTo(v.x, 15);
-    expect(s.y).toBeCloseTo(v.y, 15);
-
-    expect(r.a).toBeCloseTo(z.a, 15);
-    expect(r.b).toBeCloseTo(z.b, 15);
-
-    expect(t.x).toBeCloseTo(p.x, 15);
-    expect(t.y).toBeCloseTo(p.y, 15);
+    expectToBeCloseVector2(s, v, 14);
+    expectToBeCloseComplex(r, z, 14);
+    expectToBeClosePoint2(t, p, 14);
 });
 
 test("Matrix3A - inverse", () => {
@@ -112,14 +115,9 @@ test("Matrix3 - extract", () => {
 
     const { s, r, t } = mat.extractSRT();
 
-    expect(s.x).toBeCloseTo(v.x, 15);
-    expect(s.y).toBeCloseTo(v.y, 15);
-
-    expect(r.a).toBeCloseTo(z.a, 15);
-    expect(r.b).toBeCloseTo(z.b, 15);
-
-    expect(t.x).toBeCloseTo(p.x, 15);
-    expect(t.y).toBeCloseTo(p.y, 15);
+    expectToBeCloseVector2(s, v, 14);
+    expectToBeCloseComplex(r, z, 14);
+    expectToBeClosePoint2(t, p, 14);
 });
 
 test("Matrix3 - inverse", () => {
@@ -207,18 +205,9 @@ test("Matrix4A - extract", () => {
 
     const { s, r, t } = mat.extractSRT();
 
-    expect(s.x).toBeCloseTo(v.x, 15);
-    expect(s.y).toBeCloseTo(v.y, 15);
-    expect(s.z).toBeCloseTo(v.z, 15);
-
-    expect(r.a).toBeCloseTo(q.a, 15);
-    expect(r.b).toBeCloseTo(q.b, 15);
-    expect(r.c).toBeCloseTo(q.c, 15);
-    expect(r.d).toBeCloseTo(q.d, 15);
-
-    expect(t.x).toBeCloseTo(p.x, 15);
-    expect(t.y).toBeCloseTo(p.y, 15);
-    expect(t.z).toBeCloseTo(p.z, 15);
+    expectToBeCloseVector3(s, v, 14);
+    expectToBeCloseQuaternion(r, q, 14);
+    expectToBeClosePoint3(t, p, 14);
 });
 
 test("Matrix4A - inverse", () => {
@@ -344,18 +333,9 @@ test("Matrix4 - extract", () => {
 
     const { s, r, t } = mat.extractSRT();
 
-    expect(s.x).toBeCloseTo(v.x, 15);
-    expect(s.y).toBeCloseTo(v.y, 15);
-    expect(s.z).toBeCloseTo(v.z, 15);
-
-    expect(r.a).toBeCloseTo(q.a, 15);
-    expect(r.b).toBeCloseTo(q.b, 15);
-    expect(r.c).toBeCloseTo(q.c, 15);
-    expect(r.d).toBeCloseTo(q.d, 15);
-
-    expect(t.x).toBeCloseTo(p.x, 15);
-    expect(t.y).toBeCloseTo(p.y, 15);
-    expect(t.z).toBeCloseTo(p.z, 15);
+    expectToBeCloseVector3(s, v, 14);
+    expectToBeCloseQuaternion(r, q, 14);
+    expectToBeClosePoint3(t, p, 14);
 });
 
 test("Matrix4 - inverse", () => {
