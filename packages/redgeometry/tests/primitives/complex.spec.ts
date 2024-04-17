@@ -20,9 +20,9 @@ test("Complex - rotate", () => {
     const a = 1;
     const z = Complex.fromRotationAngle(a);
 
-    const z1 = z.rotate(-a);
+    z.rotate(-a);
 
-    expectToBeCloseComplex(z1, Complex.createIdentity());
+    expectToBeCloseComplex(z, Complex.createIdentity());
 });
 
 test("Quaternion - mulPt/mulVec", () => {

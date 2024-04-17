@@ -94,10 +94,14 @@ export class Complex {
         return new Vector2(this.a * v.x - this.b * v.y, this.a * v.y + this.b * v.x);
     }
 
-    public rotate(angle: number): Complex {
+    public rotate(angle: number): void {
         const sin = Math.sin(angle);
         const cos = Math.cos(angle);
-        return new Complex(cos * this.a - sin * this.b, cos * this.b + sin * this.a);
+        const a = this.a;
+        const b = this.b;
+
+        this.a = cos * a - sin * b;
+        this.b = cos * b + sin * a;
     }
 
     public sub(z: Complex): Complex {

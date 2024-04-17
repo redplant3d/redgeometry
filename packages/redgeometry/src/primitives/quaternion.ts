@@ -267,100 +267,112 @@ export class Quaternion {
         );
     }
 
-    public rotateX(angleX: number): Quaternion {
+    public rotateX(angleX: number): void {
         const sin = Math.sin(0.5 * angleX);
         const cos = Math.cos(0.5 * angleX);
+        const a = this.a;
+        const b = this.b;
+        const c = this.c;
+        const d = this.d;
 
         // | cos |   | a |
         // | sin | * | b |
         // |   0 |   | c |
         // |   0 |   | d |
-        return new Quaternion(
-            cos * this.a - sin * this.b,
-            cos * this.b + sin * this.a,
-            cos * this.c - sin * this.d,
-            cos * this.d + sin * this.c,
-        );
+        this.a = cos * a - sin * b;
+        this.b = cos * b + sin * a;
+        this.c = cos * c - sin * d;
+        this.d = cos * d + sin * c;
     }
 
-    public rotateXPre(angleX: number): Quaternion {
+    public rotateXPre(angleX: number): void {
         const sin = Math.sin(0.5 * angleX);
         const cos = Math.cos(0.5 * angleX);
+        const a = this.a;
+        const b = this.b;
+        const c = this.c;
+        const d = this.d;
 
         // | a |   | cos |
         // | b | * | sin |
         // | c |   |   0 |
         // | d |   |   0 |
-        return new Quaternion(
-            this.a * cos - this.b * sin,
-            this.b * cos + this.a * sin,
-            this.c * cos + this.d * sin,
-            this.d * cos - this.c * sin,
-        );
+        this.a = a * cos - b * sin;
+        this.b = b * cos + a * sin;
+        this.c = c * cos + d * sin;
+        this.d = d * cos - c * sin;
     }
 
-    public rotateY(angleY: number): Quaternion {
+    public rotateY(angleY: number): void {
         const sin = Math.sin(0.5 * angleY);
         const cos = Math.cos(0.5 * angleY);
+        const a = this.a;
+        const b = this.b;
+        const c = this.c;
+        const d = this.d;
 
         // | cos |   | a |
         // |   0 | * | b |
         // | sin |   | c |
         // |   0 |   | d |
-        return new Quaternion(
-            cos * this.a - sin * this.c,
-            cos * this.b + sin * this.d,
-            cos * this.c + sin * this.a,
-            cos * this.d - sin * this.b,
-        );
+        this.a = cos * a - sin * c;
+        this.b = cos * b + sin * d;
+        this.c = cos * c + sin * a;
+        this.d = cos * d - sin * b;
     }
 
-    public rotateYPre(angleY: number): Quaternion {
+    public rotateYPre(angleY: number): void {
         const sin = Math.sin(0.5 * angleY);
         const cos = Math.cos(0.5 * angleY);
+        const a = this.a;
+        const b = this.b;
+        const c = this.c;
+        const d = this.d;
 
         // | a |   | cos |
         // | b | * |   0 |
         // | c |   | sin |
         // | d |   |   0 |
-        return new Quaternion(
-            this.a * cos - this.c * sin,
-            this.b * cos - this.d * sin,
-            this.c * cos + this.a * sin,
-            this.d * cos + this.b * sin,
-        );
+        this.a = a * cos - c * sin;
+        this.b = b * cos - d * sin;
+        this.c = c * cos + a * sin;
+        this.d = d * cos + b * sin;
     }
 
-    public rotateZ(angleZ: number): Quaternion {
+    public rotateZ(angleZ: number): void {
         const sin = Math.sin(0.5 * angleZ);
         const cos = Math.cos(0.5 * angleZ);
+        const a = this.a;
+        const b = this.b;
+        const c = this.c;
+        const d = this.d;
 
         // | cos |   | a |
         // |   0 | * | b |
         // |   0 |   | c |
         // | sin |   | d |
-        return new Quaternion(
-            cos * this.a - sin * this.d,
-            cos * this.b - sin * this.c,
-            cos * this.c + sin * this.b,
-            cos * this.d + sin * this.a,
-        );
+        this.a = cos * a - sin * d;
+        this.b = cos * b - sin * c;
+        this.c = cos * c + sin * b;
+        this.d = cos * d + sin * a;
     }
 
-    public rotateZPre(angleZ: number): Quaternion {
+    public rotateZPre(angleZ: number): void {
         const sin = Math.sin(0.5 * angleZ);
         const cos = Math.cos(0.5 * angleZ);
+        const a = this.a;
+        const b = this.b;
+        const c = this.c;
+        const d = this.d;
 
         // | a |   | cos |
         // | b | * |   0 |
         // | c |   |   0 |
         // | d |   | sin |
-        return new Quaternion(
-            this.a * cos - this.d * sin,
-            this.b * cos + this.c * sin,
-            this.c * cos - this.b * sin,
-            this.d * cos + this.a * sin,
-        );
+        this.a = a * cos - d * sin;
+        this.b = b * cos + c * sin;
+        this.c = c * cos - b * sin;
+        this.d = d * cos + a * sin;
     }
 
     public sub(q: Quaternion): Quaternion {

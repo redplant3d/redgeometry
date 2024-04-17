@@ -300,8 +300,22 @@ function cameraMoveSystem(world: World): void {
         return;
     }
 
-    let camRot = transform.rotation;
-    let camPos = transform.translation;
+    const camRot = transform.rotation;
+
+    if (mouse.isPressing(MouseButtons.Mouse3)) {
+        let dx = 0;
+        let dy = 0;
+
+        for (const ev of world.readEvents<InputMouseMotionEvent>("input-mouse-motion")) {
+            dx -= ev.movementX;
+            dy -= ev.movementY;
+        }
+
+        const sens = 1 / 250;
+
+        camRot.rotateXPre(sens * dy);
+        camRot.rotateY(sens * dx);
+    }
 
     let vel = 0.005;
     let x = 0;
@@ -322,27 +336,8 @@ function cameraMoveSystem(world: World): void {
         v = v.unitOrZero().mul(delta * vel);
         v = camRot.mulVec(v);
 
-        camPos = camPos.add(v);
+        transform.translation = transform.translation.add(v);
     }
-
-    if (mouse.isPressing(MouseButtons.Mouse3)) {
-        let dx = 0;
-        let dy = 0;
-
-        for (const ev of world.readEvents<InputMouseMotionEvent>("input-mouse-motion")) {
-            dx -= ev.movementX;
-            dy -= ev.movementY;
-        }
-
-        const sens = 1 / 250;
-        const yaw = sens * dx;
-        const pitch = sens * dy;
-
-        camRot = camRot.rotateXPre(pitch).rotateY(yaw);
-    }
-
-    transform.rotation = camRot;
-    transform.translation = camPos;
 
     world.updateComponent<TransformComponent>(mainCamera, "transform");
 
