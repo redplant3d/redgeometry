@@ -84,6 +84,11 @@ export class Polygon2 {
         this.points = [];
     }
 
+    public clone(): Polygon2 {
+        const points = this.points.map((p) => p.clone());
+        return new Polygon2(points);
+    }
+
     public findClosestEdgePoint(p: Point2): Edge2 | undefined {
         let minDistSq = Number.POSITIVE_INFINITY;
         let closestEdge: Edge2 | undefined;

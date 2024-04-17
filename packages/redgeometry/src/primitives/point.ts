@@ -83,6 +83,10 @@ export class Point2 {
         return new Point2(x, y);
     }
 
+    public clone(): Point2 {
+        return new Point2(this.x, this.y);
+    }
+
     public copyTo(data: number[], offset = 0): void {
         data[offset] = this.x;
         data[offset + 1] = this.y;
@@ -212,6 +216,10 @@ export class Point3 {
         const y = this.y + f * v.y;
         const z = this.z + f * v.z;
         return new Point3(x, y, z);
+    }
+
+    public clone(): Point3 {
+        return new Point3(this.x, this.y, this.z);
     }
 
     public copyTo(data: number[], offset = 0): void {

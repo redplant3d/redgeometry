@@ -47,6 +47,10 @@ export class ColorRgba {
         return new ColorRgba(r / 255, g / 255, b / 255, a / 255);
     }
 
+    public clone(): ColorRgba {
+        return new ColorRgba(this.r, this.g, this.b, this.a);
+    }
+
     public style(): string {
         const r = this.clampFloatToHex(this.r);
         const g = this.clampFloatToHex(this.g);

@@ -31,6 +31,10 @@ export class Complex {
         return new Complex(this.a + z.a, this.b + z.b);
     }
 
+    public clone(): Complex {
+        return new Complex(this.a, this.b);
+    }
+
     public conjugate(): Complex {
         return new Complex(this.a, -this.b);
     }

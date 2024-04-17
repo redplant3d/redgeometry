@@ -21,6 +21,10 @@ export class Ray2 {
         return new Ray2(p, v);
     }
 
+    public clone(): Ray2 {
+        return new Ray2(this.p.clone(), this.v.clone());
+    }
+
     /**
      * Returns the parameterized value where a point `p` is orthogonal on the ray.
      */
@@ -81,6 +85,10 @@ export class Ray3 {
         const p = new Point3(px, py, pz);
         const v = new Vector3(vx, vy, vz);
         return new Ray3(p, v);
+    }
+
+    public clone(): Ray3 {
+        return new Ray3(this.p.clone(), this.v.clone());
     }
 
     /**

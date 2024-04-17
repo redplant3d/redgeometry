@@ -44,6 +44,10 @@ export class Box2 {
         return new Box2(x0, y0, x1, y1);
     }
 
+    public clone(): Box2 {
+        return new Box2(this.x0, this.y0, this.x1, this.y1);
+    }
+
     public contains(p: Point2): boolean {
         return this.x0 < p.x && this.y0 < p.y && this.x1 > p.x && this.y1 > p.y;
     }
@@ -171,6 +175,10 @@ export class Box3 {
         const z1 = Math.max(p0.z, p1.z);
 
         return new Box3(x0, y0, z0, x1, y1, z1);
+    }
+
+    public clone(): Box3 {
+        return new Box3(this.x0, this.y0, this.z0, this.x1, this.y1, this.z1);
     }
 
     public contains(p: Point3): boolean {

@@ -99,6 +99,10 @@ export class Vector2 {
         return new Vector2(x, y);
     }
 
+    public clone(): Vector2 {
+        return new Vector2(this.x, this.y);
+    }
+
     public copyTo(data: number[], offset = 0): void {
         data[offset] = this.x;
         data[offset + 1] = this.y;
@@ -301,6 +305,10 @@ export class Vector3 {
         const y = clamp(this.y, vmin.y, vmax.y);
         const z = clamp(this.z, vmin.z, vmax.z);
         return new Vector3(x, y, z);
+    }
+
+    public clone(): Vector3 {
+        return new Vector3(this.x, this.y, this.z);
     }
 
     public copyTo(data: number[], offset = 0): void {

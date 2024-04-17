@@ -170,6 +170,10 @@ export class Quaternion {
         return new Vector3(this.b, this.c, this.d);
     }
 
+    public clone(): Quaternion {
+        return new Quaternion(this.a, this.b, this.c, this.d);
+    }
+
     public conjugate(): Quaternion {
         return new Quaternion(this.a, -this.b, -this.c, -this.d);
     }

@@ -68,6 +68,10 @@ export class Bezier1Curve2 {
         return result;
     }
 
+    public clone(): Bezier1Curve2 {
+        return new Bezier1Curve2(this.p0.clone(), this.p1.clone());
+    }
+
     public getBounds(): Box2 {
         return Box2.fromPoints(this.p0, this.p1);
     }
@@ -198,6 +202,10 @@ export class Bezier2Curve2 {
         const p2 = new Point2(x2, y2);
 
         return new Bezier2Curve2(p0, p1, p2);
+    }
+
+    public clone(): Bezier2Curve2 {
+        return new Bezier2Curve2(this.p0.clone(), this.p1.clone(), this.p2.clone());
     }
 
     public getBounds(): Box2 {
@@ -544,6 +552,10 @@ export class Bezier3Curve2 {
         const p3 = new Point2(x3, y3);
 
         return new Bezier3Curve2(p0, p1, p2, p3);
+    }
+
+    public clone(): Bezier3Curve2 {
+        return new Bezier3Curve2(this.p0.clone(), this.p1.clone(), this.p2.clone(), this.p3.clone());
     }
 
     public getBounds(): Box2 {
@@ -913,6 +925,10 @@ export class BezierRCurve2 {
         const v2 = p2.sub(pc);
 
         return v1.dot(v2) / Math.sqrt(v1.lenSq() * v2.lenSq());
+    }
+
+    public clone(): BezierRCurve2 {
+        return new BezierRCurve2(this.p0.clone(), this.p1.clone(), this.p2.clone(), this.w);
     }
 
     public getBounds(): Box2 {

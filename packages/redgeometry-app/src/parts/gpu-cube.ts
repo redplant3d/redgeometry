@@ -301,6 +301,7 @@ function cameraMoveSystem(world: World): void {
     }
 
     const camRot = transform.rotation;
+    const camPos = transform.translation;
 
     if (mouse.isPressing(MouseButtons.Mouse3)) {
         let dx = 0;
@@ -336,7 +337,7 @@ function cameraMoveSystem(world: World): void {
         v = v.unitOrZero().mul(delta * vel);
         v = camRot.mulVec(v);
 
-        transform.translation = transform.translation.add(v);
+        transform.translation = camPos.add(v);
     }
 
     world.updateComponent<TransformComponent>(mainCamera, "transform");

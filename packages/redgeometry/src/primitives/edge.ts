@@ -267,6 +267,10 @@ export class Edge2 {
         return e1.p0.eq(e2.p1) && e1.p1.eq(e2.p0);
     }
 
+    public clone(): Edge2 {
+        return new Edge2(this.p0.clone(), this.p1.clone());
+    }
+
     public eq(e: Edge2): boolean {
         return this.p0.eq(e.p0) && this.p1.eq(e.p1);
     }
@@ -393,6 +397,10 @@ export class Edge3 {
 
     public static isOpposite(e1: Edge3, e2: Edge3): boolean {
         return e1.p0.eq(e2.p1) && e1.p1.eq(e2.p0);
+    }
+
+    public clone(): Edge3 {
+        return new Edge3(this.p0.clone(), this.p1.clone());
     }
 
     public eq(e: Edge3): boolean {
