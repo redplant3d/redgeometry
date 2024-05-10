@@ -116,7 +116,7 @@ export class Complex {
         return new Complex(this.a - z.a, this.b - z.b);
     }
 
-    public toArray(): number[] {
+    public toArray(): [number, number] {
         return [this.a, this.b];
     }
 

@@ -31,6 +31,10 @@ export class Box2 {
         return new Box2(obj.x0, obj.y0, obj.x1, obj.y1);
     }
 
+    public static fromArray(data: number[], offset = 0): Box2 {
+        return new Box2(data[offset], data[offset + 1], data[offset + 2], data[offset + 3]);
+    }
+
     public static fromPoints(p0: Point2, p1: Point2): Box2 {
         const x0 = Math.min(p0.x, p1.x);
         const y0 = Math.min(p0.y, p1.y);
@@ -133,6 +137,10 @@ export class Box2 {
         return new Box2(this.x0 - dx, this.y0 - dy, this.x1 + dx, this.y1 + dy);
     }
 
+    public toArray(): [number, number, number, number] {
+        return [this.x0, this.y0, this.x1, this.y1];
+    }
+
     public toString(): string {
         return `{x0: ${this.x0}, y0: ${this.y0}, x1: ${this.x1}, y1: ${this.y1}}`;
     }
@@ -189,6 +197,17 @@ export class Box3 {
 
     public static from(obj: { x0: number; y0: number; z0: number; x1: number; y1: number; z1: number }): Box3 {
         return new Box3(obj.x0, obj.y0, obj.z0, obj.x1, obj.y1, obj.z1);
+    }
+
+    public static fromArray(data: number[], offset = 0): Box3 {
+        return new Box3(
+            data[offset],
+            data[offset + 1],
+            data[offset + 2],
+            data[offset + 3],
+            data[offset + 4],
+            data[offset + 5],
+        );
     }
 
     public static fromPoints(p0: Point3, p1: Point3): Box3 {
@@ -316,6 +335,10 @@ export class Box3 {
 
     public scaleAbsolute(dx: number, dy: number, dz: number): Box3 {
         return new Box3(this.x0 - dx, this.y0 - dy, this.z0 - dz, this.x1 + dx, this.y1 + dy, this.z1 + dz);
+    }
+
+    public toArray(): [number, number, number, number, number, number] {
+        return [this.x0, this.y0, this.z0, this.x1, this.y1, this.z1];
     }
 
     public toString(): string {

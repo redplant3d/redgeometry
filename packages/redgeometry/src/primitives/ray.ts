@@ -14,6 +14,13 @@ export class Ray2 {
         return new Ray2(obj.p, obj.v);
     }
 
+    public static fromArray(data: number[], offset = 0): Ray2 {
+        const p = Point2.fromArray(data, offset);
+        const v = Vector2.fromArray(data, offset + 2);
+
+        return new Ray2(p, v);
+    }
+
     public static fromPoints(p0: Point2, p1: Point2): Ray2 {
         const v = p1.sub(p0);
         return new Ray2(p0, v);
@@ -62,6 +69,10 @@ export class Ray2 {
         return new Ray2(this.p, this.v.neg());
     }
 
+    public toArray(): [number, number, number, number] {
+        return [this.p.x, this.p.y, this.v.x, this.v.y];
+    }
+
     public toString(): string {
         return `{p: ${this.p}, p: ${this.p}}`;
     }
@@ -82,6 +93,13 @@ export class Ray3 {
 
     public static from(obj: { p: Point3; v: Vector3 }): Ray3 {
         return new Ray3(obj.p, obj.v);
+    }
+
+    public static fromArray(data: number[], offset = 0): Ray3 {
+        const p = Point3.fromArray(data, offset);
+        const v = Vector3.fromArray(data, offset + 3);
+
+        return new Ray3(p, v);
     }
 
     public static fromPoints(p0: Point3, p1: Point3): Ray3 {
@@ -134,6 +152,10 @@ export class Ray3 {
 
     public reverse(): Ray3 {
         return new Ray3(this.p, this.v.neg());
+    }
+
+    public toArray(): [number, number, number, number, number, number] {
+        return [this.p.x, this.p.y, this.p.z, this.v.x, this.v.y, this.v.z];
     }
 
     public toString(): string {

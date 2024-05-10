@@ -45,8 +45,11 @@ export class Edge2 {
         return new Edge2(obj.p0, obj.p1);
     }
 
-    public static fromArray(data: Point2[], offset = 0): Edge2 {
-        return new Edge2(data[offset], data[offset + 1]);
+    public static fromArray(data: number[], offset = 0): Edge2 {
+        const p0 = Point2.fromArray(data, offset);
+        const p1 = Point2.fromArray(data, offset + 2);
+
+        return new Edge2(p0, p1);
     }
 
     public static fromXY(x0: number, y0: number, x1: number, y1: number): Edge2 {
@@ -346,6 +349,10 @@ export class Edge2 {
         return new Edge2(this.p1, this.p0);
     }
 
+    public toArray(): [number, number, number, number] {
+        return [this.p0.x, this.p0.y, this.p1.x, this.p1.y];
+    }
+
     public toBezier(): Bezier1Curve2 {
         return new Bezier1Curve2(this.p0, this.p1);
     }
@@ -376,8 +383,11 @@ export class Edge3 {
         return new Edge3(obj.p0, obj.p1);
     }
 
-    public static fromArray(data: Point3[], offset = 0): Edge3 {
-        return new Edge3(data[offset], data[offset + 1]);
+    public static fromArray(data: number[], offset = 0): Edge3 {
+        const p0 = Point3.fromArray(data, offset);
+        const p1 = Point3.fromArray(data, offset + 3);
+
+        return new Edge3(p0, p1);
     }
 
     public static fromXYZ(x0: number, y0: number, z0: number, x1: number, y1: number, z1: number): Edge3 {
@@ -474,6 +484,10 @@ export class Edge3 {
 
     public reverse(): Edge3 {
         return new Edge3(this.p1, this.p0);
+    }
+
+    public toArray(): [number, number, number, number, number, number] {
+        return [this.p0.x, this.p0.y, this.p0.z, this.p1.x, this.p1.y, this.p1.z];
     }
 
     public toString(): string {

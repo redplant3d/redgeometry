@@ -194,7 +194,7 @@ export class Vector2 {
         return new Vector2(this.x - v.x, this.y - v.y);
     }
 
-    public toArray(): number[] {
+    public toArray(): [number, number] {
         return [this.x, this.y];
     }
 
@@ -412,7 +412,7 @@ export class Vector3 {
         return new Vector3(this.x - v.x, this.y - v.y, this.z - v.z);
     }
 
-    public toArray(): number[] {
+    public toArray(): [number, number, number] {
         return [this.x, this.y, this.z];
     }
 
@@ -595,7 +595,7 @@ export class Vector4 {
         return new Vector4(this.x - v.x, this.y - v.y, this.z - v.z, this.w - v.w);
     }
 
-    public toArray(): number[] {
+    public toArray(): [number, number, number, number] {
         return [this.x, this.y, this.z, this.w];
     }
 

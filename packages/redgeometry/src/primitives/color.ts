@@ -17,6 +17,10 @@ export class ColorRgba {
         return new ColorRgba(obj.r, obj.g, obj.b, obj.a);
     }
 
+    public static fromArray(data: number[], offset = 0): ColorRgba {
+        return new ColorRgba(data[offset], data[offset + 1], data[offset + 2], data[offset + 3]);
+    }
+
     public static fromHSV(h: number, s: number, v: number, a: number): ColorRgba {
         const i = Math.floor(h * 6);
         const f = h * 6 - i;
@@ -61,6 +65,10 @@ export class ColorRgba {
         const b = this.clampFloatToHex(this.b);
         const a = this.clampFloatToHex(this.a);
         return `#${r}${g}${b}${a}`;
+    }
+
+    public toArray(): [number, number, number, number] {
+        return [this.r, this.g, this.b, this.a];
     }
 
     private clampFloatToHex(f: number): string {

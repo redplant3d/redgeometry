@@ -44,6 +44,13 @@ export class Bezier1Curve2 {
         return new Bezier1Curve2(obj.p0, obj.p1);
     }
 
+    public static fromArray(data: number[], offset = 0): Bezier1Curve2 {
+        const p0 = Point2.fromArray(data, offset);
+        const p1 = Point2.fromArray(data, offset + 2);
+
+        return new Bezier1Curve2(p0, p1);
+    }
+
     public static fromXY(x0: number, y0: number, x1: number, y1: number): Bezier1Curve2 {
         const p0 = new Point2(x0, y0);
         const p1 = new Point2(x1, y1);
@@ -172,6 +179,10 @@ export class Bezier1Curve2 {
         return new Bezier1Curve2(tp0, tp1);
     }
 
+    public toArray(): [number, number, number, number] {
+        return [this.p0.x, this.p0.y, this.p1.x, this.p1.y];
+    }
+
     public toEdge(): Edge2 {
         return new Edge2(this.p0, this.p1);
     }
@@ -202,6 +213,14 @@ export class Bezier2Curve2 {
 
     public static from(obj: { p0: Point2; p1: Point2; p2: Point2 }): Bezier2Curve2 {
         return new Bezier2Curve2(obj.p0, obj.p1, obj.p2);
+    }
+
+    public static fromArray(data: number[], offset = 0): Bezier2Curve2 {
+        const p0 = Point2.fromArray(data, offset);
+        const p1 = Point2.fromArray(data, offset + 2);
+        const p2 = Point2.fromArray(data, offset + 4);
+
+        return new Bezier2Curve2(p0, p1, p2);
     }
 
     public static fromXY(x0: number, y0: number, x1: number, y1: number, x2: number, y2: number): Bezier2Curve2 {
@@ -518,6 +537,10 @@ export class Bezier2Curve2 {
         return new Bezier2Curve2(tp0, tp1, tp2);
     }
 
+    public toArray(): [number, number, number, number, number, number] {
+        return [this.p0.x, this.p0.y, this.p1.x, this.p1.y, this.p2.x, this.p2.y];
+    }
+
     public toString(): string {
         return `{p0: ${this.p0}, p1: ${this.p1}, p2: ${this.p2}}`;
     }
@@ -546,6 +569,15 @@ export class Bezier3Curve2 {
 
     public static from(obj: { p0: Point2; p1: Point2; p2: Point2; p3: Point2 }): Bezier3Curve2 {
         return new Bezier3Curve2(obj.p0, obj.p1, obj.p2, obj.p3);
+    }
+
+    public static fromArray(data: number[], offset = 0): Bezier3Curve2 {
+        const p0 = Point2.fromArray(data, offset);
+        const p1 = Point2.fromArray(data, offset + 2);
+        const p2 = Point2.fromArray(data, offset + 4);
+        const p3 = Point2.fromArray(data, offset + 6);
+
+        return new Bezier3Curve2(p0, p1, p2, p3);
     }
 
     public static fromXY(
@@ -869,6 +901,10 @@ export class Bezier3Curve2 {
         return new Bezier3Curve2(t0p0, t1p1, t0p2, t1p3);
     }
 
+    public toArray(): [number, number, number, number, number, number, number, number] {
+        return [this.p0.x, this.p0.y, this.p1.x, this.p1.y, this.p2.x, this.p2.y, this.p3.x, this.p3.y];
+    }
+
     public toString(): string {
         return `{p0: ${this.p0}, p1: ${this.p1}, p2: ${this.p2},p2: ${this.p3}}`;
     }
@@ -897,6 +933,15 @@ export class BezierRCurve2 {
 
     public static from(obj: { p0: Point2; p1: Point2; p2: Point2; w: number }): BezierRCurve2 {
         return new BezierRCurve2(obj.p0, obj.p1, obj.p2, obj.w);
+    }
+
+    public static fromArray(data: number[], offset = 0): BezierRCurve2 {
+        const p0 = Point2.fromArray(data, offset);
+        const p1 = Point2.fromArray(data, offset + 2);
+        const p2 = Point2.fromArray(data, offset + 4);
+        const w = data[offset + 6];
+
+        return new BezierRCurve2(p0, p1, p2, w);
     }
 
     public static fromCenterPoint(p0: Point2, p1: Point2, p2: Point2, pc: Point2): BezierRCurve2 {
@@ -1210,6 +1255,10 @@ export class BezierRCurve2 {
         const tp2 = t1p1.lerp(t1p2, t1);
 
         return BezierRCurve2.fromProjectivePoints(tp0, tp1, tp2);
+    }
+
+    public toArray(): [number, number, number, number, number, number, number] {
+        return [this.p0.x, this.p0.y, this.p1.x, this.p1.y, this.p2.x, this.p2.y, this.w];
     }
 
     public toString(): string {

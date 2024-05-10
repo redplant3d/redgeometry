@@ -130,7 +130,7 @@ export class Point2 {
         return new Vector2(this.x - p.x, this.y - p.y);
     }
 
-    public toArray(): number[] {
+    public toArray(): [number, number] {
         return [this.x, this.y];
     }
 
@@ -251,7 +251,7 @@ export class Point3 {
         return new Vector3(this.x - v.x, this.y - v.y, this.z - v.z);
     }
 
-    public toArray(): number[] {
+    public toArray(): [number, number, number] {
         return [this.x, this.y, this.z];
     }
 

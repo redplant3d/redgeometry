@@ -428,7 +428,7 @@ export class Matrix3A {
         e[5] = e5;
     }
 
-    public toArray(): number[] {
+    public toArray(): MatrixElements3A {
         return [...this.elements];
     }
 
@@ -1044,7 +1044,7 @@ export class Matrix3 {
         this.set(e0, e1, e2, e3, e4, e5, e6, e7, e8);
     }
 
-    public toArray(): number[] {
+    public toArray(): MatrixElements3 {
         return [...this.elements];
     }
 
@@ -1816,7 +1816,7 @@ export class Matrix4A {
         e[11] = e11;
     }
 
-    public toArray(): number[] {
+    public toArray(): MatrixElements4A {
         return [...this.elements];
     }
 
@@ -2915,7 +2915,7 @@ export class Matrix4 {
         this.set(e0, e1, e2, e3, e4, e5, e6, e7, e8, e9, e10, e11, e12, e13, e14, e15);
     }
 
-    public toArray(): number[] {
+    public toArray(): MatrixElements4 {
         return [...this.elements];
     }
 
