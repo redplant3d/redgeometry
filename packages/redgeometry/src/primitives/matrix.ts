@@ -2,7 +2,7 @@ import type { FixedSizeArray } from "../utility/types.js";
 import { Complex } from "./complex.js";
 import { Point2, Point3 } from "./point.js";
 import { Quaternion } from "./quaternion.js";
-import { Vector2, Vector3 } from "./vector.js";
+import { Vector2, Vector3, Vector4 } from "./vector.js";
 
 export type MatrixElements3A = FixedSizeArray<number, 6>;
 export type MatrixElements3 = FixedSizeArray<number, 9>;
@@ -103,28 +103,31 @@ export class Matrix3A {
     /**
      * Copies values from `mat` into this matrix.
      */
-    public copyFrom(mat: Matrix3A | Matrix3): void {
-        if (mat.type === MatrixType.Affine) {
-            const ea = this.elements;
-            const eb = mat.elements;
+    public copyFromMat3(mat: Matrix3): void {
+        const ea = this.elements;
+        const eb = mat.elements;
 
-            ea[0] = eb[0];
-            ea[1] = eb[1];
-            ea[2] = eb[2];
-            ea[3] = eb[3];
-            ea[4] = eb[4];
-            ea[5] = eb[5];
-        } else {
-            const ea = this.elements;
-            const eb = mat.elements;
+        ea[0] = eb[0];
+        ea[1] = eb[1];
+        ea[2] = eb[3];
+        ea[3] = eb[4];
+        ea[4] = eb[6];
+        ea[5] = eb[7];
+    }
 
-            ea[0] = eb[0];
-            ea[1] = eb[1];
-            ea[2] = eb[3];
-            ea[3] = eb[4];
-            ea[4] = eb[6];
-            ea[5] = eb[7];
-        }
+    /**
+     * Copies values from `mat` into this matrix.
+     */
+    public copyFromMat3A(mat: Matrix3A): void {
+        const ea = this.elements;
+        const eb = mat.elements;
+
+        ea[0] = eb[0];
+        ea[1] = eb[1];
+        ea[2] = eb[2];
+        ea[3] = eb[3];
+        ea[4] = eb[4];
+        ea[5] = eb[5];
     }
 
     /**
@@ -221,7 +224,7 @@ export class Matrix3A {
      * |  0   0   1 |   | 1 |
      * ```
      */
-    public mulPt(p: Point2): Point2 {
+    public mulPt2(p: Point2): Point2 {
         const e = this.elements;
 
         const x = e[0] * p.x + e[2] * p.y + e[4];
@@ -260,13 +263,30 @@ export class Matrix3A {
      * |  0   0   1 |   | 1 |
      * ```
      */
-    public mulVec(v: Vector2): Vector2 {
+    public mulVec2(v: Vector2): Vector2 {
         const e = this.elements;
 
         const x = e[0] * v.x + e[2] * v.y + e[4];
         const y = e[1] * v.x + e[3] * v.y + e[5];
 
         return new Vector2(x, y);
+    }
+
+    /**
+     * ```
+     * | e0  e2  e4 |   | x |
+     * | e1  e3  e5 | * | y |
+     * |  0   0   1 |   | z |
+     * ```
+     */
+    public mulVec3(v: Vector3): Vector3 {
+        const e = this.elements;
+
+        const x = e[0] * v.x + e[2] * v.y + e[4] * v.z;
+        const y = e[1] * v.x + e[3] * v.y + e[5] * v.z;
+        const z = v.z;
+
+        return new Vector3(x, y, z);
     }
 
     /**
@@ -526,6 +546,22 @@ export class Matrix3 {
     }
 
     /**
+     * Creates a matrix from `mat` by omitting the projection and translation parts.
+     */
+    public static fromMat4(mat: Matrix4): Matrix3 {
+        const e = mat.elements;
+        return new Matrix3([e[0], e[1], e[2], e[4], e[5], e[6], e[8], e[9], e[10]]);
+    }
+
+    /**
+     * Creates a matrix from `mat` by omitting the translation part.
+     */
+    public static fromMat4A(mat: Matrix4A): Matrix3 {
+        const e = mat.elements;
+        return new Matrix3([e[0], e[1], e[2], e[3], e[4], e[5], e[6], e[7], e[8]]);
+    }
+
+    /**
      * ```
      * | z0  z2  0 |
      * | z1  z3  0 |
@@ -604,34 +640,37 @@ export class Matrix3 {
     /**
      * Copies values from `mat` into this matrix.
      */
-    public copyFrom(mat: Matrix3A | Matrix3): void {
-        if (mat.type === MatrixType.Projective) {
-            const ea = this.elements;
-            const eb = mat.elements;
+    public copyFromMat3(mat: Matrix3): void {
+        const ea = this.elements;
+        const eb = mat.elements;
 
-            ea[0] = eb[0];
-            ea[1] = eb[1];
-            ea[2] = eb[2];
-            ea[3] = eb[3];
-            ea[4] = eb[4];
-            ea[5] = eb[5];
-            ea[6] = eb[6];
-            ea[7] = eb[7];
-            ea[8] = eb[8];
-        } else {
-            const ea = this.elements;
-            const eb = mat.elements;
+        ea[0] = eb[0];
+        ea[1] = eb[1];
+        ea[2] = eb[2];
+        ea[3] = eb[3];
+        ea[4] = eb[4];
+        ea[5] = eb[5];
+        ea[6] = eb[6];
+        ea[7] = eb[7];
+        ea[8] = eb[8];
+    }
 
-            ea[0] = eb[0];
-            ea[1] = eb[1];
-            ea[2] = 0;
-            ea[3] = eb[2];
-            ea[4] = eb[3];
-            ea[5] = 0;
-            ea[6] = eb[4];
-            ea[7] = eb[5];
-            ea[8] = 1;
-        }
+    /**
+     * Copies values from `mat` into this matrix.
+     */
+    public copyFromMat3A(mat: Matrix3A): void {
+        const ea = this.elements;
+        const eb = mat.elements;
+
+        ea[0] = eb[0];
+        ea[1] = eb[1];
+        ea[2] = 0;
+        ea[3] = eb[2];
+        ea[4] = eb[3];
+        ea[5] = 0;
+        ea[6] = eb[4];
+        ea[7] = eb[5];
+        ea[8] = 1;
     }
 
     /**
@@ -742,7 +781,7 @@ export class Matrix3 {
      * | e2  e5  e8 |   | 1 |
      * ```
      */
-    public mulPt(p: Point2): Point2 {
+    public mulPt2(p: Point2): Point2 {
         const e = this.elements;
 
         const x = e[0] * p.x + e[3] * p.y + e[6];
@@ -785,7 +824,7 @@ export class Matrix3 {
      * | e2  e5  e8 |   | 1 |
      * ```
      */
-    public mulVec(v: Vector2): Vector2 {
+    public mulVec2(v: Vector2): Vector2 {
         const e = this.elements;
 
         const x = e[0] * v.x + e[3] * v.y + e[6];
@@ -793,6 +832,23 @@ export class Matrix3 {
         const w = e[2] * v.x + e[5] * v.y + e[8];
 
         return Vector2.fromXYW(x, y, w);
+    }
+
+    /**
+     * ```
+     * | e0  e3  e6 |   | x |
+     * | e1  e4  e7 | * | y |
+     * | e2  e5  e8 |   | z |
+     * ```
+     */
+    public mulVec3(v: Vector3): Vector3 {
+        const e = this.elements;
+
+        const x = e[0] * v.x + e[3] * v.y + e[6] * v.z;
+        const y = e[1] * v.x + e[4] * v.y + e[7] * v.z;
+        const z = e[2] * v.x + e[5] * v.y + e[8] * v.z;
+
+        return new Vector3(x, y, z);
     }
 
     /**
@@ -1098,18 +1154,6 @@ export class Matrix4A {
         return new Matrix4A([1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0]);
     }
 
-    /**
-     * ```
-     * | 0  0  0  0 |
-     * | 0  0  0  0 |
-     * | 0  0  0  0 |
-     * | 0  0  0  0 |
-     * ```
-     */
-    public static createZero(): Matrix4A {
-        return new Matrix4A([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
-    }
-
     public static fromArray(elements: ArrayLike<number>, offset = 0): Matrix4A {
         const e = elements;
         const i = offset;
@@ -1128,6 +1172,22 @@ export class Matrix4A {
             e[i + 10],
             e[i + 11],
         ]);
+    }
+
+    /**
+     * Creates a matrix from `mat`.
+     */
+    public static fromMat3(mat: Matrix3): Matrix4A {
+        const e = mat.elements;
+        return new Matrix4A([e[0], e[1], e[2], e[3], e[4], e[5], e[6], e[7], e[8], 0, 0, 0]);
+    }
+
+    /**
+     * Creates a matrix from `mat`.
+     */
+    public static fromMat4(mat: Matrix4): Matrix4A {
+        const e = mat.elements;
+        return new Matrix4A([e[0], e[1], e[2], e[4], e[5], e[6], e[8], e[9], e[10], e[12], e[13], e[14]]);
     }
 
     /**
@@ -1250,40 +1310,43 @@ export class Matrix4A {
     /**
      * Copies values from `mat` into this matrix.
      */
-    public copyFrom(mat: Matrix4A | Matrix4): void {
-        if (mat.type === MatrixType.Affine) {
-            const ea = this.elements;
-            const eb = mat.elements;
+    public copyFromMat4(mat: Matrix4): void {
+        const ea = this.elements;
+        const eb = mat.elements;
 
-            ea[0] = eb[0];
-            ea[1] = eb[1];
-            ea[2] = eb[2];
-            ea[3] = eb[3];
-            ea[4] = eb[4];
-            ea[5] = eb[5];
-            ea[6] = eb[6];
-            ea[7] = eb[7];
-            ea[8] = eb[8];
-            ea[9] = eb[9];
-            ea[10] = eb[10];
-            ea[11] = eb[11];
-        } else {
-            const ea = this.elements;
-            const eb = mat.elements;
+        ea[0] = eb[0];
+        ea[1] = eb[1];
+        ea[2] = eb[2];
+        ea[3] = eb[4];
+        ea[4] = eb[5];
+        ea[5] = eb[6];
+        ea[6] = eb[8];
+        ea[7] = eb[9];
+        ea[8] = eb[10];
+        ea[9] = eb[12];
+        ea[10] = eb[13];
+        ea[11] = eb[14];
+    }
 
-            ea[0] = eb[0];
-            ea[1] = eb[1];
-            ea[2] = eb[2];
-            ea[3] = eb[4];
-            ea[4] = eb[5];
-            ea[5] = eb[6];
-            ea[6] = eb[8];
-            ea[7] = eb[9];
-            ea[8] = eb[10];
-            ea[9] = eb[12];
-            ea[10] = eb[13];
-            ea[11] = eb[14];
-        }
+    /**
+     * Copies values from `mat` into this matrix.
+     */
+    public copyFromMat4A(mat: Matrix4A): void {
+        const ea = this.elements;
+        const eb = mat.elements;
+
+        ea[0] = eb[0];
+        ea[1] = eb[1];
+        ea[2] = eb[2];
+        ea[3] = eb[3];
+        ea[4] = eb[4];
+        ea[5] = eb[5];
+        ea[6] = eb[6];
+        ea[7] = eb[7];
+        ea[8] = eb[8];
+        ea[9] = eb[9];
+        ea[10] = eb[10];
+        ea[11] = eb[11];
     }
 
     /**
@@ -1419,7 +1482,7 @@ export class Matrix4A {
      * |  0   0   0    1 |   | 1 |
      * ```
      */
-    public mulPt(p: Point3): Point3 {
+    public mulPt3(p: Point3): Point3 {
         const e = this.elements;
 
         const x = e[0] * p.x + e[3] * p.y + e[6] * p.z + e[9];
@@ -1468,7 +1531,7 @@ export class Matrix4A {
      * |  0   0   0    1 |   | 1 |
      * ```
      */
-    public mulVec(v: Vector3): Vector3 {
+    public mulVec3(v: Vector3): Vector3 {
         const e = this.elements;
 
         const x = e[0] * v.x + e[3] * v.y + e[6] * v.z + e[9];
@@ -1476,6 +1539,25 @@ export class Matrix4A {
         const z = e[2] * v.x + e[5] * v.y + e[8] * v.z + e[11];
 
         return new Vector3(x, y, z);
+    }
+
+    /**
+     * ```
+     * | e0  e3  e6   e9 |   | x |
+     * | e1  e4  e7  e10 | * | y |
+     * | e2  e5  e8  e11 |   | z |
+     * |  0   0   0    1 |   | w |
+     * ```
+     */
+    public mulVec4(v: Vector4): Vector4 {
+        const e = this.elements;
+
+        const x = e[0] * v.x + e[3] * v.y + e[6] * v.z + e[9] * v.w;
+        const y = e[1] * v.x + e[4] * v.y + e[7] * v.z + e[10] * v.w;
+        const z = e[2] * v.x + e[5] * v.y + e[8] * v.z + e[11] * v.w;
+        const w = v.w;
+
+        return new Vector4(x, y, z, w);
     }
 
     /**
@@ -1879,6 +1961,22 @@ export class Matrix4 {
     }
 
     /**
+     * Creates a matrix from `mat`.
+     */
+    public static fromMat3(mat: Matrix3): Matrix4 {
+        const e = mat.elements;
+        return new Matrix4([e[0], e[1], e[2], 0, e[3], e[4], e[5], 0, e[6], e[7], e[8], 0, 0, 0, 0, 1]);
+    }
+
+    /**
+     * Creates a matrix from `mat`.
+     */
+    public static fromMat4A(mat: Matrix4A): Matrix4 {
+        const e = mat.elements;
+        return new Matrix4([e[0], e[1], e[2], 0, e[3], e[4], e[5], 0, e[6], e[7], e[8], 0, e[9], e[10], e[11], 1]);
+    }
+
+    /**
      * Returns a right-handed orthographic projection matrix with a depth range of `[0, 1]`.
      *
      * Values equal to `glm::orthoRH_NO`.
@@ -2140,48 +2238,51 @@ export class Matrix4 {
     /**
      * Copies values from `mat` into this matrix.
      */
-    public copyFrom(mat: Matrix4A | Matrix4): void {
-        if (mat.type === MatrixType.Projective) {
-            const ea = this.elements;
-            const eb = mat.elements;
+    public copyFromMat4(mat: Matrix4): void {
+        const ea = this.elements;
+        const eb = mat.elements;
 
-            ea[0] = eb[0];
-            ea[1] = eb[1];
-            ea[2] = eb[2];
-            ea[3] = eb[3];
-            ea[4] = eb[4];
-            ea[5] = eb[5];
-            ea[6] = eb[6];
-            ea[7] = eb[7];
-            ea[8] = eb[8];
-            ea[9] = eb[9];
-            ea[10] = eb[10];
-            ea[11] = eb[11];
-            ea[12] = eb[12];
-            ea[13] = eb[13];
-            ea[14] = eb[14];
-            ea[15] = eb[15];
-        } else {
-            const ea = this.elements;
-            const eb = mat.elements;
+        ea[0] = eb[0];
+        ea[1] = eb[1];
+        ea[2] = eb[2];
+        ea[3] = eb[3];
+        ea[4] = eb[4];
+        ea[5] = eb[5];
+        ea[6] = eb[6];
+        ea[7] = eb[7];
+        ea[8] = eb[8];
+        ea[9] = eb[9];
+        ea[10] = eb[10];
+        ea[11] = eb[11];
+        ea[12] = eb[12];
+        ea[13] = eb[13];
+        ea[14] = eb[14];
+        ea[15] = eb[15];
+    }
 
-            ea[0] = eb[0];
-            ea[1] = eb[1];
-            ea[2] = eb[2];
-            ea[3] = 0;
-            ea[4] = eb[3];
-            ea[5] = eb[4];
-            ea[6] = eb[5];
-            ea[7] = 0;
-            ea[8] = eb[6];
-            ea[9] = eb[7];
-            ea[10] = eb[8];
-            ea[11] = 0;
-            ea[12] = eb[9];
-            ea[13] = eb[10];
-            ea[14] = eb[11];
-            ea[15] = 1;
-        }
+    /**
+     * Copies values from `mat` into this matrix.
+     */
+    public copyFromMat4A(mat: Matrix4A): void {
+        const ea = this.elements;
+        const eb = mat.elements;
+
+        ea[0] = eb[0];
+        ea[1] = eb[1];
+        ea[2] = eb[2];
+        ea[3] = 0;
+        ea[4] = eb[3];
+        ea[5] = eb[4];
+        ea[6] = eb[5];
+        ea[7] = 0;
+        ea[8] = eb[6];
+        ea[9] = eb[7];
+        ea[10] = eb[8];
+        ea[11] = 0;
+        ea[12] = eb[9];
+        ea[13] = eb[10];
+        ea[14] = eb[11];
+        ea[15] = 1;
     }
 
     /**
@@ -2408,7 +2509,7 @@ export class Matrix4 {
      * | e3  e7  e11  e15 |   | 1 |
      * ```
      */
-    public mulPt(p: Point3): Point3 {
+    public mulPt3(p: Point3): Point3 {
         const e = this.elements;
 
         const x = e[0] * p.x + e[4] * p.y + e[8] * p.z + e[12];
@@ -2462,7 +2563,7 @@ export class Matrix4 {
      * | e3  e7  e11  e15 |   | 1 |
      * ```
      */
-    public mulVec(v: Vector3): Vector3 {
+    public mulVec3(v: Vector3): Vector3 {
         const e = this.elements;
 
         const x = e[0] * v.x + e[4] * v.y + e[8] * v.z + e[12];
@@ -2471,6 +2572,25 @@ export class Matrix4 {
         const w = e[3] * v.x + e[7] * v.y + e[11] * v.z + e[15];
 
         return Vector3.fromXYZW(x, y, z, w);
+    }
+
+    /**
+     * ```
+     * | e0  e4   e8  e12 |   | x |
+     * | e1  e5   e9  e13 | * | y |
+     * | e2  e6  e10  e14 |   | z |
+     * | e3  e7  e11  e15 |   | w |
+     * ```
+     */
+    public mulVec4(v: Vector4): Vector4 {
+        const e = this.elements;
+
+        const x = e[0] * v.x + e[4] * v.y + e[8] * v.z + e[12] * v.w;
+        const y = e[1] * v.x + e[5] * v.y + e[9] * v.z + e[13] * v.w;
+        const z = e[2] * v.x + e[6] * v.y + e[10] * v.z + e[14] * v.w;
+        const w = e[3] * v.x + e[7] * v.y + e[11] * v.z + e[15] * v.w;
+
+        return new Vector4(x, y, z, w);
     }
 
     /**

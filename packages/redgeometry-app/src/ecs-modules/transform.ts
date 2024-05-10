@@ -87,7 +87,7 @@ export function transformSystem(world: World): void {
                 continue;
             }
 
-            computed.global.copyFrom(parentComputed.global);
+            computed.global.copyFromMat4A(parentComputed.global);
 
             if (transform.visible === Visibility.Inherit) {
                 computed.visible = parentComputed.visible;

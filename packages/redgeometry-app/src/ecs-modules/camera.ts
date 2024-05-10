@@ -24,10 +24,10 @@ export function cameraSystem(world: World): void {
 
         if (computedTransform !== undefined) {
             const matView = computedTransform.global.inverse();
-            camera.viewProjection.copyFrom(matView);
+            camera.viewProjection.copyFromMat4A(matView);
             camera.viewProjection.mulSet(camera.projection, camera.viewProjection);
         } else {
-            camera.viewProjection.copyFrom(camera.projection);
+            camera.viewProjection.copyFromMat4(camera.projection);
         }
     }
 }

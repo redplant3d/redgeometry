@@ -175,8 +175,8 @@ test("Quaternion - mulPt/mulVec", () => {
     const p = new Point3(1, 2, 3);
     const v = new Vector3(1, 2, 3);
 
-    const p1 = mat3.mul(mat2).mul(mat1).mulPt(p);
-    const v1 = mat3.mul(mat2).mul(mat1).mulVec(v);
+    const p1 = mat3.mul(mat2).mul(mat1).mulPt3(p);
+    const v1 = mat3.mul(mat2).mul(mat1).mulVec3(v);
     const p2 = q3.mul(q2).mul(q1).mulPt(p);
     const v2 = q3.mul(q2).mul(q1).mulVec(v);
     const p3 = qa.mulPt(p);

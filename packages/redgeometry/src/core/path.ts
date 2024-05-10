@@ -214,15 +214,15 @@ export class Path2 implements PathSink2 {
 
         this.moveTo(pc);
 
-        this.lineTo(mat.mulVec(v1).toPoint());
+        this.lineTo(mat.mulVec2(v1).toPoint());
 
         // Iteratively process 90 degree segments
         while (a > 0.5 * Math.PI + 0.005) {
             // TODO: Investigate correctness of `normal.neg`
             v1 = v1.normal().neg();
 
-            const p1 = mat.mulVec(vc).toPoint();
-            const p2 = mat.mulVec(v1).toPoint();
+            const p1 = mat.mulVec2(vc).toPoint();
+            const p2 = mat.mulVec2(v1).toPoint();
             this.arcTo(p1, p2);
 
             vc = vc.normal().neg();
@@ -238,8 +238,8 @@ export class Path2 implements PathSink2 {
         // but we can safely assume it does (only critical for angles close to 180 degrees)
         cos = Math.sqrt(0.5 * v1.dot(v2) + 0.5);
 
-        const p1 = mat.mulVec(vc).toPoint();
-        const p2 = mat.mulVec(v2).toPoint();
+        const p1 = mat.mulVec2(vc).toPoint();
+        const p2 = mat.mulVec2(v2).toPoint();
         this.conicTo(p1, p2, cos);
 
         this.close();
@@ -581,7 +581,7 @@ export class Path2 implements PathSink2 {
         // Vector from center (transformed midpoint)
         let v = p0.sub(p1).mul(0.5);
 
-        v = mat.mulVec(v);
+        v = mat.mulVec2(v);
 
         // Radii (see https://www.w3.org/TR/SVG/implnote.html#ArcCorrectionOutOfRangeRadii)
         let sx = Math.abs(rx);
@@ -601,8 +601,8 @@ export class Path2 implements PathSink2 {
         mat.scale(1 / sx, 1 / sy);
 
         // Calculate unit coordinates
-        let pp0 = mat.mulPt(p0);
-        let pp1 = mat.mulPt(p1);
+        let pp0 = mat.mulPt2(p0);
+        let pp1 = mat.mulPt2(p1);
 
         // New vector from center (unit midpoint)
         v = pp1.sub(pp0).mul(0.5);
@@ -680,8 +680,8 @@ export class Path2 implements PathSink2 {
             v1 = v1.normal().neg();
 
             // Transformed points of the arc segment
-            pp0 = mat.mulVec(v).toPoint();
-            pp1 = mat.mulVec(v1).toPoint();
+            pp0 = mat.mulVec2(v).toPoint();
+            pp1 = mat.mulVec2(v1).toPoint();
 
             this.arcTo(pp0, pp1);
 
@@ -695,7 +695,7 @@ export class Path2 implements PathSink2 {
         v = v.mul(2).div(v.dot(v));
 
         // Final arc segment
-        pp0 = mat.mulVec(v).toPoint();
+        pp0 = mat.mulVec2(v).toPoint();
         pp1 = p1;
 
         // This is actually half of the remaining cos. It is required that `v1 dot v2 > -1` holds
@@ -727,7 +727,7 @@ export class Path2 implements PathSink2 {
     public transform(mat: Matrix3 | Matrix3A): void {
         const points = this.points;
         for (let i = 0; i < points.length; i++) {
-            points[i] = mat.mulPt(points[i]);
+            points[i] = mat.mulPt2(points[i]);
         }
     }
 }

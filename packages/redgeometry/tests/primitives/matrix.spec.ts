@@ -49,7 +49,7 @@ test("Matrix3A - mulPt", () => {
     const mat = Matrix3A.createIdentity();
     const p = new Point2(1, 2);
 
-    const mulPt = mat.mulPt(p);
+    const mulPt = mat.mulPt2(p);
 
     expect(mulPt).toEqual(p);
 });
@@ -58,7 +58,7 @@ test("Matrix3A - mulVec", () => {
     const mat = Matrix3A.createIdentity();
     const v = new Vector2(1, 2);
 
-    const mulVec = mat.mulVec(v);
+    const mulVec = mat.mulVec2(v);
 
     expect(mulVec).toEqual(v);
 });
@@ -139,7 +139,7 @@ test("Matrix3 - mulPt", () => {
     const mat = Matrix3.createIdentity();
     const p = new Point2(1, 2);
 
-    const mulPt = mat.mulPt(p);
+    const mulPt = mat.mulPt2(p);
 
     expect(mulPt).toEqual(p);
 });
@@ -148,7 +148,7 @@ test("Matrix3 - mulVec", () => {
     const mat = Matrix3.createIdentity();
     const v = new Vector2(1, 2);
 
-    const mulVec = mat.mulVec(v);
+    const mulVec = mat.mulVec2(v);
 
     expect(mulVec).toEqual(v);
 });
@@ -229,7 +229,7 @@ test("Matrix4A - mulPt", () => {
     const mat = Matrix4A.createIdentity();
     const p = new Point3(1, 2, 3);
 
-    const mulPt = mat.mulPt(p);
+    const mulPt = mat.mulPt3(p);
 
     expect(mulPt).toEqual(p);
 });
@@ -238,7 +238,7 @@ test("Matrix4A - mulVec", () => {
     const mat = Matrix4A.createIdentity();
     const v = new Vector3(1, 2, 3);
 
-    const mulVec = mat.mulVec(v);
+    const mulVec = mat.mulVec3(v);
 
     expect(mulVec).toEqual(v);
 });
@@ -357,7 +357,7 @@ test("Matrix4 - mulPt", () => {
     const mat = Matrix4.createIdentity();
     const p = new Point3(1, 2, 3);
 
-    const mulPt = mat.mulPt(p);
+    const mulPt = mat.mulPt3(p);
 
     expect(mulPt).toEqual(p);
 });
@@ -366,7 +366,7 @@ test("Matrix4 - mulVec", () => {
     const mat = Matrix4.createIdentity();
     const v = new Vector3(1, 2, 3);
 
-    const mulVec = mat.mulVec(v);
+    const mulVec = mat.mulVec3(v);
 
     expect(mulVec).toEqual(v);
 });
