@@ -37,3 +37,27 @@ export function expectToBeCloseQuaternion(q1: Quaternion, q2: Quaternion, numDig
     expect(q1.c).toBeCloseTo(q2.c, numDigits ?? 15);
     expect(q1.d).toBeCloseTo(q2.d, numDigits ?? 15);
 }
+
+export function expectToBeCloseEuler(
+    eul1: { x: number; y: number; z: number },
+    eul2: { x: number; y: number; z: number },
+    numDigits?: number,
+): void {
+    const tau = 2 * Math.PI;
+
+    const eul1x = (eul1.x + tau) % tau;
+    const eul1y = (eul1.y + tau) % tau;
+    const eul1z = (eul1.z + tau) % tau;
+
+    const eul2x = (eul2.x + tau) % tau;
+    const eul2y = (eul2.y + tau) % tau;
+    const eul2z = (eul2.z + tau) % tau;
+
+    console.log(eul1x, eul2x);
+    console.log(eul1y, eul2y);
+    console.log(eul1z, eul2z);
+
+    expect(eul1x).toBeCloseTo(eul2x, numDigits ?? 15);
+    expect(eul1y).toBeCloseTo(eul2y, numDigits ?? 15);
+    expect(eul1z).toBeCloseTo(eul2z, numDigits ?? 15);
+}

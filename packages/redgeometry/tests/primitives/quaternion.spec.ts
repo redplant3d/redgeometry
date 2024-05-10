@@ -3,7 +3,12 @@ import { Matrix4A } from "../../src/primitives/matrix.js";
 import { Point3 } from "../../src/primitives/point.js";
 import { Quaternion, RotationOrder } from "../../src/primitives/quaternion.js";
 import { Vector3 } from "../../src/primitives/vector.js";
-import { expectToBeClosePoint3, expectToBeCloseQuaternion, expectToBeCloseVector3 } from "../expect.js";
+import {
+    expectToBeCloseEuler,
+    expectToBeClosePoint3,
+    expectToBeCloseQuaternion,
+    expectToBeCloseVector3,
+} from "../expect.js";
 
 test("Quaternion - fromRotationAngleX", () => {
     const a = 1;
@@ -140,6 +145,16 @@ test("Quaternion - fromRotationEuler", () => {
     expectToBeCloseQuaternion(qe1, qe3);
     expectToBeCloseQuaternion(qf1, qf2);
     expectToBeCloseQuaternion(qf1, qf3);
+});
+
+test("Quaternion - getEulerAngles", () => {
+    // Pitch angle (y) must be in the range of `(-Math.PI / 2, Math.PI / 2)` to avoid gimbal lock
+    const eul1 = { x: 0.5, y: 1, z: 2 };
+
+    const q = Quaternion.fromRotationEuler(eul1.x, eul1.y, eul1.z, RotationOrder.XYZ);
+    const eul2 = q.getEulerAngles();
+
+    expectToBeCloseEuler(eul1, eul2);
 });
 
 test("Quaternion - inverse", () => {

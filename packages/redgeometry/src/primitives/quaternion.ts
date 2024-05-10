@@ -199,6 +199,19 @@ export class Quaternion {
         return this.a === q.a && this.b === q.b && this.c === q.c && this.d === q.d;
     }
 
+    public getEulerAngles(): { x: number; y: number; z: number } {
+        const qa = this.a;
+        const qb = this.b;
+        const qc = this.c;
+        const qd = this.d;
+
+        const x = Math.atan2(2 * (qa * qb + qc * qd), qa * qa - qb * qb - qc * qc + qd * qd);
+        const y = Math.asin(2 * (qa * qc - qb * qd));
+        const z = Math.atan2(2 * (qa * qd + qb * qc), qa * qa + qb * qb - qc * qc - qd * qd);
+
+        return { x, y, z };
+    }
+
     public inverse(): Quaternion {
         const d = this.lenSq();
         return new Quaternion(this.a / d, -this.b / d, -this.c / d, -this.d / d);
