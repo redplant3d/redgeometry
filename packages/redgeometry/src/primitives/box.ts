@@ -26,6 +26,10 @@ export class Box2 {
         );
     }
 
+    public static from(obj: { x0: number; y0: number; x1: number; y1: number }): Box2 {
+        return new Box2(obj.x0, obj.y0, obj.x1, obj.y1);
+    }
+
     public static fromPoints(p0: Point2, p1: Point2): Box2 {
         const x0 = Math.min(p0.x, p1.x);
         const y0 = Math.min(p0.y, p1.y);
@@ -164,6 +168,10 @@ export class Box3 {
             Number.NEGATIVE_INFINITY,
             Number.NEGATIVE_INFINITY,
         );
+    }
+
+    public static from(obj: { x0: number; y0: number; z0: number; x1: number; y1: number; z1: number }): Box3 {
+        return new Box3(obj.x0, obj.y0, obj.z0, obj.x1, obj.y1, obj.z1);
     }
 
     public static fromPoints(p0: Point3, p1: Point3): Box3 {

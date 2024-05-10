@@ -17,6 +17,10 @@ export class Complex {
         return new Complex(1, 0);
     }
 
+    public static from(obj: { a: number; b: number }): Complex {
+        return new Complex(obj.a, obj.b);
+    }
+
     public static fromArray(data: number[], offset = 0): Complex {
         return new Complex(data[offset], data[offset + 1]);
     }

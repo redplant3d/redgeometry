@@ -40,6 +40,10 @@ export class Bezier1Curve2 {
         return CurveType.Bezier1;
     }
 
+    public static from(obj: { p0: Point2; p1: Point2 }): Bezier1Curve2 {
+        return new Bezier1Curve2(obj.p0, obj.p1);
+    }
+
     public static fromXY(x0: number, y0: number, x1: number, y1: number): Bezier1Curve2 {
         const p0 = new Point2(x0, y0);
         const p1 = new Point2(x1, y1);
@@ -194,6 +198,10 @@ export class Bezier2Curve2 {
 
     public get type(): CurveType.Bezier2 {
         return CurveType.Bezier2;
+    }
+
+    public static from(obj: { p0: Point2; p1: Point2; p2: Point2 }): Bezier2Curve2 {
+        return new Bezier2Curve2(obj.p0, obj.p1, obj.p2);
     }
 
     public static fromXY(x0: number, y0: number, x1: number, y1: number, x2: number, y2: number): Bezier2Curve2 {
@@ -534,6 +542,10 @@ export class Bezier3Curve2 {
 
     public get type(): CurveType.Bezier3 {
         return CurveType.Bezier3;
+    }
+
+    public static from(obj: { p0: Point2; p1: Point2; p2: Point2; p3: Point2 }): Bezier3Curve2 {
+        return new Bezier3Curve2(obj.p0, obj.p1, obj.p2, obj.p3);
     }
 
     public static fromXY(
@@ -881,6 +893,10 @@ export class BezierRCurve2 {
 
     public get type(): CurveType.BezierR {
         return CurveType.BezierR;
+    }
+
+    public static from(obj: { p0: Point2; p1: Point2; p2: Point2; w: number }): BezierRCurve2 {
+        return new BezierRCurve2(obj.p0, obj.p1, obj.p2, obj.w);
     }
 
     public static fromCenterPoint(p0: Point2, p1: Point2, p2: Point2, pc: Point2): BezierRCurve2 {

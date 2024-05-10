@@ -38,12 +38,12 @@ export class Vector2 {
         return new Vector2(0, 0);
     }
 
-    public static fromArray(data: number[], offset = 0): Vector2 {
-        return new Vector2(data[offset], data[offset + 1]);
+    public static from(obj: { x: number; y: number }): Vector2 {
+        return new Vector2(obj.x, obj.y);
     }
 
-    public static fromObject(obj: { x: number; y: number }): Vector2 {
-        return new Vector2(obj.x, obj.y);
+    public static fromArray(data: number[], offset = 0): Vector2 {
+        return new Vector2(data[offset], data[offset + 1]);
     }
 
     public static fromXYW(x: number, y: number, w: number): Vector2 {
@@ -262,12 +262,12 @@ export class Vector3 {
         return new Vector3(0, 0, 0);
     }
 
-    public static fromArray(data: number[], offset = 0): Vector3 {
-        return new Vector3(data[offset], data[offset + 1], data[offset + 2]);
+    public static from(obj: { x: number; y: number; z: number }): Vector3 {
+        return new Vector3(obj.x, obj.y, obj.z);
     }
 
-    public static fromObject(obj: { x: number; y: number; z: number }): Vector3 {
-        return new Vector3(obj.x, obj.y, obj.z);
+    public static fromArray(data: number[], offset = 0): Vector3 {
+        return new Vector3(data[offset], data[offset + 1], data[offset + 2]);
     }
 
     public static fromXY(x: number, y: number): Vector3 {
@@ -489,12 +489,12 @@ export class Vector4 {
         return new Vector4(0, 0, 0, 0);
     }
 
-    public static fromArray(data: number[], offset = 0): Vector4 {
-        return new Vector4(data[offset], data[offset + 1], data[offset + 2], data[offset + 3]);
+    public static from(obj: { x: number; y: number; z: number; w: number }): Vector4 {
+        return new Vector4(obj.x, obj.y, obj.z, obj.w);
     }
 
-    public static fromObject(obj: { x: number; y: number; z: number; w: number }): Vector4 {
-        return new Vector4(obj.x, obj.y, obj.z, obj.w);
+    public static fromArray(data: number[], offset = 0): Vector4 {
+        return new Vector4(data[offset], data[offset + 1], data[offset + 2], data[offset + 3]);
     }
 
     public static fromXYZ(x: number, y: number, z: number): Vector4 {

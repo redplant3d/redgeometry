@@ -41,12 +41,12 @@ export class Edge2 {
         }
     }
 
-    public static fromArray(data: Point2[], offset = 0): Edge2 {
-        return new Edge2(data[offset], data[offset + 1]);
+    public static from(obj: { p0: Point2; p1: Point2 }): Edge2 {
+        return new Edge2(obj.p0, obj.p1);
     }
 
-    public static fromObject(obj: { p0: Point2; p1: Point2 }): Edge2 {
-        return new Edge2(obj.p0, obj.p1);
+    public static fromArray(data: Point2[], offset = 0): Edge2 {
+        return new Edge2(data[offset], data[offset + 1]);
     }
 
     public static fromXY(x0: number, y0: number, x1: number, y1: number): Edge2 {
@@ -372,12 +372,12 @@ export class Edge3 {
         this.p1 = p1;
     }
 
-    public static fromArray(data: Point3[], offset = 0): Edge3 {
-        return new Edge3(data[offset], data[offset + 1]);
+    public static from(obj: { p0: Point3; p1: Point3 }): Edge3 {
+        return new Edge3(obj.p0, obj.p1);
     }
 
-    public static fromObject(obj: { p0: Point3; p1: Point3 }): Edge3 {
-        return new Edge3(obj.p0, obj.p1);
+    public static fromArray(data: Point3[], offset = 0): Edge3 {
+        return new Edge3(data[offset], data[offset + 1]);
     }
 
     public static fromXYZ(x0: number, y0: number, z0: number, x1: number, y1: number, z1: number): Edge3 {

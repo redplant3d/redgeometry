@@ -35,6 +35,10 @@ export class Quaternion {
         return new Quaternion(1, 0, 0, 0);
     }
 
+    public static from(obj: { a: number; b: number; c: number; d: number }): Quaternion {
+        return new Quaternion(obj.a, obj.b, obj.c, obj.d);
+    }
+
     public static fromArray(data: number[], offset = 0): Quaternion {
         return new Quaternion(data[offset], data[offset + 1], data[offset + 2], data[offset + 3]);
     }

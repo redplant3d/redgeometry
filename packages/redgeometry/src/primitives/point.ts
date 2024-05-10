@@ -17,12 +17,12 @@ export class Point2 {
         return new Point2(0, 0);
     }
 
-    public static fromArray(data: number[], offset = 0): Point2 {
-        return new Point2(data[offset], data[offset + 1]);
+    public static from(obj: { x: number; y: number }): Point2 {
+        return new Point2(obj.x, obj.y);
     }
 
-    public static fromObject(obj: { x: number; y: number }): Point2 {
-        return new Point2(obj.x, obj.y);
+    public static fromArray(data: number[], offset = 0): Point2 {
+        return new Point2(data[offset], data[offset + 1]);
     }
 
     public static fromXYW(x: number, y: number, w: number): Point2 {
@@ -112,9 +112,9 @@ export class Point2 {
         return this.x === 0 && this.y === 0;
     }
 
-    public lerp(p1: Point2, t: number): Point2 {
-        const x = lerp(this.x, p1.x, t);
-        const y = lerp(this.y, p1.y, t);
+    public lerp(p: Point2, t: number): Point2 {
+        const x = lerp(this.x, p.x, t);
+        const y = lerp(this.y, p.y, t);
         return new Point2(x, y);
     }
 
@@ -161,12 +161,12 @@ export class Point3 {
         return new Point3(0, 0, 0);
     }
 
-    public static fromArray(data: number[], offset = 0): Point3 {
-        return new Point3(data[offset], data[offset + 1], data[offset + 2]);
+    public static from(obj: { x: number; y: number; z: number }): Point3 {
+        return new Point3(obj.x, obj.y, obj.z);
     }
 
-    public static fromObject(obj: { x: number; y: number; z: number }): Point3 {
-        return new Point3(obj.x, obj.y, obj.z);
+    public static fromArray(data: number[], offset = 0): Point3 {
+        return new Point3(data[offset], data[offset + 1], data[offset + 2]);
     }
 
     public static fromXY(x: number, y: number): Point3 {
@@ -240,10 +240,10 @@ export class Point3 {
         return this.x === 0 && this.y === 0 && this.z === 0;
     }
 
-    public lerp(p1: Point3, t: number): Point3 {
-        const x = lerp(this.x, p1.x, t);
-        const y = lerp(this.y, p1.y, t);
-        const z = lerp(this.z, p1.z, t);
+    public lerp(p: Point3, t: number): Point3 {
+        const x = lerp(this.x, p.x, t);
+        const y = lerp(this.y, p.y, t);
+        const z = lerp(this.z, p.z, t);
         return new Point3(x, y, z);
     }
 

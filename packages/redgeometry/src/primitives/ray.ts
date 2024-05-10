@@ -10,6 +10,10 @@ export class Ray2 {
         this.v = v;
     }
 
+    public static from(obj: { p: Point2; v: Vector2 }): Ray2 {
+        return new Ray2(obj.p, obj.v);
+    }
+
     public static fromPoints(p0: Point2, p1: Point2): Ray2 {
         const v = p1.sub(p0);
         return new Ray2(p0, v);
@@ -74,6 +78,10 @@ export class Ray3 {
     constructor(p: Point3, v: Vector3) {
         this.p = p;
         this.v = v;
+    }
+
+    public static from(obj: { p: Point3; v: Vector3 }): Ray3 {
+        return new Ray3(obj.p, obj.v);
     }
 
     public static fromPoints(p0: Point3, p1: Point3): Ray3 {
