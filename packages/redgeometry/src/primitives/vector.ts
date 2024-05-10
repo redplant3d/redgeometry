@@ -1,4 +1,4 @@
-import { clamp } from "../utility/scalar.js";
+import { clamp, lerp } from "../utility/scalar.js";
 import { Point2, Point3 } from "./point.js";
 
 export class Vector2 {
@@ -163,6 +163,12 @@ export class Vector2 {
         return this.x * this.x + this.y * this.y;
     }
 
+    public lerp(v: Vector2, t: number): Vector2 {
+        const x = lerp(this.x, v.x, t);
+        const y = lerp(this.y, v.y, t);
+        return new Vector2(x, y);
+    }
+
     /**
      * Multiplies the current vector by `f`.
      */
@@ -268,10 +274,6 @@ export class Vector3 {
         return new Vector3(x, y, 1);
     }
 
-    public static fromXYW(x: number, y: number, w: number): Vector3 {
-        return new Vector3(w * x, w * y, w);
-    }
-
     public static fromXYZW(x: number, y: number, z: number, w: number): Vector3 {
         return new Vector3(x / w, y / w, z / w);
     }
@@ -361,6 +363,13 @@ export class Vector3 {
         return this.x * this.x + this.y * this.y + this.z * this.z;
     }
 
+    public lerp(v: Vector3, t: number): Vector3 {
+        const x = lerp(this.x, v.x, t);
+        const y = lerp(this.y, v.y, t);
+        const z = lerp(this.z, v.z, t);
+        return new Vector3(x, y, z);
+    }
+
     public mul(f: number): Vector3 {
         return new Vector3(f * this.x, f * this.y, f * this.z);
     }
@@ -422,5 +431,175 @@ export class Vector3 {
     public unitOrZero(): Vector3 {
         const len = this.len();
         return len > 0 ? this.div(len) : Vector3.createZero();
+    }
+}
+
+export class Vector4 {
+    public w: number;
+    public x: number;
+    public y: number;
+    public z: number;
+
+    public constructor(x: number, y: number, z: number, w: number) {
+        this.x = x;
+        this.y = y;
+        this.z = z;
+        this.w = w;
+    }
+
+    /**
+     * Returns the vector `(1, 1, 1, 1)`.
+     */
+    public static createOne(): Vector4 {
+        return new Vector4(1, 1, 1, 1);
+    }
+
+    /**
+     * Returns the unit vector in the direction of the z-axis.
+     */
+    public static createUnitW(): Vector4 {
+        return new Vector4(0, 0, 0, 1);
+    }
+
+    /**
+     * Returns the unit vector in the direction of the x-axis.
+     */
+    public static createUnitX(): Vector4 {
+        return new Vector4(1, 0, 0, 0);
+    }
+
+    /**
+     * Returns the unit vector in the direction of the y-axis.
+     */
+    public static createUnitY(): Vector4 {
+        return new Vector4(0, 1, 0, 0);
+    }
+
+    /**
+     * Returns the unit vector in the direction of the z-axis.
+     */
+    public static createUnitZ(): Vector4 {
+        return new Vector4(0, 0, 1, 0);
+    }
+
+    /**
+     * Returns the vector `(0, 0, 0, 0)`.
+     */
+    public static createZero(): Vector4 {
+        return new Vector4(0, 0, 0, 0);
+    }
+
+    public static fromArray(data: number[], offset = 0): Vector4 {
+        return new Vector4(data[offset], data[offset + 1], data[offset + 2], data[offset + 3]);
+    }
+
+    public static fromObject(obj: { x: number; y: number; z: number; w: number }): Vector4 {
+        return new Vector4(obj.x, obj.y, obj.z, obj.w);
+    }
+
+    public static fromXYZ(x: number, y: number, z: number): Vector4 {
+        return new Vector4(x, y, z, 1);
+    }
+
+    /**
+     * Returns the sum of the current vector and a vector `v`.
+     */
+    public add(v: Vector4): Vector4 {
+        return new Vector4(this.x + v.x, this.y + v.y, this.z + v.z, this.w + v.w);
+    }
+
+    /**
+     * Returns the sum of the current vector and a vector `v` scaled by `f`.
+     */
+    public addMul(v: Vector4, f: number): Vector4 {
+        const x = this.x + f * v.x;
+        const y = this.y + f * v.y;
+        const z = this.z + f * v.z;
+        const w = this.w + f * v.w;
+        return new Vector4(x, y, z, w);
+    }
+
+    public clamp(vmin: Vector4, vmax: Vector4): Vector4 {
+        const x = clamp(this.x, vmin.x, vmax.x);
+        const y = clamp(this.y, vmin.y, vmax.y);
+        const z = clamp(this.z, vmin.z, vmax.z);
+        const w = clamp(this.w, vmin.w, vmax.w);
+        return new Vector4(x, y, z, w);
+    }
+
+    public clone(): Vector4 {
+        return new Vector4(this.x, this.y, this.z, this.w);
+    }
+
+    public copyTo(data: number[], offset = 0): void {
+        data[offset] = this.x;
+        data[offset + 1] = this.y;
+        data[offset + 2] = this.z;
+        data[offset + 3] = this.w;
+    }
+
+    /**
+     * Divides the current vector by `d`.
+     *
+     * Note: Each element is divided separately.
+     */
+    public div(d: number): Vector4 {
+        return new Vector4(this.x / d, this.y / d, this.z / d, this.w / d);
+    }
+
+    public dot(v: Vector4): number {
+        return this.x * v.x + this.y * v.y + this.z * v.z + this.w * v.w;
+    }
+
+    public eq(v: Vector4): boolean {
+        return this.x === v.x && this.y === v.y && this.z === v.z && this.w === v.w;
+    }
+
+    public isFinite(): boolean {
+        return Number.isFinite(this.x) && Number.isFinite(this.y) && Number.isFinite(this.z) && Number.isFinite(this.w);
+    }
+
+    public isOne(): boolean {
+        return this.x === 1 && this.y === 1 && this.z === 1 && this.w === 1;
+    }
+
+    public isZero(): boolean {
+        return this.x === 0 && this.y === 0 && this.z === 0 && this.w === 0;
+    }
+
+    public len(): number {
+        return Math.sqrt(this.lenSq());
+    }
+
+    public lenSq(): number {
+        return this.x * this.x + this.y * this.y + this.z * this.z + this.w * this.w;
+    }
+
+    public lerp(v: Vector4, t: number): Vector4 {
+        const x = lerp(this.x, v.x, t);
+        const y = lerp(this.y, v.y, t);
+        const z = lerp(this.z, v.z, t);
+        const w = lerp(this.w, v.w, t);
+        return new Vector4(x, y, z, w);
+    }
+
+    public mul(f: number): Vector4 {
+        return new Vector4(f * this.x, f * this.y, f * this.z, f * this.w);
+    }
+
+    public neg(): Vector4 {
+        return new Vector4(-this.x, -this.y, -this.z, -this.w);
+    }
+
+    public sub(v: Vector4): Vector4 {
+        return new Vector4(this.x - v.x, this.y - v.y, this.z - v.z, this.w - v.w);
+    }
+
+    public toArray(): number[] {
+        return [this.x, this.y, this.z, this.w];
+    }
+
+    public toString(): string {
+        return `{x: ${this.x}, y: ${this.y}, z: ${this.z}}, w: ${this.z}}`;
     }
 }
