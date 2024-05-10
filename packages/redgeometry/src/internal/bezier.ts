@@ -9,7 +9,8 @@ import { RootType, solveCubic, solveQuadratic } from "../utility/solve.js";
 
 export function encloseCurveAt(c: BezierCurve2, box: Box2, t: number): void {
     if (t > 0 && t < 1) {
-        box.enclose(c.getValueAt(t));
+        const p = c.getValueAt(t);
+        box.enclose(p);
     }
 }
 

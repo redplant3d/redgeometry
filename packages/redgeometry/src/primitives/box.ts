@@ -1,3 +1,4 @@
+import type { Matrix3, Matrix3A, Matrix4, Matrix4A } from "./matrix.js";
 import { Point2, Point3 } from "./point.js";
 import type { Ray2, Ray3 } from "./ray.js";
 
@@ -75,6 +76,11 @@ export class Box2 {
         this.y1 = Math.max(this.y1, p.y);
     }
 
+    public encloseWithTransform(p: Point2, mat: Matrix3 | Matrix3A): void {
+        const pp = mat.mulPt2(p);
+        this.enclose(pp);
+    }
+
     public getCenter(): Point2 {
         return new Point2(0.5 * (this.x0 + this.x1), 0.5 * (this.y0 + this.y1));
     }
@@ -131,6 +137,17 @@ export class Box2 {
         return `{x0: ${this.x0}, y0: ${this.y0}, x1: ${this.x1}, y1: ${this.y1}}`;
     }
 
+    public transform(mat: Matrix3 | Matrix3A): Box2 {
+        const box = Box2.createEmpty();
+
+        box.encloseWithTransform(new Point2(this.x0, this.y0), mat);
+        box.encloseWithTransform(new Point2(this.x0, this.y1), mat);
+        box.encloseWithTransform(new Point2(this.x1, this.y0), mat);
+        box.encloseWithTransform(new Point2(this.x1, this.y1), mat);
+
+        return box;
+    }
+
     public union(b: Box2): void {
         this.x0 = Math.min(this.x0, b.x0);
         this.y0 = Math.min(this.y0, b.y0);
@@ -185,6 +202,17 @@ export class Box3 {
         return new Box3(x0, y0, z0, x1, y1, z1);
     }
 
+    public static fromXYZWHD(x: number, y: number, z: number, w: number, h: number, d: number): Box3 {
+        const x0 = Math.min(x, x + w);
+        const y0 = Math.min(y, y + h);
+        const z0 = Math.min(z, z + d);
+        const x1 = Math.max(x, x + w);
+        const y1 = Math.max(y, y + h);
+        const z1 = Math.max(z, z + d);
+
+        return new Box3(x0, y0, z0, x1, y1, z1);
+    }
+
     public clone(): Box3 {
         return new Box3(this.x0, this.y0, this.z0, this.x1, this.y1, this.z1);
     }
@@ -216,6 +244,11 @@ export class Box3 {
         this.x1 = Math.max(this.x1, p.x);
         this.y1 = Math.max(this.y1, p.y);
         this.z1 = Math.max(this.z1, p.z);
+    }
+
+    public encloseWithTransform(p: Point3, mat: Matrix4 | Matrix4A): void {
+        const pp = mat.mulPt3(p);
+        this.enclose(pp);
     }
 
     public getCenter(): Point3 {
@@ -287,6 +320,21 @@ export class Box3 {
 
     public toString(): string {
         return `{x0: ${this.x0}, y0: ${this.y0}, z0: ${this.z0}, x1: ${this.x1}, y1: ${this.y1}}, z1: ${this.z1}}`;
+    }
+
+    public transform(mat: Matrix4 | Matrix4A): Box3 {
+        const box = Box3.createEmpty();
+
+        box.encloseWithTransform(new Point3(this.x0, this.y0, this.z0), mat);
+        box.encloseWithTransform(new Point3(this.x0, this.y0, this.z1), mat);
+        box.encloseWithTransform(new Point3(this.x0, this.y1, this.z0), mat);
+        box.encloseWithTransform(new Point3(this.x0, this.y1, this.z1), mat);
+        box.encloseWithTransform(new Point3(this.x1, this.y0, this.z0), mat);
+        box.encloseWithTransform(new Point3(this.x1, this.y0, this.z1), mat);
+        box.encloseWithTransform(new Point3(this.x1, this.y1, this.z0), mat);
+        box.encloseWithTransform(new Point3(this.x1, this.y1, this.z1), mat);
+
+        return box;
     }
 
     public union(b: Box3): void {
