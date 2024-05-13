@@ -600,6 +600,6 @@ export class Vector4 {
     }
 
     public toString(): string {
-        return `{x: ${this.x}, y: ${this.y}, z: ${this.z}}, w: ${this.z}}`;
+        return `{x: ${this.x}, y: ${this.y}, z: ${this.z}}, w: ${this.w}}`;
     }
 }
