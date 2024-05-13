@@ -224,7 +224,7 @@ export class Matrix3A {
      * |  0   0   1 |   | 1 |
      * ```
      */
-    public mulPt2(p: Point2): Point2 {
+    public mulPt(p: Point2): Point2 {
         const e = this.elements;
 
         const x = e[0] * p.x + e[2] * p.y + e[4];
@@ -263,30 +263,13 @@ export class Matrix3A {
      * |  0   0   1 |   | 1 |
      * ```
      */
-    public mulVec2(v: Vector2): Vector2 {
+    public mulVec(v: Vector2): Vector2 {
         const e = this.elements;
 
         const x = e[0] * v.x + e[2] * v.y + e[4];
         const y = e[1] * v.x + e[3] * v.y + e[5];
 
         return new Vector2(x, y);
-    }
-
-    /**
-     * ```
-     * | e0  e2  e4 |   | x |
-     * | e1  e3  e5 | * | y |
-     * |  0   0   1 |   | z |
-     * ```
-     */
-    public mulVec3(v: Vector3): Vector3 {
-        const e = this.elements;
-
-        const x = e[0] * v.x + e[2] * v.y + e[4] * v.z;
-        const y = e[1] * v.x + e[3] * v.y + e[5] * v.z;
-        const z = v.z;
-
-        return new Vector3(x, y, z);
     }
 
     /**
@@ -781,7 +764,7 @@ export class Matrix3 {
      * | e2  e5  e8 |   | 1 |
      * ```
      */
-    public mulPt2(p: Point2): Point2 {
+    public mulPt(p: Point2): Point2 {
         const e = this.elements;
 
         const x = e[0] * p.x + e[3] * p.y + e[6];
@@ -821,27 +804,10 @@ export class Matrix3 {
      * ```
      * | e0  e3  e6 |   | x |
      * | e1  e4  e7 | * | y |
-     * | e2  e5  e8 |   | 1 |
-     * ```
-     */
-    public mulVec2(v: Vector2): Vector2 {
-        const e = this.elements;
-
-        const x = e[0] * v.x + e[3] * v.y + e[6];
-        const y = e[1] * v.x + e[4] * v.y + e[7];
-        const w = e[2] * v.x + e[5] * v.y + e[8];
-
-        return Vector2.fromXYW(x, y, w);
-    }
-
-    /**
-     * ```
-     * | e0  e3  e6 |   | x |
-     * | e1  e4  e7 | * | y |
      * | e2  e5  e8 |   | z |
      * ```
      */
-    public mulVec3(v: Vector3): Vector3 {
+    public mulVec(v: Vector3): Vector3 {
         const e = this.elements;
 
         const x = e[0] * v.x + e[3] * v.y + e[6] * v.z;
@@ -1482,7 +1448,7 @@ export class Matrix4A {
      * |  0   0   0    1 |   | 1 |
      * ```
      */
-    public mulPt3(p: Point3): Point3 {
+    public mulPt(p: Point3): Point3 {
         const e = this.elements;
 
         const x = e[0] * p.x + e[3] * p.y + e[6] * p.z + e[9];
@@ -1531,7 +1497,7 @@ export class Matrix4A {
      * |  0   0   0    1 |   | 1 |
      * ```
      */
-    public mulVec3(v: Vector3): Vector3 {
+    public mulVec(v: Vector3): Vector3 {
         const e = this.elements;
 
         const x = e[0] * v.x + e[3] * v.y + e[6] * v.z + e[9];
@@ -1539,25 +1505,6 @@ export class Matrix4A {
         const z = e[2] * v.x + e[5] * v.y + e[8] * v.z + e[11];
 
         return new Vector3(x, y, z);
-    }
-
-    /**
-     * ```
-     * | e0  e3  e6   e9 |   | x |
-     * | e1  e4  e7  e10 | * | y |
-     * | e2  e5  e8  e11 |   | z |
-     * |  0   0   0    1 |   | w |
-     * ```
-     */
-    public mulVec4(v: Vector4): Vector4 {
-        const e = this.elements;
-
-        const x = e[0] * v.x + e[3] * v.y + e[6] * v.z + e[9] * v.w;
-        const y = e[1] * v.x + e[4] * v.y + e[7] * v.z + e[10] * v.w;
-        const z = e[2] * v.x + e[5] * v.y + e[8] * v.z + e[11] * v.w;
-        const w = v.w;
-
-        return new Vector4(x, y, z, w);
     }
 
     /**
@@ -2509,7 +2456,7 @@ export class Matrix4 {
      * | e3  e7  e11  e15 |   | 1 |
      * ```
      */
-    public mulPt3(p: Point3): Point3 {
+    public mulPt(p: Point3): Point3 {
         const e = this.elements;
 
         const x = e[0] * p.x + e[4] * p.y + e[8] * p.z + e[12];
@@ -2560,29 +2507,10 @@ export class Matrix4 {
      * | e0  e4   e8  e12 |   | x |
      * | e1  e5   e9  e13 | * | y |
      * | e2  e6  e10  e14 |   | z |
-     * | e3  e7  e11  e15 |   | 1 |
-     * ```
-     */
-    public mulVec3(v: Vector3): Vector3 {
-        const e = this.elements;
-
-        const x = e[0] * v.x + e[4] * v.y + e[8] * v.z + e[12];
-        const y = e[1] * v.x + e[5] * v.y + e[9] * v.z + e[13];
-        const z = e[2] * v.x + e[6] * v.y + e[10] * v.z + e[14];
-        const w = e[3] * v.x + e[7] * v.y + e[11] * v.z + e[15];
-
-        return Vector3.fromXYZW(x, y, z, w);
-    }
-
-    /**
-     * ```
-     * | e0  e4   e8  e12 |   | x |
-     * | e1  e5   e9  e13 | * | y |
-     * | e2  e6  e10  e14 |   | z |
      * | e3  e7  e11  e15 |   | w |
      * ```
      */
-    public mulVec4(v: Vector4): Vector4 {
+    public mulVec(v: Vector4): Vector4 {
         const e = this.elements;
 
         const x = e[0] * v.x + e[4] * v.y + e[8] * v.z + e[12] * v.w;

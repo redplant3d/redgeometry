@@ -32,8 +32,8 @@ test("Quaternion - mulPt/mulVec", () => {
     const p = new Point2(1, 2);
     const v = new Vector2(1, 2);
 
-    const p1 = mat.mulPt2(p);
-    const v1 = mat.mulVec2(v);
+    const p1 = mat.mulPt(p);
+    const v1 = mat.mulVec(v);
     const p2 = z.mulPt(p);
     const v2 = z.mulVec(v);
 

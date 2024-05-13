@@ -3,7 +3,7 @@ import { Complex } from "../../src/index.js";
 import { Matrix3, Matrix3A, Matrix4, Matrix4A } from "../../src/primitives/matrix.js";
 import { Point2, Point3 } from "../../src/primitives/point.js";
 import { Quaternion, RotationOrder } from "../../src/primitives/quaternion.js";
-import { Vector2, Vector3 } from "../../src/primitives/vector.js";
+import { Vector2, Vector3, Vector4 } from "../../src/primitives/vector.js";
 import {
     expectToBeCloseComplex,
     expectToBeClosePoint2,
@@ -49,7 +49,7 @@ test("Matrix3A - mulPt", () => {
     const mat = Matrix3A.createIdentity();
     const p = new Point2(1, 2);
 
-    const mulPt = mat.mulPt2(p);
+    const mulPt = mat.mulPt(p);
 
     expect(mulPt).toEqual(p);
 });
@@ -58,7 +58,7 @@ test("Matrix3A - mulVec", () => {
     const mat = Matrix3A.createIdentity();
     const v = new Vector2(1, 2);
 
-    const mulVec = mat.mulVec2(v);
+    const mulVec = mat.mulVec(v);
 
     expect(mulVec).toEqual(v);
 });
@@ -139,16 +139,16 @@ test("Matrix3 - mulPt", () => {
     const mat = Matrix3.createIdentity();
     const p = new Point2(1, 2);
 
-    const mulPt = mat.mulPt2(p);
+    const mulPt = mat.mulPt(p);
 
     expect(mulPt).toEqual(p);
 });
 
 test("Matrix3 - mulVec", () => {
     const mat = Matrix3.createIdentity();
-    const v = new Vector2(1, 2);
+    const v = new Vector3(1, 2, 3);
 
-    const mulVec = mat.mulVec2(v);
+    const mulVec = mat.mulVec(v);
 
     expect(mulVec).toEqual(v);
 });
@@ -229,7 +229,7 @@ test("Matrix4A - mulPt", () => {
     const mat = Matrix4A.createIdentity();
     const p = new Point3(1, 2, 3);
 
-    const mulPt = mat.mulPt3(p);
+    const mulPt = mat.mulPt(p);
 
     expect(mulPt).toEqual(p);
 });
@@ -238,7 +238,7 @@ test("Matrix4A - mulVec", () => {
     const mat = Matrix4A.createIdentity();
     const v = new Vector3(1, 2, 3);
 
-    const mulVec = mat.mulVec3(v);
+    const mulVec = mat.mulVec(v);
 
     expect(mulVec).toEqual(v);
 });
@@ -357,16 +357,16 @@ test("Matrix4 - mulPt", () => {
     const mat = Matrix4.createIdentity();
     const p = new Point3(1, 2, 3);
 
-    const mulPt = mat.mulPt3(p);
+    const mulPt = mat.mulPt(p);
 
     expect(mulPt).toEqual(p);
 });
 
 test("Matrix4 - mulVec", () => {
     const mat = Matrix4.createIdentity();
-    const v = new Vector3(1, 2, 3);
+    const v = new Vector4(1, 2, 3, 4);
 
-    const mulVec = mat.mulVec3(v);
+    const mulVec = mat.mulVec(v);
 
     expect(mulVec).toEqual(v);
 });
