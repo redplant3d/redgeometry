@@ -70,21 +70,21 @@ export class Quaternion {
     }
 
     public static fromRotationEuler(angleX: number, angleY: number, angleZ: number, order: RotationOrder): Quaternion {
-        const sinx = Math.sin(0.5 * angleX);
-        const cosx = Math.cos(0.5 * angleX);
-        const siny = Math.sin(0.5 * angleY);
-        const cosy = Math.cos(0.5 * angleY);
-        const sinz = Math.sin(0.5 * angleZ);
-        const cosz = Math.cos(0.5 * angleZ);
+        const sinX = Math.sin(0.5 * angleX);
+        const cosX = Math.cos(0.5 * angleX);
+        const sinY = Math.sin(0.5 * angleY);
+        const cosY = Math.cos(0.5 * angleY);
+        const sinZ = Math.sin(0.5 * angleZ);
+        const cosZ = Math.cos(0.5 * angleZ);
 
-        const a1 = cosx * cosy * cosz;
-        const a2 = sinx * siny * sinz;
-        const b1 = sinx * cosy * cosz;
-        const b2 = cosx * siny * sinz;
-        const c1 = cosx * siny * cosz;
-        const c2 = sinx * cosy * sinz;
-        const d1 = cosx * cosy * sinz;
-        const d2 = sinx * siny * cosz;
+        const a1 = cosX * cosY * cosZ;
+        const a2 = sinX * sinY * sinZ;
+        const b1 = sinX * cosY * cosZ;
+        const b2 = cosX * sinY * sinZ;
+        const c1 = cosX * sinY * cosZ;
+        const c2 = sinX * cosY * sinZ;
+        const d1 = cosX * cosY * sinZ;
+        const d2 = sinX * sinY * cosZ;
 
         switch (order) {
             case RotationOrder.XYZ: {
@@ -166,6 +166,13 @@ export class Quaternion {
         }
     }
 
+    /**
+     * Returns a quaternion with values following the `XYZW` notation.
+     */
+    public static fromXYZW(x: number, y: number, z: number, w: number): Quaternion {
+        return new Quaternion(w, x, y, z);
+    }
+
     public add(q: Quaternion): Quaternion {
         return new Quaternion(this.a + q.a, this.b + q.b, this.c + q.c, this.d + q.d);
     }
@@ -199,22 +206,38 @@ export class Quaternion {
         return this.a === q.a && this.b === q.b && this.c === q.c && this.d === q.d;
     }
 
+    /**
+     * Returns the euler angles of the quaternion in `XYZ` order.
+     */
     public getEulerAngles(): { x: number; y: number; z: number } {
-        const qa = this.a;
-        const qb = this.b;
-        const qc = this.c;
-        const qd = this.d;
+        const a = this.a;
+        const b = this.b;
+        const c = this.c;
+        const d = this.d;
 
-        const x = Math.atan2(2 * (qa * qb + qc * qd), qa * qa - qb * qb - qc * qc + qd * qd);
-        const y = Math.asin(2 * (qa * qc - qb * qd));
-        const z = Math.atan2(2 * (qa * qd + qb * qc), qa * qa + qb * qb - qc * qc - qd * qd);
+        const aa = a * a;
+        const bb = b * b;
+        const cc = c * c;
+        const dd = d * d;
+
+        const ab = a * b;
+        const cd = c * d;
+        const x = Math.atan2(ab + ab + cd + cd, aa - bb - cc + dd);
+
+        const ad = a * d;
+        const bc = b * c;
+        const z = Math.atan2(ad + ad + bc + bc, aa + bb - cc - dd);
+
+        const ac = a * c;
+        const bd = b * d;
+        const y = Math.asin(ac + ac - bd - bd);
 
         return { x, y, z };
     }
 
     public inverse(): Quaternion {
-        const d = this.lenSq();
-        return new Quaternion(this.a / d, -this.b / d, -this.c / d, -this.d / d);
+        const div = this.lenSq();
+        return new Quaternion(this.a / div, -this.b / div, -this.c / div, -this.d / div);
     }
 
     public isIdentity(): boolean {
@@ -288,9 +311,9 @@ export class Quaternion {
         );
     }
 
-    public rotateX(angleX: number): void {
-        const sin = Math.sin(0.5 * angleX);
-        const cos = Math.cos(0.5 * angleX);
+    public rotateX(angle: number): void {
+        const sin = Math.sin(0.5 * angle);
+        const cos = Math.cos(0.5 * angle);
         const a = this.a;
         const b = this.b;
         const c = this.c;
@@ -306,9 +329,9 @@ export class Quaternion {
         this.d = cos * d + sin * c;
     }
 
-    public rotateXPre(angleX: number): void {
-        const sin = Math.sin(0.5 * angleX);
-        const cos = Math.cos(0.5 * angleX);
+    public rotateXPre(angle: number): void {
+        const sin = Math.sin(0.5 * angle);
+        const cos = Math.cos(0.5 * angle);
         const a = this.a;
         const b = this.b;
         const c = this.c;
@@ -324,9 +347,9 @@ export class Quaternion {
         this.d = d * cos - c * sin;
     }
 
-    public rotateY(angleY: number): void {
-        const sin = Math.sin(0.5 * angleY);
-        const cos = Math.cos(0.5 * angleY);
+    public rotateY(angle: number): void {
+        const sin = Math.sin(0.5 * angle);
+        const cos = Math.cos(0.5 * angle);
         const a = this.a;
         const b = this.b;
         const c = this.c;
@@ -342,9 +365,9 @@ export class Quaternion {
         this.d = cos * d - sin * b;
     }
 
-    public rotateYPre(angleY: number): void {
-        const sin = Math.sin(0.5 * angleY);
-        const cos = Math.cos(0.5 * angleY);
+    public rotateYPre(angle: number): void {
+        const sin = Math.sin(0.5 * angle);
+        const cos = Math.cos(0.5 * angle);
         const a = this.a;
         const b = this.b;
         const c = this.c;
@@ -360,9 +383,9 @@ export class Quaternion {
         this.d = d * cos + b * sin;
     }
 
-    public rotateZ(angleZ: number): void {
-        const sin = Math.sin(0.5 * angleZ);
-        const cos = Math.cos(0.5 * angleZ);
+    public rotateZ(angle: number): void {
+        const sin = Math.sin(0.5 * angle);
+        const cos = Math.cos(0.5 * angle);
         const a = this.a;
         const b = this.b;
         const c = this.c;
@@ -378,9 +401,9 @@ export class Quaternion {
         this.d = cos * d + sin * a;
     }
 
-    public rotateZPre(angleZ: number): void {
-        const sin = Math.sin(0.5 * angleZ);
-        const cos = Math.cos(0.5 * angleZ);
+    public rotateZPre(angle: number): void {
+        const sin = Math.sin(0.5 * angle);
+        const cos = Math.cos(0.5 * angle);
         const a = this.a;
         const b = this.b;
         const c = this.c;
@@ -409,7 +432,7 @@ export class Quaternion {
     }
 
     public unit(): Quaternion {
-        const d = this.len();
-        return new Quaternion(this.a / d, this.b / d, this.c / d, this.d / d);
+        const div = this.len();
+        return new Quaternion(this.a / div, this.b / div, this.c / div, this.d / div);
     }
 }

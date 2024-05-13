@@ -56,8 +56,8 @@ export class Complex {
     }
 
     public inverse(): Complex {
-        const d = this.lenSq();
-        return new Complex(this.a / d, -this.b / d);
+        const div = this.lenSq();
+        return new Complex(this.a / div, -this.b / div);
     }
 
     public isIdentity(): boolean {
@@ -125,7 +125,7 @@ export class Complex {
     }
 
     public unit(): Complex {
-        const d = this.len();
-        return new Complex(this.a / d, this.b / d);
+        const div = this.len();
+        return new Complex(this.a / div, this.b / div);
     }
 }
