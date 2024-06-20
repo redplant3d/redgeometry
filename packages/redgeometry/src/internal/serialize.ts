@@ -81,7 +81,7 @@ export class SerializationMap {
     }
 
     public deserialize(json: string): unknown {
-        return JSON.parse(json, (_, obj) => {
+        return JSON.parse(json, (_, obj: { type?: string; data?: unknown }) => {
             const type = obj.type;
             const data = obj.data;
 
@@ -104,7 +104,7 @@ export class SerializationMap {
 
     public serialize(data: unknown): string {
         // TODO: Fix serialization of sentinel values
-        return JSON.stringify(data, (_, obj) => {
+        return JSON.stringify(data, (_, obj: { constructor: Constructor<unknown> } | null | undefined) => {
             if (obj === undefined || obj === null) {
                 return obj;
             }
