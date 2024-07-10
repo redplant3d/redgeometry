@@ -13,10 +13,6 @@ export class ColorRgba {
         this.a = a;
     }
 
-    public static from(obj: { r: number; g: number; b: number; a: number }): ColorRgba {
-        return new ColorRgba(obj.r, obj.g, obj.b, obj.a);
-    }
-
     public static fromArray(data: number[], offset = 0): ColorRgba {
         return new ColorRgba(data[offset], data[offset + 1], data[offset + 2], data[offset + 3]);
     }
@@ -53,6 +49,14 @@ export class ColorRgba {
         const r = (n >>> 24) & 0xff;
 
         return new ColorRgba(r / 255, g / 255, b / 255, a / 255);
+    }
+
+    public static fromObject(obj: { r: number; g: number; b: number; a: number }): ColorRgba {
+        return new ColorRgba(obj.r, obj.g, obj.b, obj.a);
+    }
+
+    public static toObject(c: ColorRgba): { r: number; g: number; b: number; a: number } {
+        return { r: c.r, g: c.g, b: c.b, a: c.a };
     }
 
     public clone(): ColorRgba {

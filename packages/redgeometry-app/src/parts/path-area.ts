@@ -80,7 +80,7 @@ function updateSystem(world: World): void {
     const path = createRandomPath(random, generator, count, canvasWidth, canvasHeight);
     path.close();
 
-    const p = Point2.from(mouse.getCursorPosition());
+    const p = Point2.fromObject(mouse.getCursorPosition());
 
     world.writeData<AppPartRemoteData>({
         dataId: "app-part-remote",

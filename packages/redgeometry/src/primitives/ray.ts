@@ -1,5 +1,5 @@
-import { Point2, Point3 } from "./point.js";
-import { Vector2, Vector3 } from "./vector.js";
+import { Point2, Point3, type Point2Like, type Point3Like } from "./point.js";
+import { Vector2, Vector3, type Vector2Like, type Vector3Like } from "./vector.js";
 
 export class Ray2 {
     public p: Point2;
@@ -10,14 +10,16 @@ export class Ray2 {
         this.v = v;
     }
 
-    public static from(obj: { p: Point2; v: Vector2 }): Ray2 {
-        return new Ray2(obj.p, obj.v);
-    }
-
     public static fromArray(data: number[], offset = 0): Ray2 {
         const p = Point2.fromArray(data, offset);
         const v = Vector2.fromArray(data, offset + 2);
 
+        return new Ray2(p, v);
+    }
+
+    public static fromObject(obj: { p: Point2Like; v: Vector2Like }): Ray2 {
+        const p = Point2.fromObject(obj.p);
+        const v = Vector2.fromObject(obj.v);
         return new Ray2(p, v);
     }
 
@@ -30,6 +32,12 @@ export class Ray2 {
         const p = new Point2(px, py);
         const v = new Vector2(vx, vy);
         return new Ray2(p, v);
+    }
+
+    public static toObject(ray: Ray2): { p: Point2Like; v: Vector2Like } {
+        const p = Point2.toObject(ray.p);
+        const v = Vector2.toObject(ray.v);
+        return { p, v };
     }
 
     public clone(): Ray2 {
@@ -91,14 +99,16 @@ export class Ray3 {
         this.v = v;
     }
 
-    public static from(obj: { p: Point3; v: Vector3 }): Ray3 {
-        return new Ray3(obj.p, obj.v);
-    }
-
     public static fromArray(data: number[], offset = 0): Ray3 {
         const p = Point3.fromArray(data, offset);
         const v = Vector3.fromArray(data, offset + 3);
 
+        return new Ray3(p, v);
+    }
+
+    public static fromObject(obj: { p: Point3Like; v: Vector3Like }): Ray3 {
+        const p = Point3.fromObject(obj.p);
+        const v = Vector3.fromObject(obj.v);
         return new Ray3(p, v);
     }
 
@@ -111,6 +121,12 @@ export class Ray3 {
         const p = new Point3(px, py, pz);
         const v = new Vector3(vx, vy, vz);
         return new Ray3(p, v);
+    }
+
+    public static toObject(ray: Ray3): { p: Point3Like; v: Vector3Like } {
+        const p = Point3.toObject(ray.p);
+        const v = Vector3.toObject(ray.v);
+        return { p, v };
     }
 
     public clone(): Ray3 {

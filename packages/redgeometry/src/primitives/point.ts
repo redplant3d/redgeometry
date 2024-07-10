@@ -1,7 +1,18 @@
 import { lerp, roundToPrecision } from "../utility/scalar.js";
 import { Vector2, Vector3 } from "./vector.js";
 
-export class Point2 {
+export interface Point2Like {
+    x: number;
+    y: number;
+}
+
+export interface Point3Like {
+    x: number;
+    y: number;
+    z: number;
+}
+
+export class Point2 implements Point2Like {
     public x: number;
     public y: number;
 
@@ -17,12 +28,12 @@ export class Point2 {
         return new Point2(0, 0);
     }
 
-    public static from(obj: { x: number; y: number }): Point2 {
-        return new Point2(obj.x, obj.y);
-    }
-
     public static fromArray(data: number[], offset = 0): Point2 {
         return new Point2(data[offset], data[offset + 1]);
+    }
+
+    public static fromObject(obj: Point2Like): Point2 {
+        return new Point2(obj.x, obj.y);
     }
 
     public static fromXYW(x: number, y: number, w: number): Point2 {
@@ -65,6 +76,10 @@ export class Point2 {
         const v1 = p1.sub(p0);
         const v2 = p.sub(p0);
         return v1.cross(v2);
+    }
+
+    public static toObject(p: Point2): Point2Like {
+        return { x: p.x, y: p.y };
     }
 
     /**
@@ -143,7 +158,7 @@ export class Point2 {
     }
 }
 
-export class Point3 {
+export class Point3 implements Point3Like {
     public x: number;
     public y: number;
     public z: number;
@@ -161,12 +176,12 @@ export class Point3 {
         return new Point3(0, 0, 0);
     }
 
-    public static from(obj: { x: number; y: number; z: number }): Point3 {
-        return new Point3(obj.x, obj.y, obj.z);
-    }
-
     public static fromArray(data: number[], offset = 0): Point3 {
         return new Point3(data[offset], data[offset + 1], data[offset + 2]);
+    }
+
+    public static fromObject(obj: Point3Like): Point3 {
+        return new Point3(obj.x, obj.y, obj.z);
     }
 
     public static fromXY(x: number, y: number): Point3 {
@@ -199,6 +214,10 @@ export class Point3 {
         const y = roundToPrecision(p.y, k);
         const z = roundToPrecision(p.z, k);
         return new Point3(x, y, z);
+    }
+
+    public static toObject(p: Point3): Point3Like {
+        return { x: p.x, y: p.y, z: p.z };
     }
 
     /**

@@ -164,8 +164,8 @@ function transformEdges(edges: Edge3[], m: Matrix4): Edge2[] {
     for (const e of edges) {
         const p0 = m.mulPt(e.p0);
         const p1 = m.mulPt(e.p1);
-        const pp0 = Point2.from(p0);
-        const pp1 = Point2.from(p1);
+        const pp0 = Point2.fromObject(p0);
+        const pp1 = Point2.fromObject(p1);
         output.push(new Edge2(pp0, pp1));
     }
 

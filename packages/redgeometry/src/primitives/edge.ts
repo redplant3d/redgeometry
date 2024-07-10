@@ -2,7 +2,7 @@ import { clamp } from "../utility/scalar.js";
 import { RootType, solveQuadratic } from "../utility/solve.js";
 import { Bezier1Curve2 } from "./bezier.js";
 import { Box2, Box3 } from "./box.js";
-import { Point2, Point3 } from "./point.js";
+import { Point2, Point3, type Point2Like, type Point3Like } from "./point.js";
 import type { Vector2, Vector3 } from "./vector.js";
 
 export class Edge2 {
@@ -41,14 +41,16 @@ export class Edge2 {
         }
     }
 
-    public static from(obj: { p0: Point2; p1: Point2 }): Edge2 {
-        return new Edge2(obj.p0, obj.p1);
-    }
-
     public static fromArray(data: number[], offset = 0): Edge2 {
         const p0 = Point2.fromArray(data, offset);
         const p1 = Point2.fromArray(data, offset + 2);
 
+        return new Edge2(p0, p1);
+    }
+
+    public static fromObject(obj: { p0: Point2Like; p1: Point2Like }): Edge2 {
+        const p0 = Point2.fromObject(obj.p0);
+        const p1 = Point2.fromObject(obj.p1);
         return new Edge2(p0, p1);
     }
 
@@ -270,6 +272,12 @@ export class Edge2 {
         return e1.p0.eq(e2.p1) && e1.p1.eq(e2.p0);
     }
 
+    public static toObject(e: Edge2): { p0: Point2Like; p1: Point2Like } {
+        const p0 = Point2.toObject(e.p0);
+        const p1 = Point2.toObject(e.p1);
+        return { p0, p1 };
+    }
+
     public clone(): Edge2 {
         return new Edge2(this.p0.clone(), this.p1.clone());
     }
@@ -379,14 +387,16 @@ export class Edge3 {
         this.p1 = p1;
     }
 
-    public static from(obj: { p0: Point3; p1: Point3 }): Edge3 {
-        return new Edge3(obj.p0, obj.p1);
-    }
-
     public static fromArray(data: number[], offset = 0): Edge3 {
         const p0 = Point3.fromArray(data, offset);
         const p1 = Point3.fromArray(data, offset + 3);
 
+        return new Edge3(p0, p1);
+    }
+
+    public static fromObject(obj: { p0: Point3Like; p1: Point3Like }): Edge3 {
+        const p0 = Point3.fromObject(obj.p0);
+        const p1 = Point3.fromObject(obj.p1);
         return new Edge3(p0, p1);
     }
 
@@ -407,6 +417,12 @@ export class Edge3 {
 
     public static isOpposite(e1: Edge3, e2: Edge3): boolean {
         return e1.p0.eq(e2.p1) && e1.p1.eq(e2.p0);
+    }
+
+    public static toObject(e: Edge3): { p0: Point3Like; p1: Point3Like } {
+        const p0 = Point3.toObject(e.p0);
+        const p1 = Point3.toObject(e.p1);
+        return { p0, p1 };
     }
 
     public clone(): Edge3 {

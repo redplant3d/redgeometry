@@ -1,7 +1,25 @@
 import { clamp, lerp } from "../utility/scalar.js";
 import { Point2, Point3 } from "./point.js";
 
-export class Vector2 {
+export interface Vector2Like {
+    x: number;
+    y: number;
+}
+
+export interface Vector3Like {
+    x: number;
+    y: number;
+    z: number;
+}
+
+export interface Vector4Like {
+    w: number;
+    x: number;
+    y: number;
+    z: number;
+}
+
+export class Vector2 implements Vector2Like {
     public x: number;
     public y: number;
 
@@ -38,12 +56,12 @@ export class Vector2 {
         return new Vector2(0, 0);
     }
 
-    public static from(obj: { x: number; y: number }): Vector2 {
-        return new Vector2(obj.x, obj.y);
-    }
-
     public static fromArray(data: number[], offset = 0): Vector2 {
         return new Vector2(data[offset], data[offset + 1]);
+    }
+
+    public static fromObject(obj: Vector2Like): Vector2 {
+        return new Vector2(obj.x, obj.y);
     }
 
     public static fromXYW(x: number, y: number, w: number): Vector2 {
@@ -61,6 +79,10 @@ export class Vector2 {
             // `v1` is clockwise to `v2`
             return v1.cross(v) > 0 || v2.cross(v) < 0;
         }
+    }
+
+    public static toObject(v: Vector2): Vector2Like {
+        return { x: v.x, y: v.y };
     }
 
     /**
@@ -216,7 +238,7 @@ export class Vector2 {
     }
 }
 
-export class Vector3 {
+export class Vector3 implements Vector3Like {
     public x: number;
     public y: number;
     public z: number;
@@ -262,12 +284,12 @@ export class Vector3 {
         return new Vector3(0, 0, 0);
     }
 
-    public static from(obj: { x: number; y: number; z: number }): Vector3 {
-        return new Vector3(obj.x, obj.y, obj.z);
-    }
-
     public static fromArray(data: number[], offset = 0): Vector3 {
         return new Vector3(data[offset], data[offset + 1], data[offset + 2]);
+    }
+
+    public static fromObject(obj: Vector3Like): Vector3 {
+        return new Vector3(obj.x, obj.y, obj.z);
     }
 
     public static fromXY(x: number, y: number): Vector3 {
@@ -276,6 +298,10 @@ export class Vector3 {
 
     public static fromXYZW(x: number, y: number, z: number, w: number): Vector3 {
         return new Vector3(x / w, y / w, z / w);
+    }
+
+    public static toObject(v: Vector3): Vector3Like {
+        return { x: v.x, y: v.y, z: v.z };
     }
 
     /**
@@ -434,7 +460,7 @@ export class Vector3 {
     }
 }
 
-export class Vector4 {
+export class Vector4 implements Vector4Like {
     public w: number;
     public x: number;
     public y: number;
@@ -489,16 +515,20 @@ export class Vector4 {
         return new Vector4(0, 0, 0, 0);
     }
 
-    public static from(obj: { x: number; y: number; z: number; w: number }): Vector4 {
-        return new Vector4(obj.x, obj.y, obj.z, obj.w);
-    }
-
     public static fromArray(data: number[], offset = 0): Vector4 {
         return new Vector4(data[offset], data[offset + 1], data[offset + 2], data[offset + 3]);
     }
 
+    public static fromObject(obj: Vector4Like): Vector4 {
+        return new Vector4(obj.x, obj.y, obj.z, obj.w);
+    }
+
     public static fromXYZ(x: number, y: number, z: number): Vector4 {
         return new Vector4(x, y, z, 1);
+    }
+
+    public static toObject(v: Vector4): Vector4Like {
+        return { x: v.x, y: v.y, z: v.z, w: v.w };
     }
 
     /**

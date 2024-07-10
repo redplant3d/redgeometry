@@ -27,12 +27,12 @@ export class Box2 {
         );
     }
 
-    public static from(obj: { x0: number; y0: number; x1: number; y1: number }): Box2 {
-        return new Box2(obj.x0, obj.y0, obj.x1, obj.y1);
-    }
-
     public static fromArray(data: number[], offset = 0): Box2 {
         return new Box2(data[offset], data[offset + 1], data[offset + 2], data[offset + 3]);
+    }
+
+    public static fromObject(obj: { x0: number; y0: number; x1: number; y1: number }): Box2 {
+        return new Box2(obj.x0, obj.y0, obj.x1, obj.y1);
     }
 
     public static fromPoints(p0: Point2, p1: Point2): Box2 {
@@ -51,6 +51,10 @@ export class Box2 {
         const y1 = Math.max(y, y + h);
 
         return new Box2(x0, y0, x1, y1);
+    }
+
+    public static toObject(box: Box2): { x0: number; y0: number; x1: number; y1: number } {
+        return { x0: box.x0, y0: box.y0, x1: box.x1, y1: box.y1 };
     }
 
     public clone(): Box2 {
@@ -195,10 +199,6 @@ export class Box3 {
         );
     }
 
-    public static from(obj: { x0: number; y0: number; z0: number; x1: number; y1: number; z1: number }): Box3 {
-        return new Box3(obj.x0, obj.y0, obj.z0, obj.x1, obj.y1, obj.z1);
-    }
-
     public static fromArray(data: number[], offset = 0): Box3 {
         return new Box3(
             data[offset],
@@ -208,6 +208,10 @@ export class Box3 {
             data[offset + 4],
             data[offset + 5],
         );
+    }
+
+    public static fromObject(obj: { x0: number; y0: number; z0: number; x1: number; y1: number; z1: number }): Box3 {
+        return new Box3(obj.x0, obj.y0, obj.z0, obj.x1, obj.y1, obj.z1);
     }
 
     public static fromPoints(p0: Point3, p1: Point3): Box3 {
@@ -230,6 +234,10 @@ export class Box3 {
         const z1 = Math.max(z, z + d);
 
         return new Box3(x0, y0, z0, x1, y1, z1);
+    }
+
+    public static toObject(box: Box3): { x0: number; y0: number; z0: number; x1: number; y1: number; z1: number } {
+        return { x0: box.x0, y0: box.y0, z0: box.z0, x1: box.x1, y1: box.y1, z1: box.z1 };
     }
 
     public clone(): Box3 {

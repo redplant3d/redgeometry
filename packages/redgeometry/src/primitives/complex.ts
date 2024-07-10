@@ -1,10 +1,15 @@
 import { Point2 } from "./point.js";
 import { Vector2 } from "./vector.js";
 
+export interface ComplexLike {
+    a: number;
+    b: number;
+}
+
 /**
  * A complex number to be used for 2D rotations.
  */
-export class Complex {
+export class Complex implements ComplexLike {
     public a: number;
     public b: number;
 
@@ -17,18 +22,22 @@ export class Complex {
         return new Complex(1, 0);
     }
 
-    public static from(obj: { a: number; b: number }): Complex {
-        return new Complex(obj.a, obj.b);
-    }
-
     public static fromArray(data: number[], offset = 0): Complex {
         return new Complex(data[offset], data[offset + 1]);
+    }
+
+    public static fromObject(obj: ComplexLike): Complex {
+        return new Complex(obj.a, obj.b);
     }
 
     public static fromRotationAngle(angle: number): Complex {
         const sin = Math.sin(angle);
         const cos = Math.cos(angle);
         return new Complex(cos, sin);
+    }
+
+    public static toObject(z: Complex): ComplexLike {
+        return { a: z.a, b: z.b };
     }
 
     public add(z: Complex): Complex {

@@ -3,7 +3,7 @@ import { copyCommandsReversed, isWindingInside } from "../internal/path.js";
 import { CurveType, type BezierCurve2 } from "../primitives/bezier.js";
 import { Box2 } from "../primitives/box.js";
 import { Matrix3A, type Matrix3 } from "../primitives/matrix.js";
-import { Point2 } from "../primitives/point.js";
+import { Point2, type Point2Like } from "../primitives/point.js";
 import { Polygon2 } from "../primitives/polygon.js";
 import { Vector2 } from "../primitives/vector.js";
 import { copyArray, copyArrayReversed } from "../utility/array.js";
@@ -74,6 +74,18 @@ export class Path2 implements PathSink2 {
 
     public static createEmpty(): Path2 {
         return new Path2([], []);
+    }
+
+    public static fromObject(obj: { points: Point2Like[]; commands: PathCommand[] }): Path2 {
+        const commands = obj.commands.map((c) => ({ ...c }));
+        const points = obj.points.map((p) => Point2.fromObject(p));
+        return new Path2(commands, points);
+    }
+
+    public static toObject(path: Path2): { points: Point2Like[]; commands: PathCommand[] } {
+        const commands = path.commands.map((c) => ({ ...c }));
+        const points = path.points.map((p) => Point2.toObject(p));
+        return { commands, points };
     }
 
     public addArc(p0: Point2, p1: Point2, p2: Point2): void {
