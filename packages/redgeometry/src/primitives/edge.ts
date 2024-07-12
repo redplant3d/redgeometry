@@ -3,6 +3,7 @@ import { RootType, solveQuadratic } from "../utility/solve.js";
 import { Bezier1Curve2 } from "./bezier.js";
 import { Box2, Box3 } from "./box.js";
 import { Point2, Point3, type Point2Like, type Point3Like } from "./point.js";
+import { Ray2, Ray3 } from "./ray.js";
 import type { Vector2, Vector3 } from "./vector.js";
 
 export class Edge2 {
@@ -177,50 +178,45 @@ export class Edge2 {
     }
 
     public static getIntersection(e1: Edge2, e2: Edge2): Point2 | undefined {
-        const r = e1.vector();
-        const s = e2.vector();
+        const v1 = e1.vector();
+        const v2 = e2.vector();
+        const den = v1.cross(v2);
 
-        const rxs = r.cross(s);
-
-        // If r x s = 0 then the two lines are either collinear or parallel and non-intersecting
-        if (rxs !== 0) {
-            const v = e2.p0.sub(e1.p0);
-
-            // t = (q − p) x s / (r x s)
-            const t = v.cross(s) / rxs;
-
-            // u = (q − p) x r / (r x s)
-            const u = v.cross(r) / rxs;
-
-            // If 0 ≤ t ≤ 1 and 0 ≤ u ≤ 1 the two line segments meet at the point p + t r = q + u s
-            if (t >= 0 && t <= 1 && u >= 0 && u <= 1) {
-                return e1.getValueAt(t);
-            }
+        if (den === 0) {
+            // Edges are collinear
+            return undefined;
         }
 
-        // Otherwise, the two line segments are not parallel but do not intersect
-        return undefined;
+        // `t = (p2 − p1) cross v2 / (v1 cross v2)`
+        // `u = (p2 − p1) cross v1 / (v1 cross v2)`
+        const v = e2.p0.sub(e1.p0);
+        const t = v.cross(v2) / den;
+        const u = v.cross(v1) / den;
+
+        if (t < 0 || t > 1 || u < 0 || u > 1) {
+            return undefined;
+        }
+
+        return e1.getValueAt(t);
     }
 
     public static getIntersectionParameter(e1: Edge2, e2: Edge2): [number, number] {
-        let result: [number, number];
+        const v1 = e1.vector();
+        const v2 = e2.vector();
+        const den = v1.cross(v2);
 
-        const r = e1.vector();
-        const s = e2.vector();
-
-        const rxs = r.cross(s);
-
-        if (rxs !== 0) {
-            const v = e2.p0.sub(e1.p0);
-            const t = v.cross(s) / rxs;
-            const u = v.cross(r) / rxs;
-
-            result = [t, u];
-        } else {
-            result = [Number.NaN, Number.NaN];
+        if (den === 0) {
+            // Edges are collinear (TODO: Maybe return undefined)
+            return [Number.NaN, Number.NaN];
         }
 
-        return result;
+        // `t = (p2 − p1) cross v2 / (v1 cross v2)`
+        // `u = (p2 − p1) cross v1 / (v1 cross v2)`
+        const v = e2.p0.sub(e1.p0);
+        const t = v.cross(v2) / den;
+        const u = v.cross(v1) / den;
+
+        return [t, u];
     }
 
     public static isAdjacent(e1: Edge2, e2: Edge2): boolean {
@@ -365,6 +361,10 @@ export class Edge2 {
         return new Bezier1Curve2(this.p0, this.p1);
     }
 
+    public toRay(): Ray2 {
+        return new Ray2(this.p0, this.vector());
+    }
+
     public toString(): string {
         return `{p0: ${this.p0}, p1: ${this.p1}}`;
     }
@@ -504,6 +504,10 @@ export class Edge3 {
 
     public toArray(): [number, number, number, number, number, number] {
         return [this.p0.x, this.p0.y, this.p0.z, this.p1.x, this.p1.y, this.p1.z];
+    }
+
+    public toRay(): Ray3 {
+        return new Ray3(this.p0, this.vector());
     }
 
     public toString(): string {

@@ -34,6 +34,42 @@ export class Ray2 {
         return new Ray2(p, v);
     }
 
+    public static getIntersection(ray1: Ray2, ray2: Ray2): Point2 | undefined {
+        const v1 = ray1.v;
+        const v2 = ray2.v;
+        const den = v1.cross(v2);
+
+        if (den === 0) {
+            // Rays are collinear
+            return undefined;
+        }
+
+        // `t = (p2 − p1) cross v2 / (v1 cross v2)`
+        const v = ray2.p.sub(ray1.p);
+        const t = v.cross(ray2.v) / den;
+
+        return ray1.getValueAt(t);
+    }
+
+    public static getIntersectionParameter(ray1: Ray2, ray2: Ray2): [number, number] {
+        const v1 = ray1.v;
+        const v2 = ray2.v;
+        const den = v1.cross(v2);
+
+        if (den === 0) {
+            // Rays are collinear (TODO: Maybe return undefined)
+            return [Number.NaN, Number.NaN];
+        }
+
+        // `t = (p2 − p1) cross v2 / (v1 cross v2)`
+        // `u = (p2 − p1) cross v1 / (v1 cross v2)`
+        const v = ray2.p.sub(ray1.p);
+        const t = v.cross(v2) / den;
+        const u = v.cross(v1) / den;
+
+        return [t, u];
+    }
+
     public static toObject(ray: Ray2): { p: Point2Like; v: Vector2Like } {
         const p = Point2.toObject(ray.p);
         const v = Vector2.toObject(ray.v);

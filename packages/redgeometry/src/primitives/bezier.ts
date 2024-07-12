@@ -60,27 +60,6 @@ export class Bezier1Curve2 {
         return new Bezier1Curve2(p0, p1);
     }
 
-    public static getIntersectionParameter(c1: Bezier1Curve2, c2: Bezier1Curve2): [number, number] {
-        let result: [number, number];
-
-        const r = c1.p1.sub(c1.p0);
-        const s = c2.p1.sub(c2.p0);
-
-        const v = c2.p0.sub(c1.p0);
-        const rxs = r.cross(s);
-
-        if (rxs !== 0) {
-            const t = v.cross(s) / rxs;
-            const u = v.cross(r) / rxs;
-
-            result = [t, u];
-        } else {
-            result = [Number.NaN, Number.NaN];
-        }
-
-        return result;
-    }
-
     public static toObject(c: Bezier1Curve2): { p0: Point2Like; p1: Point2Like } {
         const p0 = Point2.toObject(c.p0);
         const p1 = Point2.toObject(c.p1);
