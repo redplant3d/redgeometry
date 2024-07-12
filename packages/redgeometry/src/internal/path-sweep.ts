@@ -80,7 +80,7 @@ export class PathSweepEvent2 {
 export function createSweepEventQueue(snapRound: SnapRound2): PathSweepEvent2[] {
     snapRound.process();
 
-    log.assertFn(() => snapRound.validate(), "PathClip2: Validation failed");
+    log.assertFnDebug(() => snapRound.validate(), "PathClip2: Validation failed");
 
     const edgeSegments: EdgeSegment2[] = [];
     snapRound.writeEdgeSegmentsTo(edgeSegments);
