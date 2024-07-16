@@ -31,18 +31,18 @@ export function minimizeCurveDistanceAt(
 }
 
 export function getWindingAtParameterLinear(c: Bezier1Curve2, t: number, px: number): number {
-    if (t < 0 || t > 1) {
+    if (!isInParameterRange(t)) {
         return 0;
     }
 
     const x = lerp(c.p0.x, c.p1.x, t);
     const yy = c.p0.y - c.p1.y;
 
-    return getWinding(px, x, yy);
+    return getWinding(t, px, x, yy);
 }
 
 export function getWindingAtParameterQuadratic(c: Bezier2Curve2, t: number, px: number): number {
-    if (t < 0 || t > 1) {
+    if (!isInParameterRange(t)) {
         return 0;
     }
 
@@ -52,11 +52,11 @@ export function getWindingAtParameterQuadratic(c: Bezier2Curve2, t: number, px: 
     const x = lerp(p01.x, p12.x, t);
     const yy = p01.y - p12.y;
 
-    return getWinding(px, x, yy);
+    return getWinding(t, px, x, yy);
 }
 
 export function getWindingAtParameterCubic(c: Bezier3Curve2, t: number, px: number): number {
-    if (t < 0 || t > 1) {
+    if (!isInParameterRange(t)) {
         return 0;
     }
 
@@ -70,11 +70,11 @@ export function getWindingAtParameterCubic(c: Bezier3Curve2, t: number, px: numb
     const x = lerp(p012.x, p123.x, t);
     const yy = p012.y - p123.y;
 
-    return getWinding(px, x, yy);
+    return getWinding(t, px, x, yy);
 }
 
 export function getWindingAtParameterConic(c: BezierRCurve2, t: number, px: number): number {
-    if (t < 0 || t > 1) {
+    if (!isInParameterRange(t)) {
         return 0;
     }
 
@@ -89,17 +89,7 @@ export function getWindingAtParameterConic(c: BezierRCurve2, t: number, px: numb
     const x = p012.x / p012.z;
     const yy = p012.y * (p12.z - p01.z) - p012.z * (p12.y - p01.y);
 
-    return getWinding(px, x, yy);
-}
-
-export function getWinding(px: number, x: number, yy: number): number {
-    if (px < x || yy === 0) {
-        return 0;
-    } else if (yy < 0) {
-        return -1;
-    } else {
-        return 1;
-    }
+    return getWinding(t, px, x, yy);
 }
 
 export function checkIntervalQuadQuad(
@@ -262,6 +252,23 @@ export function getParameterAtArcLengthConic(c: BezierRCurve2, d: number): numbe
     } else {
         // Fallback
         return 1;
+    }
+}
+
+function isInParameterRange(t: number): boolean {
+    // Returns `false` for `t = NaN`
+    return t >= 0 && t <= 1;
+}
+
+function getWinding(t: number, px: number, x: number, yy: number): number {
+    if (px < x) {
+        return 0;
+    } else if (yy < 0) {
+        return t !== 0 ? -1 : 0;
+    } else if (yy > 0) {
+        return t !== 1 ? 1 : 0;
+    } else {
+        return 0;
     }
 }
 
