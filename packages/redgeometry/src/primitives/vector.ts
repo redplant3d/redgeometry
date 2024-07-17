@@ -405,6 +405,19 @@ export class Vector3 implements Vector3Like {
     }
 
     /**
+     * Returns a non-zero normal vector.
+     */
+    public normalAny(): Vector3 {
+        if (this.x !== 0) {
+            return this.normalY();
+        } else if (this.y !== 0) {
+            return this.normalZ();
+        } else {
+            return this.normalX();
+        }
+    }
+
+    /**
      * Returns the normal vector around the x-axis.
      *
      * The normal is defined by the cross product: \

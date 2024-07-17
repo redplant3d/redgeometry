@@ -76,6 +76,23 @@ export class Quaternion implements QuaternionLike {
         return new Quaternion(cos * v.len(), sin * v.x, sin * v.y, sin * v.z);
     }
 
+    /**
+     * Returns a quaternion with minimal rotation from `v1` to `v2`.
+     */
+    public static fromRotationBetween(v1: Vector3, v2: Vector3): Quaternion {
+        const v1u = v1.unit();
+        const v2u = v2.unit();
+
+        // Vector halfway between `v1` and `v2`
+        const vu = v1u.add(v2u).unitOrZero();
+
+        // If `v` is zero then `dot = 0` and `cross` just needs to be any normal of `v1`
+        const dot = v1u.dot(vu);
+        const cross = vu.isZero() ? v1u.normalAny() : v1u.cross(vu);
+
+        return new Quaternion(dot, cross.x, cross.y, cross.z);
+    }
+
     public static fromRotationEuler(angleX: number, angleY: number, angleZ: number, order: RotationOrder): Quaternion {
         const sinX = Math.sin(0.5 * angleX);
         const cosX = Math.cos(0.5 * angleX);
