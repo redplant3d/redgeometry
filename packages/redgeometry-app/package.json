@@ -6,7 +6,7 @@
         "redgeometry": "workspace:*"
     },
     "devDependencies": {
-        "@webgpu/types": "^0.1.42"
+        "@webgpu/types": "^0.1.44"
     },
     "scripts": {
         "build": "vite-node ./scripts/build.ts",
