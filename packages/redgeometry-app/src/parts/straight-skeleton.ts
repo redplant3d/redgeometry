@@ -78,9 +78,9 @@ function updateSystem(world: World): void {
 
     const tmax = time;
 
-    // const path = createSimplePolygon(random, box, generator, 0.5, 0.25).toPath();
+    // const path = createRandomPolygonSimple(random, box, generator, 0.5, 0.25).toPath();
     const path = createRandomPolygonSimple(random, box, generator, 1, 0).toPath();
-    // const path = createSimplePolygon(random, box, generator, 0.05, 0.95).toPath();
+    // const path = createRandomPolygonSimple(random, box, generator, 0.05, 0.95).toPath();
 
     // path.clear();
     // path.moveToXY(100, 100);

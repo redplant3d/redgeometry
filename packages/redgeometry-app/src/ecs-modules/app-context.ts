@@ -2,6 +2,7 @@ import type { Mesh2, MeshFace2 } from "redgeometry/src/core/mesh";
 import { PathCommandType, type Path2 } from "redgeometry/src/core/path";
 import type { Box2 } from "redgeometry/src/primitives/box";
 import type { Edge2 } from "redgeometry/src/primitives/edge";
+import type { Matrix3A } from "redgeometry/src/primitives/matrix";
 import { Point2 } from "redgeometry/src/primitives/point";
 import type { Polygon2 } from "redgeometry/src/primitives/polygon";
 import type { Ray2 } from "redgeometry/src/primitives/ray";
@@ -333,6 +334,11 @@ export class AppContextPlugin implements WorldPlugin {
         }
     }
 
+    public resetTransform(): void {
+        const ctx = this.context;
+        ctx.resetTransform();
+    }
+
     public resize(width: number, height: number): void {
         if (width < 0 || height < 0) {
             return;
@@ -343,10 +349,10 @@ export class AppContextPlugin implements WorldPlugin {
         canvas.height = height;
     }
 
-    public setTransform(a: number, b: number, c: number, d: number, e: number, f: number): void {
+    public setTransform(mat: Matrix3A): void {
         const ctx = this.context;
-
-        ctx.setTransform(a, b, c, d, e, f);
+        const el = mat.elements;
+        ctx.setTransform(el[0], el[1], el[2], el[3], el[4], el[5]);
     }
 
     private addCircle(ctx: CanvasRenderingContext2D | OffscreenCanvasRenderingContext2D, c: Point2, r: number): void {
