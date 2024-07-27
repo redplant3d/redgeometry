@@ -83,19 +83,19 @@ export class Point2 implements Point2Like {
     }
 
     /**
-     * Returns the sum of the current point and a vector `v`.
-     */
-    public add(v: Vector2): Point2 {
-        return new Point2(this.x + v.x, this.y + v.y);
-    }
-
-    /**
      * Returns the sum of the current point and a vector `v` scaled by `f`.
      */
-    public addMul(v: Vector2, f: number): Point2 {
+    public addMulVec(v: Vector2, f: number): Point2 {
         const x = this.x + f * v.x;
         const y = this.y + f * v.y;
         return new Point2(x, y);
+    }
+
+    /**
+     * Returns the sum of the current point and a vector `v`.
+     */
+    public addVec(v: Vector2): Point2 {
+        return new Point2(this.x + v.x, this.y + v.y);
     }
 
     public clone(): Point2 {
@@ -143,6 +143,13 @@ export class Point2 implements Point2Like {
 
     public sub(p: Point2): Vector2 {
         return new Vector2(this.x - p.x, this.y - p.y);
+    }
+
+    /**
+     * Returns the difference of the current point and a vector `v`.
+     */
+    public subVec(v: Vector2): Point2 {
+        return new Point2(this.x - v.x, this.y - v.y);
     }
 
     public toArray(): [number, number] {
@@ -196,18 +203,6 @@ export class Point3 implements Point3Like {
         return new Point3(x / w, y / w, z / w);
     }
 
-    public static max(p1: Point3, p2: Point3): Point3 {
-        return new Point3(Math.max(p1.x, p2.x), Math.max(p1.y, p2.y), Math.max(p1.z, p2.z));
-    }
-
-    public static min(p1: Point3, p2: Point3): Point3 {
-        return new Point3(Math.min(p1.x, p2.x), Math.min(p1.y, p2.y), Math.min(p1.z, p2.z));
-    }
-
-    public static round(p: Point3): Point3 {
-        return new Point3(Math.round(p.x), Math.round(p.y), Math.round(p.z));
-    }
-
     public static roundToPrecision(p: Point3, k: number): Point3 {
         // `k` denotes the reciprocal of the minimum interval that the rounded number is able to represent
         const x = roundToPrecision(p.x, k);
@@ -221,20 +216,20 @@ export class Point3 implements Point3Like {
     }
 
     /**
-     * Returns the sum of the current point and a vector `v`.
-     */
-    public add(v: Vector3): Point3 {
-        return new Point3(this.x + v.x, this.y + v.y, this.z + v.z);
-    }
-
-    /**
      * Returns the sum of the current point and a vector `v` scaled by `f`.
      */
-    public addMul(v: Vector3, f: number): Point3 {
+    public addMulVec(v: Vector3, f: number): Point3 {
         const x = this.x + f * v.x;
         const y = this.y + f * v.y;
         const z = this.z + f * v.z;
         return new Point3(x, y, z);
+    }
+
+    /**
+     * Returns the sum of the current point and a vector `v`.
+     */
+    public addVec(v: Vector3): Point3 {
+        return new Point3(this.x + v.x, this.y + v.y, this.z + v.z);
     }
 
     public clone(): Point3 {
@@ -268,6 +263,13 @@ export class Point3 implements Point3Like {
 
     public sub(v: Point3): Vector3 {
         return new Vector3(this.x - v.x, this.y - v.y, this.z - v.z);
+    }
+
+    /**
+     * Returns the difference of the current point and a vector `v`.
+     */
+    public subVec(v: Vector3): Point3 {
+        return new Point3(this.x - v.x, this.y - v.y, this.z - v.z);
     }
 
     public toArray(): [number, number, number] {

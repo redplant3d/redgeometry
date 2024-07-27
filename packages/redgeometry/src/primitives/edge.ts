@@ -346,7 +346,8 @@ export class Edge2 {
 
     public normal(): Edge2 {
         const vn = this.vector().normal();
-        return new Edge2(this.p0, this.p0.add(vn));
+        const p1 = this.p0.addVec(vn);
+        return new Edge2(this.p0, p1);
     }
 
     public reverse(): Edge2 {
@@ -370,7 +371,9 @@ export class Edge2 {
     }
 
     public translate(v: Vector2): Edge2 {
-        return new Edge2(this.p0.add(v), this.p1.add(v));
+        const p0 = this.p0.addVec(v);
+        const p1 = this.p1.addVec(v);
+        return new Edge2(p0, p1);
     }
 
     public vector(): Vector2 {
@@ -465,7 +468,8 @@ export class Edge3 {
 
     public getNormalAround(v: Vector3): Edge3 {
         const vn = this.vector().cross(v);
-        return new Edge3(this.p0, this.p0.add(vn));
+        const p1 = this.p0.addVec(vn);
+        return new Edge3(this.p0, p1);
     }
 
     /**
@@ -515,7 +519,9 @@ export class Edge3 {
     }
 
     public translate(v: Vector3): Edge3 {
-        return new Edge3(this.p0.add(v), this.p1.add(v));
+        const p0 = this.p0.addVec(v);
+        const p1 = this.p1.addVec(v);
+        return new Edge3(p0, p1);
     }
 
     public vector(): Vector3 {

@@ -19,7 +19,7 @@ export function offsetQuadraticSimple(path: Path2, c: Bezier2Curve2, d: number):
         v1 = v1.mul(2 * d).div(v1.lenSq());
         v2 = v2.mul(d);
 
-        path.quadTo(c.p1.add(v1), c.p2.add(v2));
+        path.quadTo(c.p1.addVec(v1), c.p2.addVec(v2));
     }
 }
 
@@ -70,7 +70,7 @@ export function insertOuterJoin(
 
     switch (join) {
         case JoinType.Bevel: {
-            path.lineTo(p.addMul(n1, d));
+            path.lineTo(p.addMulVec(n1, d));
 
             break;
         }
@@ -80,10 +80,10 @@ export function insertOuterJoin(
             k = k.mul(2 * d).div(k.lenSq());
 
             if (k.lenSq() <= mld * mld) {
-                path.lineTo(p.add(k));
+                path.lineTo(p.addVec(k));
             }
 
-            path.lineTo(p.addMul(n1, d));
+            path.lineTo(p.addMulVec(n1, d));
 
             break;
         }
@@ -92,16 +92,16 @@ export function insertOuterJoin(
 
             k = k.mul(2 * d).div(k.lenSq());
 
-            const pp0 = p.addMul(n0, d);
-            const pp2 = p.addMul(n1, d);
+            const pp0 = p.addMulVec(n0, d);
+            const pp2 = p.addMulVec(n1, d);
 
             if (k.lenSq() <= mld * mld) {
                 // Same as miter join
-                path.lineTo(p.add(k));
+                path.lineTo(p.addVec(k));
             } else if (n0.dot(n1) <= COS_ACUTE) {
                 // Join is too sharp ('k' is approaching infinity)
-                path.lineTo(pp0.addMul(n0.normal(), -mld));
-                path.lineTo(pp2.addMul(n1.normal(), mld));
+                path.lineTo(pp0.addMulVec(n0.normal(), -mld));
+                path.lineTo(pp2.addMulVec(n1.normal(), mld));
             } else {
                 const kov = k.dot(p.sub(pp0));
                 const kok = k.dot(k);
@@ -110,7 +110,7 @@ export function insertOuterJoin(
 
                 // Fall back to bevel otherwise
                 if (t > 0) {
-                    const pp1 = p.add(k);
+                    const pp1 = p.addVec(k);
 
                     path.lineTo(pp0.lerp(pp1, t));
                     path.lineTo(pp2.lerp(pp1, t));
@@ -122,8 +122,8 @@ export function insertOuterJoin(
             break;
         }
         case JoinType.Round: {
-            const pp0 = p.addMul(n0, d);
-            const pp2 = p.addMul(n1, d);
+            const pp0 = p.addMulVec(n0, d);
+            const pp2 = p.addMulVec(n1, d);
 
             if (n0.dot(n1) < 0) {
                 // Obtuse angle (2 segments)
@@ -133,8 +133,8 @@ export function insertOuterJoin(
 
                 k = k.mul(2 * d).div(k.lenSq());
 
-                const pc1 = p.add(k);
-                const pp1 = p.addMul(nm, d);
+                const pc1 = p.addVec(k);
+                const pp1 = p.addMulVec(nm, d);
                 const pc2 = pc1.lerp(pp1, 2);
 
                 const w = BezierRCurve2.getWeightFromVectors(p, pc1, pp1);
@@ -147,7 +147,7 @@ export function insertOuterJoin(
 
                 k = k.mul(2 * d).div(k.lenSq());
 
-                const pc = p.add(k);
+                const pc = p.addVec(k);
 
                 const w = BezierRCurve2.getWeightFromVectors(p, pc, pp2);
 
@@ -167,5 +167,5 @@ export function insertInnerJoin(path: Path2, p: Point2, n1: Vector2, d: number):
     path.lineTo(p);
 
     // Bevel join
-    path.lineTo(p.addMul(n1, d));
+    path.lineTo(p.addMulVec(n1, d));
 }

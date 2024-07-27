@@ -79,7 +79,7 @@ export class KineticVertex {
     }
 
     public getPositionAt(t: number): Point2 {
-        return this.orig.addMul(this.vel, t - this.t0);
+        return this.orig.addMulVec(this.vel, t - this.t0);
     }
 }
 

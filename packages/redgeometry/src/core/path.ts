@@ -619,7 +619,7 @@ export class Path2 implements PathSink2 {
         // New vector from center (unit midpoint)
         v = pp1.sub(pp0).mul(0.5);
 
-        let pc = pp0.add(v);
+        let pc = pp0.addVec(v);
 
         // If `lenght^2 >= 1` the point is already the center
         const len2 = v.lenSq();
@@ -631,9 +631,9 @@ export class Path2 implements PathSink2 {
             v = v.normal().neg().mul(f);
 
             if (largeArc !== sweep) {
-                pc = pc.add(v);
+                pc = pc.addVec(v);
             } else {
-                pc = pc.add(v.neg());
+                pc = pc.subVec(v);
             }
         }
 

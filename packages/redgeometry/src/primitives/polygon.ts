@@ -240,8 +240,8 @@ export class Polygon2 {
             if (area < minArea) {
                 // Update bounding box
                 points[0] = p0;
-                points[1] = p0.add(v1);
-                points[2] = p1.add(v1);
+                points[1] = p0.addVec(v1);
+                points[2] = p1.addVec(v1);
                 points[3] = p1;
                 minArea = area;
             }

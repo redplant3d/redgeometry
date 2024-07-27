@@ -339,7 +339,7 @@ function cameraMoveSystem(world: World): void {
         v = v.unitOrZero().mul(delta * vel);
         v = camRot.mulVec(v);
 
-        camPos = camPos.add(v);
+        camPos = camPos.addVec(v);
     }
 
     transform.rotation = camRot;
