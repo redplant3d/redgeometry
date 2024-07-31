@@ -86,11 +86,11 @@ export class Quaternion implements QuaternionLike {
         // Vector halfway between `v1` and `v2`
         const vu = v1u.add(v2u).unitOrZero();
 
-        // If `v` is zero then `dot = 0` and `cross` just needs to be any normal of `v1`
-        const dot = v1u.dot(vu);
-        const cross = vu.isZero() ? v1u.normalAny() : v1u.cross(vu);
+        // If `vu` is zero then `vd = 0` and `vn` just needs to be any normal of `v1`
+        const vd = v1u.dot(vu);
+        const vn = vu.isZero() ? v1u.normalAroundAny() : v1u.normalAround(vu);
 
-        return new Quaternion(dot, cross.x, cross.y, cross.z);
+        return new Quaternion(vd, vn.x, vn.y, vn.z);
     }
 
     public static fromRotationEuler(angleX: number, angleY: number, angleZ: number, order: RotationOrder): Quaternion {

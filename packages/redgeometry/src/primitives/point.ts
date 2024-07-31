@@ -191,10 +191,6 @@ export class Point3 implements Point3Like {
         return new Point3(obj.x, obj.y, obj.z);
     }
 
-    public static fromXY(x: number, y: number): Point3 {
-        return new Point3(x, y, 1);
-    }
-
     public static fromXYW(x: number, y: number, w: number): Point3 {
         return new Point3(w * x, w * y, w);
     }

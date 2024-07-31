@@ -85,6 +85,12 @@ export class Vector2 implements Vector2Like {
         return { x: v.x, y: v.y };
     }
 
+    public abs(): Vector2 {
+        const x = Math.abs(this.x);
+        const y = Math.abs(this.y);
+        return new Vector2(x, y);
+    }
+
     /**
      * Returns the sum of the current vector and a vector `v`.
      */
@@ -216,6 +222,13 @@ export class Vector2 implements Vector2Like {
         return new Vector2(this.x - v.x, this.y - v.y);
     }
 
+    /**
+     * Substracts the current vector from a point `p`.
+     */
+    public subPt(p: Point2): Point2 {
+        return new Point2(p.x - this.x, p.y - this.y);
+    }
+
     public toArray(): [number, number] {
         return [this.x, this.y];
     }
@@ -292,8 +305,8 @@ export class Vector3 implements Vector3Like {
         return new Vector3(obj.x, obj.y, obj.z);
     }
 
-    public static fromXY(x: number, y: number): Vector3 {
-        return new Vector3(x, y, 1);
+    public static fromXYW(x: number, y: number, w: number): Vector3 {
+        return new Vector3(w * x, w * y, w);
     }
 
     public static fromXYZW(x: number, y: number, z: number, w: number): Vector3 {
@@ -302,6 +315,13 @@ export class Vector3 implements Vector3Like {
 
     public static toObject(v: Vector3): Vector3Like {
         return { x: v.x, y: v.y, z: v.z };
+    }
+
+    public abs(): Vector3 {
+        const x = Math.abs(this.x);
+        const y = Math.abs(this.y);
+        const z = Math.abs(this.z);
+        return new Vector3(x, y, z);
     }
 
     /**
@@ -404,16 +424,23 @@ export class Vector3 implements Vector3Like {
         return new Vector3(-this.x, -this.y, -this.z);
     }
 
+    public normalAround(v: Vector3): Vector3 {
+        return this.cross(v);
+    }
+
     /**
-     * Returns a non-zero normal vector.
+     * Returns the normal vector around the most appropriate axis.
      */
-    public normalAny(): Vector3 {
-        if (this.x !== 0) {
-            return this.normalY();
-        } else if (this.y !== 0) {
-            return this.normalZ();
+    public normalAroundAny(): Vector3 {
+        const absX = Math.abs(this.x);
+        const absY = Math.abs(this.y);
+        const absZ = Math.abs(this.z);
+
+        // Use the two biggest absolute values
+        if (absX <= absY) {
+            return absX <= absZ ? this.normalAroundX() : this.normalAroundZ();
         } else {
-            return this.normalX();
+            return absY <= absZ ? this.normalAroundY() : this.normalAroundZ();
         }
     }
 
@@ -422,8 +449,10 @@ export class Vector3 implements Vector3Like {
      *
      * The normal is defined by the cross product: \
      * `(x, y, z) cross (1, 0, 0) == (0, z, -y)`
+     *
+     * Note: Might return a zero vector.
      */
-    public normalX(): Vector3 {
+    public normalAroundX(): Vector3 {
         return new Vector3(0, this.z, -this.y);
     }
 
@@ -432,8 +461,10 @@ export class Vector3 implements Vector3Like {
      *
      * The normal is defined by the cross product: \
      * `(x, y, z) cross (0, 1, 0) == (-z, 0, x)`
+     *
+     * Note: Might return a zero vector.
      */
-    public normalY(): Vector3 {
+    public normalAroundY(): Vector3 {
         return new Vector3(-this.z, 0, this.x);
     }
 
@@ -442,13 +473,22 @@ export class Vector3 implements Vector3Like {
      *
      * The normal is defined by the cross product: \
      * `(x, y, z) cross (0, 0, 1) == (y, -x, 0)`
+     *
+     * Note: Might return a zero vector.
      */
-    public normalZ(): Vector3 {
+    public normalAroundZ(): Vector3 {
         return new Vector3(this.y, -this.x, 0);
     }
 
     public sub(v: Vector3): Vector3 {
         return new Vector3(this.x - v.x, this.y - v.y, this.z - v.z);
+    }
+
+    /**
+     * Substracts the current vector from a point `p`.
+     */
+    public subPt(p: Point3): Point3 {
+        return new Point3(p.x - this.x, p.y - this.y, p.z - this.z);
     }
 
     public toArray(): [number, number, number] {
@@ -536,12 +576,16 @@ export class Vector4 implements Vector4Like {
         return new Vector4(obj.x, obj.y, obj.z, obj.w);
     }
 
-    public static fromXYZ(x: number, y: number, z: number): Vector4 {
-        return new Vector4(x, y, z, 1);
-    }
-
     public static toObject(v: Vector4): Vector4Like {
         return { x: v.x, y: v.y, z: v.z, w: v.w };
+    }
+
+    public abs(): Vector4 {
+        const x = Math.abs(this.x);
+        const y = Math.abs(this.y);
+        const z = Math.abs(this.z);
+        const w = Math.abs(this.w);
+        return new Vector4(x, y, z, w);
     }
 
     /**

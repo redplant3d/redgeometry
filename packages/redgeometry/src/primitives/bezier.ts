@@ -1102,9 +1102,9 @@ export class BezierRCurve2 {
     }
 
     public getProjectivePoints(): [Point3, Point3, Point3] {
-        const p0 = Point3.fromXY(this.p0.x, this.p0.y);
+        const p0 = Point3.fromXYW(this.p0.x, this.p0.y, 1);
         const p1 = Point3.fromXYW(this.p1.x, this.p1.y, this.w);
-        const p2 = Point3.fromXY(this.p2.x, this.p2.y);
+        const p2 = Point3.fromXYW(this.p2.x, this.p2.y, 1);
 
         return [p0, p1, p2];
     }
