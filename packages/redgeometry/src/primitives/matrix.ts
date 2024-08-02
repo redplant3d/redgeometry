@@ -1269,6 +1269,32 @@ export class Matrix4A {
         return new Matrix4A([1, 0, 0, 0, 1, 0, 0, 0, 1, tx, ty, tz]);
     }
 
+    /**
+     * Returns a view matrix where `x` is right, `y` is up and `-z` is forward.
+     */
+    public static fromView(offset: Vector3, direction: Vector3, up: Vector3): Matrix4A {
+        // Orthonormal basis
+        const v3 = direction.neg().unit();
+        const v1 = up.cross(v3).unit();
+        const v2 = v3.cross(v1);
+
+        // See the `Matrix4.fromView()` for derivation.
+        const e0 = v1.x;
+        const e1 = v2.x;
+        const e2 = v3.x;
+        const e3 = v1.y;
+        const e4 = v2.y;
+        const e5 = v3.y;
+        const e6 = v1.z;
+        const e7 = v2.z;
+        const e8 = v3.z;
+        const e9 = -offset.dot(v1);
+        const e10 = -offset.dot(v2);
+        const e11 = -offset.dot(v3);
+
+        return new Matrix4A([e0, e1, e2, e3, e4, e5, e6, e7, e8, e9, e10, e11]);
+    }
+
     public clone(): Matrix4A {
         return new Matrix4A([...this.elements]);
     }
@@ -2128,6 +2154,46 @@ export class Matrix4 {
      */
     public static fromTranslation(tx: number, ty: number, tz: number): Matrix4 {
         return new Matrix4([1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, tx, ty, tz, 1]);
+    }
+
+    /**
+     * Returns a view matrix where `x` is right, `y` is up and `-z` is forward.
+     */
+    public static fromView(offset: Vector3, direction: Vector3, up: Vector3): Matrix4 {
+        // Orthonormal basis
+        const v3 = direction.neg().unit();
+        const v1 = up.cross(v3).unit();
+        const v2 = v3.cross(v1);
+
+        // The inverse of the view matrix is the camera transform:
+        // ```
+        // | 1  0  0  x |   | v1x  v2x  v3x  0 |
+        // | 0  1  0  y | * | v1y  v2y  v3y  0 |
+        // | 0  0  1  z |   | v1z  v2z  v3z  0 |
+        // | 0  0  0  1 |   |   0    0    0  1 |
+        // ```
+        // Because the inverse of an orthogonal matrix is just its transpose
+        // and `(A * B)^-1 = B^-1 * A^-1`, the view matrix is:
+        // ```
+        // | v1x  v2y  v3x  0 |   | 1  0  0  -x |
+        // | v2x  v2y  v2x  0 | * | 0  1  0  -y |
+        // | v3x  v3y  v3x  0 |   | 0  0  1  -z |
+        // |   0    0    0  1 |   | 0  0  0   1 |
+        // ```
+        const e0 = v1.x;
+        const e1 = v2.x;
+        const e2 = v3.x;
+        const e4 = v1.y;
+        const e5 = v2.y;
+        const e6 = v3.y;
+        const e8 = v1.z;
+        const e9 = v2.z;
+        const e10 = v3.z;
+        const e12 = -offset.dot(v1);
+        const e13 = -offset.dot(v2);
+        const e14 = -offset.dot(v3);
+
+        return new Matrix4([e0, e1, e2, 0, e4, e5, e6, 0, e8, e9, e10, 0, e12, e13, e14, 1]);
     }
 
     public add(mat: Matrix4): Matrix4 {
