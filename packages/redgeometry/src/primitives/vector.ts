@@ -115,10 +115,28 @@ export class Vector2 implements Vector2Like {
     }
 
     /**
-     * Returns the angle of the vector from polar coordinates.
+     * Returns the angle of the vector from polar coordinates in radians.
      */
     public angle(): number {
         return Math.atan2(this.y, this.x);
+    }
+
+    /**
+     * Returns the angle between the current vector and `v` in radians.
+     *
+     * Note: The returned value is unsigned and less than or equal to `PI`.
+     */
+    public angleTo(v: Vector2): number {
+        const a = this.lenSq() * v.lenSq();
+
+        if (a === 0) {
+            // Return an angle of zero if one vector is zero
+            return 0;
+        }
+
+        const b = this.dot(v) / Math.sqrt(a);
+
+        return Math.acos(b);
     }
 
     public clamp(vmin: Vector2, vmax: Vector2): Vector2 {
@@ -346,6 +364,24 @@ export class Vector3 implements Vector3Like {
      */
     public addPt(p: Point3): Point3 {
         return new Point3(p.x + this.x, p.y + this.y, p.z + this.z);
+    }
+
+    /**
+     * Returns the angle between the current vector and `v` in radians.
+     *
+     * Note: The returned value is unsigned and less than or equal to `PI`.
+     */
+    public angleTo(v: Vector3): number {
+        const a = this.lenSq() * v.lenSq();
+
+        if (a === 0) {
+            // Return an angle of zero if one vector is zero
+            return 0;
+        }
+
+        const b = this.dot(v) / Math.sqrt(a);
+
+        return Math.acos(b);
     }
 
     public clamp(vmin: Vector3, vmax: Vector3): Vector3 {
