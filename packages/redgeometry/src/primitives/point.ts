@@ -107,6 +107,12 @@ export class Point2 implements Point2Like {
         data[offset + 1] = this.y;
     }
 
+    public distanceTo(p: Point2): number {
+        const x = this.x - p.x;
+        const y = this.y - p.y;
+        return Math.sqrt(x * x + y * y);
+    }
+
     public eq(p: Point2): boolean {
         return this.x === p.x && this.y === p.y;
     }
@@ -236,6 +242,13 @@ export class Point3 implements Point3Like {
         data[offset] = this.x;
         data[offset + 1] = this.y;
         data[offset + 2] = this.z;
+    }
+
+    public distanceTo(p: Point3): number {
+        const x = this.x - p.x;
+        const y = this.y - p.y;
+        const z = this.z - p.z;
+        return Math.sqrt(x * x + y * y + z * z);
     }
 
     public eq(p: Point3): boolean {
