@@ -8,10 +8,12 @@ import { lerp } from "../utility/scalar.js";
 import { RootType, solveCubic, solveQuadratic } from "../utility/solve.js";
 
 export function encloseCurveAt(c: BezierCurve2, box: Box2, t: number): void {
-    if (t > 0 && t < 1) {
-        const p = c.getValueAt(t);
-        box.enclose(p);
+    if (!isInParameterRange(t)) {
+        return;
     }
+
+    const p = c.getValueAt(t);
+    box.enclose(p);
 }
 
 export function minimizeCurveDistanceAt(
@@ -20,13 +22,15 @@ export function minimizeCurveDistanceAt(
     t: number,
     min: { param: number; distSq: number },
 ): void {
-    if (t > 0 && t < 1) {
-        const distSq = c.getValueAt(t).sub(p).lenSq();
+    if (!isInParameterRange(t)) {
+        return;
+    }
 
-        if (distSq < min.distSq) {
-            min.param = t;
-            min.distSq = distSq;
-        }
+    const distSq = c.getValueAt(t).sub(p).lenSq();
+
+    if (distSq < min.distSq) {
+        min.param = t;
+        min.distSq = distSq;
     }
 }
 
@@ -220,10 +224,10 @@ export function getParameterAtArcLengthQuadratic(c: Bezier2Curve2, d: number): n
 
     if (r.type === RootType.Two) {
         return r.x1;
-    } else {
-        // Fallback
-        return 1;
     }
+
+    // Fallback
+    return 1;
 }
 
 export function getParameterAtArcLengthCubic(c: Bezier3Curve2, d: number): number {
@@ -235,9 +239,9 @@ export function getParameterAtArcLengthCubic(c: Bezier3Curve2, d: number): numbe
 
     if (r.type === RootType.Three) {
         return r.x1;
-    } else {
-        return r.x;
     }
+
+    return r.x;
 }
 
 export function getParameterAtArcLengthConic(c: BezierRCurve2, d: number): number {
@@ -249,27 +253,35 @@ export function getParameterAtArcLengthConic(c: BezierRCurve2, d: number): numbe
 
     if (r.type === RootType.Two) {
         return r.x1;
-    } else {
-        // Fallback
-        return 1;
     }
+
+    // Fallback
+    return 1;
 }
 
 function isInParameterRange(t: number): boolean {
-    // Returns `false` for `t = NaN`
+    // Returns `false` for `t == NaN`
     return t >= 0 && t <= 1;
 }
 
 function getWinding(t: number, px: number, x: number, yy: number): number {
     if (px < x) {
-        return 0;
-    } else if (yy < 0) {
-        return t !== 0 ? -1 : 0;
-    } else if (yy > 0) {
-        return t !== 1 ? 1 : 0;
-    } else {
+        // Quickly reject
         return 0;
     }
+
+    if (yy < 0) {
+        // Consider parameter `t == 0` inclusive and `t == 1` exclusive
+        return t !== 0 ? -1 : 0;
+    }
+
+    if (yy > 0) {
+        // Consider parameter `t == 0` exclusive and `t == 1` inclusive
+        return t !== 1 ? 1 : 0;
+    }
+
+    // Do not consider if direction is horizontal
+    return 0;
 }
 
 function sampleArcLengthQuadratic(wz: number, xz: number, qqa: Vector2, qqb: Vector2): number {
