@@ -516,6 +516,27 @@ export class Vector3 implements Vector3Like {
         return new Vector3(this.y, -this.x, 0);
     }
 
+    /**
+     * Returns the orthonormal basis of the current (unit) vector.
+     *
+     * References:
+     * - Tom Duff, James Burgess, Per Christensen, Christophe Hery, Andrew Kensler, Max Liani and Ryusuke Villemin.
+     *   *Building an Orthonormal Basis, Revisited*.
+     *   Journal of Computer Graphics Techniques Vol. 6, No. 1, 2017.
+     */
+    public orthonormalBasis(): { n1: Vector3; n2: Vector3 } {
+        const { x, y, z } = this;
+
+        // This implementation will only work for unit vectors.
+        const sign = z >= 0 ? 1 : -1;
+        const a = -1 / (sign + z);
+        const b = x * y * a;
+        const n1 = new Vector3(1 + sign * x * x * a, sign * b, -sign * x);
+        const n2 = new Vector3(b, sign + y * y * a, -y);
+
+        return { n1, n2 };
+    }
+
     public sub(v: Vector3): Vector3 {
         return new Vector3(this.x - v.x, this.y - v.y, this.z - v.z);
     }
