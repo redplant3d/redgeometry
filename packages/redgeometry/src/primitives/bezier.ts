@@ -957,8 +957,8 @@ export class BezierRCurve2 {
 
     public static fromCenterPoint(p0: Point2, p1: Point2, p2: Point2, pc: Point2): BezierRCurve2 {
         const pm = p0.lerp(p2, 0.5);
-        const dm = pm.sub(pc).len();
-        const d1 = p1.sub(pc).len();
+        const dm = pm.distanceTo(pc);
+        const d1 = p1.distanceTo(pc);
         const w = Math.sqrt(dm / d1);
         return new BezierRCurve2(p0, p1, p2, w);
     }

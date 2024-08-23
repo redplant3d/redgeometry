@@ -217,8 +217,8 @@ export function getArcLengthConic(c: BezierRCurve2): number {
 }
 
 export function getParameterAtArcLengthQuadratic(c: Bezier2Curve2, d: number): number {
-    const d1 = c.p1.sub(c.p0).len();
-    const d2 = c.p2.sub(c.p1).len();
+    const d1 = c.p1.distanceTo(c.p0);
+    const d2 = c.p2.distanceTo(c.p1);
 
     const r = solveQuadratic(d2 - d1, d1, -d);
 
@@ -231,9 +231,9 @@ export function getParameterAtArcLengthQuadratic(c: Bezier2Curve2, d: number): n
 }
 
 export function getParameterAtArcLengthCubic(c: Bezier3Curve2, d: number): number {
-    const d1 = c.p1.sub(c.p0).len();
-    const d2 = c.p2.sub(c.p1).len();
-    const d3 = c.p2.sub(c.p1).len();
+    const d1 = c.p1.distanceTo(c.p0);
+    const d2 = c.p2.distanceTo(c.p1);
+    const d3 = c.p2.distanceTo(c.p1);
 
     const r = solveCubic(d3 - 2 * d2 + d1, d2 - d1, d1, -d);
 
@@ -245,8 +245,8 @@ export function getParameterAtArcLengthCubic(c: Bezier3Curve2, d: number): numbe
 }
 
 export function getParameterAtArcLengthConic(c: BezierRCurve2, d: number): number {
-    const d1 = c.p1.sub(c.p0).len();
-    const d2 = c.p2.sub(c.p1).len();
+    const d1 = c.p1.distanceTo(c.p0);
+    const d2 = c.p2.distanceTo(c.p1);
     const dw = c.w * d1;
 
     const r = solveQuadratic(d2 - 2 * dw - d1, dw, -d);

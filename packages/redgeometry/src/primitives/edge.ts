@@ -88,7 +88,7 @@ export class Edge2 {
         const p0 = e1.getValueAt(t);
         const p1 = e2.getValueAt(u);
 
-        return p0.sub(p1).len();
+        return p0.distanceTo(p1);
     }
 
     public static getClosestParameter(e1: Edge2, e2: Edge2): [number, number] {
@@ -299,7 +299,7 @@ export class Edge2 {
     }
 
     public getClosestPointDistance(p: Point2): number {
-        return this.getClosestPoint(p).sub(p).len();
+        return this.getClosestPoint(p).distanceTo(p);
     }
 
     /**
@@ -453,7 +453,7 @@ export class Edge3 {
     }
 
     public getClosestPointDistance(p: Point3): number {
-        return this.getClosestPoint(p).sub(p).len();
+        return this.getClosestPoint(p).distanceTo(p);
     }
 
     /**

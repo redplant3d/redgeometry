@@ -217,7 +217,7 @@ export function getDashStart(dashArray: number[], dashOffset: number): [number, 
 }
 
 export function getDashArcLengthLinear(c: Bezier1Curve2): number {
-    return c.p1.sub(c.p0).len();
+    return c.p1.distanceTo(c.p0);
 }
 
 export function getDashParameterLinear(c: Bezier1Curve2, length: number): number {
