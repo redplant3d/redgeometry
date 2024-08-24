@@ -233,15 +233,15 @@ export class Polygon2 {
             const p1 = edge.getValueAt(maxParam);
 
             const v0 = p1.sub(p0);
-            const v1 = v0.unit().normal().mul(minDist);
+            const v1 = v0.unit().normal().mulS(minDist);
 
             const area = v0.cross(v1);
 
             if (area < minArea) {
                 // Update bounding box
                 points[0] = p0;
-                points[1] = p0.addVec(v1);
-                points[2] = p1.addVec(v1);
+                points[1] = p0.addV(v1);
+                points[2] = p1.addV(v1);
                 points[3] = p1;
                 minArea = area;
             }
@@ -325,7 +325,7 @@ export class Polygon2 {
     public transform(mat: Matrix3 | Matrix3A): void {
         const points = this.points;
         for (let i = 0; i < points.length; i++) {
-            points[i] = mat.mulPt(points[i]);
+            points[i] = mat.mulP(points[i]);
         }
     }
 }

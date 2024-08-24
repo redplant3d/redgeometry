@@ -147,7 +147,7 @@ export class PathFlattenIncremental2 implements PathFlatten2 {
 
         for (let t = step; t < 1; t += step) {
             // Evaluate points (Horner's method)
-            const p = qa.mul(t).add(qb).mul(t).addPt(qc);
+            const p = qa.mulS(t).add(qb).mulS(t).addP(qc);
             output.lineTo(p);
         }
 

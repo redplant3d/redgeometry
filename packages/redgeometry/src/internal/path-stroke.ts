@@ -293,17 +293,17 @@ export class StrokeState {
     }
 
     private insertLinearStroke(p: Point2, m: Vector2): void {
-        const v = m.unit().normal().mul(this.distance);
+        const v = m.unit().normal().mulS(this.distance);
 
-        this.left.lineTo(p.addVec(v));
-        this.right.lineTo(p.subVec(v));
+        this.left.lineTo(p.addV(v));
+        this.right.lineTo(p.subV(v));
     }
 
     private insertMoveStroke(p0: Point2, m: Vector2): void {
-        const v = m.unit().normal().mul(this.distance);
+        const v = m.unit().normal().mulS(this.distance);
 
-        this.left.moveTo(p0.addVec(v));
-        this.right.moveTo(p0.subVec(v));
+        this.left.moveTo(p0.addV(v));
+        this.right.moveTo(p0.subV(v));
     }
 
     private insertQuadraticDegenerateDashStroke(p0: Point2, p1: Point2, p2: Point2): void {
@@ -381,11 +381,11 @@ export class StrokeState {
 
             v1 = v1.add(v2);
 
-            v1 = v1.mul(2 * d).div(v1.lenSq());
-            v2 = v2.mul(d);
+            v1 = v1.mulS(2 * d).divS(v1.lenSq());
+            v2 = v2.mulS(d);
 
-            this.left.quadTo(c.p1.addVec(v1), c.p2.addVec(v2));
-            this.right.quadTo(c.p1.subVec(v1), c.p2.subVec(v2));
+            this.left.quadTo(c.p1.addV(v1), c.p2.addV(v2));
+            this.right.quadTo(c.p1.subV(v1), c.p2.subV(v2));
         }
     }
 
@@ -455,9 +455,9 @@ export function insertStrokeCap(path: Path2, p1: Point2, cap: CapType | CustomCa
                 break;
             }
 
-            const v = p1.sub(p0).mul(0.5).normal();
-            path.lineTo(p0.addVec(v));
-            path.lineTo(p1.addVec(v));
+            const v = p1.sub(p0).mulS(0.5).normal();
+            path.lineTo(p0.addV(v));
+            path.lineTo(p1.addV(v));
             path.lineTo(p1);
 
             break;
@@ -469,10 +469,10 @@ export function insertStrokeCap(path: Path2, p1: Point2, cap: CapType | CustomCa
                 break;
             }
 
-            const v0 = p1.sub(p0).mul(0.5).normal();
+            const v0 = p1.sub(p0).mulS(0.5).normal();
             const v1 = v0.sub(v0.normal());
-            path.arcTo(p0.addVec(v0), p0.addVec(v1));
-            path.arcTo(p1.addVec(v0), p1);
+            path.arcTo(p0.addV(v0), p0.addV(v1));
+            path.arcTo(p1.addV(v0), p1);
 
             break;
         }

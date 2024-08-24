@@ -32,10 +32,10 @@ test("Quaternion - mulPt/mulVec", () => {
     const p = new Point2(1, 2);
     const v = new Vector2(1, 2);
 
-    const p1 = mat.mulPt(p);
-    const v1 = mat.mulVec(v);
-    const p2 = z.mulPt(p);
-    const v2 = z.mulVec(v);
+    const p1 = mat.mulP(p);
+    const v1 = mat.mulV(v);
+    const p2 = z.mulP(p);
+    const v2 = z.mulV(v);
 
     expectToBeClosePoint2(p1, p2);
     expectToBeCloseVector2(v1, v2);

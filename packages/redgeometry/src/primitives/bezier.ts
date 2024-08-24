@@ -305,7 +305,7 @@ export class Bezier2Curve2 {
 
         // vv = qqa * t + qbb
         // vvv = qqa
-        const vv = qqa.mul(t).add(qqb);
+        const vv = qqa.mulS(t).add(qqb);
         const vvv = qqa;
 
         const len = vv.len();
@@ -323,7 +323,7 @@ export class Bezier2Curve2 {
         const p01 = this.p0.lerp(this.p1, t);
         const p12 = this.p1.lerp(this.p2, t);
 
-        return p12.sub(p01).mul(2);
+        return p12.sub(p01).mulS(2);
     }
 
     public getDerivativeCoefficients(): [Vector2, Vector2] {
@@ -332,7 +332,7 @@ export class Bezier2Curve2 {
 
         // qqa = 2 * (v2 - v1)
         // qqb = v1 + v1
-        const qqa = v2.sub(v1).mul(2);
+        const qqa = v2.sub(v1).mulS(2);
         const qqb = v1.add(v1);
 
         return [qqa, qqb];
@@ -344,14 +344,14 @@ export class Bezier2Curve2 {
         // p = qa * t^2 + qb * t + qc
         // pp = 2 * qa * t + qb
         // ppp = 2 * qa
-        const p = qa.mul(t).add(qb).mul(t).addPt(qc);
-        const pp = qa.mul(2 * t).add(qb);
-        const ppp = qa.mul(2);
+        const p = qa.mulS(t).add(qb).mulS(t).addP(qc);
+        const pp = qa.mulS(2 * t).add(qb);
+        const ppp = qa.mulS(2);
 
         const v = pp.normal();
         const f = pp.lenSq() / pp.cross(ppp);
 
-        return p.addMulVec(v, f);
+        return p.addMulV(v, f);
     }
 
     public getOffsetCuspParameter(rad: number): [number, number] {
@@ -643,8 +643,8 @@ export class Bezier3Curve2 {
         // qb = 3 * (v2 - v1);
         // qc = 3 * v1;
         const qa = v3.sub(v2).sub(v2).add(v1);
-        const qb = v2.sub(v1).mul(3);
-        const qc = v1.mul(3);
+        const qb = v2.sub(v1).mulS(3);
+        const qc = v1.mulS(3);
         const qd = this.p0;
 
         return [qa, qb, qc, qd];
@@ -663,8 +663,8 @@ export class Bezier3Curve2 {
 
         // vv = qqa * t^2 + qqb * t + qqc
         // vvv = 2 * qqa * t + qqb
-        const vv = qqa.mul(t).add(qqb).mul(t).add(qqc);
-        const vvv = qqa.mul(2 * t).add(qqb);
+        const vv = qqa.mulS(t).add(qqb).mulS(t).add(qqc);
+        const vvv = qqa.mulS(2 * t).add(qqb);
 
         const len = vv.len();
 
@@ -685,7 +685,7 @@ export class Bezier3Curve2 {
         const p012 = p01.lerp(p12, t);
         const p123 = p12.lerp(p23, t);
 
-        return p123.sub(p012).mul(3);
+        return p123.sub(p012).mulS(3);
     }
 
     public getDerivativeCoefficients(): [Vector2, Vector2, Vector2] {
@@ -696,9 +696,9 @@ export class Bezier3Curve2 {
         // qqa = 3 * (v3 - v2 - v2 + v1);
         // qqb = 6 * (v2 - v1);
         // qqc = 3 * v1;
-        const qqa = v3.sub(v2).sub(v2).add(v1).mul(3);
-        const qqb = v2.sub(v1).mul(6);
-        const qqc = v1.mul(3);
+        const qqa = v3.sub(v2).sub(v2).add(v1).mulS(3);
+        const qqb = v2.sub(v1).mulS(6);
+        const qqc = v1.mulS(3);
 
         return [qqa, qqb, qqc];
     }
@@ -709,18 +709,18 @@ export class Bezier3Curve2 {
         // p = qa * t^3 + qb * t^2 + qc * t + qd
         // pp = 3 * qa * t^2 + 2 * qb * t + qc
         // ppp = 6 * qa * t + 2 * qb
-        const p = qa.mul(t).add(qb).mul(t).add(qc).mul(t).addPt(qd);
+        const p = qa.mulS(t).add(qb).mulS(t).add(qc).mulS(t).addP(qd);
         const pp = qa
-            .mul(3 * t)
+            .mulS(3 * t)
             .addMul(qb, 2)
-            .mul(t)
+            .mulS(t)
             .add(qc);
-        const ppp = qa.mul(6 * t).addMul(qb, 2);
+        const ppp = qa.mulS(6 * t).addMul(qb, 2);
 
         const v = pp.normal();
         const f = pp.lenSq() / pp.cross(ppp);
 
-        return p.addMulVec(v, f);
+        return p.addMulV(v, f);
     }
 
     public getInflectionParameter(): [number, number] {
@@ -1052,7 +1052,7 @@ export class BezierRCurve2 {
 
         // Point and derivative in homogeneous coordinates
         const p = p01.lerp(p12, t);
-        const pp = p12.sub(p01).mul(2);
+        const pp = p12.sub(p01).mulS(2);
 
         // Transforming to cartesian coordinates requires quotient rule
         const x = pp.x * p.z - p.x * pp.z;
@@ -1072,7 +1072,7 @@ export class BezierRCurve2 {
      * const c = BezierRCurve2.fromXY(0, 0, 0, 1, 1, 1, 2);
      * const [qqa, qqb, qqc] = c.getDerivativeCoefficients();
      * const t = 0.5;
-     * const vv = qqa.mul(t).add(qqb).mul(t).addPt(qqc);
+     * const vv = qqa.mul(t).add(qqb).mul(t).addP(qqc);
      * const v = Vector2.fromXYW(vv.x, vv.y, vv.z * vv.z);
      * ```
      */
@@ -1095,7 +1095,7 @@ export class BezierRCurve2 {
         const vv1 = pp1.sub(pp0);
 
         const qqa = vv2.sub(vv1);
-        const qqb = vv1.mul(2);
+        const qqb = vv1.mulS(2);
         const qqc = pp0;
 
         return [qqa, qqb, qqc];

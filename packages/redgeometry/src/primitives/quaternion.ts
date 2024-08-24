@@ -305,7 +305,7 @@ export class Quaternion implements QuaternionLike {
      * | d |   | pz |   | -d |
      * ```
      */
-    public mulPt(p: Point3): Point3 {
+    public mulP(p: Point3): Point3 {
         const a = this.b * p.x + this.c * p.y + this.d * p.z;
         const b = this.a * p.x + this.c * p.z - this.d * p.y;
         const c = this.a * p.y - this.b * p.z + this.d * p.x;
@@ -326,7 +326,7 @@ export class Quaternion implements QuaternionLike {
      * | d |   | vz |   | -d |
      * ```
      */
-    public mulVec(v: Vector3): Vector3 {
+    public mulV(v: Vector3): Vector3 {
         const a = this.b * v.x + this.c * v.y + this.d * v.z;
         const b = this.a * v.x + this.c * v.z - this.d * v.y;
         const c = this.a * v.y - this.b * v.z + this.d * v.x;

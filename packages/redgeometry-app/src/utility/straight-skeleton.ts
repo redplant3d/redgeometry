@@ -43,7 +43,7 @@ export class KineticVertex {
 
     public static getVelocity(n1: Vector2, n2: Vector2): Vector2 {
         const k = n1.add(n2);
-        return k.mul(2).div(k.lenSq());
+        return k.mulS(2).divS(k.lenSq());
     }
 
     public static getWavefrontEdgeCcw(e: MeshEdge2): MeshEdge2 {
@@ -79,7 +79,7 @@ export class KineticVertex {
     }
 
     public getPositionAt(t: number): Point2 {
-        return this.orig.addMulVec(this.vel, t - this.t0);
+        return this.orig.addMulV(this.vel, t - this.t0);
     }
 }
 

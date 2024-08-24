@@ -97,7 +97,7 @@ export class Complex implements ComplexLike {
      * | b |   | py |
      * ```
      */
-    public mulPt(p: Point2): Point2 {
+    public mulP(p: Point2): Point2 {
         return new Point2(this.a * p.x - this.b * p.y, this.a * p.y + this.b * p.x);
     }
 
@@ -107,7 +107,7 @@ export class Complex implements ComplexLike {
      * | b |   | vy |
      * ```
      */
-    public mulVec(v: Vector2): Vector2 {
+    public mulV(v: Vector2): Vector2 {
         return new Vector2(this.a * v.x - this.b * v.y, this.a * v.y + this.b * v.x);
     }
 

@@ -224,7 +224,7 @@ export class Matrix3A {
      * |  0   0   1 |   | 1 |
      * ```
      */
-    public mulPt(p: Point2): Point2 {
+    public mulP(p: Point2): Point2 {
         const e = this.elements;
 
         const x = e[0] * p.x + e[2] * p.y + e[4];
@@ -263,7 +263,7 @@ export class Matrix3A {
      * |  0   0   1 |   | 1 |
      * ```
      */
-    public mulVec(v: Vector2): Vector2 {
+    public mulV(v: Vector2): Vector2 {
         const e = this.elements;
 
         const x = e[0] * v.x + e[2] * v.y + e[4];
@@ -764,7 +764,7 @@ export class Matrix3 {
      * | e2  e5  e8 |   | 1 |
      * ```
      */
-    public mulPt(p: Point2): Point2 {
+    public mulP(p: Point2): Point2 {
         const e = this.elements;
 
         const x = e[0] * p.x + e[3] * p.y + e[6];
@@ -807,7 +807,7 @@ export class Matrix3 {
      * | e2  e5  e8 |   | z |
      * ```
      */
-    public mulVec(v: Vector3): Vector3 {
+    public mulV(v: Vector3): Vector3 {
         const e = this.elements;
 
         const x = e[0] * v.x + e[3] * v.y + e[6] * v.z;
@@ -1474,7 +1474,7 @@ export class Matrix4A {
      * |  0   0   0    1 |   | 1 |
      * ```
      */
-    public mulPt(p: Point3): Point3 {
+    public mulP(p: Point3): Point3 {
         const e = this.elements;
 
         const x = e[0] * p.x + e[3] * p.y + e[6] * p.z + e[9];
@@ -1523,7 +1523,7 @@ export class Matrix4A {
      * |  0   0   0    1 |   | 1 |
      * ```
      */
-    public mulVec(v: Vector3): Vector3 {
+    public mulV(v: Vector3): Vector3 {
         const e = this.elements;
 
         const x = e[0] * v.x + e[3] * v.y + e[6] * v.z + e[9];
@@ -2522,7 +2522,7 @@ export class Matrix4 {
      * | e3  e7  e11  e15 |   | 1 |
      * ```
      */
-    public mulPt(p: Point3): Point3 {
+    public mulP(p: Point3): Point3 {
         const e = this.elements;
 
         const x = e[0] * p.x + e[4] * p.y + e[8] * p.z + e[12];
@@ -2576,7 +2576,7 @@ export class Matrix4 {
      * | e3  e7  e11  e15 |   | w |
      * ```
      */
-    public mulVec(v: Vector4): Vector4 {
+    public mulV(v: Vector4): Vector4 {
         const e = this.elements;
 
         const x = e[0] * v.x + e[4] * v.y + e[8] * v.z + e[12] * v.w;

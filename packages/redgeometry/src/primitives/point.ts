@@ -85,7 +85,7 @@ export class Point2 implements Point2Like {
     /**
      * Returns the sum of the current point and a vector `v` scaled by `f`.
      */
-    public addMulVec(v: Vector2, f: number): Point2 {
+    public addMulV(v: Vector2, f: number): Point2 {
         const x = this.x + f * v.x;
         const y = this.y + f * v.y;
         return new Point2(x, y);
@@ -94,7 +94,7 @@ export class Point2 implements Point2Like {
     /**
      * Returns the sum of the current point and a vector `v`.
      */
-    public addVec(v: Vector2): Point2 {
+    public addV(v: Vector2): Point2 {
         return new Point2(this.x + v.x, this.y + v.y);
     }
 
@@ -154,7 +154,7 @@ export class Point2 implements Point2Like {
     /**
      * Returns the difference of the current point and a vector `v`.
      */
-    public subVec(v: Vector2): Point2 {
+    public subV(v: Vector2): Point2 {
         return new Point2(this.x - v.x, this.y - v.y);
     }
 
@@ -220,7 +220,7 @@ export class Point3 implements Point3Like {
     /**
      * Returns the sum of the current point and a vector `v` scaled by `f`.
      */
-    public addMulVec(v: Vector3, f: number): Point3 {
+    public addMulV(v: Vector3, f: number): Point3 {
         const x = this.x + f * v.x;
         const y = this.y + f * v.y;
         const z = this.z + f * v.z;
@@ -230,7 +230,7 @@ export class Point3 implements Point3Like {
     /**
      * Returns the sum of the current point and a vector `v`.
      */
-    public addVec(v: Vector3): Point3 {
+    public addV(v: Vector3): Point3 {
         return new Point3(this.x + v.x, this.y + v.y, this.z + v.z);
     }
 
@@ -277,7 +277,7 @@ export class Point3 implements Point3Like {
     /**
      * Returns the difference of the current point and a vector `v`.
      */
-    public subVec(v: Vector3): Point3 {
+    public subV(v: Vector3): Point3 {
         return new Point3(this.x - v.x, this.y - v.y, this.z - v.z);
     }
 

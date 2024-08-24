@@ -336,10 +336,10 @@ function cameraMoveSystem(world: World): void {
     let v = new Vector3(x, y, z);
 
     if (!v.isZero()) {
-        v = v.unitOrZero().mul(delta * vel);
-        v = camRot.mulVec(v);
+        v = v.unitOrZero().mulS(delta * vel);
+        v = camRot.mulV(v);
 
-        camPos = camPos.addVec(v);
+        camPos = camPos.addV(v);
     }
 
     transform.rotation = camRot;

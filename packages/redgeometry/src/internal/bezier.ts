@@ -285,17 +285,17 @@ function getWinding(t: number, px: number, x: number, yy: number): number {
 }
 
 function sampleArcLengthQuadratic(wz: number, xz: number, qqa: Vector2, qqb: Vector2): number {
-    const v = qqa.mul(xz).add(qqb);
+    const v = qqa.mulS(xz).add(qqb);
     return wz * v.len();
 }
 
 function sampleArcLengthCubic(wz: number, xz: number, qqa: Vector2, qqb: Vector2, qqc: Vector2): number {
-    const v = qqa.mul(xz).add(qqb).mul(xz).add(qqc);
+    const v = qqa.mulS(xz).add(qqb).mulS(xz).add(qqc);
     return wz * v.len();
 }
 
 function sampleArcLengthConic(wz: number, xz: number, qqa: Vector3, qqb: Vector3, qqc: Point3): number {
-    const vv = qqa.mul(xz).add(qqb).mul(xz).addPt(qqc);
+    const vv = qqa.mulS(xz).add(qqb).mulS(xz).addP(qqc);
     const v = Vector2.fromXYW(vv.x, vv.y, vv.z * vv.z);
     return wz * v.len();
 }

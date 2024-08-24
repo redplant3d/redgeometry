@@ -110,7 +110,7 @@ export class Vector2 implements Vector2Like {
     /**
      * Adds the current vector to a point `p`.
      */
-    public addPt(p: Point2): Point2 {
+    public addP(p: Point2): Point2 {
         return new Point2(p.x + this.x, p.y + this.y);
     }
 
@@ -167,12 +167,12 @@ export class Vector2 implements Vector2Like {
     }
 
     /**
-     * Divides the current vector by `d`.
+     * Returns the quotient of the current vector and a scalar `s`.
      *
      * Note: Each element is divided separately.
      */
-    public div(d: number): Vector2 {
-        return new Vector2(this.x / d, this.y / d);
+    public divS(s: number): Vector2 {
+        return new Vector2(this.x / s, this.y / s);
     }
 
     /**
@@ -216,10 +216,10 @@ export class Vector2 implements Vector2Like {
     }
 
     /**
-     * Multiplies the current vector by `f`.
+     * Returns the product of the current vector and a scalar `s`.
      */
-    public mul(f: number): Vector2 {
-        return new Vector2(f * this.x, f * this.y);
+    public mulS(s: number): Vector2 {
+        return new Vector2(s * this.x, s * this.y);
     }
 
     public neg(): Vector2 {
@@ -243,7 +243,7 @@ export class Vector2 implements Vector2Like {
     /**
      * Substracts the current vector from a point `p`.
      */
-    public subPt(p: Point2): Point2 {
+    public subP(p: Point2): Point2 {
         return new Point2(p.x - this.x, p.y - this.y);
     }
 
@@ -260,12 +260,12 @@ export class Vector2 implements Vector2Like {
     }
 
     public unit(): Vector2 {
-        return this.div(this.len());
+        return this.divS(this.len());
     }
 
     public unitOrZero(): Vector2 {
         const len = this.len();
-        return len > 0 ? this.div(len) : Vector2.createZero();
+        return len > 0 ? this.divS(len) : Vector2.createZero();
     }
 }
 
@@ -362,7 +362,7 @@ export class Vector3 implements Vector3Like {
     /**
      * Adds the current vector to a point `p`.
      */
-    public addPt(p: Point3): Point3 {
+    public addP(p: Point3): Point3 {
         return new Point3(p.x + this.x, p.y + this.y, p.z + this.z);
     }
 
@@ -409,12 +409,12 @@ export class Vector3 implements Vector3Like {
     }
 
     /**
-     * Divides the current vector by `d`.
+     * Returns the quotient of the current vector and a scalar `s`.
      *
      * Note: Each element is divided separately.
      */
-    public div(d: number): Vector3 {
-        return new Vector3(this.x / d, this.y / d, this.z / d);
+    public divS(s: number): Vector3 {
+        return new Vector3(this.x / s, this.y / s, this.z / s);
     }
 
     public dot(v: Vector3): number {
@@ -452,8 +452,11 @@ export class Vector3 implements Vector3Like {
         return new Vector3(x, y, z);
     }
 
-    public mul(f: number): Vector3 {
-        return new Vector3(f * this.x, f * this.y, f * this.z);
+    /**
+     * Returns the product of the current vector and a scalar `s`.
+     */
+    public mulS(s: number): Vector3 {
+        return new Vector3(s * this.x, s * this.y, s * this.z);
     }
 
     public neg(): Vector3 {
@@ -544,7 +547,7 @@ export class Vector3 implements Vector3Like {
     /**
      * Substracts the current vector from a point `p`.
      */
-    public subPt(p: Point3): Point3 {
+    public subP(p: Point3): Point3 {
         return new Point3(p.x - this.x, p.y - this.y, p.z - this.z);
     }
 
@@ -561,12 +564,12 @@ export class Vector3 implements Vector3Like {
     }
 
     public unit(): Vector3 {
-        return this.div(this.len());
+        return this.divS(this.len());
     }
 
     public unitOrZero(): Vector3 {
         const len = this.len();
-        return len > 0 ? this.div(len) : Vector3.createZero();
+        return len > 0 ? this.divS(len) : Vector3.createZero();
     }
 }
 
@@ -683,12 +686,12 @@ export class Vector4 implements Vector4Like {
     }
 
     /**
-     * Divides the current vector by `d`.
+     * Returns the quotient of the current vector and a scalar `s`.
      *
      * Note: Each element is divided separately.
      */
-    public div(d: number): Vector4 {
-        return new Vector4(this.x / d, this.y / d, this.z / d, this.w / d);
+    public divS(s: number): Vector4 {
+        return new Vector4(this.x / s, this.y / s, this.z / s, this.w / s);
     }
 
     public dot(v: Vector4): number {
@@ -727,8 +730,11 @@ export class Vector4 implements Vector4Like {
         return new Vector4(x, y, z, w);
     }
 
-    public mul(f: number): Vector4 {
-        return new Vector4(f * this.x, f * this.y, f * this.z, f * this.w);
+    /**
+     * Returns the product of the current vector and a scalar `s`.
+     */
+    public mulS(s: number): Vector4 {
+        return new Vector4(s * this.x, s * this.y, s * this.z, s * this.w);
     }
 
     public neg(): Vector4 {

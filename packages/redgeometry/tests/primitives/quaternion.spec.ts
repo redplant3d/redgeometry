@@ -190,16 +190,16 @@ test("Quaternion - mulPt/mulVec", () => {
     const p = new Point3(1, 2, 3);
     const v = new Vector3(1, 2, 3);
 
-    const p1 = mat3.mul(mat2).mul(mat1).mulPt(p);
-    const v1 = mat3.mul(mat2).mul(mat1).mulVec(v);
-    const p2 = q3.mul(q2).mul(q1).mulPt(p);
-    const v2 = q3.mul(q2).mul(q1).mulVec(v);
-    const p3 = qa.mulPt(p);
-    const v3 = qa.mulVec(v);
-    const p4 = qb.mulPt(p);
-    const v4 = qb.mulVec(v);
-    const p5 = qc.mulPt(p);
-    const v5 = qc.mulVec(v);
+    const p1 = mat3.mul(mat2).mul(mat1).mulP(p);
+    const v1 = mat3.mul(mat2).mul(mat1).mulV(v);
+    const p2 = q3.mul(q2).mul(q1).mulP(p);
+    const v2 = q3.mul(q2).mul(q1).mulV(v);
+    const p3 = qa.mulP(p);
+    const v3 = qa.mulV(v);
+    const p4 = qb.mulP(p);
+    const v4 = qb.mulV(v);
+    const p5 = qc.mulP(p);
+    const v5 = qc.mulV(v);
 
     expectToBeClosePoint3(p1, p2);
     expectToBeCloseVector3(v1, v2);
