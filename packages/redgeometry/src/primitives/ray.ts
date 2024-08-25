@@ -102,7 +102,7 @@ export class Ray2 {
      * Returns the parameterized point on the ray along its direction.
      */
     public getValueAt(t: number): Point2 {
-        return this.p.addMulV(this.v, t);
+        return this.p.addVMulS(this.v, t);
     }
 
     public normal(): Ray2 {
@@ -196,7 +196,7 @@ export class Ray3 {
      * Returns the parameterized point on the ray along its direction.
      */
     public getValueAt(t: number): Point3 {
-        return this.p.addMulV(this.v, t);
+        return this.p.addVMulS(this.v, t);
     }
 
     public isFinite(): boolean {

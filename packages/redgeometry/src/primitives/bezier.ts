@@ -351,7 +351,7 @@ export class Bezier2Curve2 {
         const v = pp.normal();
         const f = pp.lenSq() / pp.cross(ppp);
 
-        return p.addMulV(v, f);
+        return p.addVMulS(v, f);
     }
 
     public getOffsetCuspParameter(rad: number): [number, number] {
@@ -712,15 +712,15 @@ export class Bezier3Curve2 {
         const p = qa.mulS(t).add(qb).mulS(t).add(qc).mulS(t).addP(qd);
         const pp = qa
             .mulS(3 * t)
-            .addMul(qb, 2)
+            .addMulS(qb, 2)
             .mulS(t)
             .add(qc);
-        const ppp = qa.mulS(6 * t).addMul(qb, 2);
+        const ppp = qa.mulS(6 * t).addMulS(qb, 2);
 
         const v = pp.normal();
         const f = pp.lenSq() / pp.cross(ppp);
 
-        return p.addMulV(v, f);
+        return p.addVMulS(v, f);
     }
 
     public getInflectionParameter(): [number, number] {

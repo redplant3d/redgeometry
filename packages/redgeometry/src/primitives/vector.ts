@@ -99,19 +99,17 @@ export class Vector2 implements Vector2Like {
     }
 
     /**
-     * Returns the sum of the current vector and a vector `v` scaled by `f`.
+     * Returns the sum of the current vector and a vector `v` multiplied by a scalar `s`.
      */
-    public addMul(v: Vector2, f: number): Vector2 {
-        const x = this.x + f * v.x;
-        const y = this.y + f * v.y;
-        return new Vector2(x, y);
+    public addMulS(v: Vector2, s: number): Vector2 {
+        return new Vector2(this.x + s * v.x, this.y + s * v.y);
     }
 
     /**
      * Adds the current vector to a point `p`.
      */
     public addP(p: Point2): Point2 {
-        return new Point2(p.x + this.x, p.y + this.y);
+        return p.addV(this);
     }
 
     /**
@@ -244,7 +242,7 @@ export class Vector2 implements Vector2Like {
      * Substracts the current vector from a point `p`.
      */
     public subP(p: Point2): Point2 {
-        return new Point2(p.x - this.x, p.y - this.y);
+        return p.subV(this);
     }
 
     public toArray(): [number, number] {
@@ -350,20 +348,17 @@ export class Vector3 implements Vector3Like {
     }
 
     /**
-     * Returns the sum of the current vector and a vector `v` scaled by `f`.
+     * Returns the sum of the current vector and a vector `v` multiplied by a scalar `s`.
      */
-    public addMul(v: Vector3, f: number): Vector3 {
-        const x = this.x + f * v.x;
-        const y = this.y + f * v.y;
-        const z = this.z + f * v.z;
-        return new Vector3(x, y, z);
+    public addMulS(v: Vector3, s: number): Vector3 {
+        return new Vector3(this.x + s * v.x, this.y + s * v.y, this.z + s * v.z);
     }
 
     /**
      * Adds the current vector to a point `p`.
      */
     public addP(p: Point3): Point3 {
-        return new Point3(p.x + this.x, p.y + this.y, p.z + this.z);
+        return p.addV(this);
     }
 
     /**
@@ -548,7 +543,7 @@ export class Vector3 implements Vector3Like {
      * Substracts the current vector from a point `p`.
      */
     public subP(p: Point3): Point3 {
-        return new Point3(p.x - this.x, p.y - this.y, p.z - this.z);
+        return p.subV(this);
     }
 
     public toArray(): [number, number, number] {
@@ -656,14 +651,10 @@ export class Vector4 implements Vector4Like {
     }
 
     /**
-     * Returns the sum of the current vector and a vector `v` scaled by `f`.
+     * Returns the sum of the current vector and a vector `v` multiplied by a scalar `s`.
      */
-    public addMul(v: Vector4, f: number): Vector4 {
-        const x = this.x + f * v.x;
-        const y = this.y + f * v.y;
-        const z = this.z + f * v.z;
-        const w = this.w + f * v.w;
-        return new Vector4(x, y, z, w);
+    public addMulS(v: Vector4, s: number): Vector4 {
+        return new Vector4(this.x + s * v.x, this.y + s * v.y, this.z + s * v.z, this.w + s * v.w);
     }
 
     public clamp(vmin: Vector4, vmax: Vector4): Vector4 {
