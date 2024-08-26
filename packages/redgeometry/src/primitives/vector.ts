@@ -106,9 +106,12 @@ export class Vector2 implements Vector2Like {
     }
 
     /**
-     * Adds the current vector to a point `p`.
+     * Returns the sum of the current vector and a point `p`.
      */
     public addP(p: Point2): Point2 {
+        // This is provided as syntactic sugar for e.g. Horner's method
+        // `qa.mulS(t).add(qb).mulS(t).addP(qc)`
+        // where `qa` and `qb` are vectors and `qc` is a point
         return p.addV(this);
     }
 
@@ -238,13 +241,6 @@ export class Vector2 implements Vector2Like {
         return new Vector2(this.x - v.x, this.y - v.y);
     }
 
-    /**
-     * Substracts the current vector from a point `p`.
-     */
-    public subP(p: Point2): Point2 {
-        return p.subV(this);
-    }
-
     public toArray(): [number, number] {
         return [this.x, this.y];
     }
@@ -355,14 +351,17 @@ export class Vector3 implements Vector3Like {
     }
 
     /**
-     * Adds the current vector to a point `p`.
+     * Returns the sum of the current vector and a point `p`.
      */
     public addP(p: Point3): Point3 {
+        // This is provided as syntactic sugar for e.g. Horner's method
+        // `qa.mulS(t).add(qb).mulS(t).addP(qc)`
+        // where `qa` and `qb` are vectors and `qc` is a point
         return p.addV(this);
     }
 
     /**
-     * Returns the angle between the current vector and `v` in radians.
+     * Returns the angle between the current vector and a vector `v` in radians.
      *
      * Note: The returned value is unsigned and less than or equal to `PI`.
      */
@@ -370,7 +369,7 @@ export class Vector3 implements Vector3Like {
         const a = this.lenSq() * v.lenSq();
 
         if (a === 0) {
-            // Return an angle of zero if one vector is zero
+            // Return an angle of zero if any vector is zero
             return 0;
         }
 
@@ -537,13 +536,6 @@ export class Vector3 implements Vector3Like {
 
     public sub(v: Vector3): Vector3 {
         return new Vector3(this.x - v.x, this.y - v.y, this.z - v.z);
-    }
-
-    /**
-     * Substracts the current vector from a point `p`.
-     */
-    public subP(p: Point3): Point3 {
-        return p.subV(this);
     }
 
     public toArray(): [number, number, number] {
