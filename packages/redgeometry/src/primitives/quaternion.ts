@@ -1,4 +1,4 @@
-import { assertUnreachable } from "../index.js";
+import { assertUnreachable } from "../utility/debug.js";
 import { Point3 } from "./point.js";
 import { Vector3 } from "./vector.js";
 

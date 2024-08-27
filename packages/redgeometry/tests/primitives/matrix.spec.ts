@@ -1,5 +1,5 @@
 import { expect, test } from "vitest";
-import { Complex } from "../../src/index.js";
+import { Complex } from "../../src/primitives/complex.js";
 import { Matrix3, Matrix3A, Matrix4, Matrix4A } from "../../src/primitives/matrix.js";
 import { Point2, Point3 } from "../../src/primitives/point.js";
 import { Quaternion, RotationOrder } from "../../src/primitives/quaternion.js";

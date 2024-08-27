@@ -1,5 +1,5 @@
 import { expect, test } from "vitest";
-import { Bitset } from "../../src/index.js";
+import { Bitset } from "../../src/utility/set.js";
 
 test("BitSet.eq", () => {
     const b1 = Bitset.fromElements([0]);
