@@ -339,6 +339,22 @@ export class Quaternion implements QuaternionLike {
         );
     }
 
+    /**
+     * Returns the current quaternion to the power of `x`.
+     *
+     * References:
+     * - https://en.wikipedia.org/wiki/Quaternion#Exponential,_logarithm,_and_power_functions
+     */
+    public pow(x: number): Quaternion {
+        const len = this.len();
+        const r = Math.pow(len, x);
+        const angle = x * Math.acos(this.a / len);
+        const rsin = r * Math.sin(angle);
+        const rcos = r * Math.cos(angle);
+        const va = this.axis().unit();
+        return new Quaternion(rcos, rsin * va.x, rsin * va.y, rsin * va.z);
+    }
+
     public rotateX(angle: number): void {
         const sin = Math.sin(0.5 * angle);
         const cos = Math.cos(0.5 * angle);
