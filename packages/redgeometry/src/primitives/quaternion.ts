@@ -1,4 +1,5 @@
 import { assertUnreachable } from "../utility/debug.js";
+import { lerp } from "../utility/scalar.js";
 import { Point3 } from "./point.js";
 import { Vector3 } from "./vector.js";
 
@@ -205,6 +206,26 @@ export class Quaternion implements QuaternionLike {
         return new Quaternion(this.a + q.a, this.b + q.b, this.c + q.c, this.d + q.d);
     }
 
+    /**
+     * Returns the angle between the current quaternion and `q` in radians.
+     *
+     * Note: The returned value is unsigned and less than `2 * PI`.
+     */
+    public angleTo(q: Quaternion): number {
+        // Glenn Davis formula (referenced by Ken Shoemake)
+        const dot = this.a * q.a + this.b * q.b + this.c * q.c + this.d * q.d;
+        const lenSq = this.lenSq() * q.lenSq();
+
+        if (dot * dot >= lenSq) {
+            // Angle either undefined, very close or equal to zero
+            return 0;
+        }
+
+        const cos = dot / Math.sqrt(lenSq);
+
+        return 2 * Math.acos(cos);
+    }
+
     public axis(): Vector3 {
         return new Vector3(this.b, this.c, this.d);
     }
@@ -278,6 +299,19 @@ export class Quaternion implements QuaternionLike {
 
     public lenSq(): number {
         return this.a * this.a + this.b * this.b + this.c * this.c + this.d * this.d;
+    }
+
+    /**
+     * Returns the linear interpolation of the current quaternion and `q`.
+     *
+     * Note: For the more common spherical linear interpolation see `slerp`.
+     */
+    public lerp(q: Quaternion, t: number): Quaternion {
+        const a = lerp(this.a, q.a, t);
+        const b = lerp(this.b, q.b, t);
+        const c = lerp(this.c, q.c, t);
+        const d = lerp(this.d, q.d, t);
+        return new Quaternion(a, b, c, d);
     }
 
     /**
@@ -461,6 +495,37 @@ export class Quaternion implements QuaternionLike {
         this.b = b * cos + c * sin;
         this.c = c * cos - b * sin;
         this.d = d * cos + a * sin;
+    }
+
+    /**
+     * Returns the spherical linear interpolation of the current quaternion and `q`.
+     */
+    public slerp(q: Quaternion, t: number): Quaternion {
+        // Glenn Davis formula (referenced by Ken Shoemake)
+        const dot = this.a * q.a + this.b * q.b + this.c * q.c + this.d * q.d;
+        const lenSq = this.lenSq() * q.lenSq();
+
+        if (dot * dot >= lenSq) {
+            // Fallback (angle either undefined, very close or equal to zero)
+            return this.lerp(q, t);
+        }
+
+        const cos = dot / Math.sqrt(lenSq);
+
+        const angle = Math.acos(cos);
+        const sin1 = Math.sin(angle - angle * t);
+        const sin2 = Math.sin(angle * t);
+        const sin3 = Math.sin(angle);
+
+        const s1 = sin1 / sin3;
+        const s2 = sin2 / sin3;
+
+        const a = s1 * this.a + s2 * q.a;
+        const b = s1 * this.b + s2 * q.b;
+        const c = s1 * this.c + s2 * q.c;
+        const d = s1 * this.d + s2 * q.d;
+
+        return new Quaternion(a, b, c, d);
     }
 
     public sub(q: Quaternion): Quaternion {

@@ -125,19 +125,20 @@ export class Vector2 implements Vector2Like {
     /**
      * Returns the angle between the current vector and `v` in radians.
      *
-     * Note: The returned value is unsigned and less than or equal to `PI`.
+     * Note: The returned value is unsigned and less than `PI`.
      */
     public angleTo(v: Vector2): number {
-        const a = this.lenSq() * v.lenSq();
+        const dot = this.dot(v);
+        const lenSq = this.lenSq() * v.lenSq();
 
-        if (a === 0) {
-            // Return an angle of zero if one vector is zero
+        if (dot * dot >= lenSq) {
+            // Angle either undefined, very close or equal to zero
             return 0;
         }
 
-        const b = this.dot(v) / Math.sqrt(a);
+        const cos = dot / Math.sqrt(lenSq);
 
-        return Math.acos(b);
+        return Math.acos(cos);
     }
 
     public clamp(vmin: Vector2, vmax: Vector2): Vector2 {
@@ -235,6 +236,33 @@ export class Vector2 implements Vector2Like {
      */
     public normal(): Vector2 {
         return new Vector2(this.y, -this.x);
+    }
+
+    /**
+     * Returns the spherical linear interpolation of the current vector and `v`.
+     */
+    public slerp(v: Vector2, t: number): Vector2 {
+        const dot = this.dot(v);
+        const lenSq = this.lenSq() * v.lenSq();
+
+        if (dot * dot >= lenSq) {
+            // Fallback (angle either undefined, very close or equal to zero)
+            return this.lerp(v, t);
+        }
+
+        const cos = dot / Math.sqrt(lenSq);
+        const angle = Math.acos(cos);
+        const sin1 = Math.sin(angle - angle * t);
+        const sin2 = Math.sin(angle * t);
+        const sin3 = Math.sin(angle);
+
+        const s1 = sin1 / sin3;
+        const s2 = sin2 / sin3;
+
+        const x = s1 * this.x + s2 * v.x;
+        const y = s1 * this.y + s2 * v.y;
+
+        return new Vector2(x, y);
     }
 
     public sub(v: Vector2): Vector2 {
@@ -532,6 +560,34 @@ export class Vector3 implements Vector3Like {
         const n2 = new Vector3(b, sign + y * y * a, -y);
 
         return { n1, n2 };
+    }
+
+    /**
+     * Returns the spherical linear interpolation of the current vector and `v`.
+     */
+    public slerp(v: Vector3, t: number): Vector3 {
+        const dot = this.dot(v);
+        const lenSq = this.lenSq() * v.lenSq();
+
+        if (dot * dot >= lenSq) {
+            // Fallback (angle either undefined, very close or equal to zero)
+            return this.lerp(v, t);
+        }
+
+        const cos = dot / Math.sqrt(lenSq);
+        const angle = Math.acos(cos);
+        const sin1 = Math.sin(angle - angle * t);
+        const sin2 = Math.sin(angle * t);
+        const sin3 = Math.sin(angle);
+
+        const s1 = sin1 / sin3;
+        const s2 = sin2 / sin3;
+
+        const x = s1 * this.x + s2 * v.x;
+        const y = s1 * this.y + s2 * v.y;
+        const z = s1 * this.z + s2 * v.z;
+
+        return new Vector3(x, y, z);
     }
 
     public sub(v: Vector3): Vector3 {
