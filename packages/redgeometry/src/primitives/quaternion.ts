@@ -227,7 +227,7 @@ export class Quaternion implements QuaternionLike {
 
     public dot(q: Quaternion): number {
         // `(1 / 2) * (q1 * (q2*)) - q2 * (q1*))`
-        return this.a * q.a + this.b * q.b + this.c * q.c + this.d * q.d;
+        return this.b * q.b + this.c * q.c + this.d * q.d;
     }
 
     public eq(q: Quaternion): boolean {
