@@ -53,10 +53,6 @@ export function expectToBeCloseEuler(
     const eul2y = (eul2.y + tau) % tau;
     const eul2z = (eul2.z + tau) % tau;
 
-    console.log(eul1x, eul2x);
-    console.log(eul1y, eul2y);
-    console.log(eul1z, eul2z);
-
     expect(eul1x).toBeCloseTo(eul2x, numDigits ?? 15);
     expect(eul1y).toBeCloseTo(eul2y, numDigits ?? 15);
     expect(eul1z).toBeCloseTo(eul2z, numDigits ?? 15);
