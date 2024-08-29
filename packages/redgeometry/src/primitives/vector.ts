@@ -1,4 +1,4 @@
-import { clamp, lerp } from "../utility/scalar.js";
+import { clamp, eqApproxAbs, eqApproxRel, lerp } from "../utility/scalar.js";
 import { Point2, Point3 } from "./point.js";
 
 export interface Vector2Like {
@@ -189,6 +189,14 @@ export class Vector2 implements Vector2Like {
 
     public eq(v: Vector2): boolean {
         return this.x === v.x && this.y === v.y;
+    }
+
+    public eqApproxAbs(v: Vector2, eps: number): boolean {
+        return eqApproxAbs(this.x, v.x, eps) && eqApproxAbs(this.y, v.y, eps);
+    }
+
+    public eqApproxRel(v: Vector2, eps: number): boolean {
+        return eqApproxRel(this.x, v.x, eps) && eqApproxRel(this.y, v.y, eps);
     }
 
     public isFinite(): boolean {
@@ -445,6 +453,14 @@ export class Vector3 implements Vector3Like {
 
     public eq(v: Vector3): boolean {
         return this.x === v.x && this.y === v.y && this.z === v.z;
+    }
+
+    public eqApproxAbs(v: Vector3, eps: number): boolean {
+        return eqApproxAbs(this.x, v.x, eps) && eqApproxAbs(this.y, v.y, eps) && eqApproxAbs(this.z, v.z, eps);
+    }
+
+    public eqApproxRel(v: Vector3, eps: number): boolean {
+        return eqApproxRel(this.x, v.x, eps) && eqApproxRel(this.y, v.y, eps) && eqApproxRel(this.z, v.z, eps);
     }
 
     public isFinite(): boolean {
@@ -739,6 +755,24 @@ export class Vector4 implements Vector4Like {
 
     public eq(v: Vector4): boolean {
         return this.x === v.x && this.y === v.y && this.z === v.z && this.w === v.w;
+    }
+
+    public eqApproxAbs(v: Vector4, eps: number): boolean {
+        return (
+            eqApproxAbs(this.x, v.x, eps) &&
+            eqApproxAbs(this.y, v.y, eps) &&
+            eqApproxAbs(this.z, v.z, eps) &&
+            eqApproxAbs(this.w, v.w, eps)
+        );
+    }
+
+    public eqApproxRel(v: Vector4, eps: number): boolean {
+        return (
+            eqApproxRel(this.x, v.x, eps) &&
+            eqApproxRel(this.y, v.y, eps) &&
+            eqApproxRel(this.z, v.z, eps) &&
+            eqApproxAbs(this.w, v.w, eps)
+        );
     }
 
     public isFinite(): boolean {

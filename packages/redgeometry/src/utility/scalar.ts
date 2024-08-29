@@ -29,6 +29,24 @@ export function clamp(x: number, min: number, max: number): number {
 }
 
 /**
+ * Returns `true` if the values `x` and `y` are within the absolute error threshold `eps`.
+ */
+export function eqApproxAbs(x: number, y: number, eps: number): boolean {
+    // Returns false if any parameter is `NaN`
+    return Math.abs(x - y) <= eps;
+}
+
+/**
+ * Returns `true` if the values `x` and `y` are within the relative error threshold `eps`.
+ */
+export function eqApproxRel(x: number, y: number, eps: number): boolean {
+    // Returns false if any parameter is `NaN`
+    const absx = Math.abs(x);
+    const absy = Math.abs(y);
+    return Math.abs(x - y) <= Math.max(absx, absy) * eps;
+}
+
+/**
  * Returns the linear interpolation of `x0` and `x1` with parameter `t`.
  */
 export function lerp(x0: number, x1: number, t: number): number {

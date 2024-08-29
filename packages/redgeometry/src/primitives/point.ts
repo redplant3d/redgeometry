@@ -1,4 +1,4 @@
-import { lerp, roundToPrecision } from "../utility/scalar.js";
+import { eqApproxAbs, eqApproxRel, lerp, roundToPrecision } from "../utility/scalar.js";
 import { Vector2, Vector3 } from "./vector.js";
 
 export interface Point2Like {
@@ -113,6 +113,14 @@ export class Point2 implements Point2Like {
 
     public eq(p: Point2): boolean {
         return this.x === p.x && this.y === p.y;
+    }
+
+    public eqApproxAbs(p: Point2, eps: number): boolean {
+        return eqApproxAbs(this.x, p.x, eps) && eqApproxAbs(this.y, p.y, eps);
+    }
+
+    public eqApproxRel(p: Point2, eps: number): boolean {
+        return eqApproxRel(this.x, p.x, eps) && eqApproxRel(this.y, p.y, eps);
     }
 
     public gt(p: Point2): boolean {
@@ -248,6 +256,14 @@ export class Point3 implements Point3Like {
 
     public eq(p: Point3): boolean {
         return this.x === p.x && this.y === p.y && this.z === p.z;
+    }
+
+    public eqApproxAbs(p: Point3, eps: number): boolean {
+        return eqApproxAbs(this.x, p.x, eps) && eqApproxAbs(this.y, p.y, eps) && eqApproxAbs(this.z, p.z, eps);
+    }
+
+    public eqApproxRel(p: Point3, eps: number): boolean {
+        return eqApproxRel(this.x, p.x, eps) && eqApproxRel(this.y, p.y, eps) && eqApproxRel(this.z, p.z, eps);
     }
 
     public isFinite(): boolean {
