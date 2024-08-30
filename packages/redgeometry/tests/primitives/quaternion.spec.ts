@@ -75,63 +75,63 @@ test("Quaternion - fromRotationEuler", () => {
 
     const qa1 = Quaternion.fromRotationEuler(ax, ay, az, RotationOrder.XYZ);
     const qa2 = Quaternion.createIdentity();
-    qa2.rotateX(ax);
-    qa2.rotateY(ay);
-    qa2.rotateZ(az);
+    qa2.rotateXPre(ax);
+    qa2.rotateYPre(ay);
+    qa2.rotateZPre(az);
     const qa3 = Quaternion.createIdentity();
-    qa3.rotateZPre(az);
-    qa3.rotateYPre(ay);
-    qa3.rotateXPre(ax);
+    qa3.rotateZ(az);
+    qa3.rotateY(ay);
+    qa3.rotateX(ax);
 
     const qb1 = Quaternion.fromRotationEuler(ax, ay, az, RotationOrder.XZY);
     const qb2 = Quaternion.createIdentity();
-    qb2.rotateX(ax);
-    qb2.rotateZ(az);
-    qb2.rotateY(ay);
+    qb2.rotateXPre(ax);
+    qb2.rotateZPre(az);
+    qb2.rotateYPre(ay);
     const qb3 = Quaternion.createIdentity();
-    qb3.rotateYPre(ay);
-    qb3.rotateZPre(az);
-    qb3.rotateXPre(ax);
+    qb3.rotateY(ay);
+    qb3.rotateZ(az);
+    qb3.rotateX(ax);
 
     const qc1 = Quaternion.fromRotationEuler(ax, ay, az, RotationOrder.YXZ);
     const qc2 = Quaternion.createIdentity();
-    qc2.rotateY(ay);
-    qc2.rotateX(ax);
-    qc2.rotateZ(az);
+    qc2.rotateYPre(ay);
+    qc2.rotateXPre(ax);
+    qc2.rotateZPre(az);
     const qc3 = Quaternion.createIdentity();
-    qc3.rotateZPre(az);
-    qc3.rotateXPre(ax);
-    qc3.rotateYPre(ay);
+    qc3.rotateZ(az);
+    qc3.rotateX(ax);
+    qc3.rotateY(ay);
 
     const qd1 = Quaternion.fromRotationEuler(ax, ay, az, RotationOrder.YZX);
     const qd2 = Quaternion.createIdentity();
-    qd2.rotateY(ay);
-    qd2.rotateZ(az);
-    qd2.rotateX(ax);
+    qd2.rotateYPre(ay);
+    qd2.rotateZPre(az);
+    qd2.rotateXPre(ax);
     const qd3 = Quaternion.createIdentity();
-    qd3.rotateXPre(ax);
-    qd3.rotateZPre(az);
-    qd3.rotateYPre(ay);
+    qd3.rotateX(ax);
+    qd3.rotateZ(az);
+    qd3.rotateY(ay);
 
     const qe1 = Quaternion.fromRotationEuler(ax, ay, az, RotationOrder.ZXY);
     const qe2 = Quaternion.createIdentity();
-    qe2.rotateZ(az);
-    qe2.rotateX(ax);
-    qe2.rotateY(ay);
+    qe2.rotateZPre(az);
+    qe2.rotateXPre(ax);
+    qe2.rotateYPre(ay);
     const qe3 = Quaternion.createIdentity();
-    qe3.rotateYPre(ay);
-    qe3.rotateXPre(ax);
-    qe3.rotateZPre(az);
+    qe3.rotateY(ay);
+    qe3.rotateX(ax);
+    qe3.rotateZ(az);
 
     const qf1 = Quaternion.fromRotationEuler(ax, ay, az, RotationOrder.ZYX);
     const qf2 = Quaternion.createIdentity();
-    qf2.rotateZ(az);
-    qf2.rotateY(ay);
-    qf2.rotateX(ax);
+    qf2.rotateZPre(az);
+    qf2.rotateYPre(ay);
+    qf2.rotateXPre(ax);
     const qf3 = Quaternion.createIdentity();
-    qf3.rotateXPre(ax);
-    qf3.rotateYPre(ay);
-    qf3.rotateZPre(az);
+    qf3.rotateX(ax);
+    qf3.rotateY(ay);
+    qf3.rotateZ(az);
 
     expectToBeCloseQuaternion(qa1, qa2);
     expectToBeCloseQuaternion(qa1, qa3);
@@ -149,12 +149,28 @@ test("Quaternion - fromRotationEuler", () => {
 
 test("Quaternion - getEulerAngles", () => {
     // Pitch angle (y) must be in the range of `(-Math.PI / 2, Math.PI / 2)` to avoid gimbal lock
-    const eul1 = { x: 0.5, y: 1, z: 2 };
+    const eul = { x: 0.25, y: 0.5, z: 1 };
 
-    const q = Quaternion.fromRotationEuler(eul1.x, eul1.y, eul1.z, RotationOrder.XYZ);
-    const eul2 = q.getEulerAngles();
+    const q1 = Quaternion.fromRotationEuler(eul.x, eul.y, eul.z, RotationOrder.XYZ);
+    const q2 = Quaternion.fromRotationEuler(eul.x, eul.y, eul.z, RotationOrder.XZY);
+    const q3 = Quaternion.fromRotationEuler(eul.x, eul.y, eul.z, RotationOrder.YXZ);
+    const q4 = Quaternion.fromRotationEuler(eul.x, eul.y, eul.z, RotationOrder.YZX);
+    const q5 = Quaternion.fromRotationEuler(eul.x, eul.y, eul.z, RotationOrder.ZXY);
+    const q6 = Quaternion.fromRotationEuler(eul.x, eul.y, eul.z, RotationOrder.ZYX);
 
-    expectToBeCloseEuler(eul1, eul2);
+    const eul1 = q1.getEulerAngles(RotationOrder.XYZ);
+    const eul2 = q2.getEulerAngles(RotationOrder.XZY);
+    const eul3 = q3.getEulerAngles(RotationOrder.YXZ);
+    const eul4 = q4.getEulerAngles(RotationOrder.YZX);
+    const eul5 = q5.getEulerAngles(RotationOrder.ZXY);
+    const eul6 = q6.getEulerAngles(RotationOrder.ZYX);
+
+    expectToBeCloseEuler(eul, eul1);
+    expectToBeCloseEuler(eul, eul2);
+    expectToBeCloseEuler(eul, eul3);
+    expectToBeCloseEuler(eul, eul4);
+    expectToBeCloseEuler(eul, eul5);
+    expectToBeCloseEuler(eul, eul6);
 });
 
 test("Quaternion - inverse", () => {
@@ -172,13 +188,15 @@ test("Quaternion - mulPt/mulVec", () => {
     const ax = 1;
     const ay = 2;
     const az = 3;
+
+    // Extrinsic `XYZ` rotation
     const q1 = Quaternion.fromRotationAngleX(ax);
     const q2 = Quaternion.fromRotationAngleY(ay);
     const q3 = Quaternion.fromRotationAngleZ(az);
     const mat1 = Matrix4A.fromRotation(q1.a, q1.b, q1.c, q1.d);
     const mat2 = Matrix4A.fromRotation(q2.a, q2.b, q2.c, q2.d);
     const mat3 = Matrix4A.fromRotation(q3.a, q3.b, q3.c, q3.d);
-    const qa = Quaternion.fromRotationEuler(ax, ay, az, RotationOrder.XYZ);
+    const qa = Quaternion.fromRotationEuler(ax, ay, az, RotationOrder.ZYX);
     const qb = Quaternion.createIdentity();
     qb.rotateX(ax);
     qb.rotateY(ay);
@@ -187,6 +205,7 @@ test("Quaternion - mulPt/mulVec", () => {
     qc.rotateZPre(az);
     qc.rotateYPre(ay);
     qc.rotateXPre(ax);
+
     const p = new Point3(1, 2, 3);
     const v = new Vector3(1, 2, 3);
 

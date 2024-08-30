@@ -94,6 +94,9 @@ export class Quaternion implements QuaternionLike {
         return new Quaternion(vd, vn.x, vn.y, vn.z);
     }
 
+    /**
+     * Returns a quaternion rotated by the intrinsic Euler (Tait-Bryan) angles `angleX`, `angleY` and `angleZ` with `order`.
+     */
     public static fromRotationEuler(angleX: number, angleY: number, angleZ: number, order: RotationOrder): Quaternion {
         const sinX = Math.sin(0.5 * angleX);
         const cosX = Math.cos(0.5 * angleX);
@@ -113,22 +116,22 @@ export class Quaternion implements QuaternionLike {
 
         switch (order) {
             case RotationOrder.XYZ: {
-                return new Quaternion(a1 + a2, b1 - b2, c1 + c2, d1 - d2);
+                return new Quaternion(a1 - a2, b1 + b2, c1 - c2, d1 + d2);
             }
             case RotationOrder.XZY: {
-                return new Quaternion(a1 - a2, b1 + b2, c1 + c2, d1 - d2);
-            }
-            case RotationOrder.YXZ: {
-                return new Quaternion(a1 - a2, b1 - b2, c1 + c2, d1 + d2);
-            }
-            case RotationOrder.YZX: {
                 return new Quaternion(a1 + a2, b1 - b2, c1 - c2, d1 + d2);
             }
-            case RotationOrder.ZXY: {
+            case RotationOrder.YXZ: {
                 return new Quaternion(a1 + a2, b1 + b2, c1 - c2, d1 - d2);
             }
+            case RotationOrder.YZX: {
+                return new Quaternion(a1 - a2, b1 + b2, c1 + c2, d1 - d2);
+            }
+            case RotationOrder.ZXY: {
+                return new Quaternion(a1 - a2, b1 - b2, c1 + c2, d1 + d2);
+            }
             case RotationOrder.ZYX: {
-                return new Quaternion(a1 - a2, b1 + b2, c1 - c2, d1 + d2);
+                return new Quaternion(a1 + a2, b1 - b2, c1 + c2, d1 - d2);
             }
             default: {
                 assertUnreachable(order);
@@ -256,32 +259,71 @@ export class Quaternion implements QuaternionLike {
     }
 
     /**
-     * Returns the euler angles of the quaternion in `XYZ` order.
+     * Returns the instrinsic Euler (Tait-Bryan) angles of the current quaternion the with respect to `order`.
+     *
+     * References:
+     * - https://en.wikipedia.org/wiki/Euler_angles#Conversion_to_other_orientation_representations
      */
-    public getEulerAngles(): { x: number; y: number; z: number } {
-        const a = this.a;
-        const b = this.b;
-        const c = this.c;
-        const d = this.d;
+    public getEulerAngles(order: RotationOrder): { x: number; y: number; z: number } {
+        const qaa = this.a * this.a;
+        const qbb = this.b * this.b;
+        const qcc = this.c * this.c;
+        const qdd = this.d * this.d;
 
-        const aa = a * a;
-        const bb = b * b;
-        const cc = c * c;
-        const dd = d * d;
+        const qab2 = 2 * this.a * this.b;
+        const qac2 = 2 * this.a * this.c;
+        const qad2 = 2 * this.a * this.d;
+        const qbc2 = 2 * this.b * this.c;
+        const qbd2 = 2 * this.b * this.d;
+        const qcd2 = 2 * this.c * this.d;
 
-        const ab = a * b;
-        const cd = c * d;
-        const x = Math.atan2(ab + ab + cd + cd, aa - bb - cc + dd);
-
-        const ad = a * d;
-        const bc = b * c;
-        const z = Math.atan2(ad + ad + bc + bc, aa + bb - cc - dd);
-
-        const ac = a * c;
-        const bd = b * d;
-        const y = Math.asin(ac + ac - bd - bd);
-
-        return { x, y, z };
+        switch (order) {
+            case RotationOrder.XYZ: {
+                return {
+                    x: Math.atan2(qab2 - qcd2, qaa - qbb - qcc + qdd),
+                    y: Math.asin(qbd2 + qac2),
+                    z: Math.atan2(qad2 - qbc2, qaa + qbb - qcc - qdd),
+                };
+            }
+            case RotationOrder.XZY: {
+                return {
+                    x: Math.atan2(qcd2 + qab2, qaa - qbb + qcc - qdd),
+                    y: Math.atan2(qbd2 + qac2, qaa + qbb - qcc - qdd),
+                    z: Math.asin(qad2 - qbc2),
+                };
+            }
+            case RotationOrder.YXZ: {
+                return {
+                    x: Math.asin(qab2 - qcd2),
+                    y: Math.atan2(qbd2 + qac2, qaa - qbb - qcc + qdd),
+                    z: Math.atan2(qbc2 + qad2, qaa - qbb + qcc - qdd),
+                };
+            }
+            case RotationOrder.YZX: {
+                return {
+                    x: Math.atan2(qab2 - qcd2, qaa - qbb + qcc - qdd),
+                    y: Math.atan2(qac2 - qbd2, qaa + qbb - qcc - qdd),
+                    z: Math.asin(qbc2 + qad2),
+                };
+            }
+            case RotationOrder.ZXY: {
+                return {
+                    x: Math.asin(qcd2 + qab2),
+                    y: Math.atan2(qac2 - qbd2, qaa - qbb - qcc + qdd),
+                    z: Math.atan2(qad2 - qbc2, qaa - qbb + qcc - qdd),
+                };
+            }
+            case RotationOrder.ZYX: {
+                return {
+                    x: Math.atan2(qcd2 + qab2, qaa - qbb - qcc + qdd),
+                    y: Math.asin(qac2 - qbd2),
+                    z: Math.atan2(qbc2 + qad2, qaa + qbb - qcc - qdd),
+                };
+            }
+            default: {
+                assertUnreachable(order);
+            }
+        }
     }
 
     public inverse(): Quaternion {
@@ -389,112 +431,130 @@ export class Quaternion implements QuaternionLike {
         return new Quaternion(rcos, rsin * va.x, rsin * va.y, rsin * va.z);
     }
 
+    /**
+     * Returns the current quaternion rotated by an extrinsic rotation around the x-axis.
+     */
     public rotateX(angle: number): void {
         const sin = Math.sin(0.5 * angle);
         const cos = Math.cos(0.5 * angle);
-        const a = this.a;
-        const b = this.b;
-        const c = this.c;
-        const d = this.d;
+        const qa = this.a;
+        const qb = this.b;
+        const qc = this.c;
+        const qd = this.d;
 
         // | cos |   | a |
         // | sin | * | b |
         // |   0 |   | c |
         // |   0 |   | d |
-        this.a = cos * a - sin * b;
-        this.b = cos * b + sin * a;
-        this.c = cos * c - sin * d;
-        this.d = cos * d + sin * c;
+        this.a = cos * qa - sin * qb;
+        this.b = cos * qb + sin * qa;
+        this.c = cos * qc - sin * qd;
+        this.d = cos * qd + sin * qc;
     }
 
+    /**
+     * Returns the current quaternion rotated by an instrinsic rotation around the x-axis.
+     */
     public rotateXPre(angle: number): void {
         const sin = Math.sin(0.5 * angle);
         const cos = Math.cos(0.5 * angle);
-        const a = this.a;
-        const b = this.b;
-        const c = this.c;
-        const d = this.d;
+        const qa = this.a;
+        const qb = this.b;
+        const qc = this.c;
+        const qd = this.d;
 
         // | a |   | cos |
         // | b | * | sin |
         // | c |   |   0 |
         // | d |   |   0 |
-        this.a = a * cos - b * sin;
-        this.b = b * cos + a * sin;
-        this.c = c * cos + d * sin;
-        this.d = d * cos - c * sin;
+        this.a = qa * cos - qb * sin;
+        this.b = qb * cos + qa * sin;
+        this.c = qc * cos + qd * sin;
+        this.d = qd * cos - qc * sin;
     }
 
+    /**
+     * Returns the current quaternion rotated by an extrinsic rotation around the y-axis.
+     */
     public rotateY(angle: number): void {
         const sin = Math.sin(0.5 * angle);
         const cos = Math.cos(0.5 * angle);
-        const a = this.a;
-        const b = this.b;
-        const c = this.c;
-        const d = this.d;
+        const qa = this.a;
+        const qb = this.b;
+        const qc = this.c;
+        const qd = this.d;
 
         // | cos |   | a |
         // |   0 | * | b |
         // | sin |   | c |
         // |   0 |   | d |
-        this.a = cos * a - sin * c;
-        this.b = cos * b + sin * d;
-        this.c = cos * c + sin * a;
-        this.d = cos * d - sin * b;
+        this.a = cos * qa - sin * qc;
+        this.b = cos * qb + sin * qd;
+        this.c = cos * qc + sin * qa;
+        this.d = cos * qd - sin * qb;
     }
 
+    /**
+     * Returns the current quaternion rotated by an instrinsic rotation around the y-axis.
+     */
     public rotateYPre(angle: number): void {
         const sin = Math.sin(0.5 * angle);
         const cos = Math.cos(0.5 * angle);
-        const a = this.a;
-        const b = this.b;
-        const c = this.c;
-        const d = this.d;
+        const qa = this.a;
+        const qb = this.b;
+        const qc = this.c;
+        const qd = this.d;
 
         // | a |   | cos |
         // | b | * |   0 |
         // | c |   | sin |
         // | d |   |   0 |
-        this.a = a * cos - c * sin;
-        this.b = b * cos - d * sin;
-        this.c = c * cos + a * sin;
-        this.d = d * cos + b * sin;
+        this.a = qa * cos - qc * sin;
+        this.b = qb * cos - qd * sin;
+        this.c = qc * cos + qa * sin;
+        this.d = qd * cos + qb * sin;
     }
 
+    /**
+     * Returns the current quaternion rotated by an extrinsic rotation around the z-axis.
+     */
     public rotateZ(angle: number): void {
         const sin = Math.sin(0.5 * angle);
         const cos = Math.cos(0.5 * angle);
-        const a = this.a;
-        const b = this.b;
-        const c = this.c;
-        const d = this.d;
+        const qa = this.a;
+        const qb = this.b;
+        const qc = this.c;
+        const qd = this.d;
 
         // | cos |   | a |
         // |   0 | * | b |
         // |   0 |   | c |
         // | sin |   | d |
-        this.a = cos * a - sin * d;
-        this.b = cos * b - sin * c;
-        this.c = cos * c + sin * b;
-        this.d = cos * d + sin * a;
+        this.a = cos * qa - sin * qd;
+        this.b = cos * qb - sin * qc;
+        this.c = cos * qc + sin * qb;
+        this.d = cos * qd + sin * qa;
     }
 
+    /**
+     * Returns the current quaternion rotated by an instrinsic rotation around the z-axis.
+     */
     public rotateZPre(angle: number): void {
         const sin = Math.sin(0.5 * angle);
         const cos = Math.cos(0.5 * angle);
-        const a = this.a;
-        const b = this.b;
-        const c = this.c;
-        const d = this.d;
+        const qa = this.a;
+        const qb = this.b;
+        const qc = this.c;
+        const qd = this.d;
 
         // | a |   | cos |
         // | b | * |   0 |
         // | c |   |   0 |
         // | d |   | sin |
-        this.a = a * cos - d * sin;
-        this.b = b * cos + c * sin;
-        this.c = c * cos - b * sin;
-        this.d = d * cos + a * sin;
+        this.a = qa * cos - qd * sin;
+        this.b = qb * cos + qc * sin;
+        this.c = qc * cos - qb * sin;
+        this.d = qd * cos + qa * sin;
     }
 
     /**
