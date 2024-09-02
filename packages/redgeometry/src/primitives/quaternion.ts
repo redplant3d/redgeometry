@@ -259,7 +259,7 @@ export class Quaternion implements QuaternionLike {
     }
 
     /**
-     * Returns the instrinsic Euler (Tait-Bryan) angles of the current quaternion the with respect to `order`.
+     * Returns the instrinsic Euler (Tait-Bryan) angles of the current quaternion with respect to `order`.
      *
      * References:
      * - https://en.wikipedia.org/wiki/Euler_angles#Conversion_to_other_orientation_representations
