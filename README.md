@@ -42,6 +42,7 @@ Execute `npm run init` to install/update the development environment and `npm ru
 
 -   Visual Studio Code
 -   Node.js 22.x or later
+-   pnpm 9.x
 
 ### Example `launch.json`
 
