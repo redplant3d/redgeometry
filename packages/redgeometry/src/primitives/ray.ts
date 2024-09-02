@@ -160,6 +160,48 @@ export class Ray3 {
         return new Ray3(p, v);
     }
 
+    /**
+     * Returns the parameters of the closest points which lie on the rays `ray1` and `ray2`
+     * or `undefined` if the rays are parallel.
+     */
+    public static getClosestParameter(ray1: Ray3, ray2: Ray3): [number, number] | undefined {
+        // Reference: https://math.stackexchange.com/a/4764188
+        // ```
+        // p1 + t1 * v1 = p2 + t2 * v2
+        // t1 * v1 - t2 * v2 = p2 - p1
+        // ```
+        const vc = ray1.v.cross(ray2.v);
+        const den = vc.lenSq();
+
+        if (den === 0) {
+            // Rays are parallel
+            return undefined;
+        }
+
+        // `v = p2 - p1`
+        const v = ray2.p.sub(ray1.p);
+
+        // We can elimate `t2` by applying the cross product with `v2` so that `v2 cross v2` vanishes:
+        // ```
+        // t1 * (v1 cross v2) - t2 * (v2 cross v2) = v cross v2
+        // t1 * (v1 cross v2) = v cross v2
+        // t1 * (v1 cross v2) dot (v1 cross v2) = (v cross v2) dot (v1 cross v2)
+        // t1 = ((v cross v2) dot (v1 cross v2)) / ((v1 cross v2) dot (v1 cross v2))
+        // ```
+        const t1 = v.cross(ray2.v).dot(vc) / den;
+
+        // Similarly, we eliminate `t1` and use the anticommutativity property of the cross product:
+        // ```
+        // t1 * (v1 cross v1) - t2 * (v2 cross v1) = v cross v1
+        // t2 * (v1 cross v2) = v cross v1
+        // t2 * (v1 cross v2) dot (v1 cross v2) = (v cross v1) dot (v1 cross v2)
+        // t2 = ((v cross v1) dot (v1 cross v2)) / ((v1 cross v2) dot (v1 cross v2))
+        // ```
+        const t2 = v.cross(ray1.v).dot(vc) / den;
+
+        return [t1, t2];
+    }
+
     public static toObject(ray: Ray3): { p: Point3Like; v: Vector3Like } {
         const p = Point3.toObject(ray.p);
         const v = Vector3.toObject(ray.v);
