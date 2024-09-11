@@ -1,3 +1,4 @@
+import { eqApproxAbs, eqApproxRel } from "../utility/scalar.js";
 import { Point2 } from "./point.js";
 import { Vector2 } from "./vector.js";
 
@@ -44,6 +45,25 @@ export class Complex implements ComplexLike {
         return new Complex(this.a + z.a, this.b + z.b);
     }
 
+    /**
+     * Returns the angle between the current complex and `z` in radians.
+     *
+     * Note: The returned value is unsigned and less than `PI`.
+     */
+    public angleTo(z: Complex): number {
+        const dot = this.a * z.a + this.b * z.b;
+        const lenSq = this.lenSq() * z.lenSq();
+
+        if (dot * dot >= lenSq) {
+            // Angle either undefined, very close or equal to zero
+            return 0;
+        }
+
+        const cos = dot / Math.sqrt(lenSq);
+
+        return Math.acos(cos);
+    }
+
     public clone(): Complex {
         return new Complex(this.a, this.b);
     }
@@ -52,16 +72,16 @@ export class Complex implements ComplexLike {
         return new Complex(this.a, -this.b);
     }
 
-    public cross(z: Complex): Complex {
-        return new Complex(0, this.a * z.b - this.b * z.a);
-    }
-
-    public dot(z: Complex): number {
-        return this.a * z.a + this.b * z.b;
-    }
-
     public eq(z: Complex): boolean {
         return this.a === z.a && this.b === z.b;
+    }
+
+    public eqApproxAbs(z: Complex, eps: number): boolean {
+        return eqApproxAbs(this.a, z.a, eps) && eqApproxAbs(this.b, z.b, eps);
+    }
+
+    public eqApproxRel(z: Complex, eps: number): boolean {
+        return eqApproxRel(this.a, z.a, eps) && eqApproxRel(this.b, z.b, eps);
     }
 
     public inverse(): Complex {
@@ -114,11 +134,11 @@ export class Complex implements ComplexLike {
     public rotate(angle: number): void {
         const sin = Math.sin(angle);
         const cos = Math.cos(angle);
-        const a = this.a;
-        const b = this.b;
+        const za = this.a;
+        const zb = this.b;
 
-        this.a = cos * a - sin * b;
-        this.b = cos * b + sin * a;
+        this.a = cos * za - sin * zb;
+        this.b = cos * zb + sin * za;
     }
 
     public sub(z: Complex): Complex {
