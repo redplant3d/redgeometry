@@ -347,18 +347,20 @@ export class SnapRound2 {
 
         for (let i = 0; i < segments.length; i++) {
             const s = segments[i];
+            const p0 = s.p0;
+            const p1 = s.p1;
 
-            if (s.p0.eq(s.p1)) {
+            if (p0.eq(p1)) {
                 // Ignore empty edges
                 continue;
             }
 
-            if (s.p0.lt(s.p1)) {
-                events.push(new SnapRoundSweepEvent2(s.p0, s.p1, s, i, true));
-                events.push(new SnapRoundSweepEvent2(s.p1, s.p0, s, i, false));
+            if (p0.x !== p1.x ? p0.x < p1.x : p0.y < p1.y) {
+                events.push(new SnapRoundSweepEvent2(p0, p1, s, i, true));
+                events.push(new SnapRoundSweepEvent2(p1, p0, s, i, false));
             } else {
-                events.push(new SnapRoundSweepEvent2(s.p1, s.p0, s, i, true));
-                events.push(new SnapRoundSweepEvent2(s.p0, s.p1, s, i, false));
+                events.push(new SnapRoundSweepEvent2(p1, p0, s, i, true));
+                events.push(new SnapRoundSweepEvent2(p0, p1, s, i, false));
             }
         }
 

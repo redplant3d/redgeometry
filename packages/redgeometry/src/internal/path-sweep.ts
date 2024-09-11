@@ -89,16 +89,16 @@ export function createSweepEventQueue(snapRound: SnapRound2): PathSweepEvent2[] 
 
     for (const seg of edgeSegments) {
         // Fetch points, weight becomes winding
+        const wind = seg.ref.weight;
         const p0 = seg.p0;
         const p1 = seg.p1;
-        const wind = seg.ref.weight;
 
         if (p0.eq(p1)) {
             // Ignore empty edges
             continue;
         }
 
-        if (p0.lt(p1)) {
+        if (p0.x !== p1.x ? p0.x < p1.x : p0.y < p1.y) {
             queue.push(new PathSweepEvent2(p0, p1, seg, wind, true));
             queue.push(new PathSweepEvent2(p1, p0, seg, wind, false));
         } else {

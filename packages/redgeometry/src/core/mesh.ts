@@ -1255,7 +1255,7 @@ export class Mesh2 {
                 }
             }
 
-            if (p1.lt(p2)) {
+            if (p1.x !== p2.x ? p1.x < p2.x : p1.y < p2.y) {
                 // log.infoDebug("{} -> Regular (Interior Above)", p1);
                 this.monotoneDelete(status, e0, e1);
                 this.monotoneInsert(status, e1);

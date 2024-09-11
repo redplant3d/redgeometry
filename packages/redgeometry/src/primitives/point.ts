@@ -123,14 +123,6 @@ export class Point2 implements Point2Like {
         return eqApproxRel(this.x, p.x, eps) && eqApproxRel(this.y, p.y, eps);
     }
 
-    public gt(p: Point2): boolean {
-        return this.x === p.x ? this.y > p.y : this.x > p.x;
-    }
-
-    public gte(p: Point2): boolean {
-        return this.x === p.x ? this.y >= p.y : this.x > p.x;
-    }
-
     public isFinite(): boolean {
         return Number.isFinite(this.x) && Number.isFinite(this.y);
     }
@@ -143,14 +135,6 @@ export class Point2 implements Point2Like {
         const x = lerp(this.x, p.x, t);
         const y = lerp(this.y, p.y, t);
         return new Point2(x, y);
-    }
-
-    public lt(p: Point2): boolean {
-        return this.x === p.x ? this.y < p.y : this.x < p.x;
-    }
-
-    public lte(p: Point2): boolean {
-        return this.x === p.x ? this.y <= p.y : this.x < p.x;
     }
 
     public sub(p: Point2): Vector2 {

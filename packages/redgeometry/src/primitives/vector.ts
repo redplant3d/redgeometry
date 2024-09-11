@@ -13,10 +13,10 @@ export interface Vector3Like {
 }
 
 export interface Vector4Like {
-    w: number;
     x: number;
     y: number;
     z: number;
+    w: number;
 }
 
 export class Vector2 implements Vector2Like {
@@ -157,9 +157,9 @@ export class Vector2 implements Vector2Like {
     }
 
     /**
-     * Returns the cross product of the current vector and `v` as a scalar value.
+     * Returns the 2D cross product of the current vector and `v` as a scalar value.
      *
-     * The 2D cross product is defined by z-value of the 3D cross product: \
+     * The 2D cross product is defined by the magnitude of the 3D cross product: \
      * `(x1, y1, 0) cross (x2, y2, 0) == (0, 0, x1 * y2 - y1 * x2)`
      *
      * Identity relating to the dot product: `v1 cross v2 === v1 dot normal(v2)`
@@ -295,7 +295,12 @@ export class Vector2 implements Vector2Like {
 
     public unitOrZero(): Vector2 {
         const len = this.len();
-        return len > 0 ? this.divS(len) : Vector2.createZero();
+
+        if (len === 0) {
+            return Vector2.createZero();
+        }
+
+        return this.divS(len);
     }
 }
 
@@ -628,15 +633,20 @@ export class Vector3 implements Vector3Like {
 
     public unitOrZero(): Vector3 {
         const len = this.len();
-        return len > 0 ? this.divS(len) : Vector3.createZero();
+
+        if (len === 0) {
+            return Vector3.createZero();
+        }
+
+        return this.divS(len);
     }
 }
 
 export class Vector4 implements Vector4Like {
-    public w: number;
     public x: number;
     public y: number;
     public z: number;
+    public w: number;
 
     public constructor(x: number, y: number, z: number, w: number) {
         this.x = x;
