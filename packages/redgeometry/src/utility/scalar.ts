@@ -25,7 +25,7 @@ export function betweenInt(a: number, b: number, t: number): number {
  * Returns the value `x` clamped between `min` and `max`.
  */
 export function clamp(x: number, min: number, max: number): number {
-    return x <= min ? min : x >= max ? max : x;
+    return Math.min(Math.max(x, min), max);
 }
 
 /**
