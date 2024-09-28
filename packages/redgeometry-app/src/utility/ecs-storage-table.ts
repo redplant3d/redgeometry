@@ -1,966 +1,1155 @@
-import type { SerializationMap } from "redgeometry/src/internal/serialize";
-import { assertDebug, throwError } from "redgeometry/src/utility/debug";
-import { ObjectPool } from "redgeometry/src/utility/object";
-import { Bitset } from "redgeometry/src/utility/set";
-import type { Component, ComponentId, ComponentIdOf, ComponentIdsOf, EntityId } from "../ecs/types.js";
-import { ChangeFlags } from "../ecs/world.js";
+import { assertDebug, assertUnreachable, throwError } from "redgeometry/src/utility/debug";
+import type { Component, ComponentId, ComponentIdOf, EntityId } from "../ecs/types.js";
 
-enum EntityChangeFlags {
-    None,
-    Created,
-    Updated,
-    Deleted,
+const EMPTY_COMPONENT: Component = { componentId: "" };
+const EMPTY_MAP: Map<never, never> = new Map<never, never>();
+const EMPTY_ARRAY: never[] = [];
+const ENTITY_REF_MASK = 0x00ffffff;
+
+export enum ComponentFlags {
+    None = 0,
+    Created = 1,
+    Updated = 2,
+    Deleted = 4,
 }
 
-type ComponentRef = number;
-type EntityRef = number;
-type ComponentEntityRef = number;
-type ComponentTableEntryRef = number;
+export enum EntityFlags {
+    None = 0,
+    Created = 1,
+    Destroyed = 2,
+    Disabled = 4,
+}
+
+export interface EntityComponentQuery<T extends Component = Component> {
+    hasComponent(componentId: ComponentIdOf<T>): boolean;
+    hasComponentFlags(componentId: ComponentIdOf<T>, flags: ComponentFlags): boolean;
+    hasEntityFlags(flags: EntityFlags): boolean;
+    isChanged(componentId: ComponentIdOf<T>): boolean;
+    isCreated(componentId: ComponentIdOf<T>): boolean;
+    isDeleted(componentId: ComponentIdOf<T>): boolean;
+    isEntityDestroyed(): boolean;
+    isUpdated(componentId: ComponentIdOf<T>): boolean;
+}
+
+enum EntityTransitionType {
+    Reset,
+    Destroy,
+    Disable,
+    Enable,
+}
+
+enum ComponentTransitionType {
+    Add,
+    Set,
+    Update,
+    Delete,
+}
+
+enum StorageFlags {
+    None = 0,
+    Destroyed = 1,
+}
+
+type ComponentSetEntryRef = number;
+type ComponentSetRef = number;
+type ComponentSetStorageRef = number;
 type ComponentTableRef = number;
+type EntityRef = number;
+type EntityVersion = number;
 
-function tableTypeCreateFn(): Bitset {
-    return Bitset.fromCapacity(0);
-}
+type ComponentSetShape = ReadonlyMap<ComponentId, ComponentFlags>;
+type ComponentContainer = Component[];
 
-function tableTypeClearFn(b: Bitset): void {
-    b.reset();
-}
+type EntityTransition = {
+    type: EntityTransitionType;
+    state: ComponentSetState;
+    hits: number;
+};
+
+type ComponentTransition = {
+    type: ComponentTransitionType;
+    state: ComponentSetState;
+    id: ComponentId;
+    hits: number;
+};
 
 export class EntityComponentStorage {
-    private changeTick: number;
-
-    public componentChangeEntries: ComponentChangeEntries;
-    public componentEntries: ComponentEntries;
-    public entityChangeEntries: EntityChangeEntries;
-    public entityEntries: EntityEntries;
+    public componenSets: ComponentSet[];
+    public componentSetStates: ComponentSetState[];
+    public componentSetStorages: ComponentSetStorage[];
+    public entities: Entities;
 
     constructor() {
-        this.entityEntries = new EntityEntries();
-        this.componentEntries = new ComponentEntries();
-        this.componentChangeEntries = new ComponentChangeEntries();
-        this.entityChangeEntries = new EntityChangeEntries();
+        const rootState = new ComponentSetState(EMPTY_MAP, EntityFlags.Created);
+        const terminalStorage = new ComponentSetStorage(EMPTY_MAP, StorageFlags.Destroyed);
 
-        this.changeTick = 0;
+        this.componentSetStates = [rootState];
+        this.componentSetStorages = [terminalStorage];
+        this.componenSets = [];
+
+        this.entities = new Entities();
     }
 
-    public cleanup(): void {
-        this.entityChangeEntries.clear();
-        this.componentChangeEntries.clear();
-
-        this.changeTick = (this.changeTick + 1) >>> 0;
-    }
-
-    public clear(): void {
-        this.entityEntries.clear();
-        this.entityChangeEntries.clear();
-        this.componentEntries.clear();
-        this.componentChangeEntries.clear();
-
-        this.changeTick = 0;
-    }
-
-    public createEntity<T extends Component[]>(parent: EntityId | undefined, components: T): EntityId {
-        const entityId = this.entityEntries.createEntityId();
-        const componentTableRef = this.componentEntries.getTableRefOrCreate(components);
-        const componentTable = this.componentEntries.tables[componentTableRef];
-        const entityRef = componentTable.addEntity(
-            entityId,
-            parent,
-            components,
-            componentTableRef,
-            this.entityEntries,
-            this.componentChangeEntries,
-            this.changeTick,
+    public addComponent<T extends Component>(entityId: EntityId, component: T): void {
+        const entityRef = this.entities.getRefOrThrow(entityId);
+        const currSet = this.getComponentSet(entityRef);
+        const nextState = this.makeComponentTransition(
+            currSet.state,
+            component.componentId,
+            ComponentTransitionType.Add,
         );
+        const nextSet = this.findOrCreateSet(nextState);
 
-        this.entityEntries.setRef(entityId, entityRef);
+        const storageRef = this.moveSetEntry(entityId, entityRef, currSet, nextState, nextSet);
+        nextSet.storage.setComponent(storageRef, component);
+    }
+
+    public clear(prune: boolean): void {
+        const rootState = new ComponentSetState(EMPTY_MAP, EntityFlags.Created);
+        const terminalStorage = new ComponentSetStorage(EMPTY_MAP, StorageFlags.Destroyed);
+
+        this.componentSetStates = [rootState];
+        this.componentSetStorages = [terminalStorage];
+        this.componenSets = [];
+
+        this.entities.clear(prune);
+    }
+
+    public createEntity<T extends Component[]>(components: T): EntityId {
+        const entityId = this.entities.createEntityId();
+
+        let nextState = this.getRootState();
+
+        for (const comp of components) {
+            nextState = this.makeComponentTransition(nextState, comp.componentId, ComponentTransitionType.Add);
+        }
+
+        const nextSet = this.findOrCreateSet(nextState);
+        const storageRef = this.createSetEntry(entityId, nextState, nextSet);
+
+        nextSet.storage.setComponents(storageRef, components);
 
         return entityId;
     }
 
-    public createHierarchySelector(): EntityHierarchySelector {
-        return new EntityHierarchySelector(this.entityEntries);
+    public deleteComponent<T extends Component>(entityId: EntityId, componentId: ComponentIdOf<T>): void {
+        const entityRef = this.entities.getRefOrThrow(entityId);
+        const currSet = this.getComponentSet(entityRef);
+        const nextState = this.makeComponentTransition(currSet.state, componentId, ComponentTransitionType.Delete);
+        const nextSet = this.findOrCreateSet(nextState);
+
+        this.moveSetEntryDeleteComponent(entityId, entityRef, currSet, nextState, nextSet);
     }
 
-    public deleteComponent(_entityId: EntityId, _componentId: ComponentId): boolean {
-        throwError("Not implemented");
+    public destroyEntity(entityId: EntityId): void {
+        const entityRef = this.entities.getRefOrThrow(entityId);
+        const currSet = this.getComponentSet(entityRef);
+        const nextState = this.makeEntityTransition(currSet.state, EntityTransitionType.Destroy);
+        const nextSet = this.findOrCreateSet(nextState);
+
+        this.moveSetEntryDestroyEntity(entityId, entityRef, currSet, nextState, nextSet);
     }
 
-    public destroyEntity(entityId: EntityId): boolean {
-        const entityRef = this.entityEntries.getRef(entityId);
+    public disableEntity(entityId: EntityId): void {
+        const entityRef = this.entities.getRefOrThrow(entityId);
+        const currSet = this.getComponentSet(entityRef);
+        const nextState = this.makeEntityTransition(currSet.state, EntityTransitionType.Disable);
+        const nextSet = this.findOrCreateSet(nextState);
 
-        if (entityRef === undefined) {
-            return false;
-        }
+        this.updateSetEntry(entityRef, currSet, nextState, nextSet);
+    }
 
-        const componentTableRef = this.entityEntries.componentTableRefs[entityRef];
-        const componentEntityRef = this.entityEntries.componentEntityRefs[entityRef];
-        const table = this.componentEntries.tables[componentTableRef];
+    public enableEntity(entityId: EntityId): void {
+        const entityRef = this.entities.getRefOrThrow(entityId);
+        const currSet = this.getComponentSet(entityRef);
+        const nextState = this.makeEntityTransition(currSet.state, EntityTransitionType.Enable);
+        const nextSet = this.findOrCreateSet(nextState);
 
-        table.swapRemove(componentEntityRef, this.entityEntries);
-
-        this.entityEntries.swapRemove(entityId, entityRef, this.componentEntries);
-
-        return true;
+        this.updateSetEntry(entityRef, currSet, nextState, nextSet);
     }
 
     public getComponent<T extends Component>(entityId: EntityId, componentId: ComponentIdOf<T>): T | undefined {
-        const entityRef = this.entityEntries.getRefOrThrow(entityId);
-        const componentTableRef = this.entityEntries.componentTableRefs[entityRef];
-        const componentEntityRef = this.entityEntries.componentEntityRefs[entityRef];
-        const table = this.componentEntries.tables[componentTableRef];
-        const tableEntry = table.getEntry(componentId);
+        const entityRef = this.entities.getRefOrThrow(entityId);
+        const currSet = this.getComponentSet(entityRef);
+        const setEntryRef = this.entities.componentSetEntryRefs[entityRef];
 
-        if (tableEntry === undefined) {
-            return undefined;
-        }
-
-        return tableEntry.components[componentEntityRef] as T;
-    }
-
-    public getEntitiesChanged(): IterableIterator<EntityId> {
-        return this.entityChangeEntries.entityIds.values();
-    }
-
-    public hasChangeFlag<T extends Component>(
-        entityId: EntityId,
-        componentId: ComponentIdOf<T>,
-        flag: ChangeFlags,
-    ): boolean {
-        const entityRef = this.entityEntries.getRefOrThrow(entityId);
-        const changeRefHead = this.entityEntries.getChangeRefHead(entityRef, this.changeTick);
-        const componentRef = this.componentEntries.getComponentRef(componentId);
-        const changeFlags = this.componentChangeEntries.find(changeRefHead, componentRef);
-
-        return (changeFlags & flag) === flag;
+        return currSet.getComponent(componentId, setEntryRef);
     }
 
     public hasComponent<T extends Component>(entityId: EntityId, componentId: ComponentIdOf<T>): boolean {
-        const entityRef = this.entityEntries.getRefOrThrow(entityId);
-        const componentTableRef = this.entityEntries.componentTableRefs[entityRef];
-        const table = this.componentEntries.tables[componentTableRef];
+        const entityRef = this.entities.getRefOrThrow(entityId);
+        const currSet = this.getComponentSet(entityRef);
 
-        return table.hasEntry(componentId);
+        return currSet.state.hasComponent(componentId);
     }
 
-    public loadEntities(_serializationMap: SerializationMap, _text: string): void {
-        throwError("Not implemented");
+    public hasComponentFlags<T extends Component>(
+        entityId: EntityId,
+        componentId: ComponentIdOf<T>,
+        changeFlag: ComponentFlags,
+    ): boolean {
+        const entityRef = this.entities.getRefOrThrow(entityId);
+        const set = this.getComponentSet(entityRef);
+
+        return set.state.hasComponentFlags(componentId, changeFlag);
     }
 
-    public queryEntities<T extends Component[]>(componentIds: ComponentIdsOf<T>): EntityComponentIterator {
-        const componentTables: ComponentTable[] = [];
+    public hasEntityFlags(entityId: EntityId, flags: EntityFlags): boolean {
+        const entityRef = this.entities.getRefOrThrow(entityId);
+        const set = this.getComponentSet(entityRef);
 
-        for (const table of this.componentEntries.tables) {
-            let isValid = true;
+        return set.state.hasEntityFlags(flags);
+    }
 
-            for (const componentId of componentIds) {
-                if (!table.hasEntry(componentId)) {
-                    isValid = false;
-                    break;
-                }
+    public queryEntities<T extends Component>(
+        match: (q: EntityComponentQuery<T>) => boolean,
+    ): EntityComponentIterator<T> {
+        // TODO:
+        // - Store max length of component set at the time of the query
+        // - Lazy evalation of query function
+        const querySets: ComponentSet[] = [];
+
+        for (const set of this.componenSets) {
+            if (set.length === 0 || set.state.isDisabled()) {
+                continue;
             }
 
-            if (isValid) {
-                componentTables.push(table);
+            if (match(set.state)) {
+                querySets.push(set);
             }
         }
 
-        return new EntityComponentIterator(this.entityEntries, this.componentEntries, componentTables);
+        return new EntityComponentIterator<T>(querySets);
     }
 
-    public saveEntities(_serializationMap: SerializationMap): string {
-        throwError("Not implemented");
+    public reset(): void {
+        this.resetComponentSets();
+
+        // Reset component storage of destroyed entities
+        const storage = this.getFinalStorage();
+
+        if (storage.length > 0) {
+            storage.clear();
+        }
     }
 
     public setComponent<T extends Component>(entityId: EntityId, component: T): void {
-        const entityRef = this.entityEntries.getRefOrThrow(entityId);
-        const componentTableRef = this.entityEntries.componentTableRefs[entityRef];
-        const componentEntityRef = this.entityEntries.componentEntityRefs[entityRef];
-        const table = this.componentEntries.tables[componentTableRef];
-        const tableEntry = table.getEntry(component.componentId);
-
-        if (tableEntry === undefined) {
-            return;
-        }
-
-        // Set component value
-        tableEntry.components[componentEntityRef] = component;
-
-        // Write component table changes
-        tableEntry.update(
-            componentEntityRef,
-            this.entityEntries,
-            entityRef,
-            this.componentChangeEntries,
-            this.changeTick,
+        const entityRef = this.entities.getRefOrThrow(entityId);
+        const currSet = this.getComponentSet(entityRef);
+        const nextState = this.makeComponentTransition(
+            currSet.state,
+            component.componentId,
+            ComponentTransitionType.Set,
         );
+        const nextSet = this.findOrCreateSet(nextState);
 
-        // Write entity changes
-        this.entityEntries.update(entityId, entityRef, this.entityChangeEntries, this.changeTick);
-    }
-
-    public setParent(entityId: EntityId, parentEntityId: EntityId): void {
-        if (!this.entityEntries.isValidParent(entityId, parentEntityId)) {
-            throwError("Parent '{}' must not be a child of entity '{}'", parentEntityId, entityId);
-        }
-
-        this.entityEntries.setParent(entityId, parentEntityId, this.changeTick);
+        const storageRef = this.moveSetEntry(entityId, entityRef, currSet, nextState, nextSet);
+        nextSet.storage.setComponent(storageRef, component);
     }
 
     public updateComponent<T extends Component>(entityId: EntityId, componentId: ComponentIdOf<T>): void {
-        const entityRef = this.entityEntries.getRefOrThrow(entityId);
-        const componentTableRef = this.entityEntries.componentTableRefs[entityRef];
-        const componentEntityRef = this.entityEntries.componentEntityRefs[entityRef];
-        const table = this.componentEntries.tables[componentTableRef];
-        const tableEntry = table.getEntry(componentId);
+        const entityRef = this.entities.getRefOrThrow(entityId);
+        const currSet = this.getComponentSet(entityRef);
+        const nextState = this.makeComponentTransition(currSet.state, componentId, ComponentTransitionType.Update);
+        const nextSet = this.findOrCreateSet(nextState);
 
-        if (tableEntry === undefined) {
+        this.updateSetEntry(entityRef, currSet, nextState, nextSet);
+    }
+
+    private createSetEntry(
+        entityId: EntityId,
+        nextState: ComponentSetState,
+        nextSet: ComponentSet,
+    ): ComponentSetStorageRef {
+        const storageRef = nextSet.storage.createEntry(entityId);
+        const setEntryRef = nextSet.createEntry(entityId & ENTITY_REF_MASK, storageRef);
+
+        this.entities.createEntry(entityId, nextState.setRef, setEntryRef);
+
+        return storageRef;
+    }
+
+    private findOrCreateSet(state: ComponentSetState): ComponentSet {
+        let setRef = state.setRef;
+
+        if (setRef >= 0) {
+            return this.componenSets[setRef];
+        }
+
+        setRef = this.componenSets.length;
+
+        const storage = this.findOrCreateStorage(state);
+        const set = new ComponentSet(state, storage);
+        this.componenSets.push(set);
+
+        state.setRef = setRef;
+
+        return set;
+    }
+
+    private findOrCreateStorage(state: ComponentSetState): ComponentSetStorage {
+        const compIds: ComponentId[] = [];
+
+        for (const [key, value] of state.shape) {
+            if (value !== ComponentFlags.Deleted) {
+                compIds.push(key);
+            }
+        }
+
+        let flags = StorageFlags.None;
+
+        if (compIds.length === 0 && state.isEntityDestroyed()) {
+            flags = StorageFlags.Destroyed;
+        }
+
+        for (const storage of this.componentSetStorages) {
+            if (storage.isMatching(compIds, flags)) {
+                return storage;
+            }
+        }
+
+        const components = new Map();
+        for (const compId of compIds) {
+            components.set(compId, []);
+        }
+
+        const storage = new ComponentSetStorage(components, flags);
+        this.componentSetStorages.push(storage);
+
+        return storage;
+    }
+
+    private getComponentSet(entityRef: EntityRef): ComponentSet {
+        const componentSetRef = this.entities.componentSetRefs[entityRef];
+        return this.componenSets[componentSetRef];
+    }
+
+    private getFinalStorage(): ComponentSetStorage {
+        return this.componentSetStorages[0];
+    }
+
+    private getRootState(): ComponentSetState {
+        return this.componentSetStates[0];
+    }
+
+    private makeComponentTransition(
+        state: ComponentSetState,
+        componentId: ComponentId,
+        type: ComponentTransitionType,
+    ): ComponentSetState {
+        for (const transition of state.componentTransitions) {
+            if (transition.id === componentId && transition.type === type) {
+                // Found cached transition
+                transition.hits += 1;
+                return transition.state;
+            }
+        }
+
+        // New transition
+        const nextMap = new Map(state.shape);
+
+        switch (type) {
+            case ComponentTransitionType.Add: {
+                nextMap.set(componentId, ComponentFlags.Created | ComponentFlags.Updated);
+                break;
+            }
+            case ComponentTransitionType.Set: {
+                if (nextMap.has(componentId)) {
+                    nextMap.set(componentId, ComponentFlags.Updated);
+                } else {
+                    nextMap.set(componentId, ComponentFlags.Created | ComponentFlags.Updated);
+                }
+                break;
+            }
+            case ComponentTransitionType.Update: {
+                const flag = nextMap.get(componentId);
+                if (flag === undefined) {
+                    throwError("Unable to update component id '{}'", componentId);
+                }
+                nextMap.set(componentId, flag | ComponentFlags.Updated);
+                break;
+            }
+            case ComponentTransitionType.Delete: {
+                if (!nextMap.has(componentId)) {
+                    throwError("Unable to delete component id '{}'", componentId);
+                }
+                nextMap.set(componentId, ComponentFlags.Deleted);
+                break;
+            }
+            default: {
+                assertUnreachable(type);
+            }
+        }
+
+        for (let i = 0; i < this.componentSetStates.length; i++) {
+            const currState = this.componentSetStates[i];
+            if (currState.isMatching(nextMap, state.flags)) {
+                // Create new transition edge
+                state.createComponentTransition(type, currState, componentId);
+                return currState;
+            }
+        }
+
+        const nextState = new ComponentSetState(nextMap, state.flags);
+        this.componentSetStates.push(nextState);
+        state.createComponentTransition(type, nextState, componentId);
+        return nextState;
+    }
+
+    private makeEntityTransition(state: ComponentSetState, type: EntityTransitionType): ComponentSetState {
+        for (const transition of state.entityTransitions) {
+            if (transition.type === type) {
+                // Found cached transition
+                transition.hits += 1;
+                return transition.state;
+            }
+        }
+
+        // New transition
+        let nextShape = state.shape;
+        let nextFlags = state.flags;
+
+        switch (type) {
+            case EntityTransitionType.Reset: {
+                const shape = new Map();
+                for (const [key, value] of state.shape) {
+                    if (value === ComponentFlags.Deleted) {
+                        continue;
+                    }
+                    shape.set(key, ComponentFlags.None);
+                }
+                nextShape = shape;
+                nextFlags &= ~EntityFlags.Created;
+                break;
+            }
+            case EntityTransitionType.Destroy: {
+                const shape = new Map();
+                for (const key of state.shape.keys()) {
+                    shape.set(key, ComponentFlags.Deleted);
+                }
+                nextShape = shape;
+                nextFlags |= EntityFlags.Destroyed;
+                break;
+            }
+            case EntityTransitionType.Disable: {
+                nextFlags |= EntityFlags.Disabled;
+                break;
+            }
+            case EntityTransitionType.Enable: {
+                nextFlags &= ~EntityFlags.Disabled;
+                break;
+            }
+            default: {
+                assertUnreachable(type);
+            }
+        }
+
+        for (let i = 0; i < this.componentSetStates.length; i++) {
+            const currState = this.componentSetStates[i];
+            if (currState.isMatching(nextShape, nextFlags)) {
+                // Create new transition edge
+                state.createEntityTransition(type, currState);
+                return currState;
+            }
+        }
+
+        const nextState = new ComponentSetState(nextShape, nextFlags);
+        this.componentSetStates.push(nextState);
+        state.createEntityTransition(type, nextState);
+        return nextState;
+    }
+
+    private moveSet(setSrc: ComponentSet, setDest: ComponentSet, entityStorage: Entities): void {
+        const setRefDest = setDest.state.setRef;
+
+        let setEntryRefDest = setDest.length;
+        let setEntryRefSrc = 0;
+
+        while (setEntryRefSrc < setSrc.length) {
+            const storageRef = setSrc.storageRefs[setEntryRefSrc];
+
+            if (storageRef < 0) {
+                // Skip empty entry
+                setEntryRefSrc += 1;
+                continue;
+            }
+
+            const entityRef = setSrc.entityRefs[setEntryRefSrc];
+
+            // Create in set
+            setDest.storageRefs.push(storageRef);
+            setDest.entityRefs.push(entityRef);
+            setDest.length += 1;
+
+            entityStorage.updateEntry(entityRef, setRefDest, setEntryRefDest);
+
+            setEntryRefDest += 1;
+            setEntryRefSrc += 1;
+        }
+
+        // Clear src
+        setSrc.clear();
+    }
+
+    private moveSetEntry(
+        entityId: EntityId,
+        entityRef: EntityRef,
+        currSet: ComponentSet,
+        nextState: ComponentSetState,
+        nextSet: ComponentSet,
+    ): ComponentSetStorageRef {
+        const currSetEntryRef = this.entities.componentSetEntryRefs[entityRef];
+        const currStorageRef = currSet.storageRefs[currSetEntryRef];
+
+        if (nextSet === currSet) {
+            // No move necessary
+            return currStorageRef;
+        } else if (currSet.storage === nextSet.storage) {
+            // Just update set
+            currSet.destroyEntry(currSetEntryRef);
+            const nextSetEntryRef = nextSet.createEntry(entityRef, currStorageRef);
+            this.entities.updateEntry(entityRef, nextState.setRef, nextSetEntryRef);
+
+            return currStorageRef;
+        } else {
+            // Storage move
+            const nextStorageRef = nextSet.storage.createEntry(entityId);
+            nextSet.storage.copyComponents(nextStorageRef, currSet.storage, currStorageRef, currSet.storage);
+            currSet.storage.destroyEntry(currStorageRef);
+
+            currSet.destroyEntry(currSetEntryRef);
+            const nextSetEntryRef = nextSet.createEntry(entityRef, nextStorageRef);
+            this.entities.updateEntry(entityRef, nextState.setRef, nextSetEntryRef);
+
+            return nextStorageRef;
+        }
+    }
+
+    private moveSetEntryDeleteComponent(
+        entityId: EntityId,
+        entityRef: EntityRef,
+        currSet: ComponentSet,
+        nextState: ComponentSetState,
+        nextSet: ComponentSet,
+    ): void {
+        if (nextSet === currSet) {
+            // Nothing to do
             return;
         }
 
-        // Write component table changes
-        tableEntry.update(
-            componentEntityRef,
-            this.entityEntries,
-            entityRef,
-            this.componentChangeEntries,
-            this.changeTick,
-        );
+        const currSetEntryRef = this.entities.componentSetEntryRefs[entityRef];
+        const currStorageRef = currSet.storageRefs[currSetEntryRef];
 
-        // Write entity changes
-        this.entityEntries.update(entityId, entityRef, this.entityChangeEntries, this.changeTick);
+        const nextStorageRef = nextSet.storage.createEntry(entityId);
+        nextSet.storage.copyComponents(nextStorageRef, currSet.storage, currStorageRef, nextSet.storage);
+        currSet.storage.destroyEntry(currStorageRef);
+
+        currSet.destroyEntry(currSetEntryRef);
+        const nextSetEntryRef = nextSet.createEntry(entityRef, nextStorageRef);
+        this.entities.updateEntry(entityRef, nextState.setRef, nextSetEntryRef);
+    }
+
+    private moveSetEntryDestroyEntity(
+        entityId: EntityId,
+        entityRef: EntityRef,
+        currSet: ComponentSet,
+        nextState: ComponentSetState,
+        nextSet: ComponentSet,
+    ): void {
+        const currSetEntryRef = this.entities.componentSetEntryRefs[entityRef];
+        const currStorageRef = currSet.storageRefs[currSetEntryRef];
+
+        const nextStorageRef = nextSet.storage.createEntry(entityId);
+        currSet.storage.destroyEntry(currStorageRef);
+
+        currSet.destroyEntry(currSetEntryRef);
+        const nextSetEntryRef = nextSet.createEntry(entityRef, nextStorageRef);
+        this.entities.updateEntry(entityRef, nextState.setRef, nextSetEntryRef);
+    }
+
+    private resetComponentSets(): void {
+        for (const set of this.componenSets) {
+            const stateDest = this.makeEntityTransition(set.state, EntityTransitionType.Reset);
+
+            if (set.state === stateDest || set.length === 0) {
+                continue;
+            }
+
+            if (set.state.isEntityDestroyed()) {
+                // Just drop data
+                set.clear();
+                continue;
+            }
+
+            const setDest = this.findOrCreateSet(stateDest);
+            this.moveSet(set, setDest, this.entities);
+        }
+    }
+
+    private updateSetEntry(
+        entityRef: EntityRef,
+        currSet: ComponentSet,
+        nextState: ComponentSetState,
+        nextSet: ComponentSet,
+    ): void {
+        if (nextSet === currSet) {
+            return;
+        }
+
+        const currSetEntryRef = this.entities.componentSetEntryRefs[entityRef];
+        const currStorageRef = currSet.storageRefs[currSetEntryRef];
+
+        currSet.destroyEntry(currSetEntryRef);
+        const nextSetEntryRef = nextSet.createEntry(entityRef, currStorageRef);
+        this.entities.updateEntry(entityRef, nextState.setRef, nextSetEntryRef);
     }
 }
 
-export class EntityComponentIterator {
-    private componentEntries: ComponentEntries;
-    private entityEntries: EntityEntries;
-    private componentTables: ComponentTable[];
+export class EntityComponentIterator<T extends Component> {
+    private currComponents: Map<ComponentId, ComponentContainer>;
+    private currEntityIds: EntityId[];
+    private currFlags: EntityFlags;
+    private currQuerySetIdx: number;
+    private currSetEntryRef: ComponentSetEntryRef;
+    private currShape: ComponentSetShape;
+    private currStorageRef: number;
+    private currStorageRefs: ComponentSetStorageRef[];
+    private querySets: ComponentSet[];
 
-    private entityRefs: EntityRef[];
+    public constructor(querySets: ComponentSet[]) {
+        this.querySets = querySets;
 
-    private componentTable: ComponentTable | undefined;
-    private entityRef: EntityRef;
-    private componentEntityRef: ComponentEntityRef;
-    private componentTableIdx: ComponentTableRef;
+        this.currComponents = EMPTY_MAP;
+        this.currShape = EMPTY_MAP;
+        this.currEntityIds = EMPTY_ARRAY;
+        this.currStorageRefs = EMPTY_ARRAY;
+        this.currFlags = EntityFlags.None;
+        this.currQuerySetIdx = -1;
+        this.currStorageRef = -1;
+        this.currSetEntryRef = -1;
+    }
 
-    public constructor(
-        entityEntries: EntityEntries,
-        componentEntries: ComponentEntries,
-        componentTables: ComponentTable[],
-    ) {
-        this.entityEntries = entityEntries;
-        this.componentEntries = componentEntries;
-        this.componentTables = componentTables;
+    public findComponent(componentId: ComponentIdOf<T>): T | undefined {
+        const components = this.currComponents.get(componentId);
 
-        this.entityRefs = [];
-        this.componentTable = undefined;
+        if (components === undefined) {
+            return undefined;
+        }
 
-        this.entityRef = -1;
-        this.componentTableIdx = -1;
-        this.componentEntityRef = -1;
+        return components[this.currStorageRef] as T;
+    }
+
+    public getComponent(componentId: ComponentIdOf<T>): T {
+        const components = this.currComponents.get(componentId);
+
+        if (components === undefined) {
+            throwError("Component id not found");
+        }
+
+        return components[this.currStorageRef] as T;
     }
 
     public getEntityId(): EntityId {
-        const entityRef = this.entityRef;
-
-        if (entityRef < 0) {
-            throwError("Invalid entity ref");
-        }
-
-        return this.entityEntries.entityIds[entityRef];
+        return this.currEntityIds[this.currStorageRef];
     }
 
-    public hasComponent<T extends Component>(componentId: ComponentIdOf<T>): boolean {
-        const componentTable = this.componentTable;
-
-        if (componentTable === undefined) {
-            throwError("Invalid component table");
-        }
-
-        return componentTable.hasEntry(componentId);
+    public hasComponent(componentId: ComponentIdOf<T>): boolean {
+        return this.currShape.has(componentId);
     }
 
-    public getComponent<T extends Component>(componentId: ComponentIdOf<T>): T {
-        const componentTable = this.componentTable;
-        const componentEntityRef = this.componentEntityRef;
-
-        if (componentTable === undefined) {
-            throwError("Invalid component table");
-        }
-
-        return componentTable.getComponent(componentId, componentEntityRef) as T;
+    public hasComponentFlags(componentId: ComponentIdOf<T>, flags: ComponentFlags): boolean {
+        const compFlags = this.currShape.get(componentId);
+        return compFlags !== undefined && (compFlags & flags) === flags;
     }
 
-    private setNextEntity(componentEntityRef: ComponentEntityRef): void {
-        this.entityRef = this.entityRefs[componentEntityRef];
-        this.componentEntityRef = componentEntityRef;
+    public hasEntityFlags(flags: EntityFlags): boolean {
+        return (this.currFlags & flags) === flags;
     }
 
-    private setNextTable(componentTableIdx: number): void {
-        const componentTable = this.componentTables[componentTableIdx];
-
-        this.componentTable = componentTable;
-        this.entityRefs = componentTable.entityRefs;
+    public isEntityDestroyed(): boolean {
+        return (this.currFlags & EntityFlags.Destroyed) !== 0;
     }
 
     public next(): boolean {
-        const componentEntityRef = this.componentEntityRef + 1;
+        let nextSetEntryRef = this.currSetEntryRef + 1;
 
-        if (componentEntityRef < this.entityRefs.length) {
-            this.setNextEntity(componentEntityRef);
+        while (nextSetEntryRef < this.currStorageRefs.length) {
+            const nextStorageRef = this.currStorageRefs[nextSetEntryRef];
 
-            return true;
+            if (nextStorageRef >= 0) {
+                this.currSetEntryRef = nextSetEntryRef;
+                this.currStorageRef = nextStorageRef;
+
+                return true;
+            }
+
+            nextSetEntryRef += 1;
         }
 
-        const componentTableIdx = this.componentTableIdx + 1;
+        return this.nextStorage();
+    }
 
-        if (componentEntityRef < this.componentTables.length) {
-            this.setNextTable(componentTableIdx);
-            this.setNextEntity(0);
+    private nextStorage(): boolean {
+        let nextSetIdx = this.currQuerySetIdx + 1;
 
-            return true;
+        while (nextSetIdx < this.querySets.length) {
+            const componentSet = this.querySets[nextSetIdx];
+
+            let nextSetEntryRef = 0;
+
+            while (nextSetEntryRef < componentSet.storageRefs.length) {
+                const nextStorageRef = componentSet.storageRefs[nextSetEntryRef];
+
+                if (nextStorageRef >= 0) {
+                    this.currQuerySetIdx = nextSetIdx;
+
+                    this.currSetEntryRef = nextSetEntryRef;
+                    this.currStorageRef = nextStorageRef;
+
+                    this.currStorageRefs = componentSet.storageRefs;
+                    this.currFlags = componentSet.state.flags;
+                    this.currShape = componentSet.state.shape;
+                    this.currComponents = componentSet.storage.components;
+                    this.currEntityIds = componentSet.storage.entityIds;
+
+                    return true;
+                }
+
+                nextSetEntryRef += 1;
+            }
+
+            nextSetIdx += 1;
         }
 
         return false;
     }
 }
 
-export class EntityHierarchySelector {
-    private entityEntries: EntityEntries;
-    private entryRef: EntityRef | undefined;
-
-    public constructor(entityEntries: EntityEntries) {
-        this.entityEntries = entityEntries;
-        this.entryRef = undefined;
-    }
-
-    public getChildren(): IterableIterator<EntityId> | undefined {
-        if (this.entryRef === undefined) {
-            return undefined;
-        }
-
-        return this.entityEntries.childrenEntityIds[this.entryRef]?.values();
-    }
-
-    public getDepth(): number {
-        if (this.entryRef === undefined) {
-            return 0;
-        }
-
-        return this.entityEntries.depths[this.entryRef];
-    }
-
-    public getParent(): EntityId | undefined {
-        if (this.entryRef === undefined) {
-            return undefined;
-        }
-
-        return this.entityEntries.parentEntityIds[this.entryRef];
-    }
-
-    public select(entityId: EntityId): void {
-        this.entryRef = this.entityEntries.getRef(entityId);
-    }
-}
-
-class EntityEntries {
+class Entities {
+    private length: number;
     private nextEntityId: number;
-    private refs: Map<EntityId, EntityRef>;
 
-    public changeFlags: EntityChangeFlags[];
-    public changeTicks: number[];
-    public childrenEntityIds: (Set<EntityId> | undefined)[];
-    public componentChangeRefHeads: number[];
-    public componentEntityRefs: ComponentEntityRef[];
-    public componentTableRefs: ComponentTableRef[];
-    public depths: number[];
-    public entityIds: EntityId[];
-    public parentEntityIds: (EntityId | undefined)[];
+    public componentSetEntryRefs: ComponentSetEntryRef[];
+    public componentSetRefs: ComponentSetRef[];
+    public versions: EntityVersion[];
 
     constructor() {
-        this.entityIds = [];
-        this.componentTableRefs = [];
-        this.componentEntityRefs = [];
-        this.componentChangeRefHeads = [];
-        this.changeTicks = [];
-        this.changeFlags = [];
-        this.parentEntityIds = [];
-        this.childrenEntityIds = [];
-        this.depths = [];
-
-        this.refs = new Map();
+        this.versions = [];
+        this.componentSetRefs = [];
+        this.componentSetEntryRefs = [];
         this.nextEntityId = 0;
+        this.length = 0;
     }
 
-    public clear(): void {
-        this.refs.clear();
+    public clear(_prune: boolean): void {
+        this.versions = [];
+        this.componentSetRefs = [];
+        this.componentSetEntryRefs = [];
+        this.length = 0;
         this.nextEntityId = 0;
-    }
-
-    public create(
-        entityId: EntityId,
-        componentTableRef: ComponentTableRef,
-        componentEntityRef: ComponentEntityRef,
-        componentChangeRefHead: number,
-        parent: EntityId | undefined,
-        changeTick: number,
-    ): EntityRef {
-        let depth = 0;
-
-        if (parent !== undefined) {
-            const parentEntryRef = this.getRefOrThrow(parent);
-
-            let children = this.childrenEntityIds[parentEntryRef];
-
-            if (children === undefined) {
-                children = new Set();
-                this.childrenEntityIds[parentEntryRef] = children;
-            }
-
-            children.add(entityId);
-
-            depth = this.depths[parentEntryRef] + 1;
-        }
-
-        const nextRef = this.entityIds.length;
-
-        this.entityIds.push(entityId);
-        this.componentTableRefs.push(componentTableRef);
-        this.componentEntityRefs.push(componentEntityRef);
-        this.componentChangeRefHeads.push(componentChangeRefHead);
-        this.changeTicks.push(changeTick);
-        this.changeFlags.push(EntityChangeFlags.Created);
-        this.parentEntityIds.push(parent);
-        this.childrenEntityIds.push(undefined);
-        this.depths.push(depth);
-
-        return nextRef;
     }
 
     public createEntityId(): EntityId {
         const entityId = this.nextEntityId;
 
-        // TODO: free list and versioning (upper 7/8 bits)
+        // TODO: Versioning
         this.nextEntityId += 1;
 
         return entityId as EntityId;
     }
 
-    public getChangeRefHead(entityRef: EntityRef, changeTick: number): number {
-        if (this.changeTicks[entityRef] !== changeTick) {
-            return -1;
-        }
+    public createEntry(
+        entityId: EntityId,
+        componentSetRef: ComponentTableRef,
+        componentSetEntryRef: ComponentSetEntryRef,
+    ): void {
+        const version = entityId >>> 24;
 
-        // Must be updated to a valid ref
-        return this.componentChangeRefHeads[entityRef];
+        this.versions.push(version);
+        this.componentSetRefs.push(componentSetRef);
+        this.componentSetEntryRefs.push(componentSetEntryRef);
+        this.length += 1;
     }
 
-    public getRef(entityId: EntityId): EntityRef | undefined {
-        const ref = this.refs.get(entityId);
-
-        if (ref === undefined || ref >= this.entityIds.length) {
-            return undefined;
-        }
-
-        return ref;
+    public destroyEntry(entityRef: number): void {
+        this.componentSetRefs[entityRef] = -1;
+        this.componentSetEntryRefs[entityRef] = -1;
     }
 
     public getRefOrThrow(entityId: EntityId): EntityRef {
-        const ref = this.refs.get(entityId);
+        const ref = entityId & ENTITY_REF_MASK;
+        const version = entityId >>> 24;
 
-        if (ref === undefined || ref >= this.entityIds.length) {
+        if (this.length <= ref || this.versions[ref] !== version) {
             throwError("Entity '{}'not found", entityId);
         }
 
         return ref;
     }
 
-    public isValidParent(entityId: EntityId, parentEntityId: EntityId): boolean {
-        // Ensure `parentEntryRef` is not a child of `entityRef`
-        let currEntityId: EntityId | undefined = parentEntityId;
+    public updateEntry(entityRef: number, setRef: number, setEntryRef: number): void {
+        this.componentSetRefs[entityRef] = setRef;
+        this.componentSetEntryRefs[entityRef] = setEntryRef;
+    }
+}
 
-        while (currEntityId !== undefined) {
-            if (currEntityId === entityId) {
+class ComponentSetState implements EntityComponentQuery<Component> {
+    public componentTransitions: ComponentTransition[];
+    public entityTransitions: EntityTransition[];
+    public flags: EntityFlags;
+    public setRef: ComponentSetRef;
+    public shape: ComponentSetShape;
+
+    constructor(shape: ComponentSetShape, flags: EntityFlags) {
+        this.shape = shape;
+        this.flags = flags;
+        this.componentTransitions = [];
+        this.entityTransitions = [];
+        this.setRef = -1;
+    }
+
+    public createComponentTransition(type: ComponentTransitionType, state: ComponentSetState, id: ComponentId): void {
+        this.componentTransitions.push({ type, state, id, hits: 0 });
+    }
+
+    public createEntityTransition(type: EntityTransitionType, state: ComponentSetState): void {
+        this.entityTransitions.push({ type, state, hits: 0 });
+    }
+
+    public hasComponent(componentId: ComponentId): boolean {
+        return this.shape.has(componentId);
+    }
+
+    public hasComponentFlags(componentId: ComponentId, flags: ComponentFlags): boolean {
+        const shapeFlags = this.shape.get(componentId);
+        return shapeFlags !== undefined && (shapeFlags & flags) === flags;
+    }
+
+    public hasEntityFlags(flags: EntityFlags): boolean {
+        return (this.flags & flags) === flags;
+    }
+
+    public isChanged(componentId: ComponentId): boolean {
+        const shapeFlags = this.shape.get(componentId);
+        return shapeFlags !== undefined && shapeFlags !== 0;
+    }
+
+    public isCreated(componentId: ComponentId): boolean {
+        const flags = this.shape.get(componentId);
+        return flags !== undefined && (flags & ComponentFlags.Created) !== 0;
+    }
+
+    public isDeleted(componentId: ComponentId): boolean {
+        const shapeFlags = this.shape.get(componentId);
+        return shapeFlags !== undefined && (shapeFlags & ComponentFlags.Deleted) !== 0;
+    }
+
+    public isDisabled(): boolean {
+        return (this.flags & EntityFlags.Disabled) !== 0;
+    }
+
+    public isEntityDestroyed(): boolean {
+        return (this.flags & EntityFlags.Destroyed) !== 0;
+    }
+
+    public isMatching(shape: ComponentSetShape, flags: EntityFlags): boolean {
+        if (this.flags !== flags || this.shape.size !== shape.size) {
+            return false;
+        }
+
+        for (const [key1, value1] of this.shape) {
+            const value2 = shape.get(key1);
+            if (value1 !== value2) {
                 return false;
             }
-
-            // Iterate parents
-            const currentEntryRef = this.getRefOrThrow(currEntityId);
-            currEntityId = this.parentEntityIds[currentEntryRef];
         }
 
         return true;
     }
 
-    public setParent(entityId: EntityId, parentEntityId: EntityId, changeTick: number): void {
-        const entityRef = this.getRefOrThrow(entityId);
-        const parentEntityRef = this.getRefOrThrow(parentEntityId);
+    public isTransient(): boolean {
+        const transientFlags = EntityFlags.Created | EntityFlags.Destroyed;
 
-        this.removeEntityFromParent(entityRef);
-        this.addEntityToParent(entityRef, parentEntityRef);
-        this.updateHierarchy(entityRef, parentEntityRef, changeTick);
-    }
-
-    public setRef(entityId: EntityId, entityRef: number): void {
-        this.refs.set(entityId, entityRef);
-    }
-
-    public swapRemove(entityId: EntityId, entityRef: EntityRef, componentEntries: ComponentEntries): void {
-        this.removeEntityFromParent(entityRef);
-
-        this.refs.delete(entityId);
-
-        const removeRef = entityRef;
-        const swapRef = this.entityIds.length - 1;
-
-        if (removeRef < swapRef) {
-            this.changeFlags[removeRef] = this.changeFlags[swapRef];
-            this.changeTicks[removeRef] = this.changeTicks[swapRef];
-            this.childrenEntityIds[removeRef] = this.childrenEntityIds[swapRef];
-            this.componentChangeRefHeads[removeRef] = this.componentChangeRefHeads[swapRef];
-            this.componentEntityRefs[removeRef] = this.componentEntityRefs[swapRef];
-            this.componentTableRefs[removeRef] = this.componentTableRefs[swapRef];
-            this.depths[removeRef] = this.depths[swapRef];
-            this.entityIds[removeRef] = this.entityIds[swapRef];
-            this.parentEntityIds[removeRef] = this.parentEntityIds[swapRef];
+        if ((this.flags & transientFlags) !== 0) {
+            return true;
         }
 
-        this.changeFlags.pop();
-        this.changeTicks.pop();
-        this.childrenEntityIds.pop();
-        this.componentChangeRefHeads.pop();
-        this.componentEntityRefs.pop();
-        this.componentTableRefs.pop();
-        this.depths.pop();
-        this.entityIds.pop();
-        this.parentEntityIds.pop();
-
-        if (removeRef < swapRef) {
-            const swapComponentTableRef = this.componentTableRefs[entityRef];
-            const swapComponentEntityRef = this.componentEntityRefs[entityRef];
-            const swapEntityId = this.entityIds[entityRef];
-
-            const table = componentEntries.tables[swapComponentTableRef];
-            table.entityRefs[swapComponentEntityRef] = entityRef;
-
-            this.refs.set(swapEntityId, entityRef);
+        for (const value of this.shape.values()) {
+            if (value !== ComponentFlags.None) {
+                return true;
+            }
         }
 
-        // TODO: Recursive deletion of entities
-    }
-
-    public update(
-        entityId: EntityId,
-        entityRef: EntityRef,
-        entityChangeEntries: EntityChangeEntries,
-        changeTick: number,
-    ): void {
-        if (this.changeTicks[entityRef] !== changeTick) {
-            this.changeTicks[entityRef] = changeTick;
-
-            entityChangeEntries.update(entityId, entityRef);
-        }
-
-        this.changeFlags[entityRef] |= EntityChangeFlags.Updated;
-    }
-
-    private addEntityToParent(entityRef: EntityRef, parentEntityRef: EntityRef): void {
-        // Set child
-        let newChildrenEntityIds = this.childrenEntityIds[parentEntityRef];
-
-        if (newChildrenEntityIds === undefined) {
-            newChildrenEntityIds = new Set();
-            this.childrenEntityIds[parentEntityRef] = newChildrenEntityIds;
-        }
-
-        const entityId = this.entityIds[entityRef];
-        newChildrenEntityIds.add(entityId);
-
-        // Set parent
-        const parentEntityId = this.entityIds[parentEntityRef];
-        this.parentEntityIds[entityRef] = parentEntityId;
-    }
-
-    private removeEntityFromParent(entityRef: EntityRef): void {
-        const parentEntityId = this.parentEntityIds[entityRef];
-
-        if (parentEntityId === undefined) {
-            return;
-        }
-
-        const parentEntityRef = this.getRefOrThrow(parentEntityId);
-        const childrenEntityIds = this.childrenEntityIds[parentEntityRef];
-
-        if (childrenEntityIds !== undefined) {
-            const entityId = this.entityIds[entityRef];
-            childrenEntityIds.delete(entityId);
-        }
-    }
-
-    private updateHierarchy(entityRef: EntityRef, parentEntityRef: EntityRef, changeTick: number): void {
-        this.depths[entityRef] = this.depths[parentEntityRef] + 1;
-        this.changeTicks[entityRef] = changeTick;
-        this.changeFlags[entityRef] = EntityChangeFlags.Updated;
-
-        const childrenEntityIds = this.childrenEntityIds[entityRef];
-
-        if (childrenEntityIds === undefined) {
-            return;
-        }
-
-        for (const childEntityId of childrenEntityIds) {
-            const childEntityRef = this.getRefOrThrow(childEntityId);
-            this.updateHierarchy(childEntityRef, entityRef, changeTick);
-        }
-    }
-}
-
-class ComponentEntries {
-    private componentIds: Map<ComponentId, number>;
-    private nextComponentRef: ComponentRef;
-    private tableTypePool: ObjectPool<Bitset>;
-
-    public tables: ComponentTable[];
-
-    constructor() {
-        this.tableTypePool = new ObjectPool(tableTypeCreateFn, tableTypeClearFn);
-        this.tables = [];
-
-        this.componentIds = new Map();
-        this.nextComponentRef = 0;
-    }
-
-    public clear(): void {
-        for (const table of this.tables) {
-            table.entityRefs = [];
-        }
-
-        this.tables = [];
-
-        this.componentIds.clear();
-        this.nextComponentRef = 0;
-    }
-
-    public destroyEntity(_ref: ComponentEntityRef): boolean {
         return false;
     }
 
-    public getComponentRef(componentId: ComponentId): ComponentRef {
-        let ref = this.componentIds.get(componentId);
-
-        if (ref === undefined) {
-            ref = this.nextComponentRef;
-            this.componentIds.set(componentId, ref);
-            this.nextComponentRef += 1;
-        }
-
-        return ref;
-    }
-
-    public getTableRefOrCreate(components: Component[]): ComponentTableRef {
-        const tableType = this.tableTypePool.rent();
-
-        for (const component of components) {
-            const componentRef = this.getComponentRef(component.componentId);
-            tableType.set(componentRef);
-        }
-
-        let tableRef = -1;
-
-        for (let i = 0; i < this.tables.length; i++) {
-            if (this.tables[i].isType(tableType)) {
-                tableRef = i;
-                break;
-            }
-        }
-
-        if (tableRef < 0) {
-            // Copy and shrink table type
-            const nextTableType = Bitset.from(tableType);
-
-            tableRef = this.createComponentTable(nextTableType, components);
-        }
-
-        this.tableTypePool.return(tableType);
-
-        return tableRef;
-    }
-
-    private createComponentTable(type: Bitset, components: Component[]): ComponentTableRef {
-        const entryRefs = new Map<ComponentId, ComponentTableEntryRef>();
-        const entries: ComponentTableEntry[] = [];
-
-        for (let i = 0; i < components.length; i++) {
-            const componentId = components[i].componentId;
-
-            entryRefs.set(componentId, i);
-
-            const componentRef = this.getComponentRef(componentId);
-            const entry = new ComponentTableEntry(componentRef);
-            entries.push(entry);
-        }
-
-        const ref = this.tables.length;
-
-        const table = new ComponentTable(type, entryRefs, entries);
-
-        this.tables.push(table);
-
-        return ref;
+    public isUpdated(componentId: ComponentId): boolean {
+        const shapeFlags = this.shape.get(componentId);
+        return shapeFlags !== undefined && (shapeFlags & ComponentFlags.Updated) !== 0;
     }
 }
 
-class ComponentTable {
-    private entries: ComponentTableEntry[];
-    private entryRefs: Map<ComponentId, ComponentTableEntryRef>;
-    private type: Bitset;
+class ComponentSet {
+    public entityRefs: EntityRef[];
+    public length: number;
+    public state: ComponentSetState;
+    public storage: ComponentSetStorage;
+    public storageRefs: ComponentSetStorageRef[];
 
-    public entityRefs: number[];
+    constructor(state: ComponentSetState, storage: ComponentSetStorage) {
+        this.state = state;
+        this.storage = storage;
 
-    constructor(type: Bitset, entryRefs: Map<ComponentId, ComponentTableEntryRef>, entries: ComponentTableEntry[]) {
-        this.type = type;
-        this.entryRefs = entryRefs;
-        this.entries = entries;
-
+        this.storageRefs = [];
         this.entityRefs = [];
+        this.length = 0;
     }
 
-    public addEntity(
-        entityId: EntityId,
-        parent: EntityId | undefined,
-        components: Component[],
-        componentTableRef: ComponentTableRef,
-        entityEntries: EntityEntries,
-        changeEntries: ComponentChangeEntries,
-        changeTick: number,
-    ): EntityRef {
-        let changeRefHead = -1;
+    public clear(): void {
+        this.entityRefs = [];
+        this.storageRefs = [];
+        this.length = 0;
+    }
 
-        for (const component of components) {
-            const entry = this.getEntryOrThrow(component.componentId);
-            const componentRef = entry.getComponentRef();
-            const changeRef = changeEntries.create(changeRefHead, componentRef, ChangeFlags.Created);
+    public createEntry(entityRef: EntityRef, storageRef: ComponentSetStorageRef): ComponentSetEntryRef {
+        const nextEntryRef = this.length;
 
-            entry.create(component, changeTick, changeRef);
-
-            changeRefHead = changeRef;
-        }
-
-        const componentEntityRef = this.entityRefs.length;
-
-        const entityRef = entityEntries.create(
-            entityId,
-            componentTableRef,
-            componentEntityRef,
-            changeRefHead,
-            parent,
-            changeTick,
-        );
-
+        this.storageRefs.push(storageRef);
         this.entityRefs.push(entityRef);
+        this.length += 1;
 
-        return entityRef;
+        return nextEntryRef;
     }
 
-    public getEntry(componentId: ComponentId): ComponentTableEntry | undefined {
-        const entryRef = this.entryRefs.get(componentId);
+    public destroyEntry(setEntryRef: ComponentSetEntryRef): void {
+        this.storageRefs[setEntryRef] = -1;
+        this.entityRefs[setEntryRef] = -1;
+    }
 
-        if (entryRef === undefined) {
+    public getComponent<T extends Component>(
+        componentId: ComponentIdOf<T>,
+        componentSetEntryRef: ComponentSetEntryRef,
+    ): T | undefined {
+        const components = this.storage.components.get(componentId);
+
+        if (components === undefined) {
             return undefined;
         }
 
-        return this.entries[entryRef];
+        const storageRef = this.storageRefs[componentSetEntryRef];
+
+        return components[storageRef] as T;
     }
 
-    public getEntryOrThrow(componentId: ComponentId): ComponentTableEntry {
-        const entryRef = this.entryRefs.get(componentId);
-
-        if (entryRef === undefined) {
-            throwError("Component id '{}' not found", componentId);
-        }
-
-        return this.entries[entryRef];
-    }
-
-    public getComponent(componentId: ComponentId, componentEntityRef: ComponentEntityRef): Component {
-        const entryRef = this.entryRefs.get(componentId);
-        assertDebug(entryRef !== undefined);
-        return this.entries[entryRef].components[componentEntityRef];
-    }
-
-    public hasEntry(componentId: ComponentId): boolean {
-        return this.entryRefs.has(componentId);
-    }
-
-    public isType(type: Bitset): boolean {
-        return type.eq(this.type);
-    }
-
-    public swapRemove(componentEntityRef: ComponentEntityRef, entityEntries: EntityEntries): void {
-        const removeRef = componentEntityRef;
-        const swapRef = this.entityRefs.length - 1;
-
-        for (const entry of this.entries) {
-            if (removeRef < swapRef) {
-                entry.changeRefs[removeRef] = entry.changeRefs[swapRef];
-                entry.changeTicks[removeRef] = entry.changeTicks[swapRef];
-                entry.components[removeRef] = entry.components[swapRef];
-            }
-
-            entry.changeRefs.pop();
-            entry.changeTicks.pop();
-            entry.components.pop();
-        }
-
-        if (removeRef < swapRef) {
-            this.entityRefs[componentEntityRef] = this.entityRefs[swapRef];
-        }
-
-        this.entityRefs.pop();
-
-        if (removeRef < swapRef) {
-            // Update entity ref to component
-            const swapEntityRef = this.entityRefs[componentEntityRef];
-            entityEntries.componentEntityRefs[swapEntityRef] = componentEntityRef;
-        }
+    public setComponent(currSetEntryRef: number, component: Component): void {
+        const storageRef = this.storageRefs[currSetEntryRef];
+        this.storage.setComponent(storageRef, component);
     }
 }
 
-class ComponentTableEntry {
-    private componentRef: ComponentRef;
+class ComponentSetStorage {
+    public components: Map<ComponentId, ComponentContainer>;
+    public entityIds: EntityId[];
+    public flags: StorageFlags;
+    public length: number;
 
-    public changeRefs: number[];
-    public changeTicks: number[];
-    public components: Component[];
+    constructor(components: Map<string, ComponentContainer>, flags: StorageFlags) {
+        this.components = components;
+        this.flags = flags;
 
-    constructor(componentRef: ComponentRef) {
-        this.componentRef = componentRef;
-
-        this.changeRefs = [];
-        this.changeTicks = [];
-        this.components = [];
-    }
-
-    public create(component: Component, changeTick: number, changeRef: number): void {
-        this.components.push(component);
-        this.changeTicks.push(changeTick);
-        this.changeRefs.push(changeRef);
-    }
-
-    public getComponentRef(): number {
-        return this.componentRef;
-    }
-
-    public update(
-        componentEntityRef: ComponentEntityRef,
-        entityEntries: EntityEntries,
-        entityRef: EntityRef,
-        changeEntries: ComponentChangeEntries,
-        changeTick: number,
-    ): void {
-        if (this.changeTicks[componentEntityRef] !== changeTick) {
-            const changeRefHead = entityEntries.getChangeRefHead(entityRef, changeTick);
-            const changeRef = changeEntries.create(changeRefHead, this.componentRef, ChangeFlags.Updated);
-
-            // Update for current table entry
-            this.changeTicks[componentEntityRef] = changeTick;
-            this.changeRefs[componentEntityRef] = changeRef;
-
-            // Update entity change ref head
-            entityEntries.componentChangeRefHeads[entityRef] = changeRef;
-        } else {
-            const changeRef = this.changeRefs[componentEntityRef];
-            changeEntries.set(changeRef, ChangeFlags.Updated);
-        }
-    }
-}
-
-class ComponentChangeEntries {
-    public changeFlags: number[];
-    public componentRefs: number[];
-    public nextEntryRefs: number[];
-
-    constructor() {
-        this.changeFlags = [];
-        this.componentRefs = [];
-        this.nextEntryRefs = [];
+        this.entityIds = [];
+        this.length = 0;
     }
 
     public clear(): void {
-        this.changeFlags = [];
-        this.componentRefs = [];
-        this.nextEntryRefs = [];
+        for (const key of this.components.keys()) {
+            this.components.set(key, []);
+        }
+
+        this.entityIds = [];
     }
 
-    public create(nextEntryRef: number, componentRef: ComponentRef, changeFlag: ChangeFlags): number {
-        const nextRef = this.changeFlags.length;
+    public copyComponents(
+        storageRef: ComponentSetStorageRef,
+        storageSrc: ComponentSetStorage,
+        storageRefSrc: ComponentSetStorageRef,
+        storageKeys: ComponentSetStorage,
+    ): void {
+        for (const id of storageKeys.components.keys()) {
+            const compContainerSrc = storageSrc.components.get(id);
+            const compContainerDest = this.components.get(id);
+            assertDebug(compContainerSrc !== undefined && compContainerDest !== undefined);
+            compContainerDest[storageRef] = compContainerSrc[storageRefSrc];
+        }
+    }
 
-        this.changeFlags.push(changeFlag);
-        this.componentRefs.push(componentRef);
-        this.nextEntryRefs.push(nextEntryRef);
+    public createEntry(entityId: EntityId): ComponentSetStorageRef {
+        const ref = this.nextRef();
+
+        this.entityIds[ref] = entityId;
+
+        return ref;
+    }
+
+    public destroyEntry(storageRef: ComponentSetStorageRef): void {
+        for (const id of this.components.keys()) {
+            const compContainer = this.components.get(id);
+            assertDebug(compContainer !== undefined);
+            compContainer[storageRef] = EMPTY_COMPONENT;
+        }
+
+        this.entityIds[storageRef] = -1 as EntityId;
+    }
+
+    public isMatching(componentIds: ComponentId[], flags: StorageFlags): boolean {
+        if (this.flags !== flags || this.components.size !== componentIds.length) {
+            return false;
+        }
+
+        for (const compId of componentIds) {
+            if (!this.components.has(compId)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    public setComponent(storageRef: ComponentSetStorageRef, value: Component): void {
+        const compContainer = this.components.get(value.componentId);
+        assertDebug(compContainer !== undefined);
+        compContainer[storageRef] = value;
+    }
+
+    public setComponents(ref: ComponentSetStorageRef, components: Component[]): void {
+        for (const comp of components) {
+            const compContainer = this.components.get(comp.componentId);
+            assertDebug(compContainer !== undefined);
+            compContainer[ref] = comp;
+        }
+    }
+
+    private nextRef(): ComponentSetStorageRef {
+        const nextRef = this.length;
+
+        for (const components of this.components.values()) {
+            components.push(EMPTY_COMPONENT);
+        }
+
+        this.entityIds.push(-1 as EntityId);
+        this.length += 1;
 
         return nextRef;
     }
-
-    public find(changeRefHead: number, componentRef: ComponentRef): ChangeFlags {
-        // Change ref head might be `-1`
-        let currRef = changeRefHead;
-
-        while (currRef >= 0) {
-            if (this.componentRefs[currRef] === componentRef) {
-                return this.changeFlags[currRef];
-            }
-
-            currRef = this.nextEntryRefs[currRef];
-        }
-
-        return ChangeFlags.None;
-    }
-
-    public get(changeRef: number): ChangeFlags {
-        return this.changeFlags[changeRef];
-    }
-
-    public getChain(firstChangeRef: number): ChangeFlags[] {
-        const changeFlags = [];
-
-        let currRef = firstChangeRef;
-
-        while (currRef >= 0) {
-            changeFlags.push(this.changeFlags[currRef]);
-
-            currRef = this.nextEntryRefs[currRef];
-        }
-
-        return changeFlags;
-    }
-
-    public set(changeRef: number, changeFlag: ChangeFlags): void {
-        this.changeFlags[changeRef] |= changeFlag;
-    }
-
-    public setAll(changeRef: number, changeFlag: ChangeFlags): void {
-        this.changeFlags[changeRef] = changeFlag;
-    }
 }
 
-class EntityChangeEntries {
-    public entityIds: EntityId[];
-    public entityRefs: EntityRef[];
+export function buildComponenSetStateGraphviz(states: ComponentSetState[], rankdir = "TB"): string {
+    let data = `digraph {
+forcelabels = true;
+rankdir = ${rankdir}
+bgcolor = white
+node [shape=oval, style=filled, fontname=arial, fontsize=10]
+edge [fontname=arial, fontsize=8]
+`;
+    for (let i = 0; i < states.length; i++) {
+        const { shape, flags, setRef } = states[i];
+        const fill = states[i].isTransient() ? "tan" : "lavender";
+        let label = "";
+        for (const [id, flags] of shape) {
+            label += `<b>${id}</b>: <i>${componentFlagsStrings(flags).join(" | ")}</i><br/>`;
+        }
+        label += `flags: <i>${entityFlagsStrings(flags).join(" | ")}</i><br/>`;
+        label += `set: <i>${setRef}</i>`;
+        data += `"${i}" [fillcolor=${fill}, label=<${label}>]\n`;
+    }
+    for (let i = 0; i < states.length; i++) {
+        const { componentTransitions, entityTransitions } = states[i];
+        for (const transition of componentTransitions) {
+            const j = states.indexOf(transition.state);
+            const label = `<b>${componentTransitionTypeString(transition.type)}</b>: <i>${transition.id}</i>`;
+            data += `{ "${i}" -> "${j}" [color=blue, label=<${label}>] }\n`;
+        }
+        for (const transition of entityTransitions) {
+            const j = states.indexOf(transition.state);
+            const label = `<b>${entityTransitionTypeString(transition.type)}</b>`;
+            data += `{ "${i}" -> "${j}" [color=red, label=<${label}>] }\n`;
+        }
+    }
+    data += `}`;
 
-    constructor() {
-        this.entityIds = [];
-        this.entityRefs = [];
+    return data;
+
+    function entityTransitionTypeString(type: EntityTransitionType): string {
+        switch (type) {
+            case EntityTransitionType.Reset:
+                return "Reset";
+            case EntityTransitionType.Destroy:
+                return "Destroy";
+            case EntityTransitionType.Disable:
+                return "Disable";
+            case EntityTransitionType.Enable:
+                return "Enable";
+            default:
+                assertUnreachable(type);
+        }
     }
 
-    public clear(): void {
-        this.entityIds = [];
-        this.entityRefs = [];
+    function componentTransitionTypeString(type: ComponentTransitionType): string {
+        switch (type) {
+            case ComponentTransitionType.Add:
+                return "Add";
+            case ComponentTransitionType.Set:
+                return "Set";
+            case ComponentTransitionType.Update:
+                return "Update";
+            case ComponentTransitionType.Delete:
+                return "Delete";
+            default:
+                assertUnreachable(type);
+        }
     }
 
-    public update(entityId: EntityId, entityRef: EntityRef): void {
-        this.entityIds.push(entityId);
-        this.entityRefs.push(entityRef);
+    function entityFlagsStrings(flags: EntityFlags): string[] {
+        const strings: string[] = [];
+
+        if (flags === EntityFlags.None) {
+            strings.push("None");
+        }
+
+        if ((flags & EntityFlags.Created) !== 0) {
+            strings.push("Created");
+        }
+
+        if ((flags & EntityFlags.Destroyed) !== 0) {
+            strings.push("Destroyed");
+        }
+
+        if ((flags & EntityFlags.Disabled) !== 0) {
+            strings.push("Disabled");
+        }
+
+        return strings;
+    }
+
+    function componentFlagsStrings(flags: ComponentFlags): string[] {
+        const strings: string[] = [];
+
+        if (flags === ComponentFlags.None) {
+            strings.push("None");
+        }
+
+        if ((flags & ComponentFlags.Created) !== 0) {
+            strings.push("Created");
+        }
+
+        if ((flags & ComponentFlags.Updated) !== 0) {
+            strings.push("Updated");
+        }
+
+        if ((flags & ComponentFlags.Deleted) !== 0) {
+            strings.push("Deleted");
+        }
+
+        return strings;
     }
 }
