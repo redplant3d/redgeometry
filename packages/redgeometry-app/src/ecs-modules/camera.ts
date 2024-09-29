@@ -13,14 +13,13 @@ export type CameraComponent = {
 };
 
 export function cameraSystem(world: World): void {
-    for (const entity of world.getEntitiesChanged()) {
-        const camera = world.getComponent<CameraComponent>(entity, "camera");
+    const query = world.queryEntities<CameraComponent | ComputedTransformComponent>(
+        (q) => q.hasComponent("camera") && (q.isUpdated("camera") || q.isUpdated("computed-transform")),
+    );
 
-        if (camera === undefined) {
-            continue;
-        }
-
-        const computedTransform = world.getComponent<ComputedTransformComponent>(entity, "computed-transform");
+    while (query.next()) {
+        const camera = query.getComponent<CameraComponent>("camera");
+        const computedTransform = query.findComponent<ComputedTransformComponent>("computed-transform");
 
         if (computedTransform !== undefined) {
             const matView = computedTransform.global.inverse();

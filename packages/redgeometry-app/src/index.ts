@@ -1,6 +1,4 @@
-import { RandomXSR128 } from "redgeometry/src/utility/random";
 import { LocalAppContext, WebAppContext } from "./ecs/app.js";
-import type { Component } from "./ecs/types.js";
 import { BPLUS_TREE_MAIN_WORLD, BPLUS_TREE_REMOTE_WORLD } from "./parts/bplus-tree.js";
 import { ECS_MAIN_WORLD, ECS_REMOTE_WORLD } from "./parts/ecs-bounce.js";
 import { GPU_CUBE_MAIN_WORLD, GPU_CUBE_REMOTE_WORLD } from "./parts/gpu-cube.js";
@@ -17,11 +15,6 @@ import { SAMPLING_MAIN_WORLD, SAMPLING_REMOTE_WORLD } from "./parts/sampling.js"
 import { SNAP_ROUNDING_MAIN_WORLD, SNAP_ROUNDING_REMOTE_WORLD } from "./parts/snap-rounding.js";
 import { STRAIGHT_SKELETON_MAIN_WORLD, STRAIGHT_SKELETON_REMOTE_WORLD } from "./parts/straight-skeleton.js";
 import { TRIANGULATE_MAIN_WORLD, TRIANGULATE_REMOTE_WORLD } from "./parts/triangulate.js";
-import {
-    buildComponenSetStateGraphviz,
-    EntityComponentStorage,
-    type EntityComponentQuery,
-} from "./utility/ecs-storage-table.js";
 import { AppLauncher } from "./utility/launcher.js";
 
 // const context: LocalAppContext | WebAppContext = new LocalAppContext();
@@ -108,109 +101,4 @@ launcher.addPart(
     { id: "triangulate-main", parent: undefined, worlds: [TRIANGULATE_MAIN_WORLD] },
     { id: "triangulate-remote", parent: "triangulate-main", worlds: [TRIANGULATE_REMOTE_WORLD] },
 );
-// launcher.run("playground");
-
-type ComponentA = { componentId: "component-a"; a: number };
-const componentA = { componentId: "component-a", a: 0 } satisfies ComponentA;
-
-type ComponentB = { componentId: "component-b"; b: number };
-const componentB = { componentId: "component-b", b: 0 } satisfies ComponentB;
-
-type ComponentC = { componentId: "component-c"; c: number };
-const componentC = { componentId: "component-c", c: 0 } satisfies ComponentC;
-
-type ComponentD = { componentId: "component-d"; d: number };
-const componentD = { componentId: "component-d", d: 0 } satisfies ComponentD;
-
-type ComponentE = { componentId: "component-e"; e: number };
-const componentE = { componentId: "component-e", e: 0 } satisfies ComponentE;
-
-const ecStorage = new EntityComponentStorage();
-
-test(ecStorage);
-
-try {
-    const data = buildComponenSetStateGraphviz(ecStorage.componentSetStates);
-    await navigator.clipboard.writeText(data);
-    console.log(`Graphviz content copied to clipboard (${data.length} bytes)`);
-} catch (error: unknown) {
-    console.error("Unable to copy content to clipboard (document is not focused)");
-}
-
-function createManyEntities(ecStorage: EntityComponentStorage): void {
-    const random = RandomXSR128.fromSeedLcg(0);
-
-    console.time("createEntities");
-    for (let i = 0; i < 1000000; i += 1) {
-        const components: Component[] = [];
-
-        if (random.nextFloat() < 0.83) components.push(componentA);
-        if (random.nextFloat() < 0.66) components.push(componentB);
-        if (random.nextFloat() < 0.5) components.push(componentC);
-        if (random.nextFloat() < 0.33) components.push(componentD);
-        if (random.nextFloat() < 0.16) components.push(componentE);
-
-        ecStorage.createEntity(components);
-    }
-    console.timeEnd("createEntities");
-
-    const queryFn = (q: EntityComponentQuery<ComponentA | ComponentB | ComponentC>): boolean =>
-        q.hasComponent("component-a") &&
-        q.hasComponent("component-b") &&
-        q.hasComponent("component-c") &&
-        q.isEntityDestroyed();
-
-    let sum = 0;
-
-    for (let i = 0; i < 1000; i += 1) {
-        const query = ecStorage.queryEntities(queryFn);
-        while (query.next()) {
-            sum += 1;
-        }
-    }
-
-    sum = 0;
-
-    console.time("queryEntities");
-    for (let i = 0; i < 1000000; i += 1) {
-        const query = ecStorage.queryEntities(queryFn);
-        while (query.next()) {
-            sum += 1;
-        }
-    }
-    console.timeEnd("queryEntities");
-    console.log("sum =", sum);
-
-    console.log({
-        setCount: ecStorage.componenSets.length,
-        setStorageCount: ecStorage.componentSetStorages.length,
-        setStateCount: ecStorage.componentSetStates.length,
-    });
-
-    console.time("reset");
-    ecStorage.reset();
-    console.timeEnd("reset");
-
-    console.log({
-        setCount: ecStorage.componenSets.length,
-        setStorageCount: ecStorage.componentSetStorages.length,
-        setStateCount: ecStorage.componentSetStates.length,
-    });
-}
-
-function test(ecStorage: EntityComponentStorage): void {
-    const entityId1 = ecStorage.createEntity<[ComponentA]>([componentA]);
-    const entityId2 = ecStorage.createEntity<[ComponentB]>([componentB]);
-    ecStorage.reset();
-    ecStorage.updateComponent<ComponentA>(entityId1, "component-a");
-    ecStorage.addComponent<ComponentA>(entityId2, componentA);
-    ecStorage.reset();
-    ecStorage.disableEntity(entityId2);
-    ecStorage.reset();
-    ecStorage.enableEntity(entityId2);
-    ecStorage.reset();
-    ecStorage.deleteComponent<ComponentB>(entityId2, "component-b");
-    ecStorage.reset();
-
-    console.log(ecStorage.componentSetStates);
-}
+launcher.run("ecs-bounce");

@@ -1,21 +1,22 @@
 import { DEFAULT_SERIALIZATION_MAPPING, SerializationMap } from "redgeometry/src/internal/serialize";
 import { log, throwError } from "redgeometry/src/utility/debug";
 import {
+    buildComponenSetStateGraphviz,
+    ComponentFlags,
     EntityComponentIterator,
     EntityComponentStorage,
-    EntityHierarchySelector,
-} from "../utility/ecs-storage-sparse.js";
+    type EntityComponentQuery,
+} from "../utility/ecs-storage-table.js";
 import {
     SystemSchedule,
     type SystemDependencyOptions,
     type SystemOptions,
-    type SystemWithArgsOptions,
     type SystemsOptions,
+    type SystemWithArgsOptions,
 } from "./schedule.js";
 import type {
     Component,
     ComponentIdOf,
-    ComponentIdsOf,
     DefaultSystemStage,
     DefaultWorldScheduleId,
     EntityId,
@@ -38,7 +39,7 @@ import type {
     WorldScheduleId,
 } from "./types.js";
 
-export { EntityComponentIterator, EntityHierarchySelector };
+export { EntityComponentIterator };
 
 /**
  * Channel to remote worlds.
@@ -168,32 +169,28 @@ export class World {
      * Clears all entities from this world.
      */
     public clearEntities(): void {
-        this.ecStorage.clear();
+        this.ecStorage.clear(true);
     }
 
     /**
      * Creates a new entity.
      */
-    public createEntity<T extends Component[]>(parent: EntityId | undefined, ...components: T): EntityId {
-        return this.ecStorage.createEntity(parent, components);
-    }
-
-    public createHierarchySelector(): EntityHierarchySelector {
-        return this.ecStorage.createHierarchySelector();
+    public createEntity<T extends Component[]>(...components: T): EntityId {
+        return this.ecStorage.createEntity(components);
     }
 
     /**
      * Removes `componentId` from `entity` and returns if it was sucessful.
      */
-    public deleteComponent<T extends Component>(entity: EntityId, componentId: ComponentIdOf<T>): boolean {
-        return this.ecStorage.deleteComponent(entity, componentId);
+    public deleteComponent<T extends Component>(entity: EntityId, componentId: ComponentIdOf<T>): void {
+        this.ecStorage.deleteComponent(entity, componentId);
     }
 
     /**
      * Destroys `entity` from the world and returns if it was sucessful.
      */
-    public destroyEntity(entity: EntityId): boolean {
-        return this.ecStorage.destroyEntity(entity);
+    public destroyEntity(entity: EntityId): void {
+        this.ecStorage.destroyEntity(entity);
     }
 
     public getChannel(worldId: WorldId): WorldChannel {
@@ -211,13 +208,6 @@ export class World {
      */
     public getComponent<T extends Component>(entity: EntityId, componentId: ComponentIdOf<T>): T | undefined {
         return this.ecStorage.getComponent(entity, componentId);
-    }
-
-    /**
-     * Get entities that have changed recently.
-     */
-    public getEntitiesChanged(): IterableIterator<EntityId> {
-        return this.ecStorage.getEntitiesChanged();
     }
 
     public getPlugin<T extends WorldPlugin>(pluginId: WorldPluginIdOf<T>): T {
@@ -243,9 +233,9 @@ export class World {
     public hasChangeFlag<T extends Component>(
         entityId: EntityId,
         componentId: ComponentIdOf<T>,
-        flag: ChangeFlags,
+        flag: ComponentFlags,
     ): boolean {
-        return this.ecStorage.hasChangeFlag(entityId, componentId, flag);
+        return this.ecStorage.hasComponentFlags(entityId, componentId, flag);
     }
 
     public hasComponent<T extends Component>(entity: EntityId, componentId: ComponentIdOf<T>): boolean {
@@ -277,11 +267,13 @@ export class World {
     }
 
     public loadEntities(text: string): void {
-        this.ecStorage.loadEntities(this.serializationMap, text);
+        // this.ecStorage.loadEntities(this.serializationMap, text);
     }
 
-    public queryEntities<T extends Component[]>(componentIds: ComponentIdsOf<T>): EntityComponentIterator {
-        return this.ecStorage.queryEntities(componentIds);
+    public queryEntities<T extends Component>(
+        match: (q: EntityComponentQuery<T>) => boolean,
+    ): EntityComponentIterator<T> {
+        return this.ecStorage.queryEntities(match);
     }
 
     public queueEvent<T extends WorldEvent>(event: T): void {
@@ -379,15 +371,16 @@ export class World {
     }
 
     public saveEntities(): string {
-        return this.ecStorage.saveEntities(this.serializationMap);
+        // return this.ecStorage.saveEntities(this.serializationMap);
+
+        const data = buildComponenSetStateGraphviz(this.ecStorage.componentSetStates);
+        console.log(data);
+
+        return "";
     }
 
     public setComponent<T extends Component>(entityId: EntityId, component: T): void {
         this.ecStorage.setComponent(entityId, component);
-    }
-
-    public setParent(entity: EntityId, parent: EntityId): void {
-        this.ecStorage.setParent(entity, parent);
     }
 
     public setPlugin<T extends WorldPlugin>(plugin: T): void {
@@ -444,7 +437,7 @@ export class World {
     }
 
     private cleanup(): void {
-        this.ecStorage.cleanup();
+        this.ecStorage.reset();
 
         // Reset events
         for (const eventId of this.events.keys()) {

@@ -629,24 +629,24 @@ export class EntityComponentIterator<T extends Component> {
         this.currSetEntryRef = -1;
     }
 
-    public findComponent(componentId: ComponentIdOf<T>): T | undefined {
+    public findComponent<U extends T>(componentId: ComponentIdOf<U>): U | undefined {
         const components = this.currComponents.get(componentId);
 
         if (components === undefined) {
             return undefined;
         }
 
-        return components[this.currStorageRef] as T;
+        return components[this.currStorageRef] as U;
     }
 
-    public getComponent(componentId: ComponentIdOf<T>): T {
+    public getComponent<U extends T>(componentId: ComponentIdOf<U>): U {
         const components = this.currComponents.get(componentId);
 
         if (components === undefined) {
             throwError("Component id not found");
         }
 
-        return components[this.currStorageRef] as T;
+        return components[this.currStorageRef] as U;
     }
 
     public getEntityId(): EntityId {

@@ -10,7 +10,8 @@ import { AppMainModule, AppRemoteModule, type AppStateData } from "../ecs-module
 import { type TimeData } from "../ecs-modules/time.js";
 import type { WorldOptions } from "../ecs/app.js";
 import type { DefaultSystemStage, WorldModule } from "../ecs/types.js";
-import { ChangeFlags, DEFAULT_WORLD_SCHEDULES, type World } from "../ecs/world.js";
+import { DEFAULT_WORLD_SCHEDULES, type World } from "../ecs/world.js";
+import { ComponentFlags } from "../utility/ecs-storage-table.js";
 
 type AppPartMainData = {
     dataId: "app-part-main";
@@ -127,13 +128,12 @@ function spawnSystem(world: World): void {
             const velocity = new Vector2(random.nextFloatBetween(-1, 1), random.nextFloatBetween(-1, 1));
 
             world.createEntity<[CircleComponent | RectangleComponent, ObjectComponent]>(
-                undefined,
                 { componentId: shape },
                 { componentId: "object", size, color, position, velocity },
             );
         }
     } else {
-        const query = world.queryEntities<[ObjectComponent]>(["object"]);
+        const query = world.queryEntities<ObjectComponent>((q) => q.hasComponent("object"));
 
         let i = nextCount;
 
@@ -157,7 +157,7 @@ function movementSystem(world: World): void {
 
     const { width, height } = ctx.canvas;
 
-    const query = world.queryEntities<[ObjectComponent]>(["object"]);
+    const query = world.queryEntities<ObjectComponent>((q) => q.hasComponent("object"));
 
     while (query.next()) {
         const entityId = query.getEntityId();
@@ -240,7 +240,9 @@ function clearRenderSystem(world: World): void {
 function circleRenderSystem(world: World): void {
     const ctx = world.getPlugin<AppContextPlugin>("app-context");
 
-    const query = world.queryEntities<[CircleComponent, ObjectComponent]>(["circle", "object"]);
+    const query = world.queryEntities<CircleComponent | ObjectComponent>(
+        (q) => q.hasComponent("circle") && q.hasComponent("object"),
+    );
 
     const red = Path2.createEmpty();
     const blue = Path2.createEmpty();
@@ -271,7 +273,9 @@ function circleRenderSystem(world: World): void {
 function rectangleRenderSystem(world: World): void {
     const ctx = world.getPlugin<AppContextPlugin>("app-context");
 
-    const query = world.queryEntities<[RectangleComponent, ObjectComponent]>(["rectangle", "object"]);
+    const query = world.queryEntities<RectangleComponent | ObjectComponent>(
+        (q) => q.hasComponent("rectangle") && q.hasComponent("object"),
+    );
 
     const red = Path2.createEmpty();
     const blue = Path2.createEmpty();
@@ -308,18 +312,22 @@ function notificationSystem(world: World): void {
     let createdCount = 0;
     let deletedCount = 0;
 
-    for (const entityId of world.getEntitiesChanged()) {
-        if (world.hasChangeFlag<ObjectComponent>(entityId, "object", ChangeFlags.Created)) {
+    const query = world.queryEntities<ObjectComponent>((q) => q.isChanged("object"));
+
+    while (query.next()) {
+        if (query.hasComponentFlags("object", ComponentFlags.Created)) {
             createdCount += 1;
         }
 
-        if (world.hasChangeFlag<ObjectComponent>(entityId, "object", ChangeFlags.Deleted)) {
+        if (query.hasComponentFlags("object", ComponentFlags.Deleted)) {
             deletedCount += 1;
         }
     }
 
     if (createdCount > 0 || deletedCount > 0) {
         log.info("created = {}, deleted = {}", createdCount, deletedCount);
+
+        world.saveEntities();
     }
 }
 

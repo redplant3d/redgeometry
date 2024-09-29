@@ -16,6 +16,7 @@ import {
 import type { AssetId, AssetPlugin } from "../ecs-modules/asset.js";
 import type { CameraBundle, CameraComponent } from "../ecs-modules/camera.js";
 import { GPUModule, type GPUData, type GPUInitData } from "../ecs-modules/gpu.js";
+import type { ParentComponent } from "../ecs-modules/hierachy.js";
 import {
     KeyboardButtons,
     KeyboardPlugin,
@@ -112,7 +113,6 @@ function initRemoteSystem(world: World): void {
     });
 
     const mainCamera = world.createEntity<CameraBundle>(
-        undefined,
         {
             componentId: "camera",
             projection: Matrix4.createIdentity(),
@@ -206,7 +206,7 @@ function initAssetSystem(world: World): void {
         vertices: { type: "number", array: cubeVertices },
     });
 
-    appRemoteData.parentEntity = world.createEntity<[TransformComponent]>(undefined, {
+    appRemoteData.parentEntity = world.createEntity<[TransformComponent]>({
         componentId: "transform",
         rotation: Quaternion.createIdentity(),
         scale: Vector3.createOne(),
@@ -225,15 +225,19 @@ function spawnSystem(world: World): void {
     const nextCount = appStateData.count;
 
     const maxCount = Math.abs(currCount - nextCount);
-    const minCount = Math.min(maxCount, 2500);
+    const minCount = Math.min(maxCount, 10000);
+
+    const { random, materialHandles, meshHandles, parentEntity } = appRemoteData;
+
+    if (parentEntity === undefined) {
+        return;
+    }
 
     if (currCount < nextCount) {
-        const { random, materialHandles, meshHandles, parentEntity } = appRemoteData;
-
         for (let i = 0; i < minCount; i++) {
-            world.createEntity<[TestComponent, ...MeshBundle]>(
-                parentEntity,
+            world.createEntity<[TestComponent, ParentComponent, ...MeshBundle]>(
                 { componentId: "test" },
+                { componentId: "parent", entity: parentEntity },
                 { componentId: "mesh", handle: meshHandles[i % meshHandles.length] },
                 { componentId: "material", handle: materialHandles[i % materialHandles.length] },
                 {
@@ -265,7 +269,7 @@ function spawnSystem(world: World): void {
     }
 
     if (currCount > nextCount) {
-        const query = world.queryEntities<[TestComponent]>(["test"]);
+        const query = world.queryEntities<TestComponent>((q) => q.hasComponent("test"));
 
         let i = 0;
 

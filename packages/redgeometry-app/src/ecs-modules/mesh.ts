@@ -7,6 +7,7 @@ import { gpuCreateBuffer } from "../utility/gpu.js";
 import { AssetModule, AssetPlugin, type AssetId } from "./asset.js";
 import { cameraSystem, type CameraComponent } from "./camera.js";
 import { startGPUSystem, type GPUData } from "./gpu.js";
+import { hierarchySystem, startHierarchySystem } from "./hierachy.js";
 import type { Material, MaterialComponent } from "./material.js";
 import type { SceneData } from "./scene.js";
 import MESH_WGSL from "./shader/mesh.wgsl";
@@ -73,20 +74,22 @@ export class MeshRenderModule implements WorldModule {
         world.registerData<MeshRenderStateData>("mesh-render-state");
         world.registerData<SceneData>("scene");
 
+        world.addSystem<DefaultSystemStage>({ stage: "start-post", fn: startHierarchySystem });
         world.addSystem<DefaultSystemStage>({ stage: "start-post", fn: startMeshRenderSystem });
 
+        world.addSystem<DefaultSystemStage>({ stage: "update-post", fn: hierarchySystem });
         world.addSystem<DefaultSystemStage>({ stage: "update-post", fn: transformSystem });
         world.addSystem<DefaultSystemStage>({ stage: "update-post", fn: cameraSystem });
         world.addSystem<DefaultSystemStage>({ stage: "update-post", fn: meshRenderSystem });
 
         world.addDependency<DefaultSystemStage>({
             stage: "start-post",
-            seq: [startGPUSystem, startMeshRenderSystem],
+            seq: [startGPUSystem, startHierarchySystem, startMeshRenderSystem],
         });
 
         world.addDependency<DefaultSystemStage>({
             stage: "update-post",
-            seq: [transformSystem, cameraSystem, meshRenderSystem],
+            seq: [hierarchySystem, transformSystem, cameraSystem, meshRenderSystem],
         });
     }
 }
@@ -124,25 +127,42 @@ export function meshRenderSystem(world: World): void {
 
     const asset = world.getPlugin<AssetPlugin>("asset");
 
+    const query = world.queryEntities<MeshComponent | MaterialComponent | ComputedTransformComponent>(
+        (q) => q.isDeleted("mesh") || q.isDeleted("material") || q.isDeleted("computed-transform"),
+    );
+
     // Entries
-    for (const entity of world.getEntitiesChanged()) {
-        const mesh = world.getComponent<MeshComponent>(entity, "mesh");
-        const material = world.getComponent<MaterialComponent>(entity, "material");
-        const computedTransform = world.getComponent<ComputedTransformComponent>(entity, "computed-transform");
+    while (query.next()) {
+        const entity = query.getEntityId();
+        const entry = stateData.entries.get(entity);
+
+        if (entry !== undefined) {
+            destroyMeshEntry(stateData, entry);
+        }
+    }
+
+    const query2 = world.queryEntities<MeshComponent | MaterialComponent | ComputedTransformComponent>(
+        (q) =>
+            q.hasComponent("mesh") &&
+            q.hasComponent("material") &&
+            q.hasComponent("computed-transform") &&
+            (q.isUpdated("mesh") || q.isUpdated("material") || q.isUpdated("computed-transform")),
+    );
+
+    // Entries
+    while (query2.next()) {
+        const mesh = query2.getComponent<MeshComponent>("mesh");
+        const material = query2.getComponent<MaterialComponent>("material");
+        const computedTransform = query2.getComponent<ComputedTransformComponent>("computed-transform");
+        const entity = query2.getEntityId();
 
         let entry = stateData.entries.get(entity);
 
-        if (mesh !== undefined && material !== undefined && computedTransform !== undefined) {
-            if (entry === undefined) {
-                entry = createMeshEntry(gpuData.device, stateData, asset, entity, mesh, material);
-            }
-
-            updateMeshEntry(stateData, entry, computedTransform);
-        } else {
-            if (entry !== undefined) {
-                destroyMeshEntry(stateData, entry);
-            }
+        if (entry === undefined) {
+            entry = createMeshEntry(gpuData.device, stateData, asset, entity, mesh, material);
         }
+
+        updateMeshEntry(stateData, entry, computedTransform);
     }
 
     // Render
