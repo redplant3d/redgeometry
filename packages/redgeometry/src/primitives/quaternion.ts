@@ -562,6 +562,14 @@ export class Quaternion implements QuaternionLike {
         this.d = qd * cos + qa * sin;
     }
 
+    public rotationAngle(): number {
+        return 2 * Math.acos(this.a);
+    }
+
+    public rotationAxis(): Vector3 {
+        return new Vector3(this.b, this.c, this.d);
+    }
+
     /**
      * Returns the spherical linear interpolation of the current quaternion and `q`.
      */
