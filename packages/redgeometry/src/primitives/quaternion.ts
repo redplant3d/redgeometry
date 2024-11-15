@@ -229,8 +229,23 @@ export class Quaternion implements QuaternionLike {
         return 2 * Math.acos(cos);
     }
 
+    /**
+     * Returns the rotation axis vector of the current quaternion.
+     *
+     * Note: The vector is unscaled and might no be a unit vector.
+     */
     public axis(): Vector3 {
         return new Vector3(this.b, this.c, this.d);
+    }
+
+    /**
+     * Returns the rotation axis angle of the current quaternion.
+     *
+     * Note: The angle is also depending on the direction of the rotation axis.
+     */
+    public axisAngle(): number {
+        const qa = this.a / this.len();
+        return 2 * Math.acos(qa);
     }
 
     public clone(): Quaternion {
@@ -560,14 +575,6 @@ export class Quaternion implements QuaternionLike {
         this.b = qb * cos + qc * sin;
         this.c = qc * cos - qb * sin;
         this.d = qd * cos + qa * sin;
-    }
-
-    public rotationAngle(): number {
-        return 2 * Math.acos(this.a);
-    }
-
-    public rotationAxis(): Vector3 {
-        return new Vector3(this.b, this.c, this.d);
     }
 
     /**
