@@ -219,7 +219,8 @@ export class ObjectMapper {
     private iterateFromMapping(obj: unknown, mapping: ObjectMapping<unknown, unknown>): unknown {
         switch (mapping.type) {
             case "Class": {
-                const properties = Object.getOwnPropertyDescriptors(obj);
+                const nextObj = this.fromObject(obj);
+                const properties = Object.getOwnPropertyDescriptors(nextObj);
                 return Object.create(mapping.clsCtor.prototype, properties);
             }
             case "PrimitiveCollection": {
