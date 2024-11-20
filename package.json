@@ -45,12 +45,6 @@
         ],
         "rules": {
             "eqeqeq": "warn",
-            "@typescript-eslint/explicit-function-return-type": [
-                "warn",
-                {
-                    "allowExpressions": true
-                }
-            ],
             "@typescript-eslint/no-explicit-any": [
                 "warn",
                 {
