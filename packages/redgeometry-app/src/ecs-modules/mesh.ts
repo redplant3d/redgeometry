@@ -13,7 +13,7 @@ import MESH_WGSL from "./shader/mesh.wgsl";
 import { transformSystem, type ComputedTransformComponent, type TransformComponent } from "./transform.js";
 
 export type MeshBundle = [MeshComponent, MaterialComponent, TransformComponent];
-export const MESH_BUNDLE_IDS = ["mesh", "material", "transform"] satisfies ComponentIdsOf<MeshBundle>;
+export const MESH_BUNDLE_IDS: ComponentIdsOf<MeshBundle> = ["mesh", "material", "transform"];
 
 const MESH_MAX_ENTRIES_PER_MATERIAL = 50000;
 

@@ -4,7 +4,7 @@ import type { World } from "../ecs/world.js";
 import type { ComputedTransformComponent, TransformComponent } from "./transform.js";
 
 export type CameraBundle = [CameraComponent, TransformComponent];
-export const CAMERA_BUNDLE_IDS = ["camera", "transform"] satisfies ComponentIdsOf<CameraBundle>;
+export const CAMERA_BUNDLE_IDS: ComponentIdsOf<CameraBundle> = ["camera", "transform"];
 
 export type CameraComponent = {
     componentId: "camera";

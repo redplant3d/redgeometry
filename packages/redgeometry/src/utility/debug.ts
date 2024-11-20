@@ -2,7 +2,7 @@ import { Log } from "./log.js";
 import { formatString, type FormatParameters } from "./string.js";
 
 // Global log object
-export const log = new Log({
+export const log: Log = new Log({
     errorFn: console.error,
     warnFn: console.warn,
     infoFn: console.info,
