@@ -2,6 +2,22 @@ import type { Matrix3, Matrix3A, Matrix4, Matrix4A } from "./matrix.js";
 import { Point2, Point3 } from "./point.js";
 import type { Ray2, Ray3 } from "./ray.js";
 
+export type Box2Like = {
+    readonly x0: number;
+    readonly x1: number;
+    readonly y0: number;
+    readonly y1: number;
+};
+
+export type Box3Like = {
+    readonly x0: number;
+    readonly x1: number;
+    readonly y0: number;
+    readonly y1: number;
+    readonly z0: number;
+    readonly z1: number;
+};
+
 export class Box2 {
     public x0: number;
     public x1: number;
@@ -27,11 +43,11 @@ export class Box2 {
         );
     }
 
-    public static fromArray(data: number[], offset = 0): Box2 {
+    public static fromArray(data: ArrayLike<number>, offset = 0): Box2 {
         return new Box2(data[offset], data[offset + 1], data[offset + 2], data[offset + 3]);
     }
 
-    public static fromObject(obj: { x0: number; y0: number; x1: number; y1: number }): Box2 {
+    public static fromObject(obj: Box2Like): Box2 {
         return new Box2(obj.x0, obj.y0, obj.x1, obj.y1);
     }
 
@@ -223,7 +239,7 @@ export class Box3 {
         );
     }
 
-    public static fromArray(data: number[], offset = 0): Box3 {
+    public static fromArray(data: ArrayLike<number>, offset = 0): Box3 {
         return new Box3(
             data[offset],
             data[offset + 1],
@@ -234,7 +250,7 @@ export class Box3 {
         );
     }
 
-    public static fromObject(obj: { x0: number; y0: number; z0: number; x1: number; y1: number; z1: number }): Box3 {
+    public static fromObject(obj: Box3Like): Box3 {
         return new Box3(obj.x0, obj.y0, obj.z0, obj.x1, obj.y1, obj.z1);
     }
 

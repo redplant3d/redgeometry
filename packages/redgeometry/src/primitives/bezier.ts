@@ -21,6 +21,31 @@ export enum CurveType {
     BezierR,
 }
 
+export type Bezier1Curve2Like = {
+    readonly p0: Point2;
+    readonly p1: Point2;
+};
+
+export type Bezier2Curve2Like = {
+    readonly p0: Point2;
+    readonly p1: Point2;
+    readonly p2: Point2;
+};
+
+export type Bezier3Curve2Like = {
+    readonly p0: Point2;
+    readonly p1: Point2;
+    readonly p2: Point2;
+    readonly p3: Point2;
+};
+
+export type BezierRCurve2Like = {
+    readonly p0: Point2;
+    readonly p1: Point2;
+    readonly p2: Point2;
+    readonly w: number;
+};
+
 export type BezierCurve2 = Bezier1Curve2 | Bezier2Curve2 | Bezier3Curve2 | BezierRCurve2;
 
 export class Bezier1Curve2 {
@@ -40,14 +65,14 @@ export class Bezier1Curve2 {
         return CurveType.Bezier1;
     }
 
-    public static fromArray(data: number[], offset = 0): Bezier1Curve2 {
+    public static fromArray(data: ArrayLike<number>, offset = 0): Bezier1Curve2 {
         const p0 = Point2.fromArray(data, offset);
         const p1 = Point2.fromArray(data, offset + 2);
 
         return new Bezier1Curve2(p0, p1);
     }
 
-    public static fromObject(obj: { p0: Point2Like; p1: Point2Like }): Bezier1Curve2 {
+    public static fromObject(obj: Bezier1Curve2Like): Bezier1Curve2 {
         const p0 = Point2.fromObject(obj.p0);
         const p1 = Point2.fromObject(obj.p1);
         return new Bezier1Curve2(p0, p1);
@@ -198,7 +223,7 @@ export class Bezier2Curve2 {
         return CurveType.Bezier2;
     }
 
-    public static fromArray(data: number[], offset = 0): Bezier2Curve2 {
+    public static fromArray(data: ArrayLike<number>, offset = 0): Bezier2Curve2 {
         const p0 = Point2.fromArray(data, offset);
         const p1 = Point2.fromArray(data, offset + 2);
         const p2 = Point2.fromArray(data, offset + 4);
@@ -206,7 +231,7 @@ export class Bezier2Curve2 {
         return new Bezier2Curve2(p0, p1, p2);
     }
 
-    public static fromObject(obj: { p0: Point2Like; p1: Point2Like; p2: Point2Like }): Bezier2Curve2 {
+    public static fromObject(obj: Bezier2Curve2Like): Bezier2Curve2 {
         const p0 = Point2.fromObject(obj.p0);
         const p1 = Point2.fromObject(obj.p1);
         const p2 = Point2.fromObject(obj.p2);
@@ -567,7 +592,7 @@ export class Bezier3Curve2 {
         return CurveType.Bezier3;
     }
 
-    public static fromArray(data: number[], offset = 0): Bezier3Curve2 {
+    public static fromArray(data: ArrayLike<number>, offset = 0): Bezier3Curve2 {
         const p0 = Point2.fromArray(data, offset);
         const p1 = Point2.fromArray(data, offset + 2);
         const p2 = Point2.fromArray(data, offset + 4);
@@ -576,7 +601,7 @@ export class Bezier3Curve2 {
         return new Bezier3Curve2(p0, p1, p2, p3);
     }
 
-    public static fromObject(obj: { p0: Point2Like; p1: Point2Like; p2: Point2Like; p3: Point2Like }): Bezier3Curve2 {
+    public static fromObject(obj: Bezier3Curve2Like): Bezier3Curve2 {
         const p0 = Point2.fromObject(obj.p0);
         const p1 = Point2.fromObject(obj.p1);
         const p2 = Point2.fromObject(obj.p2);
@@ -946,7 +971,7 @@ export class BezierRCurve2 {
         return CurveType.BezierR;
     }
 
-    public static fromArray(data: number[], offset = 0): BezierRCurve2 {
+    public static fromArray(data: ArrayLike<number>, offset = 0): BezierRCurve2 {
         const p0 = Point2.fromArray(data, offset);
         const p1 = Point2.fromArray(data, offset + 2);
         const p2 = Point2.fromArray(data, offset + 4);
@@ -963,7 +988,7 @@ export class BezierRCurve2 {
         return new BezierRCurve2(p0, p1, p2, w);
     }
 
-    public static fromObject(obj: { p0: Point2Like; p1: Point2Like; p2: Point2Like; w: number }): BezierRCurve2 {
+    public static fromObject(obj: BezierRCurve2Like): BezierRCurve2 {
         const p0 = Point2.fromObject(obj.p0);
         const p1 = Point2.fromObject(obj.p1);
         const p2 = Point2.fromObject(obj.p2);

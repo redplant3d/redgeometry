@@ -2,15 +2,15 @@ import { eqApproxAbs, eqApproxRel } from "../utility/scalar.js";
 import { Point2 } from "./point.js";
 import { Vector2 } from "./vector.js";
 
-export interface ComplexLike {
-    a: number;
-    b: number;
-}
+export type ComplexLike = {
+    readonly a: number;
+    readonly b: number;
+};
 
 /**
  * A complex number to be used for 2D rotations.
  */
-export class Complex implements ComplexLike {
+export class Complex {
     public a: number;
     public b: number;
 
@@ -23,7 +23,7 @@ export class Complex implements ComplexLike {
         return new Complex(1, 0);
     }
 
-    public static fromArray(data: number[], offset = 0): Complex {
+    public static fromArray(data: ArrayLike<number>, offset = 0): Complex {
         return new Complex(data[offset], data[offset + 1]);
     }
 

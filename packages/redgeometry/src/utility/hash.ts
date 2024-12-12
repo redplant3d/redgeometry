@@ -15,7 +15,7 @@ export class Hash {
         return 0.5 * (x + y) * (x + y + 1) + y;
     }
 
-    public static fromNumbers(...numbers: number[]): number {
+    public static fromNumbers(...numbers: ReadonlyArray<number>): number {
         let hash = 0;
 
         for (let i = 0; i < numbers.length; i++) {

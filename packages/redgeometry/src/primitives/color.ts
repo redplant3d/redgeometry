@@ -1,5 +1,12 @@
 import { clamp } from "../utility/scalar.js";
 
+export type ColorRgbaLike = {
+    readonly a: number;
+    readonly b: number;
+    readonly g: number;
+    readonly r: number;
+};
+
 export class ColorRgba {
     public a: number;
     public b: number;
@@ -13,7 +20,7 @@ export class ColorRgba {
         this.a = a;
     }
 
-    public static fromArray(data: number[], offset = 0): ColorRgba {
+    public static fromArray(data: ArrayLike<number>, offset = 0): ColorRgba {
         return new ColorRgba(data[offset], data[offset + 1], data[offset + 2], data[offset + 3]);
     }
 
@@ -51,7 +58,7 @@ export class ColorRgba {
         return new ColorRgba(r / 255, g / 255, b / 255, a / 255);
     }
 
-    public static fromObject(obj: { r: number; g: number; b: number; a: number }): ColorRgba {
+    public static fromObject(obj: ColorRgbaLike): ColorRgba {
         return new ColorRgba(obj.r, obj.g, obj.b, obj.a);
     }
 

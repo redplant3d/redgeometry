@@ -48,6 +48,11 @@ export enum PathCommandType {
     Close,
 }
 
+export type Path2Like = {
+    readonly points: Point2Like[];
+    readonly commands: PathCommand[];
+};
+
 export type PathCommandMove = { type: PathCommandType.Move };
 export type PathCommandLine = { type: PathCommandType.Linear };
 export type PathCommandQuad = { type: PathCommandType.Quadratic };
@@ -76,13 +81,13 @@ export class Path2 implements PathSink2 {
         return new Path2([], []);
     }
 
-    public static fromObject(obj: { points: Point2Like[]; commands: PathCommand[] }): Path2 {
+    public static fromObject(obj: Path2Like): Path2 {
         const commands = obj.commands.map((c) => ({ ...c }));
         const points = obj.points.map((p) => Point2.fromObject(p));
         return new Path2(commands, points);
     }
 
-    public static toObject(path: Path2): { points: Point2Like[]; commands: PathCommand[] } {
+    public static toObject(path: Path2): Path2Like {
         const commands = path.commands.map((c) => ({ ...c }));
         const points = path.points.map((p) => Point2.toObject(p));
         return { commands, points };

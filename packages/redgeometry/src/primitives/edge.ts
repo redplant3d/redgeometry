@@ -6,6 +6,16 @@ import { Point2, Point3, type Point2Like, type Point3Like } from "./point.js";
 import { Ray2, Ray3 } from "./ray.js";
 import type { Vector2, Vector3 } from "./vector.js";
 
+export type Edge2Like = {
+    readonly p0: Point2;
+    readonly p1: Point2;
+};
+
+export type Edge3Like = {
+    readonly p0: Point3;
+    readonly p1: Point3;
+};
+
 export class Edge2 {
     public p0: Point2;
     public p1: Point2;
@@ -42,14 +52,14 @@ export class Edge2 {
         }
     }
 
-    public static fromArray(data: number[], offset = 0): Edge2 {
+    public static fromArray(data: ArrayLike<number>, offset = 0): Edge2 {
         const p0 = Point2.fromArray(data, offset);
         const p1 = Point2.fromArray(data, offset + 2);
 
         return new Edge2(p0, p1);
     }
 
-    public static fromObject(obj: { p0: Point2Like; p1: Point2Like }): Edge2 {
+    public static fromObject(obj: Edge2Like): Edge2 {
         const p0 = Point2.fromObject(obj.p0);
         const p1 = Point2.fromObject(obj.p1);
         return new Edge2(p0, p1);
@@ -390,14 +400,14 @@ export class Edge3 {
         this.p1 = p1;
     }
 
-    public static fromArray(data: number[], offset = 0): Edge3 {
+    public static fromArray(data: ArrayLike<number>, offset = 0): Edge3 {
         const p0 = Point3.fromArray(data, offset);
         const p1 = Point3.fromArray(data, offset + 3);
 
         return new Edge3(p0, p1);
     }
 
-    public static fromObject(obj: { p0: Point3Like; p1: Point3Like }): Edge3 {
+    public static fromObject(obj: Edge3Like): Edge3 {
         const p0 = Point3.fromObject(obj.p0);
         const p1 = Point3.fromObject(obj.p1);
         return new Edge3(p0, p1);

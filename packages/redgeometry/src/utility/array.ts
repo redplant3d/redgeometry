@@ -13,7 +13,7 @@ export class ArrayMultiSet<T> {
         this.data = [];
     }
 
-    public static fromArray<T>(array: T[], compareFn: (a: T, b: T) => number): ArrayMultiSet<T> {
+    public static fromArray<T>(array: ReadonlyArray<T>, compareFn: (a: T, b: T) => number): ArrayMultiSet<T> {
         const multiSet = new ArrayMultiSet(compareFn);
         multiSet.data = array.slice().sort(compareFn);
         return multiSet;
@@ -180,7 +180,10 @@ export class ArrayMultiMap<K, V> {
         this.data = [];
     }
 
-    public static fromArray<K, V>(array: KeyValue<K, V>[], compareFn: (a: K, b: K) => number): ArrayMultiMap<K, V> {
+    public static fromArray<K, V>(
+        array: ReadonlyArray<KeyValue<K, V>>,
+        compareFn: (a: K, b: K) => number,
+    ): ArrayMultiMap<K, V> {
         const multiMap = new ArrayMultiMap<K, V>(compareFn);
         multiMap.data = array.slice().sort((d1, d2) => compareFn(d1.key, d2.key));
         return multiMap;

@@ -1,6 +1,16 @@
 import { Point2, Point3, type Point2Like, type Point3Like } from "./point.js";
 import { Vector2, Vector3, type Vector2Like, type Vector3Like } from "./vector.js";
 
+export type Ray2Like = {
+    readonly p: Point2;
+    readonly v: Vector2;
+};
+
+export type Ray3Like = {
+    readonly p: Point3;
+    readonly v: Vector3;
+};
+
 export class Ray2 {
     public p: Point2;
     public v: Vector2;
@@ -10,14 +20,14 @@ export class Ray2 {
         this.v = v;
     }
 
-    public static fromArray(data: number[], offset = 0): Ray2 {
+    public static fromArray(data: ArrayLike<number>, offset = 0): Ray2 {
         const p = Point2.fromArray(data, offset);
         const v = Vector2.fromArray(data, offset + 2);
 
         return new Ray2(p, v);
     }
 
-    public static fromObject(obj: { p: Point2Like; v: Vector2Like }): Ray2 {
+    public static fromObject(obj: Ray2Like): Ray2 {
         const p = Point2.fromObject(obj.p);
         const v = Vector2.fromObject(obj.v);
         return new Ray2(p, v);
@@ -136,14 +146,14 @@ export class Ray3 {
         this.v = v;
     }
 
-    public static fromArray(data: number[], offset = 0): Ray3 {
+    public static fromArray(data: ArrayLike<number>, offset = 0): Ray3 {
         const p = Point3.fromArray(data, offset);
         const v = Vector3.fromArray(data, offset + 3);
 
         return new Ray3(p, v);
     }
 
-    public static fromObject(obj: { p: Point3Like; v: Vector3Like }): Ray3 {
+    public static fromObject(obj: Ray3Like): Ray3 {
         const p = Point3.fromObject(obj.p);
         const v = Vector3.fromObject(obj.v);
         return new Ray3(p, v);

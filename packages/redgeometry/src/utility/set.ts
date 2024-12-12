@@ -16,7 +16,7 @@ export class Bitset {
         return new Bitset(data);
     }
 
-    public static fromBits(bits: number[]): Bitset {
+    public static fromBits(bits: ReadonlyArray<number>): Bitset {
         const maxIdx = Math.max(...bits) >>> 5;
         const data = new Uint32Array(maxIdx + 1);
 

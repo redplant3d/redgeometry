@@ -1,18 +1,18 @@
 import { eqApproxAbs, eqApproxRel, lerp, roundToPrecision } from "../utility/scalar.js";
 import { Vector2, Vector3 } from "./vector.js";
 
-export interface Point2Like {
-    x: number;
-    y: number;
-}
+export type Point2Like = {
+    readonly x: number;
+    readonly y: number;
+};
 
-export interface Point3Like {
-    x: number;
-    y: number;
-    z: number;
-}
+export type Point3Like = {
+    readonly x: number;
+    readonly y: number;
+    readonly z: number;
+};
 
-export class Point2 implements Point2Like {
+export class Point2 {
     public x: number;
     public y: number;
 
@@ -28,7 +28,7 @@ export class Point2 implements Point2Like {
         return new Point2(0, 0);
     }
 
-    public static fromArray(data: number[], offset = 0): Point2 {
+    public static fromArray(data: ArrayLike<number>, offset = 0): Point2 {
         return new Point2(data[offset], data[offset + 1]);
     }
 
@@ -161,7 +161,7 @@ export class Point2 implements Point2Like {
     }
 }
 
-export class Point3 implements Point3Like {
+export class Point3 {
     public x: number;
     public y: number;
     public z: number;
@@ -179,7 +179,7 @@ export class Point3 implements Point3Like {
         return new Point3(0, 0, 0);
     }
 
-    public static fromArray(data: number[], offset = 0): Point3 {
+    public static fromArray(data: ArrayLike<number>, offset = 0): Point3 {
         return new Point3(data[offset], data[offset + 1], data[offset + 2]);
     }
 

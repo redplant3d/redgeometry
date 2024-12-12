@@ -12,12 +12,12 @@ export enum RotationOrder {
     ZYX,
 }
 
-export interface QuaternionLike {
-    a: number;
-    b: number;
-    c: number;
-    d: number;
-}
+export type QuaternionLike = {
+    readonly a: number;
+    readonly b: number;
+    readonly c: number;
+    readonly d: number;
+};
 
 /**
  * A quaternion to be used for 3D rotations.
@@ -26,7 +26,7 @@ export interface QuaternionLike {
  * - https://en.wikipedia.org/wiki/Quaternions_and_spatial_rotation
  * - https://danceswithcode.net/engineeringnotes/quaternions/quaternions.html
  */
-export class Quaternion implements QuaternionLike {
+export class Quaternion {
     public a: number;
     public b: number;
     public c: number;
@@ -43,7 +43,7 @@ export class Quaternion implements QuaternionLike {
         return new Quaternion(1, 0, 0, 0);
     }
 
-    public static fromArray(data: number[], offset = 0): Quaternion {
+    public static fromArray(data: ArrayLike<number>, offset = 0): Quaternion {
         return new Quaternion(data[offset], data[offset + 1], data[offset + 2], data[offset + 3]);
     }
 

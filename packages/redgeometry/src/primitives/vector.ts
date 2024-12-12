@@ -1,25 +1,25 @@
 import { clamp, eqApproxAbs, eqApproxRel, lerp } from "../utility/scalar.js";
 import { Point2, Point3 } from "./point.js";
 
-export interface Vector2Like {
-    x: number;
-    y: number;
-}
+export type Vector2Like = {
+    readonly x: number;
+    readonly y: number;
+};
 
-export interface Vector3Like {
-    x: number;
-    y: number;
-    z: number;
-}
+export type Vector3Like = {
+    readonly x: number;
+    readonly y: number;
+    readonly z: number;
+};
 
-export interface Vector4Like {
-    x: number;
-    y: number;
-    z: number;
-    w: number;
-}
+export type Vector4Like = {
+    readonly x: number;
+    readonly y: number;
+    readonly z: number;
+    readonly w: number;
+};
 
-export class Vector2 implements Vector2Like {
+export class Vector2 {
     public x: number;
     public y: number;
 
@@ -56,7 +56,7 @@ export class Vector2 implements Vector2Like {
         return new Vector2(0, 0);
     }
 
-    public static fromArray(data: number[], offset = 0): Vector2 {
+    public static fromArray(data: ArrayLike<number>, offset = 0): Vector2 {
         return new Vector2(data[offset], data[offset + 1]);
     }
 
@@ -304,7 +304,7 @@ export class Vector2 implements Vector2Like {
     }
 }
 
-export class Vector3 implements Vector3Like {
+export class Vector3 {
     public x: number;
     public y: number;
     public z: number;
@@ -350,7 +350,7 @@ export class Vector3 implements Vector3Like {
         return new Vector3(0, 0, 0);
     }
 
-    public static fromArray(data: number[], offset = 0): Vector3 {
+    public static fromArray(data: ArrayLike<number>, offset = 0): Vector3 {
         return new Vector3(data[offset], data[offset + 1], data[offset + 2]);
     }
 
@@ -642,7 +642,7 @@ export class Vector3 implements Vector3Like {
     }
 }
 
-export class Vector4 implements Vector4Like {
+export class Vector4 {
     public x: number;
     public y: number;
     public z: number;
@@ -697,7 +697,7 @@ export class Vector4 implements Vector4Like {
         return new Vector4(0, 0, 0, 0);
     }
 
-    public static fromArray(data: number[], offset = 0): Vector4 {
+    public static fromArray(data: ArrayLike<number>, offset = 0): Vector4 {
         return new Vector4(data[offset], data[offset + 1], data[offset + 2], data[offset + 3]);
     }
 
