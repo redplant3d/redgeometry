@@ -9,6 +9,22 @@ export type MatrixElements3 = FixedSizeArray<number, 9>;
 export type MatrixElements4A = FixedSizeArray<number, 12>;
 export type MatrixElements4 = FixedSizeArray<number, 16>;
 
+export type Matrix3ALike = {
+    readonly elements: MatrixElements3A;
+};
+
+export type Matrix3Like = {
+    readonly elements: MatrixElements3;
+};
+
+export type Matrix4ALike = {
+    readonly elements: MatrixElements4A;
+};
+
+export type Matrix4Like = {
+    readonly elements: MatrixElements4;
+};
+
 export enum MatrixType {
     Affine,
     Projective,

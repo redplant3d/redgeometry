@@ -3,6 +3,13 @@ import { eqApproxAbs, eqApproxRel, lerp } from "../utility/scalar.js";
 import { Point3 } from "./point.js";
 import { Vector3 } from "./vector.js";
 
+export type QuaternionLike = {
+    readonly a: number;
+    readonly b: number;
+    readonly c: number;
+    readonly d: number;
+};
+
 export enum RotationOrder {
     XYZ,
     XZY,
@@ -11,13 +18,6 @@ export enum RotationOrder {
     ZXY,
     ZYX,
 }
-
-export type QuaternionLike = {
-    readonly a: number;
-    readonly b: number;
-    readonly c: number;
-    readonly d: number;
-};
 
 /**
  * A quaternion to be used for 3D rotations.

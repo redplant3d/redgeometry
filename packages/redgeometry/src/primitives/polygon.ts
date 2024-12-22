@@ -3,7 +3,11 @@ import { Polygon2EdgeIterator } from "../internal/iterator.js";
 import { Box2 } from "./box.js";
 import { Edge2 } from "./edge.js";
 import type { Matrix3, Matrix3A } from "./matrix.js";
-import { Point2 } from "./point.js";
+import { Point2, type Point2Like } from "./point.js";
+
+export type Polygon2Like = {
+    readonly points: Point2Like[];
+};
 
 export class Polygon2 {
     public points: Point2[];
@@ -14,6 +18,11 @@ export class Polygon2 {
 
     public static createEmpty(): Polygon2 {
         return new Polygon2([]);
+    }
+
+    public static fromObject(obj: Polygon2Like): Polygon2 {
+        const points = obj.points.map((p) => Point2.fromObject(p));
+        return new Polygon2(points);
     }
 
     public static isAreaIntersection(poly1: Polygon2, poly2: Polygon2, isNonZero: boolean): boolean {
@@ -70,6 +79,11 @@ export class Polygon2 {
         }
 
         return true;
+    }
+
+    public static toObject(path: Polygon2): Polygon2Like {
+        const points = path.points.map((p) => Point2.toObject(p));
+        return { points };
     }
 
     public addPoint(p: Point2): void {

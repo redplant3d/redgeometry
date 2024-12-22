@@ -69,7 +69,7 @@ export class Box2 {
         return new Box2(x0, y0, x1, y1);
     }
 
-    public static toObject(box: Box2): { x0: number; y0: number; x1: number; y1: number } {
+    public static toObject(box: Box2): Box2Like {
         return { x0: box.x0, y0: box.y0, x1: box.x1, y1: box.y1 };
     }
 
@@ -276,7 +276,7 @@ export class Box3 {
         return new Box3(x0, y0, z0, x1, y1, z1);
     }
 
-    public static toObject(box: Box3): { x0: number; y0: number; z0: number; x1: number; y1: number; z1: number } {
+    public static toObject(box: Box3): Box3Like {
         return { x0: box.x0, y0: box.y0, z0: box.z0, x1: box.x1, y1: box.y1, z1: box.z1 };
     }
 

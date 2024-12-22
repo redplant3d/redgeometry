@@ -2,13 +2,13 @@ import { Point2, Point3, type Point2Like, type Point3Like } from "./point.js";
 import { Vector2, Vector3, type Vector2Like, type Vector3Like } from "./vector.js";
 
 export type Ray2Like = {
-    readonly p: Point2;
-    readonly v: Vector2;
+    readonly p: Point2Like;
+    readonly v: Vector2Like;
 };
 
 export type Ray3Like = {
-    readonly p: Point3;
-    readonly v: Vector3;
+    readonly p: Point3Like;
+    readonly v: Vector3Like;
 };
 
 export class Ray2 {
@@ -80,7 +80,7 @@ export class Ray2 {
         return [t, u];
     }
 
-    public static toObject(ray: Ray2): { p: Point2Like; v: Vector2Like } {
+    public static toObject(ray: Ray2): Ray2Like {
         const p = Point2.toObject(ray.p);
         const v = Vector2.toObject(ray.v);
         return { p, v };
@@ -212,7 +212,7 @@ export class Ray3 {
         return [t1, t2];
     }
 
-    public static toObject(ray: Ray3): { p: Point3Like; v: Vector3Like } {
+    public static toObject(ray: Ray3): Ray3Like {
         const p = Point3.toObject(ray.p);
         const v = Vector3.toObject(ray.v);
         return { p, v };

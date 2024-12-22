@@ -62,7 +62,7 @@ export class ColorRgba {
         return new ColorRgba(obj.r, obj.g, obj.b, obj.a);
     }
 
-    public static toObject(c: ColorRgba): { r: number; g: number; b: number; a: number } {
+    public static toObject(c: ColorRgba): ColorRgbaLike {
         return { r: c.r, g: c.g, b: c.b, a: c.a };
     }
 

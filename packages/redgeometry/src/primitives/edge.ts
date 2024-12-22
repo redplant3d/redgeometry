@@ -7,13 +7,13 @@ import { Ray2, Ray3 } from "./ray.js";
 import type { Vector2, Vector3 } from "./vector.js";
 
 export type Edge2Like = {
-    readonly p0: Point2;
-    readonly p1: Point2;
+    readonly p0: Point2Like;
+    readonly p1: Point2Like;
 };
 
 export type Edge3Like = {
-    readonly p0: Point3;
-    readonly p1: Point3;
+    readonly p0: Point3Like;
+    readonly p1: Point3Like;
 };
 
 export class Edge2 {
@@ -278,7 +278,7 @@ export class Edge2 {
         return e1.p0.eq(e2.p1) && e1.p1.eq(e2.p0);
     }
 
-    public static toObject(e: Edge2): { p0: Point2Like; p1: Point2Like } {
+    public static toObject(e: Edge2): Edge2Like {
         const p0 = Point2.toObject(e.p0);
         const p1 = Point2.toObject(e.p1);
         return { p0, p1 };
@@ -432,7 +432,7 @@ export class Edge3 {
         return e1.p0.eq(e2.p1) && e1.p1.eq(e2.p0);
     }
 
-    public static toObject(e: Edge3): { p0: Point3Like; p1: Point3Like } {
+    public static toObject(e: Edge3): Edge3Like {
         const p0 = Point3.toObject(e.p0);
         const p1 = Point3.toObject(e.p1);
         return { p0, p1 };
