@@ -146,7 +146,12 @@ export class Bitset {
 
         // Intersection
         for (let i = 0; i < len; i++) {
-            if ((data1[i] & data2[i]) !== data1[i]) {
+            // Both values are signed integers because of bitwise operators
+            // (TODO: Is it better to use `Int32Array` for the data?)
+            const a = data1[i] & data2[i];
+            const b = data1[i] | 0;
+
+            if (a !== b) {
                 return false;
             }
         }

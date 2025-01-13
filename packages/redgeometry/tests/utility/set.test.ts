@@ -53,6 +53,7 @@ test("BitSet.eq", () => {
 });
 
 test("BitSet.isSubsetOf", () => {
+    // General case
     const b1 = Bitset.fromElements([0]);
     const b2 = Bitset.fromElements([1]);
     const b3 = Bitset.fromElements([0, 0]);
@@ -101,4 +102,11 @@ test("BitSet.isSubsetOf", () => {
     expect(b6.isSubsetOf(b4)).toEqual(false);
     expect(b6.isSubsetOf(b5)).toEqual(false);
     expect(b6.isSubsetOf(b6)).toEqual(true);
+
+    // Special case: `0x80000000` is a valid subset of `0x80000001` but the bitwise operation
+    // `0x80000000 & 0x80000001` returns a signed integer
+    const b7 = Bitset.fromElements([0x80000000]);
+    const b8 = Bitset.fromElements([0x80000001]);
+    expect(b7.isSubsetOf(b8)).toEqual(true);
+    expect(b8.isSubsetOf(b7)).toEqual(false);
 });
