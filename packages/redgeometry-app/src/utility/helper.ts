@@ -8,10 +8,10 @@ import {
     WindingOperator,
     type CustomWindingOperator,
 } from "redgeometry/src/core/path-options";
+import { Polygon2 } from "redgeometry/src/core/polygon";
 import type { Box2 } from "redgeometry/src/primitives/box";
 import { ColorRgba } from "redgeometry/src/primitives/color";
 import { Edge2 } from "redgeometry/src/primitives/edge";
-import { Polygon2 } from "redgeometry/src/primitives/polygon";
 import { Vector2 } from "redgeometry/src/primitives/vector";
 import type { Random } from "redgeometry/src/utility/random";
 

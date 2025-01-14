@@ -1,5 +1,5 @@
 import { expect, test } from "vitest";
-import { Polygon2 } from "../../src/primitives/polygon.js";
+import { Polygon2 } from "../../src/core/polygon.js";
 import { Vector2 } from "../../src/primitives/vector.js";
 
 test("isConvex", () => {

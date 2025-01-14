@@ -3,7 +3,6 @@ import { copyCommandsReversed, isWindingInside } from "../internal/path.js";
 import { CurveType, type BezierCurve2 } from "../primitives/bezier.js";
 import { Box2 } from "../primitives/box.js";
 import { Matrix3A, type Matrix3 } from "../primitives/matrix.js";
-import { Polygon2 } from "../primitives/polygon.js";
 import { Vector2, type Vector2Like } from "../primitives/vector.js";
 import { copyArray, copyArrayReversed } from "../utility/array.js";
 import { assertUnreachable } from "../utility/debug.js";
@@ -28,6 +27,7 @@ import {
     type PathStrokeOptions,
     type WindingOperator,
 } from "./path-options.js";
+import { Polygon2 } from "./polygon.js";
 
 export interface PathSink2 {
     close(): void;

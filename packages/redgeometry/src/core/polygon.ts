@@ -1,9 +1,9 @@
-import { Path2 } from "../core/path.js";
 import { Polygon2EdgeIterator } from "../internal/iterator.js";
-import { Box2 } from "./box.js";
-import { Edge2 } from "./edge.js";
-import type { Matrix3, Matrix3A } from "./matrix.js";
-import { Vector2, type Vector2Like } from "./vector.js";
+import { Box2 } from "../primitives/box.js";
+import { Edge2 } from "../primitives/edge.js";
+import type { Matrix3, Matrix3A } from "../primitives/matrix.js";
+import { Vector2, type Vector2Like } from "../primitives/vector.js";
+import { Path2 } from "./path.js";
 
 export type Polygon2Like = {
     readonly points: Vector2Like[];

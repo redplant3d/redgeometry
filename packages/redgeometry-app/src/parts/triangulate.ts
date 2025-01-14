@@ -2,7 +2,7 @@ import { Mesh2 } from "redgeometry/src/core/mesh";
 import { Path2 } from "redgeometry/src/core/path";
 import { PathClip2 } from "redgeometry/src/core/path-clip";
 import { DEFAULT_PATH_QUALITY_OPTIONS } from "redgeometry/src/core/path-options";
-import { Polygon2 } from "redgeometry/src/primitives/polygon";
+import { Polygon2 } from "redgeometry/src/core/polygon";
 import { log } from "redgeometry/src/utility/debug";
 import { RandomXSR128 } from "redgeometry/src/utility/random";
 import type { AppContextPlugin } from "../ecs-modules/app-context.js";

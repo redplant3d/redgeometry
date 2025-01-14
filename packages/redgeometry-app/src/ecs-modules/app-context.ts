@@ -1,9 +1,9 @@
 import type { Mesh2, MeshFace2 } from "redgeometry/src/core/mesh";
 import { PathCommandType, type Path2 } from "redgeometry/src/core/path";
+import type { Polygon2 } from "redgeometry/src/core/polygon";
 import type { Box2 } from "redgeometry/src/primitives/box";
 import type { Edge2 } from "redgeometry/src/primitives/edge";
 import type { Matrix3A } from "redgeometry/src/primitives/matrix";
-import type { Polygon2 } from "redgeometry/src/primitives/polygon";
 import type { Ray2 } from "redgeometry/src/primitives/ray";
 import { Vector2 } from "redgeometry/src/primitives/vector";
 import type { Image2 } from "redgeometry/src/render/image";
