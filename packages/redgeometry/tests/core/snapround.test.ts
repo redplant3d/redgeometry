@@ -1,22 +1,22 @@
 import { expect, test } from "vitest";
 import { intersectSegmentWithPixel } from "../../src/core/snapround.js";
-import { Point2 } from "../../src/primitives/point.js";
+import { Vector2 } from "../../src/primitives/vector.js";
 
 test("intersectSegmentWithPixel", () => {
-    const p = new Point2(2.5, 2.5);
+    const p = new Vector2(2.5, 2.5);
 
-    const p0 = new Point2(1, 1);
-    const p1 = new Point2(2, 1);
-    const p2 = new Point2(3, 1);
-    const p3 = new Point2(4, 1);
-    const p4 = new Point2(4, 2);
-    const p5 = new Point2(4, 3);
-    const p6 = new Point2(4, 4);
-    const p7 = new Point2(3, 4);
-    const p8 = new Point2(2, 4);
-    const p9 = new Point2(1, 4);
-    const p10 = new Point2(1, 3);
-    const p11 = new Point2(1, 2);
+    const p0 = new Vector2(1, 1);
+    const p1 = new Vector2(2, 1);
+    const p2 = new Vector2(3, 1);
+    const p3 = new Vector2(4, 1);
+    const p4 = new Vector2(4, 2);
+    const p5 = new Vector2(4, 3);
+    const p6 = new Vector2(4, 4);
+    const p7 = new Vector2(3, 4);
+    const p8 = new Vector2(2, 4);
+    const p9 = new Vector2(1, 4);
+    const p10 = new Vector2(1, 3);
+    const p11 = new Vector2(1, 2);
 
     // Diagonal
     expect(intersectSegmentWithPixel(p0, p6, p)).not.toEqual(undefined);

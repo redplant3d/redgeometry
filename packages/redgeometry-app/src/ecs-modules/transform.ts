@@ -1,5 +1,4 @@
 import { Matrix4A } from "redgeometry/src/primitives/matrix";
-import { Point3 } from "redgeometry/src/primitives/point";
 import { Quaternion } from "redgeometry/src/primitives/quaternion";
 import { Vector3 } from "redgeometry/src/primitives/vector";
 import type { EntityId } from "../ecs/types.js";
@@ -15,7 +14,7 @@ export type TransformComponent = {
     componentId: "transform";
     scale: Vector3;
     rotation: Quaternion;
-    translation: Point3;
+    translation: Vector3;
     visible: Visibility;
 };
 

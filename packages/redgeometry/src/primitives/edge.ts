@@ -2,25 +2,24 @@ import { clamp } from "../utility/scalar.js";
 import { RootType, solveQuadratic } from "../utility/solve.js";
 import { Bezier1Curve2 } from "./bezier.js";
 import { Box2, Box3 } from "./box.js";
-import { Point2, Point3, type Point2Like, type Point3Like } from "./point.js";
 import { Ray2, Ray3 } from "./ray.js";
-import type { Vector2, Vector3 } from "./vector.js";
+import { Vector2, Vector3, type Vector2Like, type Vector3Like } from "./vector.js";
 
 export type Edge2Like = {
-    readonly p0: Point2Like;
-    readonly p1: Point2Like;
+    readonly p0: Vector2Like;
+    readonly p1: Vector2Like;
 };
 
 export type Edge3Like = {
-    readonly p0: Point3Like;
-    readonly p1: Point3Like;
+    readonly p0: Vector3Like;
+    readonly p1: Vector3Like;
 };
 
 export class Edge2 {
-    public p0: Point2;
-    public p1: Point2;
+    public p0: Vector2;
+    public p1: Vector2;
 
-    public constructor(p0: Point2, p1: Point2) {
+    public constructor(p0: Vector2, p1: Vector2) {
         this.p0 = p0;
         this.p1 = p1;
     }
@@ -30,7 +29,7 @@ export class Edge2 {
 
         for (const clipEdge of clipEdges) {
             const [t] = Edge2.getIntersectionParameter(clipped, clipEdge);
-            const a = Point2.signedArea(clipEdge.p0, clipEdge.p1, clipped.p0);
+            const a = Vector2.signedArea(clipEdge.p0, clipEdge.p1, clipped.p0);
 
             if (t > 0 && t < 1) {
                 const p = clipped.getValueAt(t);
@@ -53,26 +52,26 @@ export class Edge2 {
     }
 
     public static fromArray(data: ArrayLike<number>, offset = 0): Edge2 {
-        const p0 = Point2.fromArray(data, offset);
-        const p1 = Point2.fromArray(data, offset + 2);
+        const p0 = Vector2.fromArray(data, offset);
+        const p1 = Vector2.fromArray(data, offset + 2);
 
         return new Edge2(p0, p1);
     }
 
     public static fromObject(obj: Edge2Like): Edge2 {
-        const p0 = Point2.fromObject(obj.p0);
-        const p1 = Point2.fromObject(obj.p1);
+        const p0 = Vector2.fromObject(obj.p0);
+        const p1 = Vector2.fromObject(obj.p1);
         return new Edge2(p0, p1);
     }
 
     public static fromXY(x0: number, y0: number, x1: number, y1: number): Edge2 {
-        const p0 = new Point2(x0, y0);
-        const p1 = new Point2(x1, y1);
+        const p0 = new Vector2(x0, y0);
+        const p1 = new Vector2(x1, y1);
 
         return new Edge2(p0, p1);
     }
 
-    public static getCircleIntersectionParameter(e: Edge2, p: Point2, r: number): [number, number] | undefined {
+    public static getCircleIntersectionParameter(e: Edge2, p: Vector2, r: number): [number, number] | undefined {
         const v1 = e.p1.sub(e.p0);
         const v2 = p.sub(e.p0);
 
@@ -187,7 +186,7 @@ export class Edge2 {
         return [t, u];
     }
 
-    public static getIntersection(e1: Edge2, e2: Edge2): Point2 | undefined {
+    public static getIntersection(e1: Edge2, e2: Edge2): Vector2 | undefined {
         const v1 = e1.vector();
         const v2 = e2.vector();
         const den = v1.cross(v2);
@@ -239,8 +238,8 @@ export class Edge2 {
 
     public static isIntersection(e1: Edge2, e2: Edge2): boolean {
         // Stategy: Quickly reject
-        const o1p0 = Point2.signedArea(e1.p0, e1.p1, e2.p0);
-        const o1p1 = Point2.signedArea(e1.p0, e1.p1, e2.p1);
+        const o1p0 = Vector2.signedArea(e1.p0, e1.p1, e2.p0);
+        const o1p1 = Vector2.signedArea(e1.p0, e1.p1, e2.p1);
         const o1 = o1p0 * o1p1;
 
         if (o1 > 0) {
@@ -248,8 +247,8 @@ export class Edge2 {
             return false;
         }
 
-        const o2p0 = Point2.signedArea(e2.p0, e2.p1, e1.p0);
-        const o2p1 = Point2.signedArea(e2.p0, e2.p1, e1.p1);
+        const o2p0 = Vector2.signedArea(e2.p0, e2.p1, e1.p0);
+        const o2p1 = Vector2.signedArea(e2.p0, e2.p1, e1.p1);
         const o2 = o2p0 * o2p1;
 
         if (o2 > 0) {
@@ -279,8 +278,8 @@ export class Edge2 {
     }
 
     public static toObject(e: Edge2): Edge2Like {
-        const p0 = Point2.toObject(e.p0);
-        const p1 = Point2.toObject(e.p1);
+        const p0 = Vector2.toObject(e.p0);
+        const p1 = Vector2.toObject(e.p1);
         return { p0, p1 };
     }
 
@@ -296,7 +295,7 @@ export class Edge2 {
         return Box2.fromPoints(this.p0, this.p1);
     }
 
-    public getClosestPoint(p: Point2): Point2 {
+    public getClosestPoint(p: Vector2): Vector2 {
         const t = this.getParameterFromPoint(p);
 
         if (t <= 0) {
@@ -308,14 +307,14 @@ export class Edge2 {
         }
     }
 
-    public getClosestPointDistance(p: Point2): number {
+    public getClosestPointDistance(p: Vector2): number {
         return this.getClosestPoint(p).distanceTo(p);
     }
 
     /**
      * Returns the parameterized value where a point `p` is orthogonal on the edge.
      */
-    public getParameterFromPoint(p: Point2): number {
+    public getParameterFromPoint(p: Vector2): number {
         const v1 = this.vector();
         const v2 = p.sub(this.p0);
 
@@ -325,7 +324,7 @@ export class Edge2 {
     /**
      * Returns the signed distance to where a point `p` is orthogonal on the edge.
      */
-    public getSignedDistanceFromPoint(p: Point2): number {
+    public getSignedDistanceFromPoint(p: Vector2): number {
         const v1 = this.vector();
         const v2 = this.p0.sub(p);
 
@@ -335,7 +334,7 @@ export class Edge2 {
     /**
      * Returns the parameterized point on the edge between its endpoints.
      */
-    public getValueAt(t: number): Point2 {
+    public getValueAt(t: number): Vector2 {
         return this.p0.lerp(this.p1, t);
     }
 
@@ -347,7 +346,7 @@ export class Edge2 {
         return this.p0.eq(this.p1);
     }
 
-    public isPointInside(p: Point2): boolean {
+    public isPointInside(p: Vector2): boolean {
         // Check if projected point is between endpoints
         const t = this.getParameterFromPoint(p);
 
@@ -392,30 +391,30 @@ export class Edge2 {
 }
 
 export class Edge3 {
-    public p0: Point3;
-    public p1: Point3;
+    public p0: Vector3;
+    public p1: Vector3;
 
-    public constructor(p0: Point3, p1: Point3) {
+    public constructor(p0: Vector3, p1: Vector3) {
         this.p0 = p0;
         this.p1 = p1;
     }
 
     public static fromArray(data: ArrayLike<number>, offset = 0): Edge3 {
-        const p0 = Point3.fromArray(data, offset);
-        const p1 = Point3.fromArray(data, offset + 3);
+        const p0 = Vector3.fromArray(data, offset);
+        const p1 = Vector3.fromArray(data, offset + 3);
 
         return new Edge3(p0, p1);
     }
 
     public static fromObject(obj: Edge3Like): Edge3 {
-        const p0 = Point3.fromObject(obj.p0);
-        const p1 = Point3.fromObject(obj.p1);
+        const p0 = Vector3.fromObject(obj.p0);
+        const p1 = Vector3.fromObject(obj.p1);
         return new Edge3(p0, p1);
     }
 
     public static fromXYZ(x0: number, y0: number, z0: number, x1: number, y1: number, z1: number): Edge3 {
-        const p0 = new Point3(x0, y0, z0);
-        const p1 = new Point3(x1, y1, z1);
+        const p0 = new Vector3(x0, y0, z0);
+        const p1 = new Vector3(x1, y1, z1);
 
         return new Edge3(p0, p1);
     }
@@ -433,8 +432,8 @@ export class Edge3 {
     }
 
     public static toObject(e: Edge3): Edge3Like {
-        const p0 = Point3.toObject(e.p0);
-        const p1 = Point3.toObject(e.p1);
+        const p0 = Vector3.toObject(e.p0);
+        const p1 = Vector3.toObject(e.p1);
         return { p0, p1 };
     }
 
@@ -450,7 +449,7 @@ export class Edge3 {
         return Box3.fromPoints(this.p0, this.p1);
     }
 
-    public getClosestPoint(p: Point3): Point3 {
+    public getClosestPoint(p: Vector3): Vector3 {
         const t = this.getParameterFromPoint(p);
 
         if (t <= 0) {
@@ -462,14 +461,14 @@ export class Edge3 {
         }
     }
 
-    public getClosestPointDistance(p: Point3): number {
+    public getClosestPointDistance(p: Vector3): number {
         return this.getClosestPoint(p).distanceTo(p);
     }
 
     /**
      * Returns the distance to where a point `p` is orthogonal on the edge.
      */
-    public getDistanceFromPoint(p: Point3): number {
+    public getDistanceFromPoint(p: Vector3): number {
         const v1 = this.vector();
         const v2 = this.p0.sub(p);
 
@@ -485,14 +484,14 @@ export class Edge3 {
     /**
      * Returns the parameterized value where a point `p` is orthogonal on the edge.
      */
-    public getParameterFromPoint(p: Point3): number {
+    public getParameterFromPoint(p: Vector3): number {
         const v1 = this.vector();
         const v2 = p.sub(this.p0);
 
         return v1.dot(v2) / v1.lenSq();
     }
 
-    public getProjectedEdge(p0: Point2, p1: Point2): Edge3 {
+    public getProjectedEdge(p0: Vector2, p1: Vector2): Edge3 {
         const edge = Edge2.fromXY(this.p0.x, this.p0.y, this.p1.x, this.p1.y);
 
         const t0 = edge.getParameterFromPoint(p0);
@@ -504,7 +503,7 @@ export class Edge3 {
     /**
      * Returns the parameterized point on the edge between its endpoints.
      */
-    public getValueAt(t: number): Point3 {
+    public getValueAt(t: number): Vector3 {
         return this.p0.lerp(this.p1, t);
     }
 

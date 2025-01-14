@@ -1,7 +1,6 @@
 import { Mesh2, MeshEdge2, type MeshFace2 } from "redgeometry/src/core/mesh";
 import { Edge2 } from "redgeometry/src/primitives/edge";
-import { Point2 } from "redgeometry/src/primitives/point";
-import type { Vector2 } from "redgeometry/src/primitives/vector";
+import { Vector2 } from "redgeometry/src/primitives/vector";
 import { assertDebug, log } from "redgeometry/src/utility/debug";
 import { RootType, solveLinear, solveQuadratic, type Root1, type Root2 } from "redgeometry/src/utility/solve";
 
@@ -15,12 +14,12 @@ export enum KineticEventType {
 export class KineticVertex {
     public n1: Vector2;
     public n2: Vector2;
-    public orig: Point2;
+    public orig: Vector2;
     public t0: number;
     public t1: number;
     public vel: Vector2;
 
-    public constructor(orig: Point2, n1: Vector2, n2: Vector2, t0: number) {
+    public constructor(orig: Vector2, n1: Vector2, n2: Vector2, t0: number) {
         this.orig = orig;
         this.vel = KineticVertex.getVelocity(n1, n2);
         this.n1 = n1;
@@ -78,7 +77,7 @@ export class KineticVertex {
         return e;
     }
 
-    public getPositionAt(t: number): Point2 {
+    public getPositionAt(t: number): Vector2 {
         return this.orig.addVMulS(this.vel, t - this.t0);
     }
 }
@@ -237,8 +236,8 @@ export class StraightSkeleton {
 
         MeshEdge2.detachPair(e1);
 
-        e1.p0 = Point2.createZero();
-        e1.sym.p0 = Point2.createZero();
+        e1.p0 = Vector2.createZero();
+        e1.sym.p0 = Vector2.createZero();
 
         // Not a vertex anymore
         e0.data = undefined;

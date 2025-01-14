@@ -1,5 +1,4 @@
-import { clamp, eqApproxAbs, eqApproxRel, lerp } from "../utility/scalar.js";
-import { Point2, Point3 } from "./point.js";
+import { clamp, eqApproxAbs, eqApproxRel, lerp, roundToPrecision } from "../utility/scalar.js";
 
 export type Vector2Like = {
     readonly x: number;
@@ -81,6 +80,44 @@ export class Vector2 {
         }
     }
 
+    /**
+     * Returns whether `p` is inside the triangle `p0`, `p1` and `p2`.
+     *
+     * References:
+     * - *Triangle Interior*.
+     *   https://mathworld.wolfram.com/TriangleInterior.html
+     */
+    public static isPointInTriangle(p0: Vector2, p1: Vector2, p2: Vector2, p: Vector2): boolean {
+        const v = p.sub(p0);
+        const v1 = p1.sub(p0);
+        const v2 = p2.sub(p0);
+
+        const r = v.cross(v2);
+        const s = v1.cross(v);
+        const d = v1.cross(v2);
+
+        if (d > 0) {
+            return r > 0 && s > 0 && r + s < d;
+        } else {
+            return r < 0 && s < 0 && r + s > d;
+        }
+    }
+
+    public static roundToPrecision(p: Vector2, k: number): Vector2 {
+        // `k` denotes the reciprocal of the minimum interval that the rounded number is able to represent
+        const x = roundToPrecision(p.x, k);
+        const y = roundToPrecision(p.y, k);
+        return new Vector2(x, y);
+    }
+
+    public static signedArea(p0: Vector2, p1: Vector2, p: Vector2): number {
+        // `result < 0` -> `p` is below `(p0, p1)`
+        // `result > 0` -> `p` is above `(p0, p1)`
+        const v1 = p1.sub(p0);
+        const v2 = p.sub(p0);
+        return v1.cross(v2);
+    }
+
     public static toObject(v: Vector2): Vector2Like {
         return { x: v.x, y: v.y };
     }
@@ -108,11 +145,25 @@ export class Vector2 {
     /**
      * Returns the sum of the current vector and a point `p`.
      */
-    public addP(p: Point2): Point2 {
+    public addP(p: Vector2): Vector2 {
         // This is provided as syntactic sugar for e.g. Horner's method
         // `qa.mulS(t).add(qb).mulS(t).addP(qc)`
         // where `qa` and `qb` are vectors and `qc` is a point
         return p.addV(this);
+    }
+
+    /**
+     * Returns the sum of the current point and a vector `v`.
+     */
+    public addV(v: Vector2): Vector2 {
+        return new Vector2(this.x + v.x, this.y + v.y);
+    }
+
+    /**
+     * Returns the sum of the current point and a vector `v` multiplied by a scalar `s`.
+     */
+    public addVMulS(v: Vector2, s: number): Vector2 {
+        return new Vector2(this.x + s * v.x, this.y + s * v.y);
     }
 
     /**
@@ -166,6 +217,12 @@ export class Vector2 {
      */
     public cross(v: Vector2): number {
         return this.x * v.y - this.y * v.x;
+    }
+
+    public distanceTo(p: Vector2): number {
+        const x = this.x - p.x;
+        const y = this.y - p.y;
+        return Math.sqrt(x * x + y * y);
     }
 
     /**
@@ -277,16 +334,27 @@ export class Vector2 {
         return new Vector2(this.x - v.x, this.y - v.y);
     }
 
+    /**
+     * Returns the difference of the current point and a vector `v`.
+     */
+    public subV(v: Vector2): Vector2 {
+        return new Vector2(this.x - v.x, this.y - v.y);
+    }
+
     public toArray(): [number, number] {
         return [this.x, this.y];
     }
 
-    public toPoint(): Point2 {
-        return new Point2(this.x, this.y);
+    public toPoint(): Vector2 {
+        return new Vector2(this.x, this.y);
     }
 
     public toString(): string {
         return `{x: ${this.x}, y: ${this.y}}`;
+    }
+
+    public toVector(): Vector2 {
+        return new Vector2(this.x, this.y);
     }
 
     public unit(): Vector2 {
@@ -366,6 +434,14 @@ export class Vector3 {
         return new Vector3(x / w, y / w, z / w);
     }
 
+    public static roundToPrecision(p: Vector3, k: number): Vector3 {
+        // `k` denotes the reciprocal of the minimum interval that the rounded number is able to represent
+        const x = roundToPrecision(p.x, k);
+        const y = roundToPrecision(p.y, k);
+        const z = roundToPrecision(p.z, k);
+        return new Vector3(x, y, z);
+    }
+
     public static toObject(v: Vector3): Vector3Like {
         return { x: v.x, y: v.y, z: v.z };
     }
@@ -394,11 +470,25 @@ export class Vector3 {
     /**
      * Returns the sum of the current vector and a point `p`.
      */
-    public addP(p: Point3): Point3 {
+    public addP(p: Vector3): Vector3 {
         // This is provided as syntactic sugar for e.g. Horner's method
         // `qa.mulS(t).add(qb).mulS(t).addP(qc)`
         // where `qa` and `qb` are vectors and `qc` is a point
         return p.addV(this);
+    }
+
+    /**
+     * Returns the sum of the current point and a vector `v`.
+     */
+    public addV(v: Vector3): Vector3 {
+        return new Vector3(this.x + v.x, this.y + v.y, this.z + v.z);
+    }
+
+    /**
+     * Returns the sum of the current point and a vector `v` multiplied by a scalar `s`.
+     */
+    public addVMulS(v: Vector3, s: number): Vector3 {
+        return new Vector3(this.x + s * v.x, this.y + s * v.y, this.z + s * v.z);
     }
 
     /**
@@ -441,6 +531,13 @@ export class Vector3 {
         const y = this.z * v.x - this.x * v.z;
         const z = this.x * v.y - this.y * v.x;
         return new Vector3(x, y, z);
+    }
+
+    public distanceTo(p: Vector3): number {
+        const x = this.x - p.x;
+        const y = this.y - p.y;
+        const z = this.z - p.z;
+        return Math.sqrt(x * x + y * y + z * z);
     }
 
     /**
@@ -615,16 +712,27 @@ export class Vector3 {
         return new Vector3(this.x - v.x, this.y - v.y, this.z - v.z);
     }
 
+    /**
+     * Returns the difference of the current point and a vector `v`.
+     */
+    public subV(v: Vector3): Vector3 {
+        return new Vector3(this.x - v.x, this.y - v.y, this.z - v.z);
+    }
+
     public toArray(): [number, number, number] {
         return [this.x, this.y, this.z];
     }
 
-    public toPoint(): Point3 {
-        return new Point3(this.x, this.y, this.z);
+    public toPoint(): Vector3 {
+        return new Vector3(this.x, this.y, this.z);
     }
 
     public toString(): string {
         return `{x: ${this.x}, y: ${this.y}, z: ${this.z}}`;
+    }
+
+    public toVector(): Vector3 {
+        return new Vector3(this.x, this.y, this.z);
     }
 
     public unit(): Vector3 {

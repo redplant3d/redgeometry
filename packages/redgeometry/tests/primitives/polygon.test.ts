@@ -1,12 +1,12 @@
 import { expect, test } from "vitest";
-import { Point2 } from "../../src/primitives/point.js";
 import { Polygon2 } from "../../src/primitives/polygon.js";
+import { Vector2 } from "../../src/primitives/vector.js";
 
 test("isConvex", () => {
-    const p0 = new Point2(0, 0);
-    const p1 = new Point2(0, 1);
-    const p2 = new Point2(1, 1);
-    const p3 = new Point2(1, 0);
+    const p0 = new Vector2(0, 0);
+    const p1 = new Vector2(0, 1);
+    const p2 = new Vector2(1, 1);
+    const p3 = new Vector2(1, 0);
 
     const polygon1 = Polygon2.createEmpty();
     polygon1.addPoint(p0);
@@ -28,10 +28,10 @@ test("isConvex", () => {
 });
 
 test("isSimple", () => {
-    const p0 = new Point2(0, 0);
-    const p1 = new Point2(0, 1);
-    const p2 = new Point2(1, 1);
-    const p3 = new Point2(1, 0);
+    const p0 = new Vector2(0, 0);
+    const p1 = new Vector2(0, 1);
+    const p2 = new Vector2(1, 1);
+    const p3 = new Vector2(1, 0);
 
     const polygon1 = Polygon2.createEmpty();
     polygon1.addPoint(p0);

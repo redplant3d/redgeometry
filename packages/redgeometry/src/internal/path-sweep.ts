@@ -1,16 +1,16 @@
 import { BooleanOperator, WindingOperator, type CustomWindingOperator } from "../core/path-options.js";
 import type { EdgeSegment2, SnapRound2 } from "../core/snapround.js";
-import { Point2 } from "../primitives/point.js";
+import { Vector2 } from "../primitives/vector.js";
 import { log } from "../utility/debug.js";
 
 export class PathSweepEvent2 {
     public left: boolean;
-    public p0: Point2;
-    public p1: Point2;
+    public p0: Vector2;
+    public p1: Vector2;
     public seg: EdgeSegment2;
     public wind: number;
 
-    public constructor(p0: Point2, p1: Point2, seg: EdgeSegment2, wind: number, left: boolean) {
+    public constructor(p0: Vector2, p1: Vector2, seg: EdgeSegment2, wind: number, left: boolean) {
         this.p0 = p0;
         this.p1 = p1;
         this.seg = seg;
@@ -32,10 +32,10 @@ export class PathSweepEvent2 {
             return ev1.left ? 1 : -1;
         } else if (ev1.left) {
             // Same left point
-            return Point2.signedArea(ev1.p1, ev1.p0, ev2.p1);
+            return Vector2.signedArea(ev1.p1, ev1.p0, ev2.p1);
         } else {
             // Same right point
-            return Point2.signedArea(ev1.p0, ev1.p1, ev2.p1);
+            return Vector2.signedArea(ev1.p0, ev1.p1, ev2.p1);
         }
     }
 
@@ -48,15 +48,15 @@ export class PathSweepEvent2 {
                 return 0;
             } else {
                 // Same left point
-                return Point2.signedArea(ev1.p1, ev1.p0, ev2.p1);
+                return Vector2.signedArea(ev1.p1, ev1.p0, ev2.p1);
             }
         } else {
             if (PathSweepEvent2.compareQueue(ev1, ev2) < 0) {
                 // `e1` is left of `e2`
-                return Point2.signedArea(ev1.p1, ev1.p0, ev2.p0);
+                return Vector2.signedArea(ev1.p1, ev1.p0, ev2.p0);
             } else {
                 // `e2` is left of `e1`
-                return Point2.signedArea(ev2.p0, ev2.p1, ev1.p0);
+                return Vector2.signedArea(ev2.p0, ev2.p1, ev1.p0);
             }
         }
     }

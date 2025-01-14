@@ -1,5 +1,4 @@
 import { Path2 } from "redgeometry/src/core/path";
-import { Point2 } from "redgeometry/src/primitives/point";
 import { Vector2 } from "redgeometry/src/primitives/vector";
 import { log } from "redgeometry/src/utility/debug";
 import { RandomXSR128, type Random } from "redgeometry/src/utility/random";
@@ -47,7 +46,7 @@ type RectangleComponent = {
 type ObjectComponent = {
     componentId: "object";
     color: string;
-    position: Point2;
+    position: Vector2;
     size: number;
     velocity: Vector2;
 };
@@ -120,7 +119,7 @@ function spawnSystem(world: World): void {
             const shape = random.nextFloat() < 0.8 ? "rectangle" : "circle";
             const size = random.nextFloatBetween(10, 100);
             const color = random.nextFloat() < 0.5 ? "red" : "blue";
-            const position = new Point2(
+            const position = new Vector2(
                 random.nextFloatBetween(0, ctx.canvas.width),
                 random.nextFloatBetween(0, ctx.canvas.height),
             );
@@ -192,7 +191,7 @@ function movementSystem(world: World): void {
             vy = -vy;
         }
 
-        object.position = new Point2(px, py);
+        object.position = new Vector2(px, py);
         object.velocity = new Vector2(vx, vy);
 
         world.updateComponent<ObjectComponent>(entityId, "object");
@@ -354,7 +353,7 @@ class AppPartRemoteModule implements WorldModule {
         world.registerEvent<AppPartCommandEvent>("app-part-command");
 
         world.registerSerializable(Vector2);
-        world.registerSerializable(Point2);
+        world.registerSerializable(Vector2);
 
         world.addSystem<DefaultSystemStage>({ stage: "start", fn: initRemoteSystem });
 

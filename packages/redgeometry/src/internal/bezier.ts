@@ -1,6 +1,5 @@
 import type { Bezier1Curve2, Bezier2Curve2, Bezier3Curve2, BezierCurve2, BezierRCurve2 } from "../primitives/bezier.js";
 import type { Box2 } from "../primitives/box.js";
-import { Point2, type Point3 } from "../primitives/point.js";
 import { Vector2, type Vector3 } from "../primitives/vector.js";
 import { log } from "../utility/debug.js";
 import { Interval } from "../utility/interval.js";
@@ -18,7 +17,7 @@ export function encloseCurveAt(c: BezierCurve2, box: Box2, t: number): void {
 
 export function minimizeCurveDistanceAt(
     c: BezierCurve2,
-    p: Point2,
+    p: Vector2,
     t: number,
     min: { param: number; distSq: number },
 ): void {
@@ -102,7 +101,7 @@ export function checkIntervalQuadQuad(
     c2: Bezier2Curve2,
     i2: Interval,
     ii: Interval,
-    output: Point2[],
+    output: Vector2[],
 ): void {
     const eps = 2 ** -50;
 
@@ -129,16 +128,16 @@ export function getIntersectionQuadQuad(
     i1: Interval,
     c2: Bezier2Curve2,
     i2: Interval,
-    output: Point2[],
+    output: Vector2[],
 ): void {
     // 'c1' is the curve part, 'c2' is the line part
     const cc2 = c2.splitBetween(i2.a, i2.b);
 
-    const d = 0.5 * Point2.signedArea(cc2.p0, cc2.p2, cc2.p1);
+    const d = 0.5 * Vector2.signedArea(cc2.p0, cc2.p2, cc2.p1);
 
-    const a0 = Point2.signedArea(cc2.p0, cc2.p2, c1.p0);
-    const a1 = Point2.signedArea(cc2.p0, cc2.p2, c1.p1);
-    const a2 = Point2.signedArea(cc2.p0, cc2.p2, c1.p2);
+    const a0 = Vector2.signedArea(cc2.p0, cc2.p2, c1.p0);
+    const a1 = Vector2.signedArea(cc2.p0, cc2.p2, c1.p1);
+    const a2 = Vector2.signedArea(cc2.p0, cc2.p2, c1.p2);
 
     const v1 = a1 - a0;
     const v2 = a2 - a1;
@@ -294,7 +293,7 @@ function sampleArcLengthCubic(wz: number, xz: number, qqa: Vector2, qqb: Vector2
     return wz * v.len();
 }
 
-function sampleArcLengthConic(wz: number, xz: number, qqa: Vector3, qqb: Vector3, qqc: Point3): number {
+function sampleArcLengthConic(wz: number, xz: number, qqa: Vector3, qqb: Vector3, qqc: Vector3): number {
     const vv = qqa.mulS(xz).add(qqb).mulS(xz).addP(qqc);
     const v = Vector2.fromXYW(vv.x, vv.y, vv.z * vv.z);
     return wz * v.len();

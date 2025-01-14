@@ -1,14 +1,8 @@
 import { expect, test } from "vitest";
 import { Matrix4A } from "../../src/primitives/matrix.js";
-import { Point3 } from "../../src/primitives/point.js";
 import { Quaternion, RotationOrder } from "../../src/primitives/quaternion.js";
 import { Vector3 } from "../../src/primitives/vector.js";
-import {
-    expectToBeCloseEuler,
-    expectToBeClosePoint3,
-    expectToBeCloseQuaternion,
-    expectToBeCloseVector3,
-} from "../expect.js";
+import { expectToBeCloseEuler, expectToBeCloseQuaternion, expectToBeCloseVector3 } from "../expect.js";
 
 test("Quaternion - fromRotationAngleX", () => {
     const a = 1;
@@ -206,7 +200,7 @@ test("Quaternion - mulPt/mulVec", () => {
     qc.rotateYPre(ay);
     qc.rotateXPre(ax);
 
-    const p = new Point3(1, 2, 3);
+    const p = new Vector3(1, 2, 3);
     const v = new Vector3(1, 2, 3);
 
     const p1 = mat3.mul(mat2).mul(mat1).mulP(p);
@@ -220,13 +214,13 @@ test("Quaternion - mulPt/mulVec", () => {
     const p5 = qc.mulP(p);
     const v5 = qc.mulV(v);
 
-    expectToBeClosePoint3(p1, p2);
+    expectToBeCloseVector3(p1, p2);
     expectToBeCloseVector3(v1, v2);
-    expectToBeClosePoint3(p1, p3);
+    expectToBeCloseVector3(p1, p3);
     expectToBeCloseVector3(v1, v3);
-    expectToBeClosePoint3(p1, p4);
+    expectToBeCloseVector3(p1, p4);
     expectToBeCloseVector3(v1, v4);
-    expectToBeClosePoint3(p1, p5);
+    expectToBeCloseVector3(p1, p5);
     expectToBeCloseVector3(v1, v5);
     expect(p1).toEqual(v1);
     expect(p2).toEqual(v2);

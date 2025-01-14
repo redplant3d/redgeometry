@@ -3,7 +3,7 @@ import { Path2 } from "redgeometry/src/core/path";
 import { PathClip2 } from "redgeometry/src/core/path-clip";
 import { DEFAULT_PATH_CLIP_OPTIONS, DEFAULT_PATH_QUALITY_OPTIONS } from "redgeometry/src/core/path-options";
 import { Box2 } from "redgeometry/src/primitives/box";
-import type { Point2 } from "redgeometry/src/primitives/point";
+import type { Vector2 } from "redgeometry/src/primitives/vector";
 import { RandomXSR128 } from "redgeometry/src/utility/random";
 import type { AppContextPlugin } from "../ecs-modules/app-context.js";
 import { AppContextModule } from "../ecs-modules/app-context.js";
@@ -23,7 +23,7 @@ type AppPartMainData = {
 type AppPartRemoteData = {
     dataId: "app-part-remote";
     mesh: Mesh2;
-    points: Point2[];
+    points: Vector2[];
 };
 
 type AppPartStateData = {
@@ -80,7 +80,7 @@ function updateSystem(world: World): void {
     const p1 = createRandomPoint(random, box);
     const p2 = createRandomPoint(random, box);
 
-    const points: Point2[] = [];
+    const points: Vector2[] = [];
 
     points.push(p0, p1, p2);
 

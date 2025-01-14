@@ -11,7 +11,6 @@ import {
     simplifyParameterStepQuad,
 } from "../internal/path-simplify.js";
 import { Bezier1Curve2, Bezier2Curve2, Bezier3Curve2, BezierRCurve2 } from "../primitives/bezier.js";
-import { Point2 } from "../primitives/point.js";
 import { Vector2 } from "../primitives/vector.js";
 import { assertUnreachable } from "../utility/debug.js";
 import { JoinType, MAX_PARAMETER, type PathOffsetOptions, type PathQualityOptions } from "./path-options.js";
@@ -39,7 +38,7 @@ export class PathOffsetIncremental2 implements PathOffset2 {
     private join: JoinType;
     private miterLimit: number;
     private ms: Vector2;
-    private ps: Point2;
+    private ps: Vector2;
     private simplifyTolerance: number;
     private tanOffsetTolerance: number;
 
@@ -52,7 +51,7 @@ export class PathOffsetIncremental2 implements PathOffset2 {
         this.join = JoinType.Bevel;
         this.miterLimit = 0;
         this.ms = Vector2.createZero();
-        this.ps = Point2.createZero();
+        this.ps = Vector2.createZero();
     }
 
     public process(input: Path2, output: Path2, options: PathOffsetOptions): void {
@@ -236,7 +235,7 @@ export class PathOffsetIncremental2 implements PathOffset2 {
         this.offsetQuadratic(cc2);
     }
 
-    private offsetFirstOrJoin(p: Point2, m0: Vector2, m1: Vector2): void {
+    private offsetFirstOrJoin(p: Vector2, m0: Vector2, m1: Vector2): void {
         if (m0.isZero()) {
             this.offsetMove(p, m1);
             this.ms = m1;
@@ -245,13 +244,13 @@ export class PathOffsetIncremental2 implements PathOffset2 {
         }
     }
 
-    private offsetLinear(p1: Point2, m: Vector2): void {
+    private offsetLinear(p1: Vector2, m: Vector2): void {
         const v = m.unit().normal().mulS(this.d);
 
         this.buffer.lineTo(p1.addV(v));
     }
 
-    private offsetMove(p0: Point2, m: Vector2): void {
+    private offsetMove(p0: Vector2, m: Vector2): void {
         const v = m.unit().normal().mulS(this.d);
 
         this.buffer.moveTo(p0.addV(v));
@@ -332,7 +331,7 @@ export class PathOffsetRecursive2 implements PathOffset2 {
     private join: JoinType;
     private miterLimit: number;
     private ms: Vector2;
-    private ps: Point2;
+    private ps: Vector2;
     private simplifyTolerance: number;
 
     public constructor(qualityOptions: PathQualityOptions) {
@@ -344,7 +343,7 @@ export class PathOffsetRecursive2 implements PathOffset2 {
         this.join = JoinType.Bevel;
         this.miterLimit = 0;
         this.ms = Vector2.createZero();
-        this.ps = Point2.createZero();
+        this.ps = Vector2.createZero();
     }
 
     public process(input: Path2, output: Path2, options: PathOffsetOptions): void {
@@ -526,7 +525,7 @@ export class PathOffsetRecursive2 implements PathOffset2 {
         offsetCubicRecursive(c0, d);
     }
 
-    private offsetFirstOrJoin(p: Point2, m0: Vector2, m1: Vector2): void {
+    private offsetFirstOrJoin(p: Vector2, m0: Vector2, m1: Vector2): void {
         if (m0.isZero()) {
             this.offsetMove(p, m1);
             this.ms = m1;
@@ -535,13 +534,13 @@ export class PathOffsetRecursive2 implements PathOffset2 {
         }
     }
 
-    private offsetLinear(p1: Point2, m: Vector2): void {
+    private offsetLinear(p1: Vector2, m: Vector2): void {
         const v = m.unit().normal().mulS(this.d);
 
         this.buffer.lineTo(p1.addV(v));
     }
 
-    private offsetMove(p0: Point2, m: Vector2): void {
+    private offsetMove(p0: Vector2, m: Vector2): void {
         const v = m.unit().normal().mulS(this.d);
 
         this.buffer.moveTo(p0.addV(v));

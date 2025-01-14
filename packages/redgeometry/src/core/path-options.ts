@@ -1,4 +1,4 @@
-import type { Point2 } from "../primitives/point.js";
+import type { Vector2 } from "../primitives/vector.js";
 import { PathDashIncremental2, PathDashRecursive2, type PathDash2 } from "./path-dash.js";
 import { PathFlattenIncremental2, PathFlattenRecursive2, type PathFlatten2 } from "./path-flatten.js";
 import { PathOffsetIncremental2, PathOffsetRecursive2, type PathOffset2 } from "./path-offset.js";
@@ -83,7 +83,7 @@ export type StrokeCaps = {
     start: CapType | CustomCap;
 };
 
-export type CustomCap = (path: PathSink2, p0: Point2, p1: Point2) => void;
+export type CustomCap = (path: PathSink2, p0: Vector2, p1: Vector2) => void;
 export type CustomWindingOperator = (wind: number) => boolean;
 
 export const BUTT_CAPS: Readonly<StrokeCaps> = { start: CapType.Butt, end: CapType.Butt };

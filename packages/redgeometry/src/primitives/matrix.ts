@@ -1,6 +1,5 @@
 import type { FixedSizeArray } from "../utility/types.js";
 import { Complex } from "./complex.js";
-import { Point2, Point3 } from "./point.js";
 import { Quaternion } from "./quaternion.js";
 import { Vector2, Vector3, Vector4 } from "./vector.js";
 
@@ -168,7 +167,7 @@ export class Matrix3A {
         );
     }
 
-    public extractSRT(): { s: Vector2; r: Complex; t: Point2 } {
+    public extractSRT(): { s: Vector2; r: Complex; t: Vector2 } {
         const e = this.elements;
 
         let sx = Math.sqrt(e[0] * e[0] + e[1] * e[1]);
@@ -182,7 +181,7 @@ export class Matrix3A {
 
         const s = new Vector2(sx, sy);
         const r = new Complex(fx * e[0], fx * e[1]);
-        const t = new Point2(e[4], e[5]);
+        const t = new Vector2(e[4], e[5]);
 
         return { s, r, t };
     }
@@ -240,13 +239,13 @@ export class Matrix3A {
      * |  0   0   1 |   | 1 |
      * ```
      */
-    public mulP(p: Point2): Point2 {
+    public mulP(p: Vector2): Vector2 {
         const e = this.elements;
 
         const x = e[0] * p.x + e[2] * p.y + e[4];
         const y = e[1] * p.x + e[3] * p.y + e[5];
 
-        return new Point2(x, y);
+        return new Vector2(x, y);
     }
 
     /**
@@ -702,7 +701,7 @@ export class Matrix3 {
         );
     }
 
-    public extractSRT(): { s: Vector2; r: Complex; t: Point2 } {
+    public extractSRT(): { s: Vector2; r: Complex; t: Vector2 } {
         const e = this.elements;
 
         let sx = Math.sqrt(e[0] * e[0] + e[1] * e[1] + e[2] * e[2]);
@@ -716,7 +715,7 @@ export class Matrix3 {
 
         const s = new Vector2(sx, sy);
         const r = new Complex(fx * e[0], fx * e[1]);
-        const t = new Point2(e[6], e[7]);
+        const t = new Vector2(e[6], e[7]);
 
         return { s, r, t };
     }
@@ -780,14 +779,14 @@ export class Matrix3 {
      * | e2  e5  e8 |   | 1 |
      * ```
      */
-    public mulP(p: Point2): Point2 {
+    public mulP(p: Vector2): Vector2 {
         const e = this.elements;
 
         const x = e[0] * p.x + e[3] * p.y + e[6];
         const y = e[1] * p.x + e[4] * p.y + e[7];
         const w = e[2] * p.x + e[5] * p.y + e[8];
 
-        return Point2.fromXYW(x, y, w);
+        return Vector2.fromXYW(x, y, w);
     }
 
     /**
@@ -1390,7 +1389,7 @@ export class Matrix4A {
         );
     }
 
-    public extractSRT(): { s: Vector3; r: Quaternion; t: Point3 } {
+    public extractSRT(): { s: Vector3; r: Quaternion; t: Vector3 } {
         const e = this.elements;
 
         let sx = Math.sqrt(e[0] * e[0] + e[1] * e[1] + e[2] * e[2]);
@@ -1417,7 +1416,7 @@ export class Matrix4A {
             fz * e[7],
             fz * e[8],
         );
-        const t = new Point3(e[9], e[10], e[11]);
+        const t = new Vector3(e[9], e[10], e[11]);
 
         return { s, r, t };
     }
@@ -1490,14 +1489,14 @@ export class Matrix4A {
      * |  0   0   0    1 |   | 1 |
      * ```
      */
-    public mulP(p: Point3): Point3 {
+    public mulP(p: Vector3): Vector3 {
         const e = this.elements;
 
         const x = e[0] * p.x + e[3] * p.y + e[6] * p.z + e[9];
         const y = e[1] * p.x + e[4] * p.y + e[7] * p.z + e[10];
         const z = e[2] * p.x + e[5] * p.y + e[8] * p.z + e[11];
 
-        return new Point3(x, y, z);
+        return new Vector3(x, y, z);
     }
 
     /**
@@ -2367,7 +2366,7 @@ export class Matrix4 {
         );
     }
 
-    public extractSRT(): { s: Vector3; r: Quaternion; t: Point3 } {
+    public extractSRT(): { s: Vector3; r: Quaternion; t: Vector3 } {
         const e = this.elements;
 
         let sx = Math.sqrt(e[0] * e[0] + e[1] * e[1] + e[2] * e[2] + e[3] * e[3]);
@@ -2394,7 +2393,7 @@ export class Matrix4 {
             fz * e[9],
             fz * e[10],
         );
-        const t = new Point3(e[12], e[13], e[14]);
+        const t = new Vector3(e[12], e[13], e[14]);
 
         return { s, r, t };
     }
@@ -2538,7 +2537,7 @@ export class Matrix4 {
      * | e3  e7  e11  e15 |   | 1 |
      * ```
      */
-    public mulP(p: Point3): Point3 {
+    public mulP(p: Vector3): Vector3 {
         const e = this.elements;
 
         const x = e[0] * p.x + e[4] * p.y + e[8] * p.z + e[12];
@@ -2546,7 +2545,7 @@ export class Matrix4 {
         const z = e[2] * p.x + e[6] * p.y + e[10] * p.z + e[14];
         const w = e[3] * p.x + e[7] * p.y + e[11] * p.z + e[15];
 
-        return Point3.fromXYZW(x, y, z, w);
+        return Vector3.fromXYZW(x, y, z, w);
     }
 
     /**

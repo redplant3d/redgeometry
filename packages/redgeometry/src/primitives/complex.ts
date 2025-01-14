@@ -1,5 +1,4 @@
 import { eqApproxAbs, eqApproxRel } from "../utility/scalar.js";
-import { Point2 } from "./point.js";
 import { Vector2 } from "./vector.js";
 
 export type ComplexLike = {
@@ -117,8 +116,8 @@ export class Complex {
      * | b |   | py |
      * ```
      */
-    public mulP(p: Point2): Point2 {
-        return new Point2(this.a * p.x - this.b * p.y, this.a * p.y + this.b * p.x);
+    public mulP(p: Vector2): Vector2 {
+        return new Vector2(this.a * p.x - this.b * p.y, this.a * p.y + this.b * p.x);
     }
 
     /**

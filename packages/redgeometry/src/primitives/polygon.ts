@@ -3,16 +3,16 @@ import { Polygon2EdgeIterator } from "../internal/iterator.js";
 import { Box2 } from "./box.js";
 import { Edge2 } from "./edge.js";
 import type { Matrix3, Matrix3A } from "./matrix.js";
-import { Point2, type Point2Like } from "./point.js";
+import { Vector2, type Vector2Like } from "./vector.js";
 
 export type Polygon2Like = {
-    readonly points: Point2Like[];
+    readonly points: Vector2Like[];
 };
 
 export class Polygon2 {
-    public points: Point2[];
+    public points: Vector2[];
 
-    public constructor(points: Point2[]) {
+    public constructor(points: Vector2[]) {
         this.points = points;
     }
 
@@ -21,7 +21,7 @@ export class Polygon2 {
     }
 
     public static fromObject(obj: Polygon2Like): Polygon2 {
-        const points = obj.points.map((p) => Point2.fromObject(p));
+        const points = obj.points.map((p) => Vector2.fromObject(p));
         return new Polygon2(points);
     }
 
@@ -57,7 +57,7 @@ export class Polygon2 {
         return false;
     }
 
-    public static isPointInside(poly: Polygon2, p: Point2, isNonZero: boolean): boolean {
+    public static isPointInside(poly: Polygon2, p: Vector2, isNonZero: boolean): boolean {
         let wind = 0;
 
         for (const e of poly.getEdgeIterator()) {
@@ -82,16 +82,16 @@ export class Polygon2 {
     }
 
     public static toObject(path: Polygon2): Polygon2Like {
-        const points = path.points.map((p) => Point2.toObject(p));
+        const points = path.points.map((p) => Vector2.toObject(p));
         return { points };
     }
 
-    public addPoint(p: Point2): void {
+    public addPoint(p: Vector2): void {
         this.points.push(p);
     }
 
     public addXY(x: number, y: number): void {
-        this.addPoint(new Point2(x, y));
+        this.addPoint(new Vector2(x, y));
     }
 
     public clear(): void {
@@ -103,7 +103,7 @@ export class Polygon2 {
         return new Polygon2(points);
     }
 
-    public findClosestEdgePoint(p: Point2): Edge2 | undefined {
+    public findClosestEdgePoint(p: Vector2): Edge2 | undefined {
         let minDistSq = Number.POSITIVE_INFINITY;
         let closestEdge: Edge2 | undefined;
 
@@ -136,7 +136,7 @@ export class Polygon2 {
         return new Box2(x0, y0, x1, y1);
     }
 
-    public getCentroid(): Point2 {
+    public getCentroid(): Vector2 {
         let x = 0;
         let y = 0;
 
@@ -147,7 +147,7 @@ export class Polygon2 {
 
         const len = this.points.length;
 
-        return new Point2(x / len, y / len);
+        return new Vector2(x / len, y / len);
     }
 
     public getConvexHull(): Polygon2 {
@@ -220,7 +220,7 @@ export class Polygon2 {
         // Find the oriented bounding box with the smallest area
         let minArea = Number.POSITIVE_INFINITY;
 
-        const points = [Point2.createZero(), Point2.createZero(), Point2.createZero(), Point2.createZero()];
+        const points = [Vector2.createZero(), Vector2.createZero(), Vector2.createZero(), Vector2.createZero()];
         const convexHull = this.getConvexHull();
 
         // Iterate all edges

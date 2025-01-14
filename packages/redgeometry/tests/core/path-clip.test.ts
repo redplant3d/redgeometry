@@ -1,6 +1,6 @@
 import { expect, test } from "vitest";
 import { PathSweepEvent2 } from "../../src/internal/path-sweep.js";
-import { Point2 } from "../../src/primitives/point.js";
+import { Vector2 } from "../../src/primitives/vector.js";
 
 test("compareQueue", () => {
     const e0 = createEvent(400, 400, 600, 600, true);
@@ -70,8 +70,8 @@ test("compareStatus", () => {
 });
 
 function createEvent(x0: number, y0: number, x1: number, y1: number, left = true): PathSweepEvent2 {
-    const p0 = new Point2(x0, y0);
-    const p1 = new Point2(x1, y1);
+    const p0 = new Vector2(x0, y0);
+    const p1 = new Vector2(x1, y1);
     const ref = { weight: 0, set: 0, data: undefined };
     const seg = { p0, p1, ref };
 

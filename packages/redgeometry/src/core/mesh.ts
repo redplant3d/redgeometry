@@ -1,6 +1,5 @@
 import { Mesh2LnextIterator, Mesh2OnextIterator } from "../internal/iterator.js";
 import { Bezier1Curve2, type BezierCurve2 } from "../primitives/bezier.js";
-import { Point2 } from "../primitives/point.js";
 import { Vector2 } from "../primitives/vector.js";
 import { ArrayMultiMap } from "../utility/array.js";
 import { assertDebug, log } from "../utility/debug.js";
@@ -37,11 +36,11 @@ export class MeshEdge2 {
     public face: MeshFace2 | undefined;
     public lnext: MeshEdge2;
     public onext: MeshEdge2;
-    public p0: Point2;
+    public p0: Vector2;
     public seg: BezierCurve2 | undefined;
     public sym: MeshEdge2;
 
-    public constructor(p0: Point2, seg: BezierCurve2 | undefined, data: unknown) {
+    public constructor(p0: Vector2, seg: BezierCurve2 | undefined, data: unknown) {
         this.p0 = p0;
         this.seg = seg;
         this.data = data;
@@ -62,7 +61,7 @@ export class MeshEdge2 {
         return this.sym.lnext;
     }
 
-    public get p1(): Point2 {
+    public get p1(): Vector2 {
         return this.sym.p0;
     }
 
@@ -92,10 +91,10 @@ export class MeshEdge2 {
             return e1.left() ? 1 : -1;
         } else if (e1.left()) {
             // Same left point
-            return Point2.signedArea(e1.p1, e1.p0, e2.p1);
+            return Vector2.signedArea(e1.p1, e1.p0, e2.p1);
         } else {
             // Same right point
-            return Point2.signedArea(e1.p0, e1.p1, e2.p1);
+            return Vector2.signedArea(e1.p0, e1.p1, e2.p1);
         }
     }
 
@@ -106,15 +105,15 @@ export class MeshEdge2 {
                 return 0;
             } else {
                 // Same `p0`
-                return Point2.signedArea(e1.p0, e1.p1, e2.p1);
+                return Vector2.signedArea(e1.p0, e1.p1, e2.p1);
             }
         } else {
             if (MeshEdge2.compareQueue(e1, e2) < 0) {
                 // `e1` left of `e2`
-                return Point2.signedArea(e1.p0, e1.p1, e2.p0);
+                return Vector2.signedArea(e1.p0, e1.p1, e2.p0);
             } else {
                 // `e2` left of `e1`
-                return Point2.signedArea(e2.p1, e2.p0, e1.p0);
+                return Vector2.signedArea(e2.p1, e2.p0, e1.p0);
             }
         }
     }
@@ -464,8 +463,8 @@ export class MeshFace2 {
     /**
      * Returns an array containing the origin points of the face.
      */
-    public getPoints(): Point2[] {
-        const points: Point2[] = [];
+    public getPoints(): Vector2[] {
+        const points: Vector2[] = [];
 
         for (const e of this.getEdgeIterator()) {
             points.push(e.p0);
@@ -492,7 +491,7 @@ export class MeshFace2 {
     /**
      * Returns `true` if a point `p` is inside the face.
      */
-    public hasPointInside(p: Point2): boolean {
+    public hasPointInside(p: Vector2): boolean {
         let wind = 0;
 
         for (const e of this.getEdgeIterator()) {
@@ -1045,7 +1044,7 @@ export class Mesh2 {
      *
      * The point will be ignored if it is not inside any of them.
      */
-    public triangulateAddPoint(p: Point2): void {
+    public triangulateAddPoint(p: Vector2): void {
         for (const face1 of this.faces) {
             if (face1.hasPointInside(p)) {
                 const e1 = face1.start;
@@ -1309,7 +1308,7 @@ export class Mesh2 {
                 while (stack.length > 1) {
                     const e1 = stack[stack.length - 1];
                     const e0 = stack[stack.length - 2];
-                    const area = Point2.signedArea(q2.p0, e1.p0, e0.p0);
+                    const area = Vector2.signedArea(q2.p0, e1.p0, e0.p0);
 
                     // Pop edges and connect (until one is outside of the polygon)
                     if ((isTop && area > 0) || (isBottom && area < 0)) {

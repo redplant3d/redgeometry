@@ -3,9 +3,8 @@ import { copyCommandsReversed, isWindingInside } from "../internal/path.js";
 import { CurveType, type BezierCurve2 } from "../primitives/bezier.js";
 import { Box2 } from "../primitives/box.js";
 import { Matrix3A, type Matrix3 } from "../primitives/matrix.js";
-import { Point2, type Point2Like } from "../primitives/point.js";
 import { Polygon2 } from "../primitives/polygon.js";
-import { Vector2 } from "../primitives/vector.js";
+import { Vector2, type Vector2Like } from "../primitives/vector.js";
 import { copyArray, copyArrayReversed } from "../utility/array.js";
 import { assertUnreachable } from "../utility/debug.js";
 import { Mesh2 } from "./mesh.js";
@@ -32,11 +31,11 @@ import {
 
 export interface PathSink2 {
     close(): void;
-    conicTo(p1: Point2, p2: Point2, w: number): void;
-    cubicTo(p1: Point2, p2: Point2, p3: Point2): void;
-    lineTo(p1: Point2): void;
-    moveTo(p0: Point2): void;
-    quadTo(p1: Point2, p2: Point2): void;
+    conicTo(p1: Vector2, p2: Vector2, w: number): void;
+    cubicTo(p1: Vector2, p2: Vector2, p3: Vector2): void;
+    lineTo(p1: Vector2): void;
+    moveTo(p0: Vector2): void;
+    quadTo(p1: Vector2, p2: Vector2): void;
 }
 
 export enum PathCommandType {
@@ -49,7 +48,7 @@ export enum PathCommandType {
 }
 
 export type Path2Like = {
-    readonly points: Point2Like[];
+    readonly points: Vector2Like[];
     readonly commands: PathCommand[];
 };
 
@@ -70,9 +69,9 @@ export type PathCommand =
 
 export class Path2 implements PathSink2 {
     private commands: PathCommand[];
-    private points: Point2[];
+    private points: Vector2[];
 
-    public constructor(commands: PathCommand[], points: Point2[]) {
+    public constructor(commands: PathCommand[], points: Vector2[]) {
         this.commands = commands;
         this.points = points;
     }
@@ -83,22 +82,22 @@ export class Path2 implements PathSink2 {
 
     public static fromObject(obj: Path2Like): Path2 {
         const commands = obj.commands.map((c) => ({ ...c }));
-        const points = obj.points.map((p) => Point2.fromObject(p));
+        const points = obj.points.map((p) => Vector2.fromObject(p));
         return new Path2(commands, points);
     }
 
     public static toObject(path: Path2): Path2Like {
         const commands = path.commands.map((c) => ({ ...c }));
-        const points = path.points.map((p) => Point2.toObject(p));
+        const points = path.points.map((p) => Vector2.toObject(p));
         return { commands, points };
     }
 
-    public addArc(p0: Point2, p1: Point2, p2: Point2): void {
+    public addArc(p0: Vector2, p1: Vector2, p2: Vector2): void {
         this.moveTo(p0);
         this.arcTo(p1, p2);
     }
 
-    public addCircle(p: Point2, r: number): void {
+    public addCircle(p: Vector2, r: number): void {
         this.addCircleXY(p.x, p.y, r);
     }
 
@@ -110,12 +109,12 @@ export class Path2 implements PathSink2 {
         this.arcToXY(x + r, y - r, x + r, y);
     }
 
-    public addConic(p0: Point2, p1: Point2, p2: Point2, w: number): void {
+    public addConic(p0: Vector2, p1: Vector2, p2: Vector2, w: number): void {
         this.moveTo(p0);
         this.conicTo(p1, p2, w);
     }
 
-    public addCubic(p0: Point2, p1: Point2, p2: Point2, p3: Point2): void {
+    public addCubic(p0: Vector2, p1: Vector2, p2: Vector2, p3: Vector2): void {
         this.moveTo(p0);
         this.cubicTo(p1, p2, p3);
     }
@@ -154,7 +153,7 @@ export class Path2 implements PathSink2 {
         }
     }
 
-    public addEllipse(p: Point2, rx: number, ry: number): void {
+    public addEllipse(p: Vector2, rx: number, ry: number): void {
         this.addEllipseXY(p.x, p.y, rx, ry);
     }
 
@@ -167,14 +166,14 @@ export class Path2 implements PathSink2 {
         this.close();
     }
 
-    public addLine(p0: Point2, p1: Point2): void {
+    public addLine(p0: Vector2, p1: Vector2): void {
         this.moveTo(p0);
         this.lineTo(p1);
     }
 
     public addLineXY(x0: number, y0: number, x1: number, y1: number): void {
-        const p0 = new Point2(x0, y0);
-        const p1 = new Point2(x1, y1);
+        const p0 = new Vector2(x0, y0);
+        const p1 = new Vector2(x1, y1);
         this.addLine(p0, p1);
     }
 
@@ -198,7 +197,7 @@ export class Path2 implements PathSink2 {
         }
     }
 
-    public addPie(pc: Point2, rx: number, ry: number, startAngle: number, sweepAngle: number): void {
+    public addPie(pc: Vector2, rx: number, ry: number, startAngle: number, sweepAngle: number): void {
         let a = sweepAngle;
 
         // Full circle is allowed
@@ -262,12 +261,12 @@ export class Path2 implements PathSink2 {
         this.close();
     }
 
-    public addQuad(p0: Point2, p1: Point2, p2: Point2): void {
+    public addQuad(p0: Vector2, p1: Vector2, p2: Vector2): void {
         this.moveTo(p0);
         this.quadTo(p1, p2);
     }
 
-    public addRect(p0: Point2, p1: Point2): void {
+    public addRect(p0: Vector2, p1: Vector2): void {
         this.addRectXY(p0.x, p0.y, p1.x, p1.y);
     }
 
@@ -279,13 +278,13 @@ export class Path2 implements PathSink2 {
         this.close();
     }
 
-    public arcTo(p1: Point2, p2: Point2): void {
+    public arcTo(p1: Vector2, p2: Vector2): void {
         this.conicTo(p1, p2, Math.SQRT1_2);
     }
 
     public arcToXY(x1: number, y1: number, x2: number, y2: number): void {
-        const p1 = new Point2(x1, y1);
-        const p2 = new Point2(x2, y2);
+        const p1 = new Vector2(x1, y1);
+        const p2 = new Vector2(x2, y2);
         this.arcTo(p1, p2);
     }
 
@@ -311,15 +310,15 @@ export class Path2 implements PathSink2 {
         this.commands.push({ type: PathCommandType.Close });
     }
 
-    public conicTo(p1: Point2, p2: Point2, w: number): void {
+    public conicTo(p1: Vector2, p2: Vector2, w: number): void {
         this.commands.push({ type: PathCommandType.Conic, w });
         this.points.push(p1);
         this.points.push(p2);
     }
 
     public conicToXY(x1: number, y1: number, x2: number, y2: number, w: number): void {
-        const p1 = new Point2(x1, y1);
-        const p2 = new Point2(x2, y2);
+        const p1 = new Vector2(x1, y1);
+        const p2 = new Vector2(x2, y2);
         this.conicTo(p1, p2, w);
     }
 
@@ -328,7 +327,7 @@ export class Path2 implements PathSink2 {
         this.points = path.points.slice();
     }
 
-    public cubicTo(p1: Point2, p2: Point2, p3: Point2): void {
+    public cubicTo(p1: Vector2, p2: Vector2, p3: Vector2): void {
         this.commands.push({ type: PathCommandType.Cubic });
         this.points.push(p1);
         this.points.push(p2);
@@ -336,9 +335,9 @@ export class Path2 implements PathSink2 {
     }
 
     public cubicToXY(x1: number, y1: number, x2: number, y2: number, x3: number, y3: number): void {
-        const p1 = new Point2(x1, y1);
-        const p2 = new Point2(x2, y2);
-        const p3 = new Point2(x3, y3);
+        const p1 = new Vector2(x1, y1);
+        const p2 = new Vector2(x2, y2);
+        const p3 = new Vector2(x3, y3);
         this.cubicTo(p1, p2, p3);
     }
 
@@ -378,7 +377,7 @@ export class Path2 implements PathSink2 {
         return this.commands[0];
     }
 
-    public getFirstPoint(): Point2 | undefined {
+    public getFirstPoint(): Vector2 | undefined {
         return this.points[0];
     }
 
@@ -386,11 +385,11 @@ export class Path2 implements PathSink2 {
         return this.commands[this.commands.length - 1];
     }
 
-    public getLastPoint(): Point2 | undefined {
+    public getLastPoint(): Vector2 | undefined {
         return this.points[this.points.length - 1];
     }
 
-    public getPoints(): readonly Point2[] {
+    public getPoints(): readonly Vector2[] {
         return this.points;
     }
 
@@ -465,7 +464,7 @@ export class Path2 implements PathSink2 {
         return svgData;
     }
 
-    public hasPointInside(p: Point2, windingOperator: WindingOperator | CustomWindingOperator): boolean {
+    public hasPointInside(p: Vector2, windingOperator: WindingOperator | CustomWindingOperator): boolean {
         if (!this.isValid()) {
             return false;
         }
@@ -487,7 +486,7 @@ export class Path2 implements PathSink2 {
     }
 
     public hasPointInsideFrac(
-        p: Point2,
+        p: Vector2,
         windingOperator: WindingOperator | CustomWindingOperator,
         stepSize?: number,
     ): boolean {
@@ -518,23 +517,23 @@ export class Path2 implements PathSink2 {
         return this.getFirstCommand()?.type === PathCommandType.Move;
     }
 
-    public lineTo(p1: Point2): void {
+    public lineTo(p1: Vector2): void {
         this.commands.push({ type: PathCommandType.Linear });
         this.points.push(p1);
     }
 
     public lineToXY(x1: number, y1: number): void {
-        const p1 = new Point2(x1, y1);
+        const p1 = new Vector2(x1, y1);
         this.lineTo(p1);
     }
 
-    public moveTo(p0: Point2): void {
+    public moveTo(p0: Vector2): void {
         this.commands.push({ type: PathCommandType.Move });
         this.points.push(p0);
     }
 
     public moveToXY(x0: number, y0: number): void {
-        const p0 = new Point2(x0, y0);
+        const p0 = new Vector2(x0, y0);
         this.moveTo(p0);
     }
 
@@ -545,15 +544,15 @@ export class Path2 implements PathSink2 {
         return output;
     }
 
-    public quadTo(p1: Point2, p2: Point2): void {
+    public quadTo(p1: Vector2, p2: Vector2): void {
         this.commands.push({ type: PathCommandType.Quadratic });
         this.points.push(p1);
         this.points.push(p2);
     }
 
     public quadToXY(x1: number, y1: number, x2: number, y2: number): void {
-        const p1 = new Point2(x1, y1);
-        const p2 = new Point2(x2, y2);
+        const p1 = new Vector2(x1, y1);
+        const p2 = new Vector2(x2, y2);
         this.quadTo(p1, p2);
     }
 
@@ -572,7 +571,7 @@ export class Path2 implements PathSink2 {
     }
 
     public svgArcTo(
-        p1: Point2,
+        p1: Vector2,
         rx: number,
         ry: number,
         xAxisRotation: number,

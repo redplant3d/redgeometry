@@ -15,7 +15,6 @@ export * from "./primitives/color.js";
 export * from "./primitives/complex.js";
 export * from "./primitives/edge.js";
 export * from "./primitives/matrix.js";
-export * from "./primitives/point.js";
 export * from "./primitives/polygon.js";
 export * from "./primitives/quaternion.js";
 export * from "./primitives/ray.js";

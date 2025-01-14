@@ -3,9 +3,9 @@ import { PathCommandType, type Path2 } from "redgeometry/src/core/path";
 import type { Box2 } from "redgeometry/src/primitives/box";
 import type { Edge2 } from "redgeometry/src/primitives/edge";
 import type { Matrix3A } from "redgeometry/src/primitives/matrix";
-import { Point2 } from "redgeometry/src/primitives/point";
 import type { Polygon2 } from "redgeometry/src/primitives/polygon";
 import type { Ray2 } from "redgeometry/src/primitives/ray";
+import { Vector2 } from "redgeometry/src/primitives/vector";
 import type { Image2 } from "redgeometry/src/render/image";
 import { assertUnreachable, throwError } from "redgeometry/src/utility/debug";
 import type { Random } from "redgeometry/src/utility/random";
@@ -281,7 +281,7 @@ export class AppContextPlugin implements WorldPlugin {
         ctx.restore();
     }
 
-    public fillPoints(points: readonly Point2[], style: CanvasStyle = "#000000", width = 1): void {
+    public fillPoints(points: readonly Vector2[], style: CanvasStyle = "#000000", width = 1): void {
         const ctx = this.context;
         ctx.beginPath();
 
@@ -308,7 +308,7 @@ export class AppContextPlugin implements WorldPlugin {
         ctx.restore();
     }
 
-    public fillText(text: string, pc: Point2, style: CanvasStyle = "#000000", font = "16px Verdana"): void {
+    public fillText(text: string, pc: Vector2, style: CanvasStyle = "#000000", font = "16px Verdana"): void {
         const ctx = this.context;
 
         ctx.save();
@@ -355,7 +355,7 @@ export class AppContextPlugin implements WorldPlugin {
         ctx.setTransform(el[0], el[1], el[2], el[3], el[4], el[5]);
     }
 
-    private addCircle(ctx: CanvasRenderingContext2D | OffscreenCanvasRenderingContext2D, c: Point2, r: number): void {
+    private addCircle(ctx: CanvasRenderingContext2D | OffscreenCanvasRenderingContext2D, c: Vector2, r: number): void {
         ctx.moveTo(c.x + r, c.y);
         ctx.arcTo(c.x + r, c.y + r, c.x, c.y + r, r);
         ctx.arcTo(c.x - r, c.y + r, c.x - r, c.y, r);
@@ -389,7 +389,7 @@ export class AppContextPlugin implements WorldPlugin {
         let cIdx = 0;
         let pIdx = 0;
 
-        let p0 = Point2.createZero();
+        let p0 = Vector2.createZero();
 
         while (cIdx < commands.length) {
             const command = commands[cIdx++];

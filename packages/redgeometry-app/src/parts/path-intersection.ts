@@ -1,6 +1,6 @@
 import { Path2 } from "redgeometry/src/core/path";
 import { Bezier2Curve2 } from "redgeometry/src/primitives/bezier";
-import { Point2 } from "redgeometry/src/primitives/point";
+import { Vector2 } from "redgeometry/src/primitives/vector";
 import type { AppContextPlugin } from "../ecs-modules/app-context.js";
 import { AppContextModule } from "../ecs-modules/app-context.js";
 import type { AppInputData } from "../ecs-modules/app-input.js";
@@ -18,7 +18,7 @@ type AppPartMainData = {
 type AppPartRemoteData = {
     dataId: "app-part-remote";
     path: Path2;
-    points: Point2[];
+    points: Vector2[];
 };
 
 type AppPartStateData = {
@@ -64,10 +64,10 @@ function writeStateSystem(world: World): void {
 function updateSystem(world: World): void {
     const { parameter } = world.readData<AppPartStateData>("app-part-state");
 
-    const c1 = new Bezier2Curve2(new Point2(100, 150), new Point2(300, 400), new Point2(600, 250));
-    const c2 = new Bezier2Curve2(new Point2(100, 500), new Point2(300, 100), new Point2(500, 100 + 3 * parameter));
+    const c1 = new Bezier2Curve2(new Vector2(100, 150), new Vector2(300, 400), new Vector2(600, 250));
+    const c2 = new Bezier2Curve2(new Vector2(100, 500), new Vector2(300, 100), new Vector2(500, 100 + 3 * parameter));
 
-    const points: Point2[] = [];
+    const points: Vector2[] = [];
     const path = Path2.createEmpty();
 
     c1.intersectQuad(c2, points);

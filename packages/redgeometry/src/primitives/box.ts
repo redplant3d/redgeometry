@@ -1,6 +1,6 @@
 import type { Matrix3, Matrix3A, Matrix4, Matrix4A } from "./matrix.js";
-import { Point2, Point3 } from "./point.js";
 import type { Ray2, Ray3 } from "./ray.js";
+import { Vector2, Vector3 } from "./vector.js";
 
 export type Box2Like = {
     readonly x0: number;
@@ -51,7 +51,7 @@ export class Box2 {
         return new Box2(obj.x0, obj.y0, obj.x1, obj.y1);
     }
 
-    public static fromPoints(p0: Point2, p1: Point2): Box2 {
+    public static fromPoints(p0: Vector2, p1: Vector2): Box2 {
         const x0 = Math.min(p0.x, p1.x);
         const y0 = Math.min(p0.y, p1.y);
         const x1 = Math.max(p0.x, p1.x);
@@ -89,11 +89,11 @@ export class Box2 {
         return new Box2(this.x0, this.y0, this.x1, this.y1);
     }
 
-    public contains(p: Point2): boolean {
+    public contains(p: Vector2): boolean {
         return this.x0 < p.x && this.y0 < p.y && this.x1 > p.x && this.y1 > p.y;
     }
 
-    public containsInclusive(p: Point2): boolean {
+    public containsInclusive(p: Vector2): boolean {
         return this.x0 <= p.x && this.y0 <= p.y && this.x1 >= p.x && this.y1 >= p.y;
     }
 
@@ -105,20 +105,20 @@ export class Box2 {
         return this.y1 - this.y0;
     }
 
-    public enclose(p: Point2): void {
+    public enclose(p: Vector2): void {
         this.x0 = Math.min(this.x0, p.x);
         this.y0 = Math.min(this.y0, p.y);
         this.x1 = Math.max(this.x1, p.x);
         this.y1 = Math.max(this.y1, p.y);
     }
 
-    public encloseWithTransform(p: Point2, mat: Matrix3 | Matrix3A): void {
+    public encloseWithTransform(p: Vector2, mat: Matrix3 | Matrix3A): void {
         const pp = mat.mulP(p);
         this.enclose(pp);
     }
 
-    public getCenter(): Point2 {
-        return new Point2(0.5 * (this.x0 + this.x1), 0.5 * (this.y0 + this.y1));
+    public getCenter(): Vector2 {
+        return new Vector2(0.5 * (this.x0 + this.x1), 0.5 * (this.y0 + this.y1));
     }
 
     public intersects(b: Box2): boolean {
@@ -192,10 +192,10 @@ export class Box2 {
     public transform(mat: Matrix3 | Matrix3A): Box2 {
         const box = Box2.createEmpty();
 
-        box.encloseWithTransform(new Point2(this.x0, this.y0), mat);
-        box.encloseWithTransform(new Point2(this.x0, this.y1), mat);
-        box.encloseWithTransform(new Point2(this.x1, this.y0), mat);
-        box.encloseWithTransform(new Point2(this.x1, this.y1), mat);
+        box.encloseWithTransform(new Vector2(this.x0, this.y0), mat);
+        box.encloseWithTransform(new Vector2(this.x0, this.y1), mat);
+        box.encloseWithTransform(new Vector2(this.x1, this.y0), mat);
+        box.encloseWithTransform(new Vector2(this.x1, this.y1), mat);
 
         return box;
     }
@@ -254,7 +254,7 @@ export class Box3 {
         return new Box3(obj.x0, obj.y0, obj.z0, obj.x1, obj.y1, obj.z1);
     }
 
-    public static fromPoints(p0: Point3, p1: Point3): Box3 {
+    public static fromPoints(p0: Vector3, p1: Vector3): Box3 {
         const x0 = Math.min(p0.x, p1.x);
         const y0 = Math.min(p0.y, p1.y);
         const z0 = Math.min(p0.z, p1.z);
@@ -298,11 +298,11 @@ export class Box3 {
         return new Box3(this.x0, this.y0, this.z0, this.x1, this.y1, this.z1);
     }
 
-    public contains(p: Point3): boolean {
+    public contains(p: Vector3): boolean {
         return this.x0 < p.x && this.y0 < p.y && this.z0 < p.z && this.x1 > p.x && this.y1 > p.y && this.z1 > p.z;
     }
 
-    public containsInclusive(p: Point3): boolean {
+    public containsInclusive(p: Vector3): boolean {
         return this.x0 <= p.x && this.y0 <= p.y && this.z0 <= p.z && this.x1 >= p.x && this.y1 >= p.y && this.z1 >= p.z;
     }
 
@@ -318,7 +318,7 @@ export class Box3 {
         return this.z1 - this.z0;
     }
 
-    public enclose(p: Point3): void {
+    public enclose(p: Vector3): void {
         this.x0 = Math.min(this.x0, p.x);
         this.y0 = Math.min(this.y0, p.y);
         this.z0 = Math.min(this.z0, p.z);
@@ -327,13 +327,13 @@ export class Box3 {
         this.z1 = Math.max(this.z1, p.z);
     }
 
-    public encloseWithTransform(p: Point3, mat: Matrix4 | Matrix4A): void {
+    public encloseWithTransform(p: Vector3, mat: Matrix4 | Matrix4A): void {
         const pp = mat.mulP(p);
         this.enclose(pp);
     }
 
-    public getCenter(): Point3 {
-        return new Point3(0.5 * (this.x0 + this.x1), 0.5 * (this.y0 + this.y1), 0.5 * (this.z0 + this.z1));
+    public getCenter(): Vector3 {
+        return new Vector3(0.5 * (this.x0 + this.x1), 0.5 * (this.y0 + this.y1), 0.5 * (this.z0 + this.z1));
     }
 
     public intersects(b: Box3): boolean {
@@ -424,14 +424,14 @@ export class Box3 {
     public transform(mat: Matrix4 | Matrix4A): Box3 {
         const box = Box3.createEmpty();
 
-        box.encloseWithTransform(new Point3(this.x0, this.y0, this.z0), mat);
-        box.encloseWithTransform(new Point3(this.x0, this.y0, this.z1), mat);
-        box.encloseWithTransform(new Point3(this.x0, this.y1, this.z0), mat);
-        box.encloseWithTransform(new Point3(this.x0, this.y1, this.z1), mat);
-        box.encloseWithTransform(new Point3(this.x1, this.y0, this.z0), mat);
-        box.encloseWithTransform(new Point3(this.x1, this.y0, this.z1), mat);
-        box.encloseWithTransform(new Point3(this.x1, this.y1, this.z0), mat);
-        box.encloseWithTransform(new Point3(this.x1, this.y1, this.z1), mat);
+        box.encloseWithTransform(new Vector3(this.x0, this.y0, this.z0), mat);
+        box.encloseWithTransform(new Vector3(this.x0, this.y0, this.z1), mat);
+        box.encloseWithTransform(new Vector3(this.x0, this.y1, this.z0), mat);
+        box.encloseWithTransform(new Vector3(this.x0, this.y1, this.z1), mat);
+        box.encloseWithTransform(new Vector3(this.x1, this.y0, this.z0), mat);
+        box.encloseWithTransform(new Vector3(this.x1, this.y0, this.z1), mat);
+        box.encloseWithTransform(new Vector3(this.x1, this.y1, this.z0), mat);
+        box.encloseWithTransform(new Vector3(this.x1, this.y1, this.z1), mat);
 
         return box;
     }

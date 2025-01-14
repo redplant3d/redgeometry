@@ -2,7 +2,7 @@ import { SnapRound2, type EdgeSegment2 } from "redgeometry/src/core/snapround";
 import { Bezier1Curve2 } from "redgeometry/src/primitives/bezier";
 import { Box2 } from "redgeometry/src/primitives/box";
 import { Edge2 } from "redgeometry/src/primitives/edge";
-import { Point2 } from "redgeometry/src/primitives/point";
+import { Vector2 } from "redgeometry/src/primitives/vector";
 import { log } from "redgeometry/src/utility/debug";
 import { RandomXSR128 } from "redgeometry/src/utility/random";
 import type { AppContextPlugin } from "../ecs-modules/app-context.js";
@@ -23,10 +23,10 @@ type AppPartRemoteData = {
     dataId: "app-part-remote";
     errors: Box2[];
     inputSegments: Edge2[];
-    intersections: Point2[];
+    intersections: Vector2[];
     magnets: Box2[];
     outputSegments: Edge2[];
-    pins: Point2[];
+    pins: Vector2[];
 };
 
 type AppPartStateData = {
@@ -138,7 +138,7 @@ function renderSystem(world: World): void {
     ctx.fillPoints(intersections, "#FF0000", 5);
 }
 
-function addEdge(snapRound: SnapRound2, p0: Point2, p1: Point2, snap = false): void {
+function addEdge(snapRound: SnapRound2, p0: Vector2, p1: Vector2, snap = false): void {
     const c = new Bezier1Curve2(p0, p1);
     snapRound.addSegment(c, 0, 1, snap, undefined);
 }
@@ -170,15 +170,15 @@ function fillEdges(
             const count = random.nextIntBetween(from, to);
 
             for (let i = 0; i < count; i++) {
-                let p0 = new Point2(width * random.nextFloat(), height * random.nextFloat());
-                let p1 = new Point2(width * random.nextFloat(), height * random.nextFloat());
+                let p0 = new Vector2(width * random.nextFloat(), height * random.nextFloat());
+                let p1 = new Vector2(width * random.nextFloat(), height * random.nextFloat());
 
                 if (random.nextFloat() < pinProbability) {
-                    p0 = Point2.roundToPrecision(p0, k);
+                    p0 = Vector2.roundToPrecision(p0, k);
                 }
 
                 if (random.nextFloat() < pinProbability) {
-                    p1 = Point2.roundToPrecision(p1, k);
+                    p1 = Vector2.roundToPrecision(p1, k);
                 }
 
                 addEdge(snapRound, p0, p1);
@@ -209,14 +209,14 @@ function fillEdges(
             break;
         }
         case 3: {
-            const p0 = new Point2(width * random.nextFloat(), height * random.nextFloat());
-            const p1 = new Point2(width * random.nextFloat(), height * random.nextFloat());
+            const p0 = new Vector2(width * random.nextFloat(), height * random.nextFloat());
+            const p1 = new Vector2(width * random.nextFloat(), height * random.nextFloat());
 
             const t0 = random.nextFloatBetween(0, 0.5);
             const t1 = random.nextFloatBetween(0.5, 1);
 
-            const pp0 = Point2.roundToPrecision(p0.lerp(p1, t0), k);
-            const pp1 = Point2.roundToPrecision(p0.lerp(p1, t1), k);
+            const pp0 = Vector2.roundToPrecision(p0.lerp(p1, t0), k);
+            const pp1 = Vector2.roundToPrecision(p0.lerp(p1, t1), k);
 
             addEdge(snapRound, p0, p1);
             addEdge(snapRound, pp0, pp1, true);
@@ -226,7 +226,7 @@ function fillEdges(
     }
 }
 
-function transformBox(points: Point2[], scale: number): Box2[] {
+function transformBox(points: Vector2[], scale: number): Box2[] {
     const result: Box2[] = [];
 
     for (const point of points) {
@@ -239,13 +239,13 @@ function transformBox(points: Point2[], scale: number): Box2[] {
     return result;
 }
 
-function transformPoints(points: Point2[], scale: number): Point2[] {
-    const result: Point2[] = [];
+function transformPoints(points: Vector2[], scale: number): Vector2[] {
+    const result: Vector2[] = [];
 
     for (const point of points) {
         const x0 = Math.round(scale * point.x);
         const y0 = Math.round(scale * point.y);
-        result.push(new Point2(x0, y0));
+        result.push(new Vector2(x0, y0));
     }
 
     return result;

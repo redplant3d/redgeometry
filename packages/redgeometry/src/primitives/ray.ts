@@ -1,50 +1,49 @@
-import { Point2, Point3, type Point2Like, type Point3Like } from "./point.js";
 import { Vector2, Vector3, type Vector2Like, type Vector3Like } from "./vector.js";
 
 export type Ray2Like = {
-    readonly p: Point2Like;
+    readonly p: Vector2Like;
     readonly v: Vector2Like;
 };
 
 export type Ray3Like = {
-    readonly p: Point3Like;
+    readonly p: Vector3Like;
     readonly v: Vector3Like;
 };
 
 export class Ray2 {
-    public p: Point2;
+    public p: Vector2;
     public v: Vector2;
 
-    constructor(p: Point2, v: Vector2) {
+    constructor(p: Vector2, v: Vector2) {
         this.p = p;
         this.v = v;
     }
 
     public static fromArray(data: ArrayLike<number>, offset = 0): Ray2 {
-        const p = Point2.fromArray(data, offset);
+        const p = Vector2.fromArray(data, offset);
         const v = Vector2.fromArray(data, offset + 2);
 
         return new Ray2(p, v);
     }
 
     public static fromObject(obj: Ray2Like): Ray2 {
-        const p = Point2.fromObject(obj.p);
+        const p = Vector2.fromObject(obj.p);
         const v = Vector2.fromObject(obj.v);
         return new Ray2(p, v);
     }
 
-    public static fromPoints(p0: Point2, p1: Point2): Ray2 {
+    public static fromPoints(p0: Vector2, p1: Vector2): Ray2 {
         const v = p1.sub(p0);
         return new Ray2(p0, v);
     }
 
     public static fromXY(px: number, py: number, vx: number, vy: number): Ray2 {
-        const p = new Point2(px, py);
+        const p = new Vector2(px, py);
         const v = new Vector2(vx, vy);
         return new Ray2(p, v);
     }
 
-    public static getIntersection(ray1: Ray2, ray2: Ray2): Point2 | undefined {
+    public static getIntersection(ray1: Ray2, ray2: Ray2): Vector2 | undefined {
         const v1 = ray1.v;
         const v2 = ray2.v;
         const den = v1.cross(v2);
@@ -81,7 +80,7 @@ export class Ray2 {
     }
 
     public static toObject(ray: Ray2): Ray2Like {
-        const p = Point2.toObject(ray.p);
+        const p = Vector2.toObject(ray.p);
         const v = Vector2.toObject(ray.v);
         return { p, v };
     }
@@ -93,7 +92,7 @@ export class Ray2 {
     /**
      * Returns the parameterized value where a point `p` is orthogonal on the ray.
      */
-    public getParameterFromPoint(p: Point2): number {
+    public getParameterFromPoint(p: Vector2): number {
         const v1 = this.v;
         const v2 = p.sub(this.p);
         return v1.dot(v2) / v1.lenSq();
@@ -102,7 +101,7 @@ export class Ray2 {
     /**
      * Returns the signed distance to where a point `p` is orthogonal to the ray.
      */
-    public getSignedDistanceFromPoint(p: Point2): number {
+    public getSignedDistanceFromPoint(p: Vector2): number {
         const v1 = this.v;
         const v2 = this.p.sub(p);
         return v1.cross(v2) / v1.len();
@@ -111,7 +110,7 @@ export class Ray2 {
     /**
      * Returns the parameterized point on the ray along its direction.
      */
-    public getValueAt(t: number): Point2 {
+    public getValueAt(t: number): Vector2 {
         return this.p.addVMulS(this.v, t);
     }
 
@@ -138,34 +137,34 @@ export class Ray2 {
 }
 
 export class Ray3 {
-    public p: Point3;
+    public p: Vector3;
     public v: Vector3;
 
-    constructor(p: Point3, v: Vector3) {
+    constructor(p: Vector3, v: Vector3) {
         this.p = p;
         this.v = v;
     }
 
     public static fromArray(data: ArrayLike<number>, offset = 0): Ray3 {
-        const p = Point3.fromArray(data, offset);
+        const p = Vector3.fromArray(data, offset);
         const v = Vector3.fromArray(data, offset + 3);
 
         return new Ray3(p, v);
     }
 
     public static fromObject(obj: Ray3Like): Ray3 {
-        const p = Point3.fromObject(obj.p);
+        const p = Vector3.fromObject(obj.p);
         const v = Vector3.fromObject(obj.v);
         return new Ray3(p, v);
     }
 
-    public static fromPoints(p0: Point3, p1: Point3): Ray3 {
+    public static fromPoints(p0: Vector3, p1: Vector3): Ray3 {
         const v = p1.sub(p0);
         return new Ray3(p0, v);
     }
 
     public static fromXYZ(px: number, py: number, pz: number, vx: number, vy: number, vz: number): Ray3 {
-        const p = new Point3(px, py, pz);
+        const p = new Vector3(px, py, pz);
         const v = new Vector3(vx, vy, vz);
         return new Ray3(p, v);
     }
@@ -213,7 +212,7 @@ export class Ray3 {
     }
 
     public static toObject(ray: Ray3): Ray3Like {
-        const p = Point3.toObject(ray.p);
+        const p = Vector3.toObject(ray.p);
         const v = Vector3.toObject(ray.v);
         return { p, v };
     }
@@ -225,7 +224,7 @@ export class Ray3 {
     /**
      * Returns the distance to where a point `p` is orthogonal to the ray.
      */
-    public getDistanceFromPoint(p: Point3): number {
+    public getDistanceFromPoint(p: Vector3): number {
         const v1 = this.v;
         const v2 = this.p.sub(p);
         return v1.cross(v2).len() / v1.len();
@@ -238,7 +237,7 @@ export class Ray3 {
     /**
      * Returns the parameterized value where a point `p` is orthogonal on the ray.
      */
-    public getParameterFromPoint(p: Point3): number {
+    public getParameterFromPoint(p: Vector3): number {
         const v1 = this.v;
         const v2 = p.sub(this.p);
         return v1.dot(v2) / v1.lenSq();
@@ -247,7 +246,7 @@ export class Ray3 {
     /**
      * Returns the parameterized point on the ray along its direction.
      */
-    public getValueAt(t: number): Point3 {
+    public getValueAt(t: number): Vector3 {
         return this.p.addVMulS(this.v, t);
     }
 

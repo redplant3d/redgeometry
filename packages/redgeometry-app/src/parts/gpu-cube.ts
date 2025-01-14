@@ -1,5 +1,4 @@
 import { Matrix4 } from "redgeometry/src/primitives/matrix";
-import { Point3 } from "redgeometry/src/primitives/point";
 import { Quaternion, RotationOrder } from "redgeometry/src/primitives/quaternion";
 import { Vector3 } from "redgeometry/src/primitives/vector";
 import { throwError } from "redgeometry/src/utility/debug";
@@ -122,7 +121,7 @@ function initRemoteSystem(world: World): void {
             componentId: "transform",
             scale: Vector3.createOne(),
             rotation: Quaternion.createIdentity(),
-            translation: new Point3(0, 0, 15),
+            translation: new Vector3(0, 0, 15),
             visible: Visibility.Inherit,
         },
     );
@@ -210,7 +209,7 @@ function initAssetSystem(world: World): void {
         componentId: "transform",
         rotation: Quaternion.createIdentity(),
         scale: Vector3.createOne(),
-        translation: Point3.createZero(),
+        translation: Vector3.createZero(),
         visible: Visibility.Inherit,
     });
 
@@ -249,7 +248,7 @@ function spawnSystem(world: World): void {
                         random.nextFloatBetween(0, 2 * Math.PI),
                         RotationOrder.XYZ,
                     ),
-                    translation: new Point3(
+                    translation: new Vector3(
                         random.nextFloatBetween(-5, 5),
                         random.nextFloatBetween(-5, 5),
                         random.nextFloatBetween(-5, 5),

@@ -1,13 +1,10 @@
 import { expect, test } from "vitest";
 import { Complex } from "../../src/primitives/complex.js";
 import { Matrix3, Matrix3A, Matrix4, Matrix4A } from "../../src/primitives/matrix.js";
-import { Point2, Point3 } from "../../src/primitives/point.js";
 import { Quaternion, RotationOrder } from "../../src/primitives/quaternion.js";
 import { Vector2, Vector3, Vector4 } from "../../src/primitives/vector.js";
 import {
     expectToBeCloseComplex,
-    expectToBeClosePoint2,
-    expectToBeClosePoint3,
     expectToBeCloseQuaternion,
     expectToBeCloseVector2,
     expectToBeCloseVector3,
@@ -16,7 +13,7 @@ import {
 test("Matrix3A - extract", () => {
     const v = new Vector2(1, 2);
     const z = Complex.fromRotationAngle(3);
-    const p = new Point2(4, 5);
+    const p = new Vector2(4, 5);
 
     const mat = Matrix3A.createIdentity();
     mat.scale(v.x, v.y);
@@ -27,7 +24,7 @@ test("Matrix3A - extract", () => {
 
     expectToBeCloseVector2(s, v, 14);
     expectToBeCloseComplex(r, z, 14);
-    expectToBeClosePoint2(t, p, 14);
+    expectToBeCloseVector2(t, p, 14);
 });
 
 test("Matrix3A - inverse", () => {
@@ -47,7 +44,7 @@ test("Matrix3A - inverse", () => {
 
 test("Matrix3A - mulPt", () => {
     const mat = Matrix3A.createIdentity();
-    const p = new Point2(1, 2);
+    const p = new Vector2(1, 2);
 
     const mulPt = mat.mulP(p);
 
@@ -106,7 +103,7 @@ test("Matrix3A - translate", () => {
 test("Matrix3 - extract", () => {
     const v = new Vector2(1, 2);
     const z = Complex.fromRotationAngle(3);
-    const p = new Point2(4, 5);
+    const p = new Vector2(4, 5);
 
     const mat = Matrix3.createIdentity();
     mat.scale(v.x, v.y);
@@ -117,7 +114,7 @@ test("Matrix3 - extract", () => {
 
     expectToBeCloseVector2(s, v, 14);
     expectToBeCloseComplex(r, z, 14);
-    expectToBeClosePoint2(t, p, 14);
+    expectToBeCloseVector2(t, p, 14);
 });
 
 test("Matrix3 - inverse", () => {
@@ -137,7 +134,7 @@ test("Matrix3 - inverse", () => {
 
 test("Matrix3 - mulPt", () => {
     const mat = Matrix3.createIdentity();
-    const p = new Point2(1, 2);
+    const p = new Vector2(1, 2);
 
     const mulPt = mat.mulP(p);
 
@@ -196,7 +193,7 @@ test("Matrix3 - translate", () => {
 test("Matrix4A - extract", () => {
     const v = new Vector3(1, 2, 3);
     const q = Quaternion.fromRotationEuler(4, 5, 6, RotationOrder.XYZ);
-    const p = new Point3(7, 8, 9);
+    const p = new Vector3(7, 8, 9);
 
     const mat = Matrix4A.createIdentity();
     mat.scale(v.x, v.y, v.z);
@@ -207,7 +204,7 @@ test("Matrix4A - extract", () => {
 
     expectToBeCloseVector3(s, v, 14);
     expectToBeCloseQuaternion(r, q, 14);
-    expectToBeClosePoint3(t, p, 14);
+    expectToBeCloseVector3(t, p, 14);
 });
 
 test("Matrix4A - inverse", () => {
@@ -227,7 +224,7 @@ test("Matrix4A - inverse", () => {
 
 test("Matrix4A - mulPt", () => {
     const mat = Matrix4A.createIdentity();
-    const p = new Point3(1, 2, 3);
+    const p = new Vector3(1, 2, 3);
 
     const mulPt = mat.mulP(p);
 
@@ -324,7 +321,7 @@ test("Matrix4A - translate", () => {
 test("Matrix4 - extract", () => {
     const v = new Vector3(1, 2, 3);
     const q = Quaternion.fromRotationEuler(4, 5, 6, RotationOrder.XYZ);
-    const p = new Point3(7, 8, 9);
+    const p = new Vector3(7, 8, 9);
 
     const mat = Matrix4.createIdentity();
     mat.scale(v.x, v.y, v.z);
@@ -335,7 +332,7 @@ test("Matrix4 - extract", () => {
 
     expectToBeCloseVector3(s, v, 14);
     expectToBeCloseQuaternion(r, q, 14);
-    expectToBeClosePoint3(t, p, 14);
+    expectToBeCloseVector3(t, p, 14);
 });
 
 test("Matrix4 - inverse", () => {
@@ -355,7 +352,7 @@ test("Matrix4 - inverse", () => {
 
 test("Matrix4 - mulPt", () => {
     const mat = Matrix4.createIdentity();
-    const p = new Point3(1, 2, 3);
+    const p = new Vector3(1, 2, 3);
 
     const mulPt = mat.mulP(p);
 

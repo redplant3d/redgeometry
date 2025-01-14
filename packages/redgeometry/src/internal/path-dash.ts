@@ -1,7 +1,6 @@
 import type { PathDashOptions } from "../core/path-options.js";
 import { Path2 } from "../core/path.js";
 import { Bezier2Curve2, type Bezier1Curve2 } from "../primitives/bezier.js";
-import type { Point2 } from "../primitives/point.js";
 import type { Vector2 } from "../primitives/vector.js";
 import { getArcLengthQuadratic, getParameterAtArcLengthQuadratic } from "./bezier.js";
 
@@ -35,7 +34,7 @@ export class DashState {
         this.pathFirst = first;
     }
 
-    public dashDegenerateQuad(p0: Point2, p1: Point2, p2: Point2): void {
+    public dashDegenerateQuad(p0: Vector2, p1: Vector2, p2: Vector2): void {
         const c1 = new Bezier2Curve2(p0, p1, p1);
         const c2 = new Bezier2Curve2(p1, p1, p2);
 
@@ -43,7 +42,7 @@ export class DashState {
         this.dashQuadraticSimple(c2);
     }
 
-    public dashFirst(p: Point2, m: Vector2): void {
+    public dashFirst(p: Vector2, m: Vector2): void {
         if (this.currentPhase && m.isZero()) {
             this.insertMove(p);
         }
@@ -155,15 +154,15 @@ export class DashState {
         return this.dashArray[this.currentIndex];
     }
 
-    private insertLinear(p1: Point2): void {
+    private insertLinear(p1: Vector2): void {
         this.path.lineTo(p1);
     }
 
-    private insertMove(p0: Point2): void {
+    private insertMove(p0: Vector2): void {
         this.path.moveTo(p0);
     }
 
-    private insertQuadratic(p1: Point2, p2: Point2): void {
+    private insertQuadratic(p1: Vector2, p2: Vector2): void {
         this.path.quadTo(p1, p2);
     }
 

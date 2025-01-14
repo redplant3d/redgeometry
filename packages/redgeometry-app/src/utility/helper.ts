@@ -11,8 +11,8 @@ import {
 import type { Box2 } from "redgeometry/src/primitives/box";
 import { ColorRgba } from "redgeometry/src/primitives/color";
 import { Edge2 } from "redgeometry/src/primitives/edge";
-import { Point2 } from "redgeometry/src/primitives/point";
 import { Polygon2 } from "redgeometry/src/primitives/polygon";
+import { Vector2 } from "redgeometry/src/primitives/vector";
 import type { Random } from "redgeometry/src/utility/random";
 
 export function createRandomColor(random: Random, s: number, v: number, a: number): ColorRgba {
@@ -64,37 +64,37 @@ export function createRandomPath(
 ): Path2 {
     const path = Path2.createEmpty();
 
-    path.moveTo(new Point2(width * random.nextFloat(), height * random.nextFloat()));
+    path.moveTo(new Vector2(width * random.nextFloat(), height * random.nextFloat()));
 
     switch (generator) {
         case 0: {
             for (let i = 0; i < count; i++) {
-                const p1 = new Point2(width * random.nextFloat(), height * random.nextFloat());
+                const p1 = new Vector2(width * random.nextFloat(), height * random.nextFloat());
                 path.lineTo(p1);
             }
             break;
         }
         case 1: {
             for (let i = 0; i < count; i++) {
-                const p1 = new Point2(width * random.nextFloat(), height * random.nextFloat());
-                const p2 = new Point2(width * random.nextFloat(), height * random.nextFloat());
+                const p1 = new Vector2(width * random.nextFloat(), height * random.nextFloat());
+                const p2 = new Vector2(width * random.nextFloat(), height * random.nextFloat());
                 path.quadTo(p1, p2);
             }
             break;
         }
         case 2: {
             for (let i = 0; i < count; i++) {
-                const p1 = new Point2(width * random.nextFloat(), height * random.nextFloat());
-                const p2 = new Point2(width * random.nextFloat(), height * random.nextFloat());
-                const p3 = new Point2(width * random.nextFloat(), height * random.nextFloat());
+                const p1 = new Vector2(width * random.nextFloat(), height * random.nextFloat());
+                const p2 = new Vector2(width * random.nextFloat(), height * random.nextFloat());
+                const p3 = new Vector2(width * random.nextFloat(), height * random.nextFloat());
                 path.cubicTo(p1, p2, p3);
             }
             break;
         }
         case 3: {
             for (let i = 0; i < count; i++) {
-                const p1 = new Point2(width * random.nextFloat(), height * random.nextFloat());
-                const p2 = new Point2(width * random.nextFloat(), height * random.nextFloat());
+                const p1 = new Vector2(width * random.nextFloat(), height * random.nextFloat());
+                const p2 = new Vector2(width * random.nextFloat(), height * random.nextFloat());
                 path.conicTo(p1, p2, 4 * random.nextFloat());
             }
             break;
@@ -104,11 +104,11 @@ export function createRandomPath(
     return path;
 }
 
-export function createRandomPoint(random: Random, box: Box2): Point2 {
+export function createRandomPoint(random: Random, box: Box2): Vector2 {
     const x = random.nextFloatBetween(box.x0, box.x1);
     const y = random.nextFloatBetween(box.y0, box.y1);
 
-    return new Point2(x, y);
+    return new Vector2(x, y);
 }
 
 export function createRandomPolygonPair(
@@ -131,11 +131,11 @@ export function createRandomPolygonPair(
             const count2 = random.nextIntBetween(from, to);
 
             for (let i = 0; i < count1; i++) {
-                polygonA.addPoint(new Point2(width * random.nextFloat(), height * random.nextFloat()));
+                polygonA.addPoint(new Vector2(width * random.nextFloat(), height * random.nextFloat()));
             }
 
             for (let i = 0; i < count2; i++) {
-                polygonB.addPoint(new Point2(width * random.nextFloat() + offset, height * random.nextFloat()));
+                polygonB.addPoint(new Vector2(width * random.nextFloat() + offset, height * random.nextFloat()));
             }
 
             break;

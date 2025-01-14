@@ -1,7 +1,6 @@
 import { COS_ACUTE, COS_OBTUSE, JoinType } from "../core/path-options.js";
 import type { Path2 } from "../core/path.js";
 import { Bezier2Curve2, BezierRCurve2 } from "../primitives/bezier.js";
-import type { Point2 } from "../primitives/point.js";
 import type { Vector2 } from "../primitives/vector.js";
 import { assertUnreachable } from "../utility/debug.js";
 
@@ -23,7 +22,7 @@ export function offsetQuadraticSimple(path: Path2, c: Bezier2Curve2, d: number):
     }
 }
 
-export function offsetQuadraticDegenerate(path: Path2, p0: Point2, p1: Point2, p2: Point2, d: number): void {
+export function offsetQuadraticDegenerate(path: Path2, p0: Vector2, p1: Vector2, p2: Vector2, d: number): void {
     const c1 = new Bezier2Curve2(p0, p1, p1);
     const c2 = new Bezier2Curve2(p1, p1, p2);
 
@@ -37,7 +36,7 @@ export function offsetQuadraticDegenerate(path: Path2, p0: Point2, p1: Point2, p
 
 export function insertOffsetJoin(
     path: Path2,
-    p: Point2,
+    p: Vector2,
     m0: Vector2,
     m1: Vector2,
     d: number,
@@ -59,7 +58,7 @@ export function insertOffsetJoin(
 
 export function insertOuterJoin(
     path: Path2,
-    p: Point2,
+    p: Vector2,
     n0: Vector2,
     n1: Vector2,
     d: number,
@@ -162,7 +161,7 @@ export function insertOuterJoin(
     }
 }
 
-export function insertInnerJoin(path: Path2, p: Point2, n1: Vector2, d: number): void {
+export function insertInnerJoin(path: Path2, p: Vector2, n1: Vector2, d: number): void {
     // Go back to the point of the base path to fix some offset artifacts (basically a hack)
     path.lineTo(p);
 

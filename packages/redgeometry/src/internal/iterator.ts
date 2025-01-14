@@ -2,7 +2,7 @@ import type { MeshEdge2 } from "../core/mesh.js";
 import { PathCommandType, type PathCommand } from "../core/path.js";
 import { Bezier1Curve2, Bezier2Curve2, Bezier3Curve2, BezierRCurve2, type BezierCurve2 } from "../primitives/bezier.js";
 import { Edge2 } from "../primitives/edge.js";
-import { Point2 } from "../primitives/point.js";
+import { Vector2 } from "../primitives/vector.js";
 import { assertUnreachable } from "../utility/debug.js";
 
 export class Mesh2LnextIterator implements IterableIterator<MeshEdge2> {
@@ -62,20 +62,20 @@ export class Mesh2OnextIterator implements IterableIterator<MeshEdge2> {
 export class Path2CurveIterator implements IterableIterator<BezierCurve2> {
     public cIdx: number;
     public commands: PathCommand[];
-    public p0: Point2;
+    public p0: Vector2;
     public pIdx: number;
-    public points: Point2[];
-    public ps: Point2;
+    public points: Vector2[];
+    public ps: Vector2;
 
-    public constructor(commands: PathCommand[], points: Point2[]) {
+    public constructor(commands: PathCommand[], points: Vector2[]) {
         this.commands = commands;
         this.points = points;
 
         this.cIdx = 0;
         this.pIdx = 0;
 
-        this.ps = Point2.createZero();
-        this.p0 = Point2.createZero();
+        this.ps = Vector2.createZero();
+        this.p0 = Vector2.createZero();
     }
 
     public [Symbol.iterator](): IterableIterator<BezierCurve2> {
@@ -141,9 +141,9 @@ export class Path2CurveIterator implements IterableIterator<BezierCurve2> {
 
 export class Polygon2EdgeIterator implements IterableIterator<Edge2> {
     public idx: number;
-    public points: Point2[];
+    public points: Vector2[];
 
-    public constructor(points: Point2[]) {
+    public constructor(points: Vector2[]) {
         this.points = points;
         this.idx = 1;
     }

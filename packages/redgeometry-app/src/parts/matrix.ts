@@ -1,7 +1,7 @@
 import { Edge2, Edge3 } from "redgeometry/src/primitives/edge";
 import { Matrix4 } from "redgeometry/src/primitives/matrix";
-import { Point2, Point3 } from "redgeometry/src/primitives/point";
 import { Quaternion, RotationOrder } from "redgeometry/src/primitives/quaternion";
+import { Vector2, Vector3 } from "redgeometry/src/primitives/vector";
 import type { AppContextPlugin } from "../ecs-modules/app-context.js";
 import { AppContextModule } from "../ecs-modules/app-context.js";
 import type { AppInputData } from "../ecs-modules/app-input.js";
@@ -129,14 +129,14 @@ function renderSystem(world: World): void {
 }
 
 function createCube(): Edge3[] {
-    const p0 = new Point3(1, 1, 1);
-    const p1 = new Point3(1, 1, -1);
-    const p2 = new Point3(1, -1, 1);
-    const p3 = new Point3(1, -1, -1);
-    const p4 = new Point3(-1, 1, 1);
-    const p5 = new Point3(-1, 1, -1);
-    const p6 = new Point3(-1, -1, 1);
-    const p7 = new Point3(-1, -1, -1);
+    const p0 = new Vector3(1, 1, 1);
+    const p1 = new Vector3(1, 1, -1);
+    const p2 = new Vector3(1, -1, 1);
+    const p3 = new Vector3(1, -1, -1);
+    const p4 = new Vector3(-1, 1, 1);
+    const p5 = new Vector3(-1, 1, -1);
+    const p6 = new Vector3(-1, -1, 1);
+    const p7 = new Vector3(-1, -1, -1);
 
     const edges = [
         new Edge3(p0, p1),
@@ -164,8 +164,8 @@ function transformEdges(edges: Edge3[], m: Matrix4): Edge2[] {
     for (const e of edges) {
         const p0 = m.mulP(e.p0);
         const p1 = m.mulP(e.p1);
-        const pp0 = Point2.fromObject(p0);
-        const pp1 = Point2.fromObject(p1);
+        const pp0 = Vector2.fromObject(p0);
+        const pp1 = Vector2.fromObject(p1);
         output.push(new Edge2(pp0, pp1));
     }
 

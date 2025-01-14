@@ -1,6 +1,6 @@
 import { CurveType, type BezierCurve2 } from "../primitives/bezier.js";
 import { Edge2 } from "../primitives/edge.js";
-import { Point2 } from "../primitives/point.js";
+import { Vector2 } from "../primitives/vector.js";
 import { ArrayMultiSet } from "../utility/array.js";
 import { assertDebug, log } from "../utility/debug.js";
 import { Float128 } from "../utility/float128.js";
@@ -13,7 +13,7 @@ enum PixelType {
 
 type Pixel2 = {
     type: PixelType;
-    p: Point2;
+    p: Vector2;
 };
 
 class PixelSet2 {
@@ -23,14 +23,14 @@ class PixelSet2 {
         this.pixel = new Map<string, Pixel2>();
     }
 
-    public addMagnet(p: Point2): void {
+    public addMagnet(p: Vector2): void {
         const key = p.toString();
 
         // Magnets may overwrite pins
         this.pixel.set(key, { type: PixelType.Magnet, p });
     }
 
-    public addPin(p: Point2): void {
+    public addPin(p: Vector2): void {
         const key = p.toString();
 
         // Pins must not overwrite magnets
@@ -43,8 +43,8 @@ class PixelSet2 {
         this.pixel.clear();
     }
 
-    public getMagnets(): Point2[] {
-        const result: Point2[] = [];
+    public getMagnets(): Vector2[] {
+        const result: Vector2[] = [];
 
         for (const pixel of this.pixel.values()) {
             if (pixel.type === PixelType.Magnet) {
@@ -55,8 +55,8 @@ class PixelSet2 {
         return result;
     }
 
-    public getPins(): Point2[] {
-        const result: Point2[] = [];
+    public getPins(): Vector2[] {
+        const result: Vector2[] = [];
 
         for (const pixel of this.pixel.values()) {
             if (pixel.type === PixelType.Pin) {
@@ -73,7 +73,7 @@ class PixelSet2 {
 }
 
 type PixelIntersection2 = {
-    p: Point2;
+    p: Vector2;
     min: number;
     max: number;
 };
@@ -85,19 +85,19 @@ export type EdgeSegmentRef2 = {
 };
 
 export type EdgeSegment2 = {
-    p0: Point2;
-    p1: Point2;
+    p0: Vector2;
+    p1: Vector2;
     ref: EdgeSegmentRef2;
 };
 
 export class SnapRoundSweepEvent2 {
     public key: number;
     public left: boolean;
-    public p0: Point2;
-    public p1: Point2;
+    public p0: Vector2;
+    public p1: Vector2;
     public seg: EdgeSegment2;
 
-    public constructor(p0: Point2, p1: Point2, seg: EdgeSegment2, key: number, left: boolean) {
+    public constructor(p0: Vector2, p1: Vector2, seg: EdgeSegment2, key: number, left: boolean) {
         this.p0 = p0;
         this.p1 = p1;
         this.seg = seg;
@@ -138,10 +138,10 @@ export class SnapRoundSweepEvent2 {
  */
 export class SnapRound2 {
     private inputSegments: EdgeSegment2[];
-    private intersections: Point2[];
-    private magnets: Point2[];
+    private intersections: Vector2[];
+    private magnets: Vector2[];
     private outputSegments: EdgeSegment2[];
-    private pins: Point2[];
+    private pins: Vector2[];
     private pixelSet: PixelSet2;
 
     public precision: number;
@@ -183,7 +183,7 @@ export class SnapRound2 {
         this.pins = [];
     }
 
-    public debugGetErrors(): Point2[] {
+    public debugGetErrors(): Vector2[] {
         return this.createIntersections(this.outputSegments);
     }
 
@@ -191,11 +191,11 @@ export class SnapRound2 {
         return this.inputSegments.slice();
     }
 
-    public debugGetIntersections(): Point2[] {
+    public debugGetIntersections(): Vector2[] {
         return this.intersections.slice();
     }
 
-    public debugGetMagnets(): Point2[] {
+    public debugGetMagnets(): Vector2[] {
         return this.magnets.slice();
     }
 
@@ -203,7 +203,7 @@ export class SnapRound2 {
         return this.outputSegments.slice();
     }
 
-    public debugGetPins(): Point2[] {
+    public debugGetPins(): Vector2[] {
         return this.pins.slice();
     }
 
@@ -229,8 +229,8 @@ export class SnapRound2 {
         const k = this.precision;
 
         for (const segment of this.outputSegments) {
-            const p0 = new Point2(segment.p0.x / k, segment.p0.y / k);
-            const p1 = new Point2(segment.p1.x / k, segment.p1.y / k);
+            const p0 = new Vector2(segment.p0.x / k, segment.p0.y / k);
+            const p1 = new Vector2(segment.p1.x / k, segment.p1.y / k);
             const ref = segment.ref;
 
             output.push({ p0, p1, ref });
@@ -241,14 +241,14 @@ export class SnapRound2 {
         const k = this.precision;
 
         for (const segment of this.outputSegments) {
-            const p0 = new Point2(segment.p0.x / k, segment.p0.y / k);
-            const p1 = new Point2(segment.p1.x / k, segment.p1.y / k);
+            const p0 = new Vector2(segment.p0.x / k, segment.p0.y / k);
+            const p1 = new Vector2(segment.p1.x / k, segment.p1.y / k);
 
             output.push(new Edge2(p0, p1));
         }
     }
 
-    private static signedArea(p0: Point2, p1: Point2, p: Point2): number {
+    private static signedArea(p0: Vector2, p1: Vector2, p: Vector2): number {
         const x0 = Float128.from(p0.x);
         const y0 = Float128.from(p0.y);
         const x1 = Float128.from(p1.x);
@@ -267,10 +267,10 @@ export class SnapRound2 {
         return va.sub(vb).value();
     }
 
-    private addEndpoint(p: Point2, k: number, snap: boolean): Point2 {
+    private addEndpoint(p: Vector2, k: number, snap: boolean): Vector2 {
         // Note: `snap` demotes `p` to a magnet (useful when lines should perfectly
         // overlap but actually do not because of floating point precision)
-        const scaled = new Point2(k * p.x, k * p.y);
+        const scaled = new Vector2(k * p.x, k * p.y);
         const snapped = roundPoint(scaled);
 
         if (this.isPin(snapped, p, k) && !snap) {
@@ -284,7 +284,7 @@ export class SnapRound2 {
         }
     }
 
-    private addSegmentCandidate(ur: EdgeSegment2, p0: Point2, p1: Point2, pins: Point2[]): void {
+    private addSegmentCandidate(ur: EdgeSegment2, p0: Vector2, p1: Vector2, pins: Vector2[]): void {
         if (p0.eq(p1)) {
             return;
         }
@@ -297,8 +297,8 @@ export class SnapRound2 {
 
         for (const pi of pinIntersections) {
             // Check if the ursegment is on the same side as the rounded segment
-            const a1 = Point2.signedArea(ur.p0, ur.p1, pi.p);
-            const a2 = Point2.signedArea(p0, p1, pi.p);
+            const a1 = Vector2.signedArea(ur.p0, ur.p1, pi.p);
+            const a2 = Vector2.signedArea(p0, p1, pi.p);
 
             if (a1 * a2 <= 0) {
                 this.addSegmentOutput(p, pi.p, ur.ref);
@@ -310,14 +310,14 @@ export class SnapRound2 {
         this.addSegmentOutput(p, p1, ur.ref);
     }
 
-    private addSegmentOutput(p0: Point2, p1: Point2, ref: EdgeSegmentRef2): void {
+    private addSegmentOutput(p0: Vector2, p1: Vector2, ref: EdgeSegmentRef2): void {
         if (!p0.eq(p1)) {
             this.outputSegments.push({ p0, p1, ref });
         }
     }
 
-    private createIntersections(segments: EdgeSegment2[]): Point2[] {
-        const intersections: Point2[] = [];
+    private createIntersections(segments: EdgeSegment2[]): Vector2[] {
+        const intersections: Vector2[] = [];
 
         const queue = this.createQueue(segments);
         const status = new ArrayMultiSet<SnapRoundSweepEvent2>(SnapRoundSweepEvent2.compareStatus);
@@ -367,7 +367,7 @@ export class SnapRound2 {
         return ArrayMultiSet.fromArray(events, SnapRoundSweepEvent2.compareQueue);
     }
 
-    private getPixelIntersections(p0: Point2, p1: Point2, pixel: Point2[]): PixelIntersection2[] {
+    private getPixelIntersections(p0: Vector2, p1: Vector2, pixel: Vector2[]): PixelIntersection2[] {
         const result: PixelIntersection2[] = [];
 
         for (const p of pixel) {
@@ -387,7 +387,7 @@ export class SnapRound2 {
         return result;
     }
 
-    private intersectEdges(magnets: Point2[], pins: Point2[]): void {
+    private intersectEdges(magnets: Vector2[], pins: Vector2[]): void {
         for (const ur of this.inputSegments) {
             const p0 = roundPoint(ur.p0);
             const p1 = roundPoint(ur.p1);
@@ -417,7 +417,7 @@ export class SnapRound2 {
         }
     }
 
-    private isPin(snapped: Point2, p: Point2, k: number): boolean {
+    private isPin(snapped: Vector2, p: Vector2, k: number): boolean {
         // Check if the input point `p` would be transformed to a pin in the output
         return snapped.x / k === p.x && snapped.y / k === p.y;
     }
@@ -435,22 +435,22 @@ export class SnapRound2 {
         });
     }
 
-    private writeSegmentIntersectionsTo(s1: EdgeSegment2, s2: EdgeSegment2, output: Point2[]): void {
+    private writeSegmentIntersectionsTo(s1: EdgeSegment2, s2: EdgeSegment2, output: Vector2[]): void {
         if (s1.p0.eq(s2.p0) || s1.p0.eq(s2.p1) || s1.p1.eq(s2.p0) || s1.p1.eq(s2.p1)) {
             // No intersection because segments are adjacent
             return;
         }
 
-        const a10 = Point2.signedArea(s2.p0, s2.p1, s1.p0);
-        const a11 = Point2.signedArea(s2.p0, s2.p1, s1.p1);
+        const a10 = Vector2.signedArea(s2.p0, s2.p1, s1.p0);
+        const a11 = Vector2.signedArea(s2.p0, s2.p1, s1.p1);
         const t = solveLinear(a11 - a10, a10);
 
         if (t < 0 || t > 1 || Number.isNaN(t)) {
             return;
         }
 
-        const a20 = Point2.signedArea(s1.p0, s1.p1, s2.p0);
-        const a21 = Point2.signedArea(s1.p0, s1.p1, s2.p1);
+        const a20 = Vector2.signedArea(s1.p0, s1.p1, s2.p0);
+        const a21 = Vector2.signedArea(s1.p0, s1.p1, s2.p1);
         const u = solveLinear(a21 - a20, a20);
 
         if (u < 0 || u > 1 || Number.isNaN(u)) {
@@ -464,7 +464,7 @@ export class SnapRound2 {
     }
 }
 
-export function intersectSegmentWithPixel(p0: Point2, p1: Point2, p: Point2): [number, number] | undefined {
+export function intersectSegmentWithPixel(p0: Vector2, p1: Vector2, p: Vector2): [number, number] | undefined {
     // Pixel bounds
     const x0 = p.x - 0.5;
     const y0 = p.y - 0.5;
@@ -528,8 +528,8 @@ export function intersectSegmentWithPixel(p0: Point2, p1: Point2, p: Point2): [n
     return result;
 }
 
-function roundPoint(p: Point2): Point2 {
+function roundPoint(p: Vector2): Vector2 {
     const x = Math.round(p.x);
     const y = Math.round(p.y);
-    return new Point2(x, y);
+    return new Vector2(x, y);
 }

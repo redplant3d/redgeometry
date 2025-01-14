@@ -1,7 +1,7 @@
 import { Path2 } from "redgeometry/src/core/path";
 import { WindingOperator } from "redgeometry/src/core/path-options";
 import { Box2 } from "redgeometry/src/primitives/box";
-import { Point2 } from "redgeometry/src/primitives/point";
+import { Vector2 } from "redgeometry/src/primitives/vector";
 import { RandomXSR128 } from "redgeometry/src/utility/random";
 import type { AppContextPlugin } from "../ecs-modules/app-context.js";
 import { AppContextModule } from "../ecs-modules/app-context.js";
@@ -80,7 +80,7 @@ function updateSystem(world: World): void {
     const path = createRandomPath(random, generator, count, canvasWidth, canvasHeight);
     path.close();
 
-    const p = Point2.fromObject(mouse.getCursorPosition());
+    const p = Vector2.fromObject(mouse.getCursorPosition());
 
     world.writeData<AppPartRemoteData>({
         dataId: "app-part-remote",

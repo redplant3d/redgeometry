@@ -1,15 +1,15 @@
 import { expect, test } from "vitest";
 import { Path2, PathCommandType, type PathCommand } from "../../src/core/path.js";
-import { Point2 } from "../../src/primitives/point.js";
+import { Vector2 } from "../../src/primitives/vector.js";
 
 const cmdMove: PathCommand = { type: PathCommandType.Move };
 const cmdLine: PathCommand = { type: PathCommandType.Linear };
 
 test("addPathAppend", () => {
-    const p1 = new Point2(100, 100);
-    const p2 = new Point2(200, 200);
-    const p3 = new Point2(300, 300);
-    const p4 = new Point2(400, 400);
+    const p1 = new Vector2(100, 100);
+    const p2 = new Vector2(200, 200);
+    const p3 = new Vector2(300, 300);
+    const p4 = new Vector2(400, 400);
 
     const path1 = Path2.createEmpty();
     path1.moveTo(p1);
@@ -26,10 +26,10 @@ test("addPathAppend", () => {
 });
 
 test("addPathReversedAppend", () => {
-    const p1 = new Point2(100, 100);
-    const p2 = new Point2(200, 200);
-    const p3 = new Point2(300, 300);
-    const p4 = new Point2(400, 400);
+    const p1 = new Vector2(100, 100);
+    const p2 = new Vector2(200, 200);
+    const p3 = new Vector2(300, 300);
+    const p4 = new Vector2(400, 400);
 
     const path1 = Path2.createEmpty();
     path1.moveTo(p1);

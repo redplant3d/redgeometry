@@ -11,31 +11,30 @@ import { Interval } from "../utility/interval.js";
 import { RootType, solveCubic, solveLinear, solveQuadratic } from "../utility/solve.js";
 import { Box2 } from "./box.js";
 import { Edge2 } from "./edge.js";
-import { Point2, Point3, type Point2Like } from "./point.js";
-import { Vector2, type Vector3 } from "./vector.js";
+import { Vector2, Vector3, type Vector2Like } from "./vector.js";
 
 export type Bezier1Curve2Like = {
-    readonly p0: Point2Like;
-    readonly p1: Point2Like;
+    readonly p0: Vector2Like;
+    readonly p1: Vector2Like;
 };
 
 export type Bezier2Curve2Like = {
-    readonly p0: Point2Like;
-    readonly p1: Point2Like;
-    readonly p2: Point2Like;
+    readonly p0: Vector2Like;
+    readonly p1: Vector2Like;
+    readonly p2: Vector2Like;
 };
 
 export type Bezier3Curve2Like = {
-    readonly p0: Point2Like;
-    readonly p1: Point2Like;
-    readonly p2: Point2Like;
-    readonly p3: Point2Like;
+    readonly p0: Vector2Like;
+    readonly p1: Vector2Like;
+    readonly p2: Vector2Like;
+    readonly p3: Vector2Like;
 };
 
 export type BezierRCurve2Like = {
-    readonly p0: Point2Like;
-    readonly p1: Point2Like;
-    readonly p2: Point2Like;
+    readonly p0: Vector2Like;
+    readonly p1: Vector2Like;
+    readonly p2: Vector2Like;
     readonly w: number;
 };
 
@@ -49,15 +48,15 @@ export enum CurveType {
 }
 
 export class Bezier1Curve2 {
-    public p0: Point2;
-    public p1: Point2;
+    public p0: Vector2;
+    public p1: Vector2;
 
-    public constructor(p0: Point2, p1: Point2) {
+    public constructor(p0: Vector2, p1: Vector2) {
         this.p0 = p0;
         this.p1 = p1;
     }
 
-    public get pn(): Point2 {
+    public get pn(): Vector2 {
         return this.p1;
     }
 
@@ -66,28 +65,28 @@ export class Bezier1Curve2 {
     }
 
     public static fromArray(data: ArrayLike<number>, offset = 0): Bezier1Curve2 {
-        const p0 = Point2.fromArray(data, offset);
-        const p1 = Point2.fromArray(data, offset + 2);
+        const p0 = Vector2.fromArray(data, offset);
+        const p1 = Vector2.fromArray(data, offset + 2);
 
         return new Bezier1Curve2(p0, p1);
     }
 
     public static fromObject(obj: Bezier1Curve2Like): Bezier1Curve2 {
-        const p0 = Point2.fromObject(obj.p0);
-        const p1 = Point2.fromObject(obj.p1);
+        const p0 = Vector2.fromObject(obj.p0);
+        const p1 = Vector2.fromObject(obj.p1);
         return new Bezier1Curve2(p0, p1);
     }
 
     public static fromXY(x0: number, y0: number, x1: number, y1: number): Bezier1Curve2 {
-        const p0 = new Point2(x0, y0);
-        const p1 = new Point2(x1, y1);
+        const p0 = new Vector2(x0, y0);
+        const p1 = new Vector2(x1, y1);
 
         return new Bezier1Curve2(p0, p1);
     }
 
     public static toObject(c: Bezier1Curve2): Bezier1Curve2Like {
-        const p0 = Point2.toObject(c.p0);
-        const p1 = Point2.toObject(c.p1);
+        const p0 = Vector2.toObject(c.p0);
+        const p1 = Vector2.toObject(c.p1);
         return { p0, p1 };
     }
 
@@ -124,11 +123,11 @@ export class Bezier1Curve2 {
         return this.getDerivative();
     }
 
-    public getValueAt(t: number): Point2 {
+    public getValueAt(t: number): Vector2 {
         return this.p0.lerp(this.p1, t);
     }
 
-    public getWindingAt(p: Point2): number {
+    public getWindingAt(p: Vector2): number {
         const v0 = this.p0.y - p.y;
         const v1 = this.p1.y - this.p0.y;
 
@@ -137,7 +136,7 @@ export class Bezier1Curve2 {
         return getWindingAtParameterLinear(this, x, p.x);
     }
 
-    public getWindingFracAt(p: Point2, step: number): number {
+    public getWindingFracAt(p: Vector2, step: number): number {
         const vv = this.getDerivative();
 
         let sum = 0;
@@ -205,17 +204,17 @@ export class Bezier1Curve2 {
 }
 
 export class Bezier2Curve2 {
-    public p0: Point2;
-    public p1: Point2;
-    public p2: Point2;
+    public p0: Vector2;
+    public p1: Vector2;
+    public p2: Vector2;
 
-    public constructor(p0: Point2, p1: Point2, p2: Point2) {
+    public constructor(p0: Vector2, p1: Vector2, p2: Vector2) {
         this.p0 = p0;
         this.p1 = p1;
         this.p2 = p2;
     }
 
-    public get pn(): Point2 {
+    public get pn(): Vector2 {
         return this.p2;
     }
 
@@ -224,32 +223,32 @@ export class Bezier2Curve2 {
     }
 
     public static fromArray(data: ArrayLike<number>, offset = 0): Bezier2Curve2 {
-        const p0 = Point2.fromArray(data, offset);
-        const p1 = Point2.fromArray(data, offset + 2);
-        const p2 = Point2.fromArray(data, offset + 4);
+        const p0 = Vector2.fromArray(data, offset);
+        const p1 = Vector2.fromArray(data, offset + 2);
+        const p2 = Vector2.fromArray(data, offset + 4);
 
         return new Bezier2Curve2(p0, p1, p2);
     }
 
     public static fromObject(obj: Bezier2Curve2Like): Bezier2Curve2 {
-        const p0 = Point2.fromObject(obj.p0);
-        const p1 = Point2.fromObject(obj.p1);
-        const p2 = Point2.fromObject(obj.p2);
+        const p0 = Vector2.fromObject(obj.p0);
+        const p1 = Vector2.fromObject(obj.p1);
+        const p2 = Vector2.fromObject(obj.p2);
         return new Bezier2Curve2(p0, p1, p2);
     }
 
     public static fromXY(x0: number, y0: number, x1: number, y1: number, x2: number, y2: number): Bezier2Curve2 {
-        const p0 = new Point2(x0, y0);
-        const p1 = new Point2(x1, y1);
-        const p2 = new Point2(x2, y2);
+        const p0 = new Vector2(x0, y0);
+        const p1 = new Vector2(x1, y1);
+        const p2 = new Vector2(x2, y2);
 
         return new Bezier2Curve2(p0, p1, p2);
     }
 
     public static toObject(c: Bezier2Curve2): Bezier2Curve2Like {
-        const p0 = Point2.toObject(c.p0);
-        const p1 = Point2.toObject(c.p1);
-        const p2 = Point2.toObject(c.p2);
+        const p0 = Vector2.toObject(c.p0);
+        const p1 = Vector2.toObject(c.p1);
+        const p2 = Vector2.toObject(c.p2);
         return { p0, p1, p2 };
     }
 
@@ -270,7 +269,7 @@ export class Bezier2Curve2 {
         return box;
     }
 
-    public getClosestParameter(p: Point2): number {
+    public getClosestParameter(p: Vector2): number {
         // Solve `(C(t) - P) dot C'(t) = 0` for `t`
         const v0 = this.p0.sub(p);
         const v1 = this.p1.sub(this.p0);
@@ -305,7 +304,7 @@ export class Bezier2Curve2 {
         return min.param;
     }
 
-    public getCoefficients(): [Vector2, Vector2, Point2] {
+    public getCoefficients(): [Vector2, Vector2, Vector2] {
         const v1 = this.p1.sub(this.p0);
         const v2 = this.p2.sub(this.p1);
 
@@ -363,7 +362,7 @@ export class Bezier2Curve2 {
         return [qqa, qqb];
     }
 
-    public getEvoluteAt(t: number): Point2 {
+    public getEvoluteAt(t: number): Vector2 {
         const [qa, qb, qc] = this.getCoefficients();
 
         // p = qa * t^2 + qb * t + qc
@@ -430,7 +429,7 @@ export class Bezier2Curve2 {
         }
     }
 
-    public getValueAt(t: number): Point2 {
+    public getValueAt(t: number): Vector2 {
         const p01 = this.p0.lerp(this.p1, t);
         const p12 = this.p1.lerp(this.p2, t);
 
@@ -444,7 +443,7 @@ export class Bezier2Curve2 {
         return qqa.dot(qqb.neg()) / qqa.lenSq();
     }
 
-    public getWindingAt(p: Point2): number {
+    public getWindingAt(p: Vector2): number {
         const v0 = this.p0.y - p.y;
         const v1 = this.p1.y - this.p0.y;
         const v2 = this.p2.y - this.p1.y;
@@ -461,7 +460,7 @@ export class Bezier2Curve2 {
         return wind;
     }
 
-    public getWindingFracAt(p: Point2, step: number): number {
+    public getWindingFracAt(p: Vector2, step: number): number {
         let sum = 0;
 
         for (let t = 0; t < 1; t += step) {
@@ -475,9 +474,9 @@ export class Bezier2Curve2 {
     }
 
     public intersectLine(c: Bezier1Curve2, output: number[]): void {
-        const a0 = Point2.signedArea(c.p0, c.p1, this.p0);
-        const a1 = Point2.signedArea(c.p0, c.p1, this.p1);
-        const a2 = Point2.signedArea(c.p0, c.p1, this.p2);
+        const a0 = Vector2.signedArea(c.p0, c.p1, this.p0);
+        const a1 = Vector2.signedArea(c.p0, c.p1, this.p1);
+        const a2 = Vector2.signedArea(c.p0, c.p1, this.p2);
 
         const v1 = a1 - a0;
         const v2 = a2 - a1;
@@ -495,7 +494,7 @@ export class Bezier2Curve2 {
         }
     }
 
-    public intersectQuad(c: Bezier2Curve2, output: Point2[]): void {
+    public intersectQuad(c: Bezier2Curve2, output: Vector2[]): void {
         const i1 = new Interval(0, 1);
         const i2 = new Interval(0, 1);
 
@@ -572,19 +571,19 @@ export class Bezier2Curve2 {
 }
 
 export class Bezier3Curve2 {
-    public p0: Point2;
-    public p1: Point2;
-    public p2: Point2;
-    public p3: Point2;
+    public p0: Vector2;
+    public p1: Vector2;
+    public p2: Vector2;
+    public p3: Vector2;
 
-    public constructor(p0: Point2, p1: Point2, p2: Point2, p3: Point2) {
+    public constructor(p0: Vector2, p1: Vector2, p2: Vector2, p3: Vector2) {
         this.p0 = p0;
         this.p1 = p1;
         this.p2 = p2;
         this.p3 = p3;
     }
 
-    public get pn(): Point2 {
+    public get pn(): Vector2 {
         return this.p3;
     }
 
@@ -593,19 +592,19 @@ export class Bezier3Curve2 {
     }
 
     public static fromArray(data: ArrayLike<number>, offset = 0): Bezier3Curve2 {
-        const p0 = Point2.fromArray(data, offset);
-        const p1 = Point2.fromArray(data, offset + 2);
-        const p2 = Point2.fromArray(data, offset + 4);
-        const p3 = Point2.fromArray(data, offset + 6);
+        const p0 = Vector2.fromArray(data, offset);
+        const p1 = Vector2.fromArray(data, offset + 2);
+        const p2 = Vector2.fromArray(data, offset + 4);
+        const p3 = Vector2.fromArray(data, offset + 6);
 
         return new Bezier3Curve2(p0, p1, p2, p3);
     }
 
     public static fromObject(obj: Bezier3Curve2Like): Bezier3Curve2 {
-        const p0 = Point2.fromObject(obj.p0);
-        const p1 = Point2.fromObject(obj.p1);
-        const p2 = Point2.fromObject(obj.p2);
-        const p3 = Point2.fromObject(obj.p3);
+        const p0 = Vector2.fromObject(obj.p0);
+        const p1 = Vector2.fromObject(obj.p1);
+        const p2 = Vector2.fromObject(obj.p2);
+        const p3 = Vector2.fromObject(obj.p3);
         return new Bezier3Curve2(p0, p1, p2, p3);
     }
 
@@ -619,19 +618,19 @@ export class Bezier3Curve2 {
         x3: number,
         y3: number,
     ): Bezier3Curve2 {
-        const p0 = new Point2(x0, y0);
-        const p1 = new Point2(x1, y1);
-        const p2 = new Point2(x2, y2);
-        const p3 = new Point2(x3, y3);
+        const p0 = new Vector2(x0, y0);
+        const p1 = new Vector2(x1, y1);
+        const p2 = new Vector2(x2, y2);
+        const p3 = new Vector2(x3, y3);
 
         return new Bezier3Curve2(p0, p1, p2, p3);
     }
 
     public static toObject(c: Bezier3Curve2): Bezier3Curve2Like {
-        const p0 = Point2.toObject(c.p0);
-        const p1 = Point2.toObject(c.p1);
-        const p2 = Point2.toObject(c.p2);
-        const p3 = Point2.toObject(c.p3);
+        const p0 = Vector2.toObject(c.p0);
+        const p1 = Vector2.toObject(c.p1);
+        const p2 = Vector2.toObject(c.p2);
+        const p3 = Vector2.toObject(c.p3);
         return { p0, p1, p2, p3 };
     }
 
@@ -659,7 +658,7 @@ export class Bezier3Curve2 {
         return box;
     }
 
-    public getCoefficients(): [Vector2, Vector2, Vector2, Point2] {
+    public getCoefficients(): [Vector2, Vector2, Vector2, Vector2] {
         const v1 = this.p1.sub(this.p0);
         const v2 = this.p2.sub(this.p1);
         const v3 = this.p3.sub(this.p2);
@@ -728,7 +727,7 @@ export class Bezier3Curve2 {
         return [qqa, qqb, qqc];
     }
 
-    public getEvoluteAt(t: number): Point2 {
+    public getEvoluteAt(t: number): Vector2 {
         const [qa, qb, qc, qd] = this.getCoefficients();
 
         // p = qa * t^3 + qb * t^2 + qc * t + qd
@@ -814,7 +813,7 @@ export class Bezier3Curve2 {
         }
     }
 
-    public getValueAt(t: number): Point2 {
+    public getValueAt(t: number): Vector2 {
         const p01 = this.p0.lerp(this.p1, t);
         const p12 = this.p1.lerp(this.p2, t);
         const p23 = this.p2.lerp(this.p3, t);
@@ -825,7 +824,7 @@ export class Bezier3Curve2 {
         return p012.lerp(p123, t);
     }
 
-    public getWindingAt(p: Point2): number {
+    public getWindingAt(p: Vector2): number {
         const v0 = this.p0.y - p.y;
         const v1 = this.p1.y - this.p0.y;
         const v2 = this.p2.y - this.p1.y;
@@ -846,7 +845,7 @@ export class Bezier3Curve2 {
         return wind;
     }
 
-    public getWindingFracAt(p: Point2, step: number): number {
+    public getWindingFracAt(p: Vector2, step: number): number {
         let sum = 0;
 
         for (let t = 0; t < 1; t += step) {
@@ -951,19 +950,19 @@ export class Bezier3Curve2 {
 }
 
 export class BezierRCurve2 {
-    public p0: Point2;
-    public p1: Point2;
-    public p2: Point2;
+    public p0: Vector2;
+    public p1: Vector2;
+    public p2: Vector2;
     public w: number;
 
-    public constructor(p0: Point2, p1: Point2, p2: Point2, w: number) {
+    public constructor(p0: Vector2, p1: Vector2, p2: Vector2, w: number) {
         this.p0 = p0;
         this.p1 = p1;
         this.p2 = p2;
         this.w = w;
     }
 
-    public get pn(): Point2 {
+    public get pn(): Vector2 {
         return this.p2;
     }
 
@@ -972,15 +971,15 @@ export class BezierRCurve2 {
     }
 
     public static fromArray(data: ArrayLike<number>, offset = 0): BezierRCurve2 {
-        const p0 = Point2.fromArray(data, offset);
-        const p1 = Point2.fromArray(data, offset + 2);
-        const p2 = Point2.fromArray(data, offset + 4);
+        const p0 = Vector2.fromArray(data, offset);
+        const p1 = Vector2.fromArray(data, offset + 2);
+        const p2 = Vector2.fromArray(data, offset + 4);
         const w = data[offset + 6];
 
         return new BezierRCurve2(p0, p1, p2, w);
     }
 
-    public static fromCenterPoint(p0: Point2, p1: Point2, p2: Point2, pc: Point2): BezierRCurve2 {
+    public static fromCenterPoint(p0: Vector2, p1: Vector2, p2: Vector2, pc: Vector2): BezierRCurve2 {
         const pm = p0.lerp(p2, 0.5);
         const dm = pm.distanceTo(pc);
         const d1 = p1.distanceTo(pc);
@@ -989,16 +988,16 @@ export class BezierRCurve2 {
     }
 
     public static fromObject(obj: BezierRCurve2Like): BezierRCurve2 {
-        const p0 = Point2.fromObject(obj.p0);
-        const p1 = Point2.fromObject(obj.p1);
-        const p2 = Point2.fromObject(obj.p2);
+        const p0 = Vector2.fromObject(obj.p0);
+        const p1 = Vector2.fromObject(obj.p1);
+        const p2 = Vector2.fromObject(obj.p2);
         return new BezierRCurve2(p0, p1, p2, obj.w);
     }
 
-    public static fromProjectivePoints(p0: Point3, p1: Point3, p2: Point3): BezierRCurve2 {
-        const pp0 = Point2.fromXYW(p0.x, p0.y, p0.z);
-        const pp1 = Point2.fromXYW(p1.x, p1.y, p1.z);
-        const pp2 = Point2.fromXYW(p2.x, p2.y, p2.z);
+    public static fromProjectivePoints(p0: Vector3, p1: Vector3, p2: Vector3): BezierRCurve2 {
+        const pp0 = Vector2.fromXYW(p0.x, p0.y, p0.z);
+        const pp1 = Vector2.fromXYW(p1.x, p1.y, p1.z);
+        const pp2 = Vector2.fromXYW(p2.x, p2.y, p2.z);
         const w = BezierRCurve2.getNormalizedWeight(p0.z, p1.z, p2.z);
 
         return new BezierRCurve2(pp0, pp1, pp2, w);
@@ -1013,9 +1012,9 @@ export class BezierRCurve2 {
         y2: number,
         w: number,
     ): BezierRCurve2 {
-        const p0 = new Point2(x0, y0);
-        const p1 = new Point2(x1, y1);
-        const p2 = new Point2(x2, y2);
+        const p0 = new Vector2(x0, y0);
+        const p1 = new Vector2(x1, y1);
+        const p2 = new Vector2(x2, y2);
 
         return new BezierRCurve2(p0, p1, p2, w);
     }
@@ -1024,7 +1023,7 @@ export class BezierRCurve2 {
         return w1 / Math.sqrt(w0 * w2);
     }
 
-    public static getWeightFromVectors(pc: Point2, p1: Point2, p2: Point2): number {
+    public static getWeightFromVectors(pc: Vector2, p1: Vector2, p2: Vector2): number {
         const v1 = p1.sub(pc);
         const v2 = p2.sub(pc);
 
@@ -1032,9 +1031,9 @@ export class BezierRCurve2 {
     }
 
     public static toObject(c: BezierRCurve2): BezierRCurve2Like {
-        const p0 = Point2.toObject(c.p0);
-        const p1 = Point2.toObject(c.p1);
-        const p2 = Point2.toObject(c.p2);
+        const p0 = Vector2.toObject(c.p0);
+        const p1 = Vector2.toObject(c.p1);
+        const p2 = Vector2.toObject(c.p2);
         return { p0, p1, p2, w: c.w };
     }
 
@@ -1101,7 +1100,7 @@ export class BezierRCurve2 {
      * const v = Vector2.fromXYW(vv.x, vv.y, vv.z * vv.z);
      * ```
      */
-    public getDerivativeCoefficients(): [Vector3, Vector3, Point3] {
+    public getDerivativeCoefficients(): [Vector3, Vector3, Vector3] {
         const [p0, p1, p2] = this.getProjectivePoints();
 
         const pp2x = p2.x * p1.z - p1.x * p2.z;
@@ -1112,9 +1111,9 @@ export class BezierRCurve2 {
         const pp0y = p1.y * p0.z - p0.y * p1.z;
 
         // Derivative coefficients as points
-        const pp2 = new Point3(2 * pp2x, 2 * pp2y, p2.z);
-        const pp1 = new Point3(pp1x, pp1y, p1.z);
-        const pp0 = new Point3(2 * pp0x, 2 * pp0y, p0.z);
+        const pp2 = new Vector3(2 * pp2x, 2 * pp2y, p2.z);
+        const pp1 = new Vector3(pp1x, pp1y, p1.z);
+        const pp0 = new Vector3(2 * pp0x, 2 * pp0y, p0.z);
 
         const vv2 = pp2.sub(pp1);
         const vv1 = pp1.sub(pp0);
@@ -1126,10 +1125,10 @@ export class BezierRCurve2 {
         return [qqa, qqb, qqc];
     }
 
-    public getProjectivePoints(): [Point3, Point3, Point3] {
-        const p0 = Point3.fromXYW(this.p0.x, this.p0.y, 1);
-        const p1 = Point3.fromXYW(this.p1.x, this.p1.y, this.w);
-        const p2 = Point3.fromXYW(this.p2.x, this.p2.y, 1);
+    public getProjectivePoints(): [Vector3, Vector3, Vector3] {
+        const p0 = Vector3.fromXYW(this.p0.x, this.p0.y, 1);
+        const p1 = Vector3.fromXYW(this.p1.x, this.p1.y, this.w);
+        const p2 = Vector3.fromXYW(this.p2.x, this.p2.y, 1);
 
         return [p0, p1, p2];
     }
@@ -1200,7 +1199,7 @@ export class BezierRCurve2 {
         }
     }
 
-    public getValueAt(t: number): Point2 {
+    public getValueAt(t: number): Vector2 {
         const [p0, p1, p2] = this.getProjectivePoints();
 
         const p01 = p0.lerp(p1, t);
@@ -1208,10 +1207,10 @@ export class BezierRCurve2 {
 
         const p = p01.lerp(p12, t);
 
-        return Point2.fromXYW(p.x, p.y, p.z);
+        return Vector2.fromXYW(p.x, p.y, p.z);
     }
 
-    public getWindingAt(p: Point2): number {
+    public getWindingAt(p: Vector2): number {
         const y1 = this.w * this.p1.y - this.w * p.y + p.y;
 
         const v0 = this.p0.y - p.y;
@@ -1230,7 +1229,7 @@ export class BezierRCurve2 {
         return wind;
     }
 
-    public getWindingFracAt(p: Point2, step: number): number {
+    public getWindingFracAt(p: Vector2, step: number): number {
         let sum = 0;
 
         for (let t = 0; t < 1; t += step) {

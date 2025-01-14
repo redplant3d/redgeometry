@@ -1,29 +1,17 @@
 import { expect } from "vitest";
 import type { Complex } from "../src/primitives/complex.js";
-import { Point2, Point3 } from "../src/primitives/point.js";
 import { Quaternion } from "../src/primitives/quaternion.js";
 import { Vector2, Vector3 } from "../src/primitives/vector.js";
 
-export function expectToBeClosePoint2(p1: Point2, p2: Point2, numDigits?: number): void {
+export function expectToBeCloseVector2(p1: Vector2, p2: Vector2, numDigits?: number): void {
     expect(p1.x).toBeCloseTo(p2.x, numDigits ?? 15);
     expect(p1.y).toBeCloseTo(p2.y, numDigits ?? 15);
 }
 
-export function expectToBeClosePoint3(p1: Point3, p2: Point3, numDigits?: number): void {
+export function expectToBeCloseVector3(p1: Vector3, p2: Vector3, numDigits?: number): void {
     expect(p1.x).toBeCloseTo(p2.x, numDigits ?? 15);
     expect(p1.y).toBeCloseTo(p2.y, numDigits ?? 15);
     expect(p1.z).toBeCloseTo(p2.z, numDigits ?? 15);
-}
-
-export function expectToBeCloseVector2(v1: Vector2, v2: Vector2, numDigits?: number): void {
-    expect(v1.x).toBeCloseTo(v2.x, numDigits ?? 15);
-    expect(v1.y).toBeCloseTo(v2.y, numDigits ?? 15);
-}
-
-export function expectToBeCloseVector3(v1: Vector3, v2: Vector3, numDigits?: number): void {
-    expect(v1.x).toBeCloseTo(v2.x, numDigits ?? 15);
-    expect(v1.y).toBeCloseTo(v2.y, numDigits ?? 15);
-    expect(v1.z).toBeCloseTo(v2.z, numDigits ?? 15);
 }
 
 export function expectToBeCloseComplex(z1: Complex, z2: Complex, numDigits?: number): void {

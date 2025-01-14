@@ -11,7 +11,6 @@ import {
 } from "../internal/path-simplify.js";
 import { StrokeState } from "../internal/path-stroke.js";
 import { Bezier1Curve2, Bezier2Curve2, Bezier3Curve2, BezierRCurve2 } from "../primitives/bezier.js";
-import { Point2 } from "../primitives/point.js";
 import { Vector2 } from "../primitives/vector.js";
 import { assertUnreachable } from "../utility/debug.js";
 import { MAX_PARAMETER, type PathQualityOptions, type PathStrokeOptions } from "./path-options.js";
@@ -59,8 +58,8 @@ export class PathStrokeIncremental2 implements PathStroke2 {
 
         let ct0 = PathCommandType.Move;
 
-        let ps = Point2.createZero();
-        let p0 = Point2.createZero();
+        let ps = Vector2.createZero();
+        let p0 = Vector2.createZero();
         let m0 = Vector2.createZero();
 
         this.state.initialize(output, options);
@@ -315,8 +314,8 @@ export class PathStrokeRecursive2 implements PathStroke2 {
         let cIdx = 0;
         let pIdx = 0;
 
-        let ps = Point2.createZero();
-        let p0 = Point2.createZero();
+        let ps = Vector2.createZero();
+        let p0 = Vector2.createZero();
         let m0 = Vector2.createZero();
 
         this.state.initialize(output, options);

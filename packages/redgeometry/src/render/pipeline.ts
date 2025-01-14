@@ -3,7 +3,7 @@ import { DEFAULT_PATH_QUALITY_OPTIONS, createPathFlatten, createPathStroke } fro
 import type { PathStroke2 } from "../core/path-stroke.js";
 import { Path2 } from "../core/path.js";
 import type { Matrix3A } from "../primitives/matrix.js";
-import { Point2 } from "../primitives/point.js";
+import { Vector2 } from "../primitives/vector.js";
 import { clamp } from "../utility/scalar.js";
 import { SoftwareCompositor } from "./compositor.js";
 import { FillRule, StrokeTransformOrder, type ContextFillOptions, type ContextStrokeOptions } from "./context.js";
@@ -108,7 +108,7 @@ export class SoftwareRenderPipeline implements RenderPipeline {
         return;
     }
 
-    private clipPolyline(polyline: readonly Point2[], rect: Rectangle2): void {
+    private clipPolyline(polyline: readonly Vector2[], rect: Rectangle2): void {
         const rasterizer = this.rasterizer;
         let p1 = polyline[0];
 
@@ -211,10 +211,10 @@ class Rectangle2 {
     }
 }
 
-function getHorizontalIntersection(p1: Point2, p2: Point2, y: number): Point2 {
-    return new Point2(p1.x + ((p2.x - p1.x) * (y - p1.y)) / (p2.y - p1.y), y);
+function getHorizontalIntersection(p1: Vector2, p2: Vector2, y: number): Vector2 {
+    return new Vector2(p1.x + ((p2.x - p1.x) * (y - p1.y)) / (p2.y - p1.y), y);
 }
 
-function getVerticalIntersection(p1: Point2, p2: Point2, x: number): Point2 {
-    return new Point2(x, p1.y + ((p2.y - p1.y) * (x - p1.x)) / (p2.x - p1.x));
+function getVerticalIntersection(p1: Vector2, p2: Vector2, x: number): Vector2 {
+    return new Vector2(x, p1.y + ((p2.y - p1.y) * (x - p1.x)) / (p2.x - p1.x));
 }
