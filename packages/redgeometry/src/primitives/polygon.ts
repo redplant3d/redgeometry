@@ -210,7 +210,7 @@ export class Polygon2 {
         let result = 0;
 
         for (const edge of this.getEdgeIterator()) {
-            result += edge.p0.toVector().cross(edge.p1.toVector());
+            result += edge.p0.cross(edge.p1);
         }
 
         return result;
@@ -254,8 +254,8 @@ export class Polygon2 {
             if (area < minArea) {
                 // Update bounding box
                 points[0] = p0;
-                points[1] = p0.addV(v1);
-                points[2] = p1.addV(v1);
+                points[1] = p0.add(v1);
+                points[2] = p1.add(v1);
                 points[3] = p1;
                 minArea = area;
             }
@@ -339,7 +339,7 @@ export class Polygon2 {
     public transform(mat: Matrix3 | Matrix3A): void {
         const points = this.points;
         for (let i = 0; i < points.length; i++) {
-            points[i] = mat.mulP(points[i]);
+            points[i] = mat.transformPoint(points[i]);
         }
     }
 }

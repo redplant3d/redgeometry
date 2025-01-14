@@ -107,8 +107,8 @@ export class Bezier1Curve2 {
     }
 
     public getSignedArea(): number {
-        const v0 = this.p0.toVector();
-        const v1 = this.p1.toVector();
+        const v0 = this.p0;
+        const v1 = this.p1;
 
         const a01 = v0.cross(v1);
 
@@ -368,14 +368,14 @@ export class Bezier2Curve2 {
         // p = qa * t^2 + qb * t + qc
         // pp = 2 * qa * t + qb
         // ppp = 2 * qa
-        const p = qa.mulS(t).add(qb).mulS(t).addP(qc);
+        const p = qa.mulS(t).add(qb).mulS(t).add(qc);
         const pp = qa.mulS(2 * t).add(qb);
         const ppp = qa.mulS(2);
 
         const v = pp.normal();
         const f = pp.lenSq() / pp.cross(ppp);
 
-        return p.addVMulS(v, f);
+        return p.addMulS(v, f);
     }
 
     public getOffsetCuspParameter(rad: number): [number, number] {
@@ -402,9 +402,9 @@ export class Bezier2Curve2 {
     }
 
     public getSignedArea(): number {
-        const v0 = this.p0.toVector();
-        const v1 = this.p1.toVector();
-        const v2 = this.p2.toVector();
+        const v0 = this.p0;
+        const v1 = this.p1;
+        const v2 = this.p2;
 
         const a01 = 2 * v0.cross(v1);
         const a12 = 2 * v1.cross(v2);
@@ -733,7 +733,7 @@ export class Bezier3Curve2 {
         // p = qa * t^3 + qb * t^2 + qc * t + qd
         // pp = 3 * qa * t^2 + 2 * qb * t + qc
         // ppp = 6 * qa * t + 2 * qb
-        const p = qa.mulS(t).add(qb).mulS(t).add(qc).mulS(t).addP(qd);
+        const p = qa.mulS(t).add(qb).mulS(t).add(qc).mulS(t).add(qd);
         const pp = qa
             .mulS(3 * t)
             .addMulS(qb, 2)
@@ -744,7 +744,7 @@ export class Bezier3Curve2 {
         const v = pp.normal();
         const f = pp.lenSq() / pp.cross(ppp);
 
-        return p.addVMulS(v, f);
+        return p.addMulS(v, f);
     }
 
     public getInflectionParameter(): [number, number] {
@@ -778,10 +778,10 @@ export class Bezier3Curve2 {
     }
 
     public getSignedArea(): number {
-        const v0 = this.p0.toVector();
-        const v1 = this.p1.toVector();
-        const v2 = this.p2.toVector();
-        const v3 = this.p3.toVector();
+        const v0 = this.p0;
+        const v1 = this.p1;
+        const v2 = this.p2;
+        const v3 = this.p3;
 
         const a01 = 6 * v0.cross(v1);
         const a23 = 6 * v2.cross(v3);
@@ -1096,7 +1096,7 @@ export class BezierRCurve2 {
      * const c = BezierRCurve2.fromXY(0, 0, 0, 1, 1, 1, 2);
      * const [qqa, qqb, qqc] = c.getDerivativeCoefficients();
      * const t = 0.5;
-     * const vv = qqa.mul(t).add(qqb).mul(t).addP(qqc);
+     * const vv = qqa.mul(t).add(qqb).mul(t).add(qqc);
      * const v = Vector2.fromXYW(vv.x, vv.y, vv.z * vv.z);
      * ```
      */
@@ -1135,9 +1135,9 @@ export class BezierRCurve2 {
 
     public getSignedArea(): number {
         // Inspired from: http://ich.deanmcnamee.com/graphics/2016/03/30/CurveArea.html
-        const v0 = this.p0.toVector();
-        const v1 = this.p1.toVector();
-        const v2 = this.p2.toVector();
+        const v0 = this.p0;
+        const v1 = this.p1;
+        const v2 = this.p2;
         const w = this.w;
 
         const a01 = v0.cross(v1);

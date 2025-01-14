@@ -395,27 +395,6 @@ export class Quaternion {
     /**
      * ```
      * | a |   |  0 |   |  a |
-     * | b | * | px | * | -b |
-     * | c |   | py |   | -c |
-     * | d |   | pz |   | -d |
-     * ```
-     */
-    public mulP(p: Vector3): Vector3 {
-        const qa = this.b * p.x + this.c * p.y + this.d * p.z;
-        const qb = this.a * p.x + this.c * p.z - this.d * p.y;
-        const qc = this.a * p.y - this.b * p.z + this.d * p.x;
-        const qd = this.a * p.z + this.b * p.y - this.c * p.x;
-
-        return new Vector3(
-            qa * this.b + qb * this.a - qc * this.d + qd * this.c,
-            qa * this.c + qb * this.d + qc * this.a - qd * this.b,
-            qa * this.d - qb * this.c + qc * this.b + qd * this.a,
-        );
-    }
-
-    /**
-     * ```
-     * | a |   |  0 |   |  a |
      * | b | * | vx | * | -b |
      * | c |   | vy |   | -c |
      * | d |   | vz |   | -d |

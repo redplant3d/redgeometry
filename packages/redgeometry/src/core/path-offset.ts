@@ -247,13 +247,13 @@ export class PathOffsetIncremental2 implements PathOffset2 {
     private offsetLinear(p1: Vector2, m: Vector2): void {
         const v = m.unit().normal().mulS(this.d);
 
-        this.buffer.lineTo(p1.addV(v));
+        this.buffer.lineTo(p1.add(v));
     }
 
     private offsetMove(p0: Vector2, m: Vector2): void {
         const v = m.unit().normal().mulS(this.d);
 
-        this.buffer.moveTo(p0.addV(v));
+        this.buffer.moveTo(p0.add(v));
     }
 
     private offsetQuadratic(c0: Bezier2Curve2): void {
@@ -537,13 +537,13 @@ export class PathOffsetRecursive2 implements PathOffset2 {
     private offsetLinear(p1: Vector2, m: Vector2): void {
         const v = m.unit().normal().mulS(this.d);
 
-        this.buffer.lineTo(p1.addV(v));
+        this.buffer.lineTo(p1.add(v));
     }
 
     private offsetMove(p0: Vector2, m: Vector2): void {
         const v = m.unit().normal().mulS(this.d);
 
-        this.buffer.moveTo(p0.addV(v));
+        this.buffer.moveTo(p0.add(v));
     }
 
     private offsetQuadratic(c0: Bezier2Curve2): void {

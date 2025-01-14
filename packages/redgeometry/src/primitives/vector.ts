@@ -143,30 +143,6 @@ export class Vector2 {
     }
 
     /**
-     * Returns the sum of the current vector and a point `p`.
-     */
-    public addP(p: Vector2): Vector2 {
-        // This is provided as syntactic sugar for e.g. Horner's method
-        // `qa.mulS(t).add(qb).mulS(t).addP(qc)`
-        // where `qa` and `qb` are vectors and `qc` is a point
-        return p.addV(this);
-    }
-
-    /**
-     * Returns the sum of the current point and a vector `v`.
-     */
-    public addV(v: Vector2): Vector2 {
-        return new Vector2(this.x + v.x, this.y + v.y);
-    }
-
-    /**
-     * Returns the sum of the current point and a vector `v` multiplied by a scalar `s`.
-     */
-    public addVMulS(v: Vector2, s: number): Vector2 {
-        return new Vector2(this.x + s * v.x, this.y + s * v.y);
-    }
-
-    /**
      * Returns the angle of the vector from polar coordinates in radians.
      */
     public angle(): number {
@@ -330,14 +306,10 @@ export class Vector2 {
         return new Vector2(x, y);
     }
 
-    public sub(v: Vector2): Vector2 {
-        return new Vector2(this.x - v.x, this.y - v.y);
-    }
-
     /**
-     * Returns the difference of the current point and a vector `v`.
+     * Returns the difference of the current vector and a vector `v`.
      */
-    public subV(v: Vector2): Vector2 {
+    public sub(v: Vector2): Vector2 {
         return new Vector2(this.x - v.x, this.y - v.y);
     }
 
@@ -345,16 +317,8 @@ export class Vector2 {
         return [this.x, this.y];
     }
 
-    public toPoint(): Vector2 {
-        return new Vector2(this.x, this.y);
-    }
-
     public toString(): string {
         return `{x: ${this.x}, y: ${this.y}}`;
-    }
-
-    public toVector(): Vector2 {
-        return new Vector2(this.x, this.y);
     }
 
     public unit(): Vector2 {
@@ -464,30 +428,6 @@ export class Vector3 {
      * Returns the sum of the current vector and a vector `v` multiplied by a scalar `s`.
      */
     public addMulS(v: Vector3, s: number): Vector3 {
-        return new Vector3(this.x + s * v.x, this.y + s * v.y, this.z + s * v.z);
-    }
-
-    /**
-     * Returns the sum of the current vector and a point `p`.
-     */
-    public addP(p: Vector3): Vector3 {
-        // This is provided as syntactic sugar for e.g. Horner's method
-        // `qa.mulS(t).add(qb).mulS(t).addP(qc)`
-        // where `qa` and `qb` are vectors and `qc` is a point
-        return p.addV(this);
-    }
-
-    /**
-     * Returns the sum of the current point and a vector `v`.
-     */
-    public addV(v: Vector3): Vector3 {
-        return new Vector3(this.x + v.x, this.y + v.y, this.z + v.z);
-    }
-
-    /**
-     * Returns the sum of the current point and a vector `v` multiplied by a scalar `s`.
-     */
-    public addVMulS(v: Vector3, s: number): Vector3 {
         return new Vector3(this.x + s * v.x, this.y + s * v.y, this.z + s * v.z);
     }
 
@@ -708,14 +648,10 @@ export class Vector3 {
         return new Vector3(x, y, z);
     }
 
-    public sub(v: Vector3): Vector3 {
-        return new Vector3(this.x - v.x, this.y - v.y, this.z - v.z);
-    }
-
     /**
-     * Returns the difference of the current point and a vector `v`.
+     * Returns the difference of the current vector and a vector `v`.
      */
-    public subV(v: Vector3): Vector3 {
+    public sub(v: Vector3): Vector3 {
         return new Vector3(this.x - v.x, this.y - v.y, this.z - v.z);
     }
 
@@ -723,16 +659,8 @@ export class Vector3 {
         return [this.x, this.y, this.z];
     }
 
-    public toPoint(): Vector3 {
-        return new Vector3(this.x, this.y, this.z);
-    }
-
     public toString(): string {
         return `{x: ${this.x}, y: ${this.y}, z: ${this.z}}`;
-    }
-
-    public toVector(): Vector3 {
-        return new Vector3(this.x, this.y, this.z);
     }
 
     public unit(): Vector3 {

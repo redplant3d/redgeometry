@@ -42,22 +42,22 @@ test("Matrix3A - inverse", () => {
     expect(mat2).toEqual(Matrix3A.createIdentity());
 });
 
-test("Matrix3A - mulPt", () => {
-    const mat = Matrix3A.createIdentity();
-    const p = new Vector2(1, 2);
-
-    const mulPt = mat.mulP(p);
-
-    expect(mulPt).toEqual(p);
-});
-
-test("Matrix3A - mulVec", () => {
+test("Matrix3A - mulV", () => {
     const mat = Matrix3A.createIdentity();
     const v = new Vector2(1, 2);
 
-    const mulVec = mat.mulV(v);
+    const mulV = mat.mulV(v);
 
-    expect(mulVec).toEqual(v);
+    expect(mulV).toEqual(v);
+});
+
+test("Matrix3A - transformPoint", () => {
+    const mat = Matrix3A.createIdentity();
+    const p = new Vector2(1, 2);
+
+    const transformPoint = mat.transformPoint(p);
+
+    expect(transformPoint).toEqual(p);
 });
 
 test("Matrix3A - rotate", () => {
@@ -132,22 +132,22 @@ test("Matrix3 - inverse", () => {
     expect(mat2).toEqual(Matrix3.createIdentity());
 });
 
-test("Matrix3 - mulPt", () => {
-    const mat = Matrix3.createIdentity();
-    const p = new Vector2(1, 2);
-
-    const mulPt = mat.mulP(p);
-
-    expect(mulPt).toEqual(p);
-});
-
-test("Matrix3 - mulVec", () => {
+test("Matrix3 - mulV", () => {
     const mat = Matrix3.createIdentity();
     const v = new Vector3(1, 2, 3);
 
-    const mulVec = mat.mulV(v);
+    const mulV = mat.mulV(v);
 
-    expect(mulVec).toEqual(v);
+    expect(mulV).toEqual(v);
+});
+
+test("Matrix3 - transformPoint", () => {
+    const mat = Matrix3.createIdentity();
+    const p = new Vector2(1, 2);
+
+    const transformPoint = mat.transformPoint(p);
+
+    expect(transformPoint).toEqual(p);
 });
 
 test("Matrix3 - rotate", () => {
@@ -222,22 +222,22 @@ test("Matrix4A - inverse", () => {
     expect(mat2).toEqual(Matrix4A.createIdentity());
 });
 
-test("Matrix4A - mulPt", () => {
-    const mat = Matrix4A.createIdentity();
-    const p = new Vector3(1, 2, 3);
-
-    const mulPt = mat.mulP(p);
-
-    expect(mulPt).toEqual(p);
-});
-
-test("Matrix4A - mulVec", () => {
+test("Matrix4A - mulV", () => {
     const mat = Matrix4A.createIdentity();
     const v = new Vector3(1, 2, 3);
 
-    const mulVec = mat.mulV(v);
+    const mulV = mat.mulV(v);
 
-    expect(mulVec).toEqual(v);
+    expect(mulV).toEqual(v);
+});
+
+test("Matrix4A - transformPoint", () => {
+    const mat = Matrix4A.createIdentity();
+    const p = new Vector3(1, 2, 3);
+
+    const transformPoint = mat.transformPoint(p);
+
+    expect(transformPoint).toEqual(p);
 });
 
 test("Matrix4A - rotate (x)", () => {
@@ -350,22 +350,22 @@ test("Matrix4 - inverse", () => {
     expect(mat2).toEqual(Matrix4.createIdentity());
 });
 
-test("Matrix4 - mulPt", () => {
-    const mat = Matrix4.createIdentity();
-    const p = new Vector3(1, 2, 3);
-
-    const mulPt = mat.mulP(p);
-
-    expect(mulPt).toEqual(p);
-});
-
-test("Matrix4 - mulVec", () => {
+test("Matrix4 - mulV", () => {
     const mat = Matrix4.createIdentity();
     const v = new Vector4(1, 2, 3, 4);
 
-    const mulVec = mat.mulV(v);
+    const mulV = mat.mulV(v);
 
-    expect(mulVec).toEqual(v);
+    expect(mulV).toEqual(v);
+});
+
+test("Matrix4 - transformPoint", () => {
+    const mat = Matrix4.createIdentity();
+    const p = new Vector3(1, 2, 3);
+
+    const transformPoint = mat.transformPoint(p);
+
+    expect(transformPoint).toEqual(p);
 });
 
 test("Matrix4 - rotate (x)", () => {

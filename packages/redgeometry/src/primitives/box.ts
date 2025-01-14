@@ -113,7 +113,7 @@ export class Box2 {
     }
 
     public encloseWithTransform(p: Vector2, mat: Matrix3 | Matrix3A): void {
-        const pp = mat.mulP(p);
+        const pp = mat.transformPoint(p);
         this.enclose(pp);
     }
 
@@ -328,7 +328,7 @@ export class Box3 {
     }
 
     public encloseWithTransform(p: Vector3, mat: Matrix4 | Matrix4A): void {
-        const pp = mat.mulP(p);
+        const pp = mat.transformPoint(p);
         this.enclose(pp);
     }
 

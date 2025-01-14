@@ -294,7 +294,7 @@ function sampleArcLengthCubic(wz: number, xz: number, qqa: Vector2, qqb: Vector2
 }
 
 function sampleArcLengthConic(wz: number, xz: number, qqa: Vector3, qqb: Vector3, qqc: Vector3): number {
-    const vv = qqa.mulS(xz).add(qqb).mulS(xz).addP(qqc);
+    const vv = qqa.mulS(xz).add(qqb).mulS(xz).add(qqc);
     const v = Vector2.fromXYW(vv.x, vv.y, vv.z * vv.z);
     return wz * v.len();
 }

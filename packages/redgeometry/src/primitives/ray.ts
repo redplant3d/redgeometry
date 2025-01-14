@@ -111,7 +111,7 @@ export class Ray2 {
      * Returns the parameterized point on the ray along its direction.
      */
     public getValueAt(t: number): Vector2 {
-        return this.p.addVMulS(this.v, t);
+        return this.p.addMulS(this.v, t);
     }
 
     public normal(): Ray2 {
@@ -131,7 +131,7 @@ export class Ray2 {
     }
 
     public translate(v: Vector2): Ray2 {
-        const p = this.p.addV(v);
+        const p = this.p.add(v);
         return new Ray2(p, this.v);
     }
 }
@@ -247,7 +247,7 @@ export class Ray3 {
      * Returns the parameterized point on the ray along its direction.
      */
     public getValueAt(t: number): Vector3 {
-        return this.p.addVMulS(this.v, t);
+        return this.p.addMulS(this.v, t);
     }
 
     public isFinite(): boolean {
@@ -267,7 +267,7 @@ export class Ray3 {
     }
 
     public translate(v: Vector3): Ray3 {
-        const p = this.p.addV(v);
+        const p = this.p.add(v);
         return new Ray3(p, this.v);
     }
 }

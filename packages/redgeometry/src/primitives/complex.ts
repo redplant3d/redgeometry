@@ -112,16 +112,6 @@ export class Complex {
 
     /**
      * ```
-     * | a | * | px |
-     * | b |   | py |
-     * ```
-     */
-    public mulP(p: Vector2): Vector2 {
-        return new Vector2(this.a * p.x - this.b * p.y, this.a * p.y + this.b * p.x);
-    }
-
-    /**
-     * ```
      * | a | * | vx |
      * | b |   | vy |
      * ```

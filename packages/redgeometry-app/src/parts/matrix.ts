@@ -158,12 +158,12 @@ function createCube(): Edge3[] {
     return edges;
 }
 
-function transformEdges(edges: Edge3[], m: Matrix4): Edge2[] {
+function transformEdges(edges: Edge3[], mat: Matrix4): Edge2[] {
     const output: Edge2[] = [];
 
     for (const e of edges) {
-        const p0 = m.mulP(e.p0);
-        const p1 = m.mulP(e.p1);
+        const p0 = mat.transformPoint(e.p0);
+        const p1 = mat.transformPoint(e.p1);
         const pp0 = Vector2.fromObject(p0);
         const pp1 = Vector2.fromObject(p1);
         output.push(new Edge2(pp0, pp1));

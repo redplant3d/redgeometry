@@ -234,22 +234,6 @@ export class Matrix3A {
 
     /**
      * ```
-     * | e0  e2  e4 |   | x |
-     * | e1  e3  e5 | * | y |
-     * |  0   0   1 |   | 1 |
-     * ```
-     */
-    public mulP(p: Vector2): Vector2 {
-        const e = this.elements;
-
-        const x = e[0] * p.x + e[2] * p.y + e[4];
-        const y = e[1] * p.x + e[3] * p.y + e[5];
-
-        return new Vector2(x, y);
-    }
-
-    /**
-     * ```
      * | ea0  ea2  ea4 |   | eb0  eb2  eb4 |
      * | ea1  ea3  ea5 | * | eb1  eb3  eb5 |
      * |   0    0    1 |   |   0    0    1 |
@@ -438,6 +422,38 @@ export class Matrix3A {
             `{e0: ${e[0]}, e2: ${e[2]}, e4: ${e[3]},\n` +
             ` e1: ${e[1]}, e3: ${e[3]}, e5: ${e[5]}}`
         );
+    }
+
+    /**
+     * ```
+     * | e0  e2  e4 |   | x |
+     * | e1  e3  e5 | * | y |
+     * |  0   0   1 |   | 1 |
+     * ```
+     */
+    public transformPoint(p: Vector2): Vector2 {
+        const e = this.elements;
+
+        const x = e[0] * p.x + e[2] * p.y + e[4];
+        const y = e[1] * p.x + e[3] * p.y + e[5];
+
+        return new Vector2(x, y);
+    }
+
+    /**
+     * ```
+     * | e0  e2  e4 |   | x |
+     * | e1  e3  e5 | * | y |
+     * |  0   0   1 |   | 0 |
+     * ```
+     */
+    public transformVector(v: Vector2): Vector2 {
+        const e = this.elements;
+
+        const x = e[0] * v.x + e[2] * v.y;
+        const y = e[1] * v.x + e[3] * v.y;
+
+        return new Vector2(x, y);
     }
 
     /**
@@ -774,23 +790,6 @@ export class Matrix3 {
 
     /**
      * ```
-     * | e0  e3  e6 |   | x |
-     * | e1  e4  e7 | * | y |
-     * | e2  e5  e8 |   | 1 |
-     * ```
-     */
-    public mulP(p: Vector2): Vector2 {
-        const e = this.elements;
-
-        const x = e[0] * p.x + e[3] * p.y + e[6];
-        const y = e[1] * p.x + e[4] * p.y + e[7];
-        const w = e[2] * p.x + e[5] * p.y + e[8];
-
-        return Vector2.fromXYW(x, y, w);
-    }
-
-    /**
-     * ```
      * | ea0  ea3  ea6 |   | eb0  eb3  eb6 |
      * | ea1  ea4  ea7 | * | eb1  eb4  eb7 |
      * | ea2  ea5  ea8 |   | eb2  eb5  eb8 |
@@ -1038,6 +1037,40 @@ export class Matrix3 {
             ` e1: ${e[1]}, e4: ${e[4]}, e7: ${e[7]},\n` +
             ` e2: ${e[2]}, e5: ${e[5]}, e8: ${e[8]}}`
         );
+    }
+
+    /**
+     * ```
+     * | e0  e3  e6 |   | x |
+     * | e1  e4  e7 | * | y |
+     * | e2  e5  e8 |   | 1 |
+     * ```
+     */
+    public transformPoint(p: Vector2): Vector2 {
+        const e = this.elements;
+
+        const x = e[0] * p.x + e[3] * p.y + e[6];
+        const y = e[1] * p.x + e[4] * p.y + e[7];
+        const w = e[2] * p.x + e[5] * p.y + e[8];
+
+        return Vector2.fromXYW(x, y, w);
+    }
+
+    /**
+     * ```
+     * | e0  e3  e6 |   | x |
+     * | e1  e4  e7 | * | y |
+     * | e2  e5  e8 |   | 0 |
+     * ```
+     */
+    public transformVector(v: Vector2): Vector2 {
+        const e = this.elements;
+
+        const x = e[0] * v.x + e[3] * v.y;
+        const y = e[1] * v.x + e[4] * v.y;
+        const w = e[2] * v.x + e[5] * v.y;
+
+        return Vector2.fromXYW(x, y, w);
     }
 
     /**
@@ -1483,24 +1516,6 @@ export class Matrix4A {
 
     /**
      * ```
-     * | e0  e3  e6   e9 |   | x |
-     * | e1  e4  e7  e10 | * | y |
-     * | e2  e5  e8  e11 |   | z |
-     * |  0   0   0    1 |   | 1 |
-     * ```
-     */
-    public mulP(p: Vector3): Vector3 {
-        const e = this.elements;
-
-        const x = e[0] * p.x + e[3] * p.y + e[6] * p.z + e[9];
-        const y = e[1] * p.x + e[4] * p.y + e[7] * p.z + e[10];
-        const z = e[2] * p.x + e[5] * p.y + e[8] * p.z + e[11];
-
-        return new Vector3(x, y, z);
-    }
-
-    /**
-     * ```
      * | ea0  ea3  ea6   ea9 |   | eb0  eb3  eb6   eb9 |
      * | ea1  ea4  ea7  ea10 | * | eb1  eb4  eb7  ea10 |
      * | ea2  ea5  ea8  ea11 |   | eb2  eb5  eb8  eb11 |
@@ -1817,6 +1832,42 @@ export class Matrix4A {
             ` e1: ${e[1]}, e4: ${e[4]}, e7: ${e[7]}, e10: ${e[10]},\n` +
             ` e2: ${e[2]}, e5: ${e[5]}, e8: ${e[8]}, e11: ${e[11]}}`
         );
+    }
+
+    /**
+     * ```
+     * | e0  e3  e6   e9 |   | x |
+     * | e1  e4  e7  e10 | * | y |
+     * | e2  e5  e8  e11 |   | z |
+     * |  0   0   0    1 |   | 1 |
+     * ```
+     */
+    public transformPoint(p: Vector3): Vector3 {
+        const e = this.elements;
+
+        const x = e[0] * p.x + e[3] * p.y + e[6] * p.z + e[9];
+        const y = e[1] * p.x + e[4] * p.y + e[7] * p.z + e[10];
+        const z = e[2] * p.x + e[5] * p.y + e[8] * p.z + e[11];
+
+        return new Vector3(x, y, z);
+    }
+
+    /**
+     * ```
+     * | e0  e3  e6   e9 |   | x |
+     * | e1  e4  e7  e10 | * | y |
+     * | e2  e5  e8  e11 |   | z |
+     * |  0   0   0    1 |   | 0 |
+     * ```
+     */
+    public transformVector(v: Vector3): Vector3 {
+        const e = this.elements;
+
+        const x = e[0] * v.x + e[3] * v.y + e[6] * v.z;
+        const y = e[1] * v.x + e[4] * v.y + e[7] * v.z;
+        const z = e[2] * v.x + e[5] * v.y + e[8] * v.z;
+
+        return new Vector3(x, y, z);
     }
 
     /**
@@ -2531,25 +2582,6 @@ export class Matrix4 {
 
     /**
      * ```
-     * | e0  e4   e8  e12 |   | x |
-     * | e1  e5   e9  e13 | * | y |
-     * | e2  e6  e10  e14 |   | z |
-     * | e3  e7  e11  e15 |   | 1 |
-     * ```
-     */
-    public mulP(p: Vector3): Vector3 {
-        const e = this.elements;
-
-        const x = e[0] * p.x + e[4] * p.y + e[8] * p.z + e[12];
-        const y = e[1] * p.x + e[5] * p.y + e[9] * p.z + e[13];
-        const z = e[2] * p.x + e[6] * p.y + e[10] * p.z + e[14];
-        const w = e[3] * p.x + e[7] * p.y + e[11] * p.z + e[15];
-
-        return Vector3.fromXYZW(x, y, z, w);
-    }
-
-    /**
-     * ```
      * | ea0  ea4   ea8  ea12 |   | eb0  eb4   eb8  eb12 |
      * | ea1  ea5   ea9  ea13 | * | eb1  eb5   eb9  eb13 |
      * | ea2  ea6  ea10  ea14 |   | eb2  eb6  eb10  eb14 |
@@ -2938,6 +2970,44 @@ export class Matrix4 {
             ` e2: ${e[2]}, e6: ${e[6]}, e10: ${e[10]}, e14: ${e[14]},\n` +
             ` e3: ${e[3]}, e7: ${e[7]}, e11: ${e[11]}, e15: ${e[15]}}`
         );
+    }
+
+    /**
+     * ```
+     * | e0  e4   e8  e12 |   | x |
+     * | e1  e5   e9  e13 | * | y |
+     * | e2  e6  e10  e14 |   | z |
+     * | e3  e7  e11  e15 |   | 1 |
+     * ```
+     */
+    public transformPoint(p: Vector3): Vector3 {
+        const e = this.elements;
+
+        const x = e[0] * p.x + e[4] * p.y + e[8] * p.z + e[12];
+        const y = e[1] * p.x + e[5] * p.y + e[9] * p.z + e[13];
+        const z = e[2] * p.x + e[6] * p.y + e[10] * p.z + e[14];
+        const w = e[3] * p.x + e[7] * p.y + e[11] * p.z + e[15];
+
+        return Vector3.fromXYZW(x, y, z, w);
+    }
+
+    /**
+     * ```
+     * | e0  e4   e8  e12 |   | x |
+     * | e1  e5   e9  e13 | * | y |
+     * | e2  e6  e10  e14 |   | z |
+     * | e3  e7  e11  e15 |   | 0 |
+     * ```
+     */
+    public transformVector(v: Vector3): Vector3 {
+        const e = this.elements;
+
+        const x = e[0] * v.x + e[4] * v.y + e[8] * v.z;
+        const y = e[1] * v.x + e[5] * v.y + e[9] * v.z;
+        const z = e[2] * v.x + e[6] * v.y + e[10] * v.z;
+        const w = e[3] * v.x + e[7] * v.y + e[11] * v.z;
+
+        return Vector3.fromXYZW(x, y, z, w);
     }
 
     /**

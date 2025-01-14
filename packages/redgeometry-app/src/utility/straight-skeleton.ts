@@ -78,7 +78,7 @@ export class KineticVertex {
     }
 
     public getPositionAt(t: number): Vector2 {
-        return this.orig.addVMulS(this.vel, t - this.t0);
+        return this.orig.addMulS(this.vel, t - this.t0);
     }
 }
 
@@ -326,9 +326,9 @@ export class StraightSkeleton {
      * Compute the time parameter where the triangle area is zero
      */
     private getTriangleCollapseParameter(vtx0: KineticVertex, vtx1: KineticVertex, vtx2: KineticVertex): Root2 | Root1 {
-        const vp0 = vtx0.getPositionAt(0).toVector();
-        const vp1 = vtx1.getPositionAt(0).toVector();
-        const vp2 = vtx2.getPositionAt(0).toVector();
+        const vp0 = vtx0.getPositionAt(0);
+        const vp1 = vtx1.getPositionAt(0);
+        const vp2 = vtx2.getPositionAt(0);
         const v0 = vtx0.vel;
         const v1 = vtx1.vel;
         const v2 = vtx2.vel;

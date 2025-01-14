@@ -294,15 +294,15 @@ export class StrokeState {
     private insertLinearStroke(p: Vector2, m: Vector2): void {
         const v = m.unit().normal().mulS(this.distance);
 
-        this.left.lineTo(p.addV(v));
-        this.right.lineTo(p.subV(v));
+        this.left.lineTo(p.add(v));
+        this.right.lineTo(p.sub(v));
     }
 
     private insertMoveStroke(p0: Vector2, m: Vector2): void {
         const v = m.unit().normal().mulS(this.distance);
 
-        this.left.moveTo(p0.addV(v));
-        this.right.moveTo(p0.subV(v));
+        this.left.moveTo(p0.add(v));
+        this.right.moveTo(p0.sub(v));
     }
 
     private insertQuadraticDegenerateDashStroke(p0: Vector2, p1: Vector2, p2: Vector2): void {
@@ -383,8 +383,8 @@ export class StrokeState {
             v1 = v1.mulS(2 * d).divS(v1.lenSq());
             v2 = v2.mulS(d);
 
-            this.left.quadTo(c.p1.addV(v1), c.p2.addV(v2));
-            this.right.quadTo(c.p1.subV(v1), c.p2.subV(v2));
+            this.left.quadTo(c.p1.add(v1), c.p2.add(v2));
+            this.right.quadTo(c.p1.sub(v1), c.p2.sub(v2));
         }
     }
 
@@ -455,8 +455,8 @@ export function insertStrokeCap(path: Path2, p1: Vector2, cap: CapType | CustomC
             }
 
             const v = p1.sub(p0).mulS(0.5).normal();
-            path.lineTo(p0.addV(v));
-            path.lineTo(p1.addV(v));
+            path.lineTo(p0.add(v));
+            path.lineTo(p1.add(v));
             path.lineTo(p1);
 
             break;
@@ -470,8 +470,8 @@ export function insertStrokeCap(path: Path2, p1: Vector2, cap: CapType | CustomC
 
             const v0 = p1.sub(p0).mulS(0.5).normal();
             const v1 = v0.sub(v0.normal());
-            path.arcTo(p0.addV(v0), p0.addV(v1));
-            path.arcTo(p1.addV(v0), p1);
+            path.arcTo(p0.add(v0), p0.add(v1));
+            path.arcTo(p1.add(v0), p1);
 
             break;
         }
