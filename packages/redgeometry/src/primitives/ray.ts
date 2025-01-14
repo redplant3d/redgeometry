@@ -122,6 +122,16 @@ export class Ray2 {
         return new Ray2(this.p, this.v.neg());
     }
 
+    public set(p: Vector2, v: Vector2): void {
+        this.p = p;
+        this.v = v;
+    }
+
+    public setXY(px: number, py: number, vx: number, vy: number): void {
+        this.p = new Vector2(px, py);
+        this.v = new Vector2(vx, vy);
+    }
+
     public toArray(): [number, number, number, number] {
         return [this.p.x, this.p.y, this.v.x, this.v.y];
     }
@@ -256,6 +266,16 @@ export class Ray3 {
 
     public reverse(): Ray3 {
         return new Ray3(this.p, this.v.neg());
+    }
+
+    public set(p: Vector3, v: Vector3): void {
+        this.p = p;
+        this.v = v;
+    }
+
+    public setXYZ(px: number, py: number, pz: number, vx: number, vy: number, vz: number): void {
+        this.p = new Vector3(px, py, pz);
+        this.v = new Vector3(vx, vy, vz);
     }
 
     public toArray(): [number, number, number, number, number, number] {

@@ -555,6 +555,13 @@ export class Quaternion {
         this.d = qd * cos + qa * sin;
     }
 
+    public set(a: number, b: number, c: number, d: number): void {
+        this.a = a;
+        this.b = b;
+        this.c = c;
+        this.d = d;
+    }
+
     /**
      * Returns the spherical linear interpolation of the current quaternion and `q`.
      */

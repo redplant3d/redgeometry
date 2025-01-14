@@ -130,6 +130,11 @@ export class Complex {
         this.b = cos * zb + sin * za;
     }
 
+    public set(a: number, b: number): void {
+        this.a = a;
+        this.b = b;
+    }
+
     public sub(z: Complex): Complex {
         return new Complex(this.a - z.a, this.b - z.b);
     }

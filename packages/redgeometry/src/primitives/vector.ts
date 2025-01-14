@@ -279,6 +279,11 @@ export class Vector2 {
         return new Vector2(this.y, -this.x);
     }
 
+    public set(x: number, y: number): void {
+        this.x = x;
+        this.y = y;
+    }
+
     /**
      * Returns the spherical linear interpolation of the current vector and `v`.
      */
@@ -620,6 +625,12 @@ export class Vector3 {
         return { n1, n2 };
     }
 
+    public set(x: number, y: number, z: number): void {
+        this.x = x;
+        this.y = y;
+        this.z = z;
+    }
+
     /**
      * Returns the spherical linear interpolation of the current vector and `v`.
      */
@@ -858,6 +869,13 @@ export class Vector4 {
 
     public neg(): Vector4 {
         return new Vector4(-this.x, -this.y, -this.z, -this.w);
+    }
+
+    public set(x: number, y: number, z: number, w: number): void {
+        this.x = x;
+        this.y = y;
+        this.z = z;
+        this.w = w;
     }
 
     public sub(v: Vector4): Vector4 {

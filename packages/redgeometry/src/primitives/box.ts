@@ -169,6 +169,13 @@ export class Box2 {
         return new Box2(this.x0 - dx, this.y0 - dy, this.x1 + dx, this.y1 + dy);
     }
 
+    public set(x0: number, y0: number, x1: number, y1: number): void {
+        this.x0 = x0;
+        this.y0 = y0;
+        this.x1 = x1;
+        this.y1 = y1;
+    }
+
     /**
      * Returns the Minkowski difference of the boxes.
      */
@@ -397,6 +404,15 @@ export class Box3 {
 
     public scaleAbsolute(dx: number, dy: number, dz: number): Box3 {
         return new Box3(this.x0 - dx, this.y0 - dy, this.z0 - dz, this.x1 + dx, this.y1 + dy, this.z1 + dz);
+    }
+
+    public set(x0: number, y0: number, z0: number, x1: number, y1: number, z1: number): void {
+        this.x0 = x0;
+        this.y0 = y0;
+        this.z0 = z0;
+        this.x1 = x1;
+        this.y1 = y1;
+        this.z1 = z1;
     }
 
     /**

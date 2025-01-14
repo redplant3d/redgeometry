@@ -70,6 +70,13 @@ export class ColorRgba {
         return new ColorRgba(this.r, this.g, this.b, this.a);
     }
 
+    public set(r: number, g: number, b: number, a: number): void {
+        this.r = r;
+        this.g = g;
+        this.b = b;
+        this.a = a;
+    }
+
     public style(): string {
         const r = this.clampFloatToHex(this.r);
         const g = this.clampFloatToHex(this.g);

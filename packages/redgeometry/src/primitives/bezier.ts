@@ -162,6 +162,16 @@ export class Bezier1Curve2 {
         return new Bezier1Curve2(this.p1, this.p0);
     }
 
+    public set(p0: Vector2, p1: Vector2): void {
+        this.p0 = p0;
+        this.p1 = p1;
+    }
+
+    public setXY(x0: number, y0: number, x1: number, y1: number): void {
+        this.p0 = new Vector2(x0, y0);
+        this.p1 = new Vector2(x1, y1);
+    }
+
     public splitAfter(t: number): Bezier1Curve2 {
         const p01 = this.p0.lerp(this.p1, t);
 
@@ -515,6 +525,18 @@ export class Bezier2Curve2 {
 
     public reverse(): Bezier2Curve2 {
         return new Bezier2Curve2(this.p2, this.p1, this.p0);
+    }
+
+    public set(p0: Vector2, p1: Vector2, p2: Vector2): void {
+        this.p0 = p0;
+        this.p1 = p1;
+        this.p2 = p2;
+    }
+
+    public setXY(x0: number, y0: number, x1: number, y1: number, x2: number, y2: number): void {
+        this.p0 = new Vector2(x0, y0);
+        this.p1 = new Vector2(x1, y1);
+        this.p2 = new Vector2(x2, y2);
     }
 
     public splitAfter(t: number): Bezier2Curve2 {
@@ -872,6 +894,20 @@ export class Bezier3Curve2 {
 
     public reverse(): Bezier3Curve2 {
         return new Bezier3Curve2(this.p3, this.p2, this.p1, this.p0);
+    }
+
+    public set(p0: Vector2, p1: Vector2, p2: Vector2, p3: Vector2): void {
+        this.p0 = p0;
+        this.p1 = p1;
+        this.p2 = p2;
+        this.p3 = p3;
+    }
+
+    public setXY(x0: number, y0: number, x1: number, y1: number, x2: number, y2: number, x3: number, y3: number): void {
+        this.p0 = new Vector2(x0, y0);
+        this.p1 = new Vector2(x1, y1);
+        this.p2 = new Vector2(x2, y2);
+        this.p3 = new Vector2(x3, y3);
     }
 
     public splitAfter(t: number): Bezier3Curve2 {
@@ -1252,6 +1288,20 @@ export class BezierRCurve2 {
 
     public reverse(): BezierRCurve2 {
         return new BezierRCurve2(this.p2, this.p1, this.p0, this.w);
+    }
+
+    public set(p0: Vector2, p1: Vector2, p2: Vector2, w: number): void {
+        this.p0 = p0;
+        this.p1 = p1;
+        this.p2 = p2;
+        this.w = w;
+    }
+
+    public setXY(x0: number, y0: number, x1: number, y1: number, x2: number, y2: number, w: number): void {
+        this.p0 = new Vector2(x0, y0);
+        this.p1 = new Vector2(x1, y1);
+        this.p2 = new Vector2(x2, y2);
+        this.w = w;
     }
 
     public splitAfter(t: number): BezierRCurve2 {
