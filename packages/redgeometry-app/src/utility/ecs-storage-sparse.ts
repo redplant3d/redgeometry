@@ -23,7 +23,7 @@ export class EntityComponentStorage {
     public entitiesChanged: Set<EntityId>;
     public entityEntries: Map<EntityId, EntityEntry>;
 
-    constructor() {
+    public constructor() {
         this.entityEntries = new Map();
         this.componentEntries = new Map();
 

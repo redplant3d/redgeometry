@@ -34,7 +34,7 @@ export class EntityComponentStorage {
     public entityChangeEntries: EntityChangeEntries;
     public entityEntries: EntityEntries;
 
-    constructor() {
+    public constructor() {
         this.entityEntries = new EntityEntries();
         this.componentEntries = new ComponentEntries();
         this.componentChangeEntries = new ComponentChangeEntries();
@@ -378,7 +378,7 @@ class EntityEntries {
     public entityIds: EntityId[];
     public parentEntityIds: (EntityId | undefined)[];
 
-    constructor() {
+    public constructor() {
         this.entityIds = [];
         this.componentTableRefs = [];
         this.componentEntityRefs = [];
@@ -623,7 +623,7 @@ class ComponentEntries {
 
     public tables: ComponentTable[];
 
-    constructor() {
+    public constructor() {
         this.tableTypePool = new ObjectPool(tableTypeCreateFn, tableTypeClearFn);
         this.tables = [];
 
@@ -718,7 +718,11 @@ class ComponentTable {
 
     public entityRefs: number[];
 
-    constructor(type: Bitset, entryRefs: Map<ComponentId, ComponentTableEntryRef>, entries: ComponentTableEntry[]) {
+    public constructor(
+        type: Bitset,
+        entryRefs: Map<ComponentId, ComponentTableEntryRef>,
+        entries: ComponentTableEntry[],
+    ) {
         this.type = type;
         this.entryRefs = entryRefs;
         this.entries = entries;
@@ -834,7 +838,7 @@ class ComponentTableEntry {
     public changeTicks: number[];
     public components: Component[];
 
-    constructor(componentRef: ComponentRef) {
+    public constructor(componentRef: ComponentRef) {
         this.componentRef = componentRef;
 
         this.changeRefs = [];
@@ -881,7 +885,7 @@ class ComponentChangeEntries {
     public componentRefs: number[];
     public nextEntryRefs: number[];
 
-    constructor() {
+    public constructor() {
         this.changeFlags = [];
         this.componentRefs = [];
         this.nextEntryRefs = [];
@@ -949,7 +953,7 @@ class EntityChangeEntries {
     public entityIds: EntityId[];
     public entityRefs: EntityRef[];
 
-    constructor() {
+    public constructor() {
         this.entityIds = [];
         this.entityRefs = [];
     }

@@ -14,7 +14,7 @@ export class Ray2 {
     public p: Vector2;
     public v: Vector2;
 
-    constructor(p: Vector2, v: Vector2) {
+    public constructor(p: Vector2, v: Vector2) {
         this.p = p;
         this.v = v;
     }
@@ -140,7 +140,7 @@ export class Ray3 {
     public p: Vector3;
     public v: Vector3;
 
-    constructor(p: Vector3, v: Vector3) {
+    public constructor(p: Vector3, v: Vector3) {
         this.p = p;
         this.v = v;
     }

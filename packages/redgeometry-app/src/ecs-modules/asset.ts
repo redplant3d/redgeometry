@@ -17,7 +17,7 @@ export class AssetPlugin implements WorldPlugin {
     public readonly meshes: AssetCollection<Mesh>;
     public readonly materials: AssetCollection<Material>;
 
-    constructor() {
+    public constructor() {
         this.meshes = new AssetCollection();
         this.materials = new AssetCollection();
     }
@@ -28,7 +28,7 @@ export class AssetCollection<T> {
 
     public entries: Map<AssetId<T>, T>;
 
-    constructor() {
+    public constructor() {
         this.entries = new Map();
         this.id = 0;
     }

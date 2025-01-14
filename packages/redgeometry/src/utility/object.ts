@@ -4,7 +4,7 @@ export class ObjectPool<T> {
 
     public objects: T[];
 
-    constructor(createFn: () => T, clearFn: (obj: T) => void) {
+    public constructor(createFn: () => T, clearFn: (obj: T) => void) {
         this.createFn = createFn;
         this.clearFn = clearFn;
 

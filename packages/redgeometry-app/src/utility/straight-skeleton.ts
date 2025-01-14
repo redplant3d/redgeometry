@@ -112,7 +112,7 @@ export class KineticEvent {
 export class StraightSkeleton {
     private vertices: KineticVertex[];
 
-    constructor() {
+    public constructor() {
         this.vertices = [];
     }
 

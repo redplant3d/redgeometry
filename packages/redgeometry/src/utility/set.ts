@@ -1,7 +1,7 @@
 export class Bitset {
     public data: Uint32Array;
 
-    constructor(data: Uint32Array) {
+    public constructor(data: Uint32Array) {
         this.data = data;
     }
 

@@ -13,7 +13,7 @@ export class AppLauncherModule implements WorldModule {
     private appPartIds: string[];
     private appPartId: string;
 
-    constructor(appPartIds: string[], appPartId: string) {
+    public constructor(appPartIds: string[], appPartId: string) {
         this.appPartIds = appPartIds;
         this.appPartId = appPartId;
     }

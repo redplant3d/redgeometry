@@ -21,7 +21,7 @@ export class AppLauncher {
     private entriesByParts: Map<AppPartId, AppLauncherPartOptionsEntry>;
     private entriesByWorldGroups: Map<WorldId, AppLauncherPartOptionsEntry>;
 
-    constructor(context: AppContext) {
+    public constructor(context: AppContext) {
         this.context = context;
 
         this.entriesByParts = new Map();
