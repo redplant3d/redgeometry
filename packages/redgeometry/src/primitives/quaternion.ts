@@ -231,7 +231,7 @@ export class Quaternion {
     /**
      * Returns the rotation axis vector of the current quaternion.
      *
-     * Note: The vector is unscaled and might no be a unit vector.
+     * Note: The vector is unscaled and might not be a unit vector.
      */
     public axis(): Vector3 {
         return new Vector3(this.b, this.c, this.d);

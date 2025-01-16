@@ -437,21 +437,22 @@ export class Vector3 {
     }
 
     /**
-     * Returns the angle between the current vector and a vector `v` in radians.
+     * Returns the angle between the current vector and `v` in radians.
      *
-     * Note: The returned value is unsigned and less than or equal to `PI`.
+     * Note: The returned value is unsigned and less than `PI`.
      */
     public angleTo(v: Vector3): number {
-        const a = this.lenSq() * v.lenSq();
+        const dot = this.dot(v);
+        const lenSq = this.lenSq() * v.lenSq();
 
-        if (a === 0) {
-            // Return an angle of zero if any vector is zero
+        if (dot * dot >= lenSq) {
+            // Angle either undefined, very close or equal to zero
             return 0;
         }
 
-        const b = this.dot(v) / Math.sqrt(a);
+        const cos = dot / Math.sqrt(lenSq);
 
-        return Math.acos(b);
+        return Math.acos(cos);
     }
 
     public clamp(vmin: Vector3, vmax: Vector3): Vector3 {

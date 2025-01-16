@@ -50,6 +50,7 @@ export class Complex {
      * Note: The returned value is unsigned and less than `PI`.
      */
     public angleTo(z: Complex): number {
+        // Formula adapted from `Quaternion`
         const dot = this.a * z.a + this.b * z.b;
         const lenSq = this.lenSq() * z.lenSq();
 
