@@ -103,10 +103,13 @@ export class Vector2 {
         }
     }
 
-    public static roundToPrecision(p: Vector2, k: number): Vector2 {
-        // `k` denotes the reciprocal of the minimum interval that the rounded number is able to represent
-        const x = roundToPrecision(p.x, k);
-        const y = roundToPrecision(p.y, k);
+    /**
+     * Returns a rounded vector from `v` with specified precision where `k` denotes the
+     * reciprocal of the minimum interval that the rounded number is able to represent
+     */
+    public static roundToPrecision(v: Vector2, k: number): Vector2 {
+        const x = roundToPrecision(v.x, k);
+        const y = roundToPrecision(v.y, k);
         return new Vector2(x, y);
     }
 
@@ -403,11 +406,14 @@ export class Vector3 {
         return new Vector3(x / w, y / w, z / w);
     }
 
-    public static roundToPrecision(p: Vector3, k: number): Vector3 {
-        // `k` denotes the reciprocal of the minimum interval that the rounded number is able to represent
-        const x = roundToPrecision(p.x, k);
-        const y = roundToPrecision(p.y, k);
-        const z = roundToPrecision(p.z, k);
+    /**
+     * Returns a rounded vector from `v` with specified precision where `k` denotes the
+     * reciprocal of the minimum interval that the rounded number is able to represent
+     */
+    public static roundToPrecision(v: Vector3, k: number): Vector3 {
+        const x = roundToPrecision(v.x, k);
+        const y = roundToPrecision(v.y, k);
+        const z = roundToPrecision(v.z, k);
         return new Vector3(x, y, z);
     }
 
@@ -751,6 +757,18 @@ export class Vector4 {
 
     public static fromObject(obj: Vector4Like): Vector4 {
         return new Vector4(obj.x, obj.y, obj.z, obj.w);
+    }
+
+    /**
+     * Returns a rounded vector from `v` with specified precision where `k` denotes the
+     * reciprocal of the minimum interval that the rounded number is able to represent
+     */
+    public static roundToPrecision(v: Vector4, k: number): Vector4 {
+        const x = roundToPrecision(v.x, k);
+        const y = roundToPrecision(v.y, k);
+        const z = roundToPrecision(v.z, k);
+        const w = roundToPrecision(v.w, k);
+        return new Vector4(x, y, z, w);
     }
 
     public static toObject(v: Vector4): Vector4Like {
