@@ -159,14 +159,14 @@ export class Vector2 {
      */
     public angleTo(v: Vector2): number {
         const dot = this.dot(v);
-        const lenSq = this.lenSq() * v.lenSq();
+        const lenSq2 = this.lenSq() * v.lenSq();
 
-        if (dot * dot >= lenSq) {
+        if (dot * dot >= lenSq2) {
             // Angle either undefined, very close or equal to zero
             return 0;
         }
 
-        const cos = dot / Math.sqrt(lenSq);
+        const cos = dot / Math.sqrt(lenSq2);
 
         return Math.acos(cos);
     }
@@ -287,19 +287,49 @@ export class Vector2 {
         this.y = y;
     }
 
+    public setAdd(v1: Vector2, v2: Vector2): void {
+        const vx = v1.x + v2.x;
+        const vy = v1.y + v2.y;
+        this.set(vx, vy);
+    }
+
+    public setAddMulS(v1: Vector2, s: number, v2: Vector2): void {
+        const vx = v1.x + s * v2.x;
+        const vy = v1.y + s * v2.y;
+        this.set(vx, vy);
+    }
+
+    public setDivS(v: Vector2, s: number): void {
+        const vx = v.x / s;
+        const vy = v.y / s;
+        this.set(vx, vy);
+    }
+
+    public setMulS(s: number, v: Vector2): void {
+        const vx = s * v.x;
+        const vy = s * v.y;
+        this.set(vx, vy);
+    }
+
+    public setSub(v1: Vector2, v2: Vector2): void {
+        const vx = v1.x - v2.x;
+        const vy = v1.y - v2.y;
+        this.set(vx, vy);
+    }
+
     /**
      * Returns the spherical linear interpolation of the current vector and `v`.
      */
     public slerp(v: Vector2, t: number): Vector2 {
         const dot = this.dot(v);
-        const lenSq = this.lenSq() * v.lenSq();
+        const lenSq2 = this.lenSq() * v.lenSq();
 
-        if (dot * dot >= lenSq) {
+        if (dot * dot >= lenSq2) {
             // Fallback (angle either undefined, very close or equal to zero)
             return this.lerp(v, t);
         }
 
-        const cos = dot / Math.sqrt(lenSq);
+        const cos = dot / Math.sqrt(lenSq2);
         const angle = Math.acos(cos);
         const sin1 = Math.sin(angle - angle * t);
         const sin2 = Math.sin(angle * t);
@@ -330,17 +360,18 @@ export class Vector2 {
     }
 
     public unit(): Vector2 {
-        return this.divS(this.len());
+        const s = this.len();
+        return this.divS(s);
     }
 
     public unitOrZero(): Vector2 {
-        const len = this.len();
+        const s = this.len();
 
-        if (len === 0) {
+        if (s === 0) {
             return Vector2.createZero();
         }
 
-        return this.divS(len);
+        return this.divS(s);
     }
 }
 
@@ -449,14 +480,14 @@ export class Vector3 {
      */
     public angleTo(v: Vector3): number {
         const dot = this.dot(v);
-        const lenSq = this.lenSq() * v.lenSq();
+        const lenSq2 = this.lenSq() * v.lenSq();
 
-        if (dot * dot >= lenSq) {
+        if (dot * dot >= lenSq2) {
             // Angle either undefined, very close or equal to zero
             return 0;
         }
 
-        const cos = dot / Math.sqrt(lenSq);
+        const cos = dot / Math.sqrt(lenSq2);
 
         return Math.acos(cos);
     }
@@ -638,19 +669,61 @@ export class Vector3 {
         this.z = z;
     }
 
+    public setAdd(v1: Vector3, v2: Vector3): void {
+        const vx = v1.x + v2.x;
+        const vy = v1.y + v2.y;
+        const vz = v1.z + v2.z;
+        this.set(vx, vy, vz);
+    }
+
+    public setAddMulS(v1: Vector3, s: number, v2: Vector3): void {
+        const vx = v1.x + s * v2.x;
+        const vy = v1.y + s * v2.y;
+        const vz = v1.z + s * v2.z;
+        this.set(vx, vy, vz);
+    }
+
+    public setCross(v1: Vector3, v2: Vector3): void {
+        const vx = v1.y * v2.z - v1.z * v2.y;
+        const vy = v1.z * v2.x - v1.x * v2.z;
+        const vz = v1.x * v2.y - v1.y * v2.x;
+        this.set(vx, vy, vz);
+    }
+
+    public setDivS(v: Vector3, s: number): void {
+        const vx = v.x / s;
+        const vy = v.y / s;
+        const vz = v.z / s;
+        this.set(vx, vy, vz);
+    }
+
+    public setMulS(s: number, v: Vector3): void {
+        const vx = s * v.x;
+        const vy = s * v.y;
+        const vz = s * v.z;
+        this.set(vx, vy, vz);
+    }
+
+    public setSub(v1: Vector3, v2: Vector3): void {
+        const vx = v1.x - v2.x;
+        const vy = v1.y - v2.y;
+        const vz = v1.z - v2.z;
+        this.set(vx, vy, vz);
+    }
+
     /**
      * Returns the spherical linear interpolation of the current vector and `v`.
      */
     public slerp(v: Vector3, t: number): Vector3 {
         const dot = this.dot(v);
-        const lenSq = this.lenSq() * v.lenSq();
+        const lenSq2 = this.lenSq() * v.lenSq();
 
-        if (dot * dot >= lenSq) {
+        if (dot * dot >= lenSq2) {
             // Fallback (angle either undefined, very close or equal to zero)
             return this.lerp(v, t);
         }
 
-        const cos = dot / Math.sqrt(lenSq);
+        const cos = dot / Math.sqrt(lenSq2);
         const angle = Math.acos(cos);
         const sin1 = Math.sin(angle - angle * t);
         const sin2 = Math.sin(angle * t);
@@ -682,17 +755,18 @@ export class Vector3 {
     }
 
     public unit(): Vector3 {
-        return this.divS(this.len());
+        const s = this.len();
+        return this.divS(s);
     }
 
     public unitOrZero(): Vector3 {
-        const len = this.len();
+        const s = this.len();
 
-        if (len === 0) {
+        if (s === 0) {
             return Vector3.createZero();
         }
 
-        return this.divS(len);
+        return this.divS(s);
     }
 }
 
@@ -897,6 +971,46 @@ export class Vector4 {
         this.w = w;
     }
 
+    public setAdd(v1: Vector4, v2: Vector4): void {
+        const vx = v1.x + v2.x;
+        const vy = v1.y + v2.y;
+        const vz = v1.z + v2.z;
+        const vw = v1.w + v2.w;
+        this.set(vx, vy, vz, vw);
+    }
+
+    public setAddMulS(v1: Vector4, s: number, v2: Vector4): void {
+        const vx = v1.x + s * v2.x;
+        const vy = v1.y + s * v2.y;
+        const vz = v1.z + s * v2.z;
+        const vw = v1.w + s * v2.w;
+        this.set(vx, vy, vz, vw);
+    }
+
+    public setDivS(v: Vector4, s: number): void {
+        const vx = v.x / s;
+        const vy = v.y / s;
+        const vz = v.z / s;
+        const vw = v.w / s;
+        this.set(vx, vy, vz, vw);
+    }
+
+    public setMulS(s: number, v: Vector4): void {
+        const vx = s * v.x;
+        const vy = s * v.y;
+        const vz = s * v.z;
+        const vw = s * v.w;
+        this.set(vx, vy, vz, vw);
+    }
+
+    public setSub(v1: Vector4, v2: Vector4): void {
+        const vx = v1.x - v2.x;
+        const vy = v1.y - v2.y;
+        const vz = v1.z - v2.z;
+        const vw = v1.w - v2.w;
+        this.set(vx, vy, vz, vw);
+    }
+
     public sub(v: Vector4): Vector4 {
         return new Vector4(this.x - v.x, this.y - v.y, this.z - v.z, this.w - v.w);
     }
@@ -907,5 +1021,20 @@ export class Vector4 {
 
     public toString(): string {
         return `{x: ${this.x}, y: ${this.y}, z: ${this.z}}, w: ${this.w}}`;
+    }
+
+    public unit(): Vector4 {
+        const s = this.len();
+        return this.divS(s);
+    }
+
+    public unitOrZero(): Vector4 {
+        const s = this.len();
+
+        if (s === 0) {
+            return Vector4.createZero();
+        }
+
+        return this.divS(s);
     }
 }

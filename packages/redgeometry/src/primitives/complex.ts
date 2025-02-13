@@ -52,14 +52,14 @@ export class Complex {
     public angleTo(z: Complex): number {
         // Formula adapted from `Quaternion`
         const dot = this.a * z.a + this.b * z.b;
-        const lenSq = this.lenSq() * z.lenSq();
+        const lenSq2 = this.lenSq() * z.lenSq();
 
-        if (dot * dot >= lenSq) {
+        if (dot * dot >= lenSq2) {
             // Angle either undefined, very close or equal to zero
             return 0;
         }
 
-        const cos = dot / Math.sqrt(lenSq);
+        const cos = dot / Math.sqrt(lenSq2);
 
         return Math.acos(cos);
     }
@@ -85,8 +85,8 @@ export class Complex {
     }
 
     public inverse(): Complex {
-        const div = this.lenSq();
-        return new Complex(this.a / div, -this.b / div);
+        const s = this.lenSq();
+        return new Complex(this.a / s, -this.b / s);
     }
 
     public isIdentity(): boolean {
@@ -136,6 +136,24 @@ export class Complex {
         this.b = b;
     }
 
+    public setAdd(z1: Complex, z2: Complex): void {
+        const za = z1.a + z2.a;
+        const zb = z1.b + z2.b;
+        this.set(za, zb);
+    }
+
+    public setMul(z1: Complex, z2: Complex): void {
+        const za = z1.a * z2.a - z1.b * z2.b;
+        const zb = z1.a * z2.b + z1.b * z2.a;
+        this.set(za, zb);
+    }
+
+    public setSub(z1: Complex, z2: Complex): void {
+        const za = z1.a - z2.a;
+        const zb = z1.b - z2.b;
+        this.set(za, zb);
+    }
+
     public sub(z: Complex): Complex {
         return new Complex(this.a - z.a, this.b - z.b);
     }
@@ -149,7 +167,7 @@ export class Complex {
     }
 
     public unit(): Complex {
-        const div = this.len();
-        return new Complex(this.a / div, this.b / div);
+        const s = this.len();
+        return new Complex(this.a / s, this.b / s);
     }
 }

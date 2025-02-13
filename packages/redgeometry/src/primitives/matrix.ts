@@ -410,6 +410,31 @@ export class Matrix3A {
         e[5] = e5;
     }
 
+    public setIdentity(): void {
+        this.set(1, 0, 0, 1, 0, 0);
+    }
+
+    public setInverse(mat: Matrix3A): void {
+        const det = mat.determinant();
+
+        if (det === 0) {
+            this.setIdentity();
+            return;
+        }
+
+        const detInv = 1 / det;
+        const e = mat.elements;
+
+        const e0 = detInv * e[3];
+        const e1 = detInv * -e[1];
+        const e2 = detInv * -e[2];
+        const e3 = detInv * e[0];
+        const e4 = -(e[4] * e0 + e[5] * e2);
+        const e5 = -(e[4] * e1 + e[5] * e3);
+
+        this.set(e0, e1, e2, e3, e4, e5);
+    }
+
     public toArray(): MatrixElements3A {
         return [...this.elements];
     }
@@ -988,6 +1013,34 @@ export class Matrix3 {
         e[6] = e6;
         e[7] = e7;
         e[8] = e8;
+    }
+
+    public setIdentity(): void {
+        this.set(1, 0, 0, 0, 1, 0, 0, 0, 1);
+    }
+
+    public setInverse(mat: Matrix3): void {
+        const det = mat.determinant();
+
+        if (det === 0) {
+            this.setIdentity();
+            return;
+        }
+
+        const detInv = 1 / det;
+        const e = mat.elements;
+
+        const e0 = detInv * (e[4] * e[8] - e[5] * e[7]);
+        const e1 = detInv * (e[2] * e[7] - e[1] * e[8]);
+        const e2 = detInv * (e[1] * e[5] - e[2] * e[4]);
+        const e3 = detInv * (e[5] * e[6] - e[3] * e[8]);
+        const e4 = detInv * (e[0] * e[8] - e[2] * e[6]);
+        const e5 = detInv * (e[2] * e[3] - e[0] * e[5]);
+        const e6 = detInv * (e[3] * e[7] - e[4] * e[6]);
+        const e7 = detInv * (e[1] * e[6] - e[0] * e[7]);
+        const e8 = detInv * (e[0] * e[4] - e[1] * e[3]);
+
+        this.set(e0, e1, e2, e3, e4, e5, e6, e7, e8);
     }
 
     public sub(mat: Matrix3): Matrix3 {
@@ -1819,6 +1872,86 @@ export class Matrix4A {
         e[11] = e11;
     }
 
+    public setIdentity(): void {
+        this.set(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0);
+    }
+
+    public setInverse(mat: Matrix4A): void {
+        const det = mat.determinant();
+
+        if (det === 0) {
+            this.setIdentity();
+            return;
+        }
+
+        const detInv = 1 / det;
+        const e = mat.elements;
+
+        const e0 = detInv * (e[4] * e[8] - e[5] * e[7]);
+        const e1 = detInv * (e[2] * e[7] - e[1] * e[8]);
+        const e2 = detInv * (e[1] * e[5] - e[2] * e[4]);
+        const e3 = detInv * (e[5] * e[6] - e[3] * e[8]);
+        const e4 = detInv * (e[0] * e[8] - e[2] * e[6]);
+        const e5 = detInv * (e[2] * e[3] - e[0] * e[5]);
+        const e6 = detInv * (e[3] * e[7] - e[4] * e[6]);
+        const e7 = detInv * (e[1] * e[6] - e[0] * e[7]);
+        const e8 = detInv * (e[0] * e[4] - e[1] * e[3]);
+        const e9 = -(e[9] * e0 + e[10] * e3 + e[11] * e6);
+        const e10 = -(e[9] * e1 + e[10] * e4 + e[11] * e7);
+        const e11 = -(e[9] * e2 + e[10] * e5 + e[11] * e8);
+
+        this.set(e0, e1, e2, e3, e4, e5, e6, e7, e8, e9, e10, e11);
+    }
+
+    public setOrthographicFrustum(
+        left: number,
+        right: number,
+        bottom: number,
+        top: number,
+        near: number,
+        far: number,
+    ): void {
+        // | e0   0   0   e9 |
+        // |  0  e4   0  e10 |
+        // |  0   0  e8  e11 |
+        // |  0   0   0    1 |
+        const e0 = 2 / (right - left);
+        const e4 = 2 / (top - bottom);
+        const e8 = 1 / (near - far);
+        const e9 = (left + right) / (left - right);
+        const e10 = (bottom + top) / (bottom - top);
+        const e11 = near / (near - far);
+
+        this.set(e0, 0, 0, 0, e4, 0, 0, 0, e8, e9, e10, e11);
+    }
+
+    /**
+     * Returns a right-handed orthographic projection matrix with a depth range of `[-1, 1]`.
+     *
+     * Values equal to `glm::orthoRH_ZO`.
+     */
+    public setOrthographicFrustumGL(
+        left: number,
+        right: number,
+        bottom: number,
+        top: number,
+        near: number,
+        far: number,
+    ): void {
+        // | e0   0   0   e9 |
+        // |  0  e4   0  e10 |
+        // |  0   0  e8  e11 |
+        // |  0   0   0    1 |
+        const e0 = 2 / (right - left);
+        const e4 = 2 / (top - bottom);
+        const e8 = 2 / (near - far);
+        const e9 = (left + right) / (left - right);
+        const e10 = (bottom + top) / (bottom - top);
+        const e11 = (near + far) / (near - far);
+
+        this.set(e0, 0, 0, 0, e4, 0, 0, 0, e8, e9, e10, e11);
+    }
+
     public toArray(): MatrixElements4A {
         return [...this.elements];
     }
@@ -2241,9 +2374,9 @@ export class Matrix4 {
         // Because the inverse of an orthogonal matrix is just its transpose
         // and `(A * B)^-1 = B^-1 * A^-1`, the view matrix is:
         // ```
-        // | v1x  v2y  v3x  0 |   | 1  0  0  -x |
-        // | v2x  v2y  v2x  0 | * | 0  1  0  -y |
-        // | v3x  v3y  v3x  0 |   | 0  0  1  -z |
+        // | v1x  v2y  v3z  0 |   | 1  0  0  -x |
+        // | v2x  v2y  v2z  0 | * | 0  1  0  -y |
+        // | v3x  v3y  v3z  0 |   | 0  0  1  -z |
         // |   0    0    0  1 |   | 0  0  0   1 |
         // ```
         const e0 = v1.x;
@@ -2906,6 +3039,222 @@ export class Matrix4 {
         e[13] = e13;
         e[14] = e14;
         e[15] = e15;
+    }
+
+    public setIdentity(): void {
+        this.set(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
+    }
+
+    public setInverse(mat: Matrix4): void {
+        const det = mat.determinant();
+
+        if (det === 0) {
+            this.setIdentity();
+            return;
+        }
+
+        const detInv = 1 / det;
+        const e = mat.elements;
+
+        const e0a = e[15] * (e[5] * e[10] - e[6] * e[9]);
+        const e0b = e[14] * (e[5] * e[11] - e[7] * e[9]);
+        const e0c = e[13] * (e[6] * e[11] - e[7] * e[10]);
+        const e0 = detInv * (e0a - e0b + e0c);
+
+        const e1a = e[15] * (e[2] * e[9] - e[1] * e[10]);
+        const e1b = e[14] * (e[3] * e[9] - e[1] * e[11]);
+        const e1c = e[13] * (e[3] * e[10] - e[2] * e[11]);
+        const e1 = detInv * (e1a - e1b + e1c);
+
+        const e2a = e[15] * (e[1] * e[6] - e[2] * e[5]);
+        const e2b = e[14] * (e[1] * e[7] - e[3] * e[5]);
+        const e2c = e[13] * (e[2] * e[7] - e[3] * e[6]);
+        const e2 = detInv * (e2a - e2b + e2c);
+
+        const e3a = e[11] * (e[2] * e[5] - e[1] * e[6]);
+        const e3b = e[10] * (e[3] * e[5] - e[1] * e[7]);
+        const e3c = e[9] * (e[3] * e[6] - e[2] * e[7]);
+        const e3 = detInv * (e3a - e3b + e3c);
+
+        const e4a = e[15] * (e[6] * e[8] - e[4] * e[10]);
+        const e4b = e[14] * (e[7] * e[8] - e[4] * e[11]);
+        const e4c = e[12] * (e[7] * e[10] - e[6] * e[11]);
+        const e4 = detInv * (e4a - e4b + e4c);
+
+        const e5a = e[15] * (e[0] * e[10] - e[2] * e[8]);
+        const e5b = e[14] * (e[0] * e[11] - e[3] * e[8]);
+        const e5c = e[12] * (e[2] * e[11] - e[3] * e[10]);
+        const e5 = detInv * (e5a - e5b + e5c);
+
+        const e6a = e[15] * (e[2] * e[4] - e[0] * e[6]);
+        const e6b = e[14] * (e[3] * e[4] - e[0] * e[7]);
+        const e6c = e[12] * (e[3] * e[6] - e[2] * e[7]);
+        const e6 = detInv * (e6a - e6b + e6c);
+
+        const e7a = e[11] * (e[0] * e[6] - e[2] * e[4]);
+        const e7b = e[10] * (e[0] * e[7] - e[3] * e[4]);
+        const e7c = e[8] * (e[2] * e[7] - e[3] * e[6]);
+        const e7 = detInv * (e7a - e7b + e7c);
+
+        const e8a = e[15] * (e[4] * e[9] - e[5] * e[8]);
+        const e8b = e[13] * (e[4] * e[11] - e[7] * e[8]);
+        const e8c = e[12] * (e[5] * e[11] - e[7] * e[9]);
+        const e8 = detInv * (e8a - e8b + e8c);
+
+        const e9a = e[15] * (e[1] * e[8] - e[0] * e[9]);
+        const e9b = e[13] * (e[3] * e[8] - e[0] * e[11]);
+        const e9c = e[12] * (e[3] * e[9] - e[1] * e[11]);
+        const e9 = detInv * (e9a - e9b + e9c);
+
+        const e10a = e[15] * (e[0] * e[5] - e[1] * e[4]);
+        const e10b = e[13] * (e[0] * e[7] - e[3] * e[4]);
+        const e10c = e[12] * (e[1] * e[7] - e[3] * e[5]);
+        const e10 = detInv * (e10a - e10b + e10c);
+
+        const e11a = e[11] * (e[1] * e[4] - e[0] * e[5]);
+        const e11b = e[9] * (e[3] * e[4] - e[0] * e[7]);
+        const e11c = e[8] * (e[3] * e[5] - e[1] * e[7]);
+        const e11 = detInv * (e11a - e11b + e11c);
+
+        const e12a = e[14] * (e[5] * e[8] - e[4] * e[9]);
+        const e12b = e[13] * (e[6] * e[8] - e[4] * e[10]);
+        const e12c = e[12] * (e[6] * e[9] - e[5] * e[10]);
+        const e12 = detInv * (e12a - e12b + e12c);
+
+        const e13a = e[14] * (e[0] * e[9] - e[1] * e[8]);
+        const e13b = e[13] * (e[0] * e[10] - e[2] * e[8]);
+        const e13c = e[12] * (e[1] * e[10] - e[2] * e[9]);
+        const e13 = detInv * (e13a - e13b + e13c);
+
+        const e14a = e[14] * (e[1] * e[4] - e[0] * e[5]);
+        const e14b = e[13] * (e[2] * e[4] - e[0] * e[6]);
+        const e14c = e[12] * (e[2] * e[5] - e[1] * e[6]);
+        const e14 = detInv * (e14a - e14b + e14c);
+
+        const e15a = e[10] * (e[0] * e[5] - e[1] * e[4]);
+        const e15b = e[9] * (e[0] * e[6] - e[2] * e[4]);
+        const e15c = e[8] * (e[1] * e[6] - e[2] * e[5]);
+        const e15 = detInv * (e15a - e15b + e15c);
+
+        this.set(e0, e1, e2, e3, e4, e5, e6, e7, e8, e9, e10, e11, e12, e13, e14, e15);
+    }
+
+    public setOrthographicFrustum(
+        left: number,
+        right: number,
+        bottom: number,
+        top: number,
+        near: number,
+        far: number,
+    ): void {
+        // | e0   0    0  e12 |
+        // |  0  e5    0  e13 |
+        // |  0   0  e10  e14 |
+        // |  0   0    0    1 |
+        const e0 = 2 / (right - left);
+        const e5 = 2 / (top - bottom);
+        const e10 = 1 / (near - far);
+        const e12 = (left + right) / (left - right);
+        const e13 = (bottom + top) / (bottom - top);
+        const e14 = near / (near - far);
+
+        this.set(e0, 0, 0, 0, 0, e5, 0, 0, 0, 0, e10, 0, e12, e13, e14, 1);
+    }
+
+    public setOrthographicFrustumGL(
+        left: number,
+        right: number,
+        bottom: number,
+        top: number,
+        near: number,
+        far: number,
+    ): void {
+        // | e0   0    0  e12 |
+        // |  0  e5    0  e13 |
+        // |  0   0  e10  e14 |
+        // |  0   0    0    1 |
+        const e0 = 2 / (right - left);
+        const e5 = 2 / (top - bottom);
+        const e10 = 2 / (near - far);
+        const e12 = (left + right) / (left - right);
+        const e13 = (bottom + top) / (bottom - top);
+        const e14 = (near + far) / (near - far);
+
+        this.set(e0, 0, 0, 0, 0, e5, 0, 0, 0, 0, e10, 0, e12, e13, e14, 1);
+    }
+
+    public setPerspective(fovY: number, aspectRatio: number, near: number, far: number): void {
+        const cot = 1 / Math.tan(0.5 * fovY);
+
+        // | e0   0    0    0 |
+        // |  0  e5    0    0 |
+        // |  0   0  e10  e14 |
+        // |  0   0   -1    0 |
+        const e0 = cot / aspectRatio;
+        const e5 = cot;
+        const e10 = far / (near - far);
+        const e14 = (near * far) / (near - far);
+
+        this.set(e0, 0, 0, 0, 0, e5, 0, 0, 0, 0, e10, -1, 0, 0, e14, 0);
+    }
+
+    public setPerspectiveFrustum(
+        left: number,
+        right: number,
+        bottom: number,
+        top: number,
+        near: number,
+        far: number,
+    ): void {
+        // | e0   0   e8    0 |
+        // |  0  e5   e9    0 |
+        // |  0   0  e10  e14 |
+        // |  0   0   -1    0 |
+        const e0 = (2 * near) / (right - left);
+        const e5 = (2 * near) / (top - bottom);
+        const e8 = (left + right) / (right - left);
+        const e9 = (bottom + top) / (top - bottom);
+        const e10 = far / (near - far);
+        const e14 = (near * far) / (near - far);
+
+        this.set(e0, 0, 0, 0, 0, e5, 0, 0, e8, e9, e10, -1, 0, 0, e14, 0);
+    }
+
+    public setPerspectiveFrustumGL(
+        left: number,
+        right: number,
+        bottom: number,
+        top: number,
+        near: number,
+        far: number,
+    ): void {
+        // | e0   0   e8    0 |
+        // |  0  e5   e9    0 |
+        // |  0   0  e10  e14 |
+        // |  0   0   -1    0 |
+        const e0 = (2 * near) / (right - left);
+        const e5 = (2 * near) / (top - bottom);
+        const e8 = (left + right) / (right - left);
+        const e9 = (bottom + top) / (top - bottom);
+        const e10 = (near + far) / (near - far);
+        const e14 = (2 * near * far) / (near - far);
+
+        this.set(e0, 0, 0, 0, 0, e5, 0, 0, e8, e9, e10, -1, 0, 0, e14, 0);
+    }
+
+    public setPerspectiveGL(fovY: number, aspectRatio: number, near: number, far: number): void {
+        const cot = 1 / Math.tan(0.5 * fovY);
+
+        // | e0   0    0    0 |
+        // |  0  e5    0    0 |
+        // |  0   0  e10  e14 |
+        // |  0   0   -1    0 |
+        const e0 = cot / aspectRatio;
+        const e5 = cot;
+        const e10 = (near + far) / (near - far);
+        const e14 = (2 * far * near) / (near - far);
+
+        this.set(e0, 0, 0, 0, 0, e5, 0, 0, 0, 0, e10, -1, 0, 0, e14, 0);
     }
 
     public sub(mat: Matrix4): Matrix4 {
