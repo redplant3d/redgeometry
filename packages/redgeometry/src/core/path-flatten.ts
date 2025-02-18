@@ -51,8 +51,8 @@ export class PathFlattenIncremental2 implements PathFlatten2 {
         let cIdx = 0;
         let pIdx = 0;
 
-        let ps: ReadonlyVector2 = Vector2.createZero();
-        let p0: ReadonlyVector2 = Vector2.createZero();
+        let ps: ReadonlyVector2 = Vector2.ZERO;
+        let p0: ReadonlyVector2 = Vector2.ZERO;
 
         while (cIdx < commands.length) {
             const command = commands[cIdx++];
@@ -184,8 +184,8 @@ export class PathFlattenRecursive2 implements PathFlatten2 {
         let cIdx = 0;
         let pIdx = 0;
 
-        let ps: ReadonlyVector2 = Vector2.createZero();
-        let p0: ReadonlyVector2 = Vector2.createZero();
+        let ps: ReadonlyVector2 = Vector2.ZERO;
+        let p0: ReadonlyVector2 = Vector2.ZERO;
 
         while (cIdx < commands.length) {
             const command = commands[cIdx++];

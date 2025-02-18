@@ -57,7 +57,7 @@ export class StrokeState {
         this.currentPhase = false;
         this.isDash = false;
         this.isFirstDash = true;
-        this.ms = Vector2.createZero();
+        this.ms = Vector2.ZERO;
         this.output = Path2.createEmpty();
         this.startAdvancedLength = 0;
         this.startIndex = 0;
@@ -93,7 +93,7 @@ export class StrokeState {
     }
 
     public finalizePoint(p: ReadonlyVector2): void {
-        const m = Vector2.createUnitX();
+        const m = Vector2.UNIT_X;
         this.insertMoveStroke(p, m);
         this.finalizeOpen();
     }

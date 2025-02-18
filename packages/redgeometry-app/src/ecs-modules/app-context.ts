@@ -393,7 +393,7 @@ export class AppContextPlugin implements WorldPlugin {
         let cIdx = 0;
         let pIdx = 0;
 
-        let p0: ReadonlyVector2 = Vector2.createZero();
+        let p0: ReadonlyVector2 = Vector2.ZERO;
 
         while (cIdx < commands.length) {
             const command = commands[cIdx++];

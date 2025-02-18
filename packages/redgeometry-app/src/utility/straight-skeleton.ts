@@ -236,8 +236,8 @@ export class StraightSkeleton {
 
         MeshEdge2.detachPair(e1);
 
-        e1.p0 = Vector2.createZero();
-        e1.sym.p0 = Vector2.createZero();
+        e1.p0 = Vector2.ZERO;
+        e1.sym.p0 = Vector2.ZERO;
 
         // Not a vertex anymore
         e0.data = undefined;

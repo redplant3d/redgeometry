@@ -220,7 +220,7 @@ export class Polygon2 {
         // Find the oriented bounding box with the smallest area
         let minArea = Number.POSITIVE_INFINITY;
 
-        const points = [Vector2.createZero(), Vector2.createZero(), Vector2.createZero(), Vector2.createZero()];
+        const points = [Vector2.ZERO, Vector2.ZERO, Vector2.ZERO, Vector2.ZERO];
         const convexHull = this.getConvexHull();
 
         // Iterate all edges

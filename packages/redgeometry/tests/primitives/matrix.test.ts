@@ -38,8 +38,8 @@ test("Matrix3A - inverse", () => {
     const mat1 = mat.mul(matInv);
     const mat2 = matInv.mul(mat);
 
-    expect(mat1).toEqual(Matrix3A.createIdentity());
-    expect(mat2).toEqual(Matrix3A.createIdentity());
+    expect(mat1).toEqual(Matrix3A.IDENTITY);
+    expect(mat2).toEqual(Matrix3A.IDENTITY);
 });
 
 test("Matrix3A - mulV", () => {
@@ -128,8 +128,8 @@ test("Matrix3 - inverse", () => {
     const mat1 = mat.mul(matInv);
     const mat2 = matInv.mul(mat);
 
-    expect(mat1).toEqual(Matrix3.createIdentity());
-    expect(mat2).toEqual(Matrix3.createIdentity());
+    expect(mat1).toEqual(Matrix3.IDENTITY);
+    expect(mat2).toEqual(Matrix3.IDENTITY);
 });
 
 test("Matrix3 - mulV", () => {
@@ -218,8 +218,8 @@ test("Matrix4A - inverse", () => {
     const mat1 = mat.mul(matInv);
     const mat2 = matInv.mul(mat);
 
-    expect(mat1).toEqual(Matrix4A.createIdentity());
-    expect(mat2).toEqual(Matrix4A.createIdentity());
+    expect(mat1).toEqual(Matrix4A.IDENTITY);
+    expect(mat2).toEqual(Matrix4A.IDENTITY);
 });
 
 test("Matrix4A - mulV", () => {
@@ -346,8 +346,8 @@ test("Matrix4 - inverse", () => {
     const mat1 = mat.mul(matInv);
     const mat2 = matInv.mul(mat);
 
-    expect(mat1).toEqual(Matrix4.createIdentity());
-    expect(mat2).toEqual(Matrix4.createIdentity());
+    expect(mat1).toEqual(Matrix4.IDENTITY);
+    expect(mat2).toEqual(Matrix4.IDENTITY);
 });
 
 test("Matrix4 - mulV", () => {

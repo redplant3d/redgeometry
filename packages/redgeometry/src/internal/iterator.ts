@@ -80,8 +80,8 @@ export class Path2CurveIterator implements IterableIterator<ReadonlyBezierCurve2
         this.cIdx = 0;
         this.pIdx = 0;
 
-        this.ps = Vector2.createZero();
-        this.p0 = Vector2.createZero();
+        this.ps = Vector2.ZERO;
+        this.p0 = Vector2.ZERO;
     }
 
     public [Symbol.iterator](): IterableIterator<ReadonlyBezierCurve2> {

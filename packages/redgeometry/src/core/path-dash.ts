@@ -53,9 +53,9 @@ export class PathDashIncremental2 implements PathDash2 {
         let cIdx = 0;
         let pIdx = 0;
 
-        let ps: ReadonlyVector2 = Vector2.createZero();
-        let p0: ReadonlyVector2 = Vector2.createZero();
-        let m0: ReadonlyVector2 = Vector2.createZero();
+        let ps: ReadonlyVector2 = Vector2.ZERO;
+        let p0: ReadonlyVector2 = Vector2.ZERO;
+        let m0: ReadonlyVector2 = Vector2.ZERO;
 
         this.initialize(output, options);
 
@@ -68,7 +68,7 @@ export class PathDashIncremental2 implements PathDash2 {
                     }
 
                     p0 = points[pIdx++];
-                    m0 = Vector2.createZero();
+                    m0 = Vector2.ZERO;
 
                     ps = p0;
                     break;
@@ -142,7 +142,7 @@ export class PathDashIncremental2 implements PathDash2 {
                     }
 
                     p0 = ps;
-                    m0 = Vector2.createZero();
+                    m0 = Vector2.ZERO;
 
                     break;
                 }
@@ -259,9 +259,9 @@ export class PathDashRecursive2 implements PathDash2 {
         let cIdx = 0;
         let pIdx = 0;
 
-        let ps: ReadonlyVector2 = Vector2.createZero();
-        let p0: ReadonlyVector2 = Vector2.createZero();
-        let m0: ReadonlyVector2 = Vector2.createZero();
+        let ps: ReadonlyVector2 = Vector2.ZERO;
+        let p0: ReadonlyVector2 = Vector2.ZERO;
+        let m0: ReadonlyVector2 = Vector2.ZERO;
 
         this.state.initialize(output, options);
 
@@ -274,7 +274,7 @@ export class PathDashRecursive2 implements PathDash2 {
                     }
 
                     p0 = points[pIdx++];
-                    m0 = Vector2.createZero();
+                    m0 = Vector2.ZERO;
 
                     ps = p0;
                     break;
@@ -348,7 +348,7 @@ export class PathDashRecursive2 implements PathDash2 {
                     }
 
                     p0 = ps;
-                    m0 = Vector2.createZero();
+                    m0 = Vector2.ZERO;
 
                     break;
                 }

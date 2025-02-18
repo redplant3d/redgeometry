@@ -66,9 +66,9 @@ export class PathStrokeIncremental2 implements PathStroke2 {
 
         let ct0 = PathCommandType.Move;
 
-        let ps: ReadonlyVector2 = Vector2.createZero();
-        let p0: ReadonlyVector2 = Vector2.createZero();
-        let m0: ReadonlyVector2 = Vector2.createZero();
+        let ps: ReadonlyVector2 = Vector2.ZERO;
+        let p0: ReadonlyVector2 = Vector2.ZERO;
+        let m0: ReadonlyVector2 = Vector2.ZERO;
 
         this.state.initialize(output, options);
 
@@ -86,7 +86,7 @@ export class PathStrokeIncremental2 implements PathStroke2 {
 
                     ps = points[pIdx++];
                     p0 = ps;
-                    m0 = Vector2.createZero();
+                    m0 = Vector2.ZERO;
                     break;
                 }
                 case PathCommandType.Linear: {
@@ -164,7 +164,7 @@ export class PathStrokeIncremental2 implements PathStroke2 {
                     }
 
                     p0 = ps;
-                    m0 = Vector2.createZero();
+                    m0 = Vector2.ZERO;
                     break;
                 }
                 default: {
@@ -322,9 +322,9 @@ export class PathStrokeRecursive2 implements PathStroke2 {
         let cIdx = 0;
         let pIdx = 0;
 
-        let ps: ReadonlyVector2 = Vector2.createZero();
-        let p0: ReadonlyVector2 = Vector2.createZero();
-        let m0: ReadonlyVector2 = Vector2.createZero();
+        let ps: ReadonlyVector2 = Vector2.ZERO;
+        let p0: ReadonlyVector2 = Vector2.ZERO;
+        let m0: ReadonlyVector2 = Vector2.ZERO;
 
         this.state.initialize(output, options);
 
@@ -342,7 +342,7 @@ export class PathStrokeRecursive2 implements PathStroke2 {
 
                     ps = points[pIdx++];
                     p0 = ps;
-                    m0 = Vector2.createZero();
+                    m0 = Vector2.ZERO;
                     break;
                 }
                 case PathCommandType.Linear: {
@@ -420,7 +420,7 @@ export class PathStrokeRecursive2 implements PathStroke2 {
                     }
 
                     p0 = ps;
-                    m0 = Vector2.createZero();
+                    m0 = Vector2.ZERO;
                     break;
                 }
                 default: {
