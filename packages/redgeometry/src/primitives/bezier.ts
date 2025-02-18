@@ -43,7 +43,7 @@ export type BezierCurve2 = Bezier1Curve2 | Bezier2Curve2 | Bezier3Curve2 | Bezie
 export interface ReadonlyBezier1Curve2 {
     readonly p0: ReadonlyVector2;
     readonly p1: ReadonlyVector2;
-    readonly pn: Vector2;
+    readonly pn: ReadonlyVector2;
     readonly type: CurveType.Bezier1;
 
     clone(): Bezier1Curve2;
@@ -72,7 +72,7 @@ export interface ReadonlyBezier2Curve2 {
     readonly p0: ReadonlyVector2;
     readonly p1: ReadonlyVector2;
     readonly p2: ReadonlyVector2;
-    readonly pn: Vector2;
+    readonly pn: ReadonlyVector2;
     readonly type: CurveType.Bezier2;
 
     clone(): Bezier2Curve2;
@@ -112,7 +112,7 @@ export interface ReadonlyBezier3Curve2 {
     readonly p1: ReadonlyVector2;
     readonly p2: ReadonlyVector2;
     readonly p3: ReadonlyVector2;
-    readonly pn: Vector2;
+    readonly pn: ReadonlyVector2;
     readonly type: CurveType.Bezier3;
 
     clone(): Bezier3Curve2;
@@ -147,7 +147,7 @@ export interface ReadonlyBezierRCurve2 {
     readonly p0: ReadonlyVector2;
     readonly p1: ReadonlyVector2;
     readonly p2: ReadonlyVector2;
-    readonly pn: Vector2;
+    readonly pn: ReadonlyVector2;
     readonly type: CurveType.BezierR;
     readonly w: number;
 
