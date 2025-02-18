@@ -1,5 +1,5 @@
 import { eqApproxAbs, eqApproxRel } from "../utility/scalar.js";
-import { Vector2 } from "./vector.js";
+import { Vector2, type ReadonlyVector2 } from "./vector.js";
 
 export type ComplexLike = {
     readonly a: number;
@@ -10,19 +10,19 @@ export interface ReadonlyComplex {
     readonly a: number;
     readonly b: number;
 
-    angleTo(z: Complex): number;
+    angleTo(z: ReadonlyComplex): number;
     clone(): Complex;
     conjugate(): Complex;
-    eq(z: Complex): boolean;
-    eqApproxAbs(z: Complex, eps: number): boolean;
-    eqApproxRel(z: Complex, eps: number): boolean;
+    eq(z: ReadonlyComplex): boolean;
+    eqApproxAbs(z: ReadonlyComplex, eps: number): boolean;
+    eqApproxRel(z: ReadonlyComplex, eps: number): boolean;
     inverse(): Complex;
     isIdentity(): boolean;
     len(): number;
     lenSq(): number;
-    mul(z: Complex): Complex;
-    mulV(v: Vector2): Vector2;
-    sub(z: Complex): Complex;
+    mul(z: ReadonlyComplex): Complex;
+    mulV(v: ReadonlyVector2): Vector2;
+    sub(z: ReadonlyComplex): Complex;
     toArray(): [number, number];
     toString(): string;
     unit(): Complex;
@@ -58,11 +58,11 @@ export class Complex implements ReadonlyComplex {
         return new Complex(cos, sin);
     }
 
-    public static toObject(z: Complex): ComplexLike {
+    public static toObject(z: ReadonlyComplex): ComplexLike {
         return { a: z.a, b: z.b };
     }
 
-    public add(z: Complex): Complex {
+    public add(z: ReadonlyComplex): Complex {
         return new Complex(this.a + z.a, this.b + z.b);
     }
 
@@ -71,7 +71,7 @@ export class Complex implements ReadonlyComplex {
      *
      * Note: The returned value is unsigned and less than `PI`.
      */
-    public angleTo(z: Complex): number {
+    public angleTo(z: ReadonlyComplex): number {
         // Formula adapted from `Quaternion`
         const dot = this.a * z.a + this.b * z.b;
         const lenSq2 = this.lenSq() * z.lenSq();
@@ -94,15 +94,15 @@ export class Complex implements ReadonlyComplex {
         return new Complex(this.a, -this.b);
     }
 
-    public eq(z: Complex): boolean {
+    public eq(z: ReadonlyComplex): boolean {
         return this.a === z.a && this.b === z.b;
     }
 
-    public eqApproxAbs(z: Complex, eps: number): boolean {
+    public eqApproxAbs(z: ReadonlyComplex, eps: number): boolean {
         return eqApproxAbs(this.a, z.a, eps) && eqApproxAbs(this.b, z.b, eps);
     }
 
-    public eqApproxRel(z: Complex, eps: number): boolean {
+    public eqApproxRel(z: ReadonlyComplex, eps: number): boolean {
         return eqApproxRel(this.a, z.a, eps) && eqApproxRel(this.b, z.b, eps);
     }
 
@@ -129,7 +129,7 @@ export class Complex implements ReadonlyComplex {
      * | b |   | zb |
      * ```
      */
-    public mul(z: Complex): Complex {
+    public mul(z: ReadonlyComplex): Complex {
         return new Complex(this.a * z.a - this.b * z.b, this.a * z.b + this.b * z.a);
     }
 
@@ -139,7 +139,7 @@ export class Complex implements ReadonlyComplex {
      * | b |   | vy |
      * ```
      */
-    public mulV(v: Vector2): Vector2 {
+    public mulV(v: ReadonlyVector2): Vector2 {
         return new Vector2(this.a * v.x - this.b * v.y, this.a * v.y + this.b * v.x);
     }
 
@@ -158,25 +158,25 @@ export class Complex implements ReadonlyComplex {
         this.b = b;
     }
 
-    public setAdd(z1: Complex, z2: Complex): void {
+    public setAdd(z1: ReadonlyComplex, z2: ReadonlyComplex): void {
         const za = z1.a + z2.a;
         const zb = z1.b + z2.b;
         this.set(za, zb);
     }
 
-    public setMul(z1: Complex, z2: Complex): void {
+    public setMul(z1: ReadonlyComplex, z2: ReadonlyComplex): void {
         const za = z1.a * z2.a - z1.b * z2.b;
         const zb = z1.a * z2.b + z1.b * z2.a;
         this.set(za, zb);
     }
 
-    public setSub(z1: Complex, z2: Complex): void {
+    public setSub(z1: ReadonlyComplex, z2: ReadonlyComplex): void {
         const za = z1.a - z2.a;
         const zb = z1.b - z2.b;
         this.set(za, zb);
     }
 
-    public sub(z: Complex): Complex {
+    public sub(z: ReadonlyComplex): Complex {
         return new Complex(this.a - z.a, this.b - z.b);
     }
 

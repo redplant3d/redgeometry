@@ -1,7 +1,14 @@
 import type { FixedSizeArray } from "../utility/types.js";
 import { Complex } from "./complex.js";
 import { Quaternion } from "./quaternion.js";
-import { Vector2, Vector3, Vector4 } from "./vector.js";
+import {
+    Vector2,
+    Vector3,
+    Vector4,
+    type ReadonlyVector2,
+    type ReadonlyVector3,
+    type ReadonlyVector4,
+} from "./vector.js";
 
 export type MatrixElements3A = FixedSizeArray<number, 6>;
 export type MatrixElements3 = FixedSizeArray<number, 9>;
@@ -30,15 +37,15 @@ export interface ReadonlyMatrix3A {
 
     clone(): Matrix3A;
     determinant(): number;
-    eq(mat: Matrix3A): boolean;
+    eq(mat: ReadonlyMatrix3A): boolean;
     extractSRT(): { s: Vector2; r: Complex; t: Vector2 };
     inverse(): Matrix3A;
-    mul(mat: Matrix3A): Matrix3A;
-    mulV(v: Vector2): Vector2;
+    mul(mat: ReadonlyMatrix3A): Matrix3A;
+    mulV(v: ReadonlyVector2): Vector2;
     toArray(): MatrixElements3A;
     toString(): string;
-    transformPoint(p: Vector2): Vector2;
-    transformVector(v: Vector2): Vector2;
+    transformPoint(p: ReadonlyVector2): Vector2;
+    transformVector(v: ReadonlyVector2): Vector2;
     transpose(): Matrix3;
 }
 
@@ -46,18 +53,18 @@ export interface ReadonlyMatrix3 {
     readonly elements: MatrixElements3;
     readonly type: MatrixType.Projective;
 
-    add(mat: Matrix3): Matrix3;
+    add(mat: ReadonlyMatrix3): Matrix3;
     clone(): Matrix3;
     determinant(): number;
-    eq(mat: Matrix3): boolean;
+    eq(mat: ReadonlyMatrix3): boolean;
     extractSRT(): { s: Vector2; r: Complex; t: Vector2 };
     inverse(): Matrix3;
-    mul(mat: Matrix3): Matrix3;
-    mulV(v: Vector3): Vector3;
+    mul(mat: ReadonlyMatrix3): Matrix3;
+    mulV(v: ReadonlyVector3): Vector3;
     toArray(): MatrixElements3;
     toString(): string;
-    transformPoint(p: Vector2): Vector2;
-    transformVector(v: Vector2): Vector2;
+    transformPoint(p: ReadonlyVector2): Vector2;
+    transformVector(v: ReadonlyVector2): Vector2;
     transpose(): Matrix3;
 }
 
@@ -67,15 +74,15 @@ export interface ReadonlyMatrix4A {
 
     clone(): Matrix4A;
     determinant(): number;
-    eq(mat: Matrix4A): boolean;
+    eq(mat: ReadonlyMatrix4A): boolean;
     extractSRT(): { s: Vector3; r: Quaternion; t: Vector3 };
     inverse(): Matrix4A;
-    mul(mat: Matrix4A): Matrix4A;
-    mulV(v: Vector3): Vector3;
+    mul(mat: ReadonlyMatrix4A): Matrix4A;
+    mulV(v: ReadonlyVector3): Vector3;
     toArray(): MatrixElements4A;
     toString(): string;
-    transformPoint(p: Vector3): Vector3;
-    transformVector(v: Vector3): Vector3;
+    transformPoint(p: ReadonlyVector3): Vector3;
+    transformVector(v: ReadonlyVector3): Vector3;
     transpose(): Matrix4;
 }
 
@@ -83,19 +90,19 @@ export interface ReadonlyMatrix4 {
     readonly elements: MatrixElements4;
     readonly type: MatrixType.Projective;
 
-    add(mat: Matrix4): Matrix4;
+    add(mat: ReadonlyMatrix4): Matrix4;
     clone(): Matrix4;
     determinant(): number;
-    eq(mat: Matrix4): boolean;
+    eq(mat: ReadonlyMatrix4): boolean;
     extractSRT(): { s: Vector3; r: Quaternion; t: Vector3 };
     inverse(): Matrix4;
-    mul(mat: Matrix4): Matrix4;
-    mulV(v: Vector4): Vector4;
-    sub(mat: Matrix4): Matrix4;
+    mul(mat: ReadonlyMatrix4): Matrix4;
+    mulV(v: ReadonlyVector4): Vector4;
+    sub(mat: ReadonlyMatrix4): Matrix4;
     toArray(): MatrixElements4;
     toString(): string;
-    transformPoint(p: Vector3): Vector3;
-    transformVector(v: Vector3): Vector3;
+    transformPoint(p: ReadonlyVector3): Vector3;
+    transformVector(v: ReadonlyVector3): Vector3;
     transpose(): Matrix4;
 }
 
@@ -193,7 +200,7 @@ export class Matrix3A implements ReadonlyMatrix3A {
     /**
      * Copies values from `mat` into this matrix.
      */
-    public copyFromMat3(mat: Matrix3): void {
+    public copyFromMat3(mat: ReadonlyMatrix3): void {
         const ea = this.elements;
         const eb = mat.elements;
 
@@ -208,7 +215,7 @@ export class Matrix3A implements ReadonlyMatrix3A {
     /**
      * Copies values from `mat` into this matrix.
      */
-    public copyFromMat3A(mat: Matrix3A): void {
+    public copyFromMat3A(mat: ReadonlyMatrix3A): void {
         const ea = this.elements;
         const eb = mat.elements;
 
@@ -228,7 +235,7 @@ export class Matrix3A implements ReadonlyMatrix3A {
         return e[0] * e[3] - e[1] * e[2];
     }
 
-    public eq(mat: Matrix3A): boolean {
+    public eq(mat: ReadonlyMatrix3A): boolean {
         const ea = this.elements;
         const eb = mat.elements;
 
@@ -291,7 +298,7 @@ export class Matrix3A implements ReadonlyMatrix3A {
      * |   0    0    1 |   |   0    0    1 |
      * ```
      */
-    public mul(mat: Matrix3A): Matrix3A {
+    public mul(mat: ReadonlyMatrix3A): Matrix3A {
         const ea = this.elements;
         const eb = mat.elements;
 
@@ -314,7 +321,7 @@ export class Matrix3A implements ReadonlyMatrix3A {
      * |   0    0    1 |   |   0    0    1 |
      * ```
      */
-    public mulSet(mat1: Matrix3A, mat2: Matrix3A): void {
+    public mulSet(mat1: ReadonlyMatrix3A, mat2: ReadonlyMatrix3A): void {
         const ea = mat1.elements;
         const eb = mat2.elements;
 
@@ -337,7 +344,7 @@ export class Matrix3A implements ReadonlyMatrix3A {
      * |  0   0   1 |   | 1 |
      * ```
      */
-    public mulV(v: Vector2): Vector2 {
+    public mulV(v: ReadonlyVector2): Vector2 {
         const e = this.elements;
 
         const x = e[0] * v.x + e[2] * v.y + e[4];
@@ -489,7 +496,7 @@ export class Matrix3A implements ReadonlyMatrix3A {
         this.set(1, 0, 0, 1, 0, 0);
     }
 
-    public setInverse(mat: Matrix3A): void {
+    public setInverse(mat: ReadonlyMatrix3A): void {
         const det = mat.determinant();
 
         if (det === 0) {
@@ -531,7 +538,7 @@ export class Matrix3A implements ReadonlyMatrix3A {
      * |  0   0   1 |   | 1 |
      * ```
      */
-    public transformPoint(p: Vector2): Vector2 {
+    public transformPoint(p: ReadonlyVector2): Vector2 {
         const e = this.elements;
 
         const x = e[0] * p.x + e[2] * p.y + e[4];
@@ -547,7 +554,7 @@ export class Matrix3A implements ReadonlyMatrix3A {
      * |  0   0   1 |   | 0 |
      * ```
      */
-    public transformVector(v: Vector2): Vector2 {
+    public transformVector(v: ReadonlyVector2): Vector2 {
         const e = this.elements;
 
         const x = e[0] * v.x + e[2] * v.y;
@@ -662,7 +669,7 @@ export class Matrix3 implements ReadonlyMatrix3 {
     /**
      * Creates a matrix from `mat` by omitting the projection and translation parts.
      */
-    public static fromMat4(mat: Matrix4): Matrix3 {
+    public static fromMat4(mat: ReadonlyMatrix4): Matrix3 {
         const e = mat.elements;
         return new Matrix3([e[0], e[1], e[2], e[4], e[5], e[6], e[8], e[9], e[10]]);
     }
@@ -670,7 +677,7 @@ export class Matrix3 implements ReadonlyMatrix3 {
     /**
      * Creates a matrix from `mat` by omitting the translation part.
      */
-    public static fromMat4A(mat: Matrix4A): Matrix3 {
+    public static fromMat4A(mat: ReadonlyMatrix4A): Matrix3 {
         const e = mat.elements;
         return new Matrix3([e[0], e[1], e[2], e[3], e[4], e[5], e[6], e[7], e[8]]);
     }
@@ -713,7 +720,7 @@ export class Matrix3 implements ReadonlyMatrix3 {
         return new Matrix3([1, 0, 0, 0, 1, 0, tx, ty, 1]);
     }
 
-    public add(mat: Matrix3): Matrix3 {
+    public add(mat: ReadonlyMatrix3): Matrix3 {
         const ea = this.elements;
         const eb = mat.elements;
 
@@ -730,7 +737,7 @@ export class Matrix3 implements ReadonlyMatrix3 {
         return new Matrix3([e0, e1, e2, e3, e4, e5, e6, e7, e8]);
     }
 
-    public addSet(mat1: Matrix3, mat2: Matrix3): void {
+    public addSet(mat1: ReadonlyMatrix3, mat2: ReadonlyMatrix3): void {
         const ea = mat1.elements;
         const eb = mat2.elements;
 
@@ -754,7 +761,7 @@ export class Matrix3 implements ReadonlyMatrix3 {
     /**
      * Copies values from `mat` into this matrix.
      */
-    public copyFromMat3(mat: Matrix3): void {
+    public copyFromMat3(mat: ReadonlyMatrix3): void {
         const ea = this.elements;
         const eb = mat.elements;
 
@@ -772,7 +779,7 @@ export class Matrix3 implements ReadonlyMatrix3 {
     /**
      * Copies values from `mat` into this matrix.
      */
-    public copyFromMat3A(mat: Matrix3A): void {
+    public copyFromMat3A(mat: ReadonlyMatrix3A): void {
         const ea = this.elements;
         const eb = mat.elements;
 
@@ -800,7 +807,7 @@ export class Matrix3 implements ReadonlyMatrix3 {
         return a - b + c;
     }
 
-    public eq(mat: Matrix3): boolean {
+    public eq(mat: ReadonlyMatrix3): boolean {
         const ea = this.elements;
         const eb = mat.elements;
 
@@ -869,7 +876,7 @@ export class Matrix3 implements ReadonlyMatrix3 {
      * | ea2  ea5  ea8 |   | eb2  eb5  eb8 |
      * ```
      */
-    public mul(mat: Matrix3): Matrix3 {
+    public mul(mat: ReadonlyMatrix3): Matrix3 {
         const ea = this.elements;
         const eb = mat.elements;
 
@@ -895,7 +902,7 @@ export class Matrix3 implements ReadonlyMatrix3 {
      * | ea2  ea5  ea8 |   | eb2  eb5  eb8 |
      * ```
      */
-    public mulSet(mat1: Matrix3, mat2: Matrix3): void {
+    public mulSet(mat1: ReadonlyMatrix3, mat2: ReadonlyMatrix3): void {
         const ea = mat1.elements;
         const eb = mat2.elements;
 
@@ -921,7 +928,7 @@ export class Matrix3 implements ReadonlyMatrix3 {
      * | e2  e5  e8 |   | z |
      * ```
      */
-    public mulV(v: Vector3): Vector3 {
+    public mulV(v: ReadonlyVector3): Vector3 {
         const e = this.elements;
 
         const x = e[0] * v.x + e[3] * v.y + e[6] * v.z;
@@ -1094,7 +1101,7 @@ export class Matrix3 implements ReadonlyMatrix3 {
         this.set(1, 0, 0, 0, 1, 0, 0, 0, 1);
     }
 
-    public setInverse(mat: Matrix3): void {
+    public setInverse(mat: ReadonlyMatrix3): void {
         const det = mat.determinant();
 
         if (det === 0) {
@@ -1118,7 +1125,7 @@ export class Matrix3 implements ReadonlyMatrix3 {
         this.set(e0, e1, e2, e3, e4, e5, e6, e7, e8);
     }
 
-    public sub(mat: Matrix3): Matrix3 {
+    public sub(mat: ReadonlyMatrix3): Matrix3 {
         const ea = this.elements;
         const eb = mat.elements;
 
@@ -1135,7 +1142,7 @@ export class Matrix3 implements ReadonlyMatrix3 {
         return new Matrix3([e0, e1, e2, e3, e4, e5, e6, e7, e8]);
     }
 
-    public subSet(mat1: Matrix3, mat2: Matrix3): void {
+    public subSet(mat1: ReadonlyMatrix3, mat2: ReadonlyMatrix3): void {
         const ea = mat1.elements;
         const eb = mat2.elements;
 
@@ -1174,7 +1181,7 @@ export class Matrix3 implements ReadonlyMatrix3 {
      * | e2  e5  e8 |   | 1 |
      * ```
      */
-    public transformPoint(p: Vector2): Vector2 {
+    public transformPoint(p: ReadonlyVector2): Vector2 {
         const e = this.elements;
 
         const x = e[0] * p.x + e[3] * p.y + e[6];
@@ -1191,7 +1198,7 @@ export class Matrix3 implements ReadonlyMatrix3 {
      * | e2  e5  e8 |   | 0 |
      * ```
      */
-    public transformVector(v: Vector2): Vector2 {
+    public transformVector(v: ReadonlyVector2): Vector2 {
         const e = this.elements;
 
         const x = e[0] * v.x + e[3] * v.y;
@@ -1319,7 +1326,7 @@ export class Matrix4A implements ReadonlyMatrix4A {
     /**
      * Creates a matrix from `mat`.
      */
-    public static fromMat3(mat: Matrix3): Matrix4A {
+    public static fromMat3(mat: ReadonlyMatrix3): Matrix4A {
         const e = mat.elements;
         return new Matrix4A([e[0], e[1], e[2], e[3], e[4], e[5], e[6], e[7], e[8], 0, 0, 0]);
     }
@@ -1327,7 +1334,7 @@ export class Matrix4A implements ReadonlyMatrix4A {
     /**
      * Creates a matrix from `mat`.
      */
-    public static fromMat4(mat: Matrix4): Matrix4A {
+    public static fromMat4(mat: ReadonlyMatrix4): Matrix4A {
         const e = mat.elements;
         return new Matrix4A([e[0], e[1], e[2], e[4], e[5], e[6], e[8], e[9], e[10], e[12], e[13], e[14]]);
     }
@@ -1448,7 +1455,7 @@ export class Matrix4A implements ReadonlyMatrix4A {
     /**
      * Returns a view matrix where `x` is right, `y` is up and `-z` is forward.
      */
-    public static fromView(offset: Vector3, direction: Vector3, up: Vector3): Matrix4A {
+    public static fromView(offset: ReadonlyVector3, direction: ReadonlyVector3, up: ReadonlyVector3): Matrix4A {
         // Orthonormal basis
         const v3 = direction.neg().unit();
         const v1 = up.cross(v3).unit();
@@ -1478,7 +1485,7 @@ export class Matrix4A implements ReadonlyMatrix4A {
     /**
      * Copies values from `mat` into this matrix.
      */
-    public copyFromMat4(mat: Matrix4): void {
+    public copyFromMat4(mat: ReadonlyMatrix4): void {
         const ea = this.elements;
         const eb = mat.elements;
 
@@ -1499,7 +1506,7 @@ export class Matrix4A implements ReadonlyMatrix4A {
     /**
      * Copies values from `mat` into this matrix.
      */
-    public copyFromMat4A(mat: Matrix4A): void {
+    public copyFromMat4A(mat: ReadonlyMatrix4A): void {
         const ea = this.elements;
         const eb = mat.elements;
 
@@ -1530,7 +1537,7 @@ export class Matrix4A implements ReadonlyMatrix4A {
         return a - b + c;
     }
 
-    public eq(mat: Matrix4A): boolean {
+    public eq(mat: ReadonlyMatrix4A): boolean {
         const ea = this.elements;
         const eb = mat.elements;
 
@@ -1619,7 +1626,7 @@ export class Matrix4A implements ReadonlyMatrix4A {
      * |   0    0    0     1 |   |   0    0    0     1 |
      * ```
      */
-    public mul(mat: Matrix4A): Matrix4A {
+    public mul(mat: ReadonlyMatrix4A): Matrix4A {
         const ea = this.elements;
         const eb = mat.elements;
 
@@ -1650,7 +1657,7 @@ export class Matrix4A implements ReadonlyMatrix4A {
      * |   0    0    0     1 |   |   0    0    0     1 |
      * ```
      */
-    public mulSet(mat1: Matrix4A, mat2: Matrix4A): void {
+    public mulSet(mat1: ReadonlyMatrix4A, mat2: ReadonlyMatrix4A): void {
         const ea = mat1.elements;
         const eb = mat2.elements;
 
@@ -1681,7 +1688,7 @@ export class Matrix4A implements ReadonlyMatrix4A {
      * |  0   0   0    1 |   | 1 |
      * ```
      */
-    public mulV(v: Vector3): Vector3 {
+    public mulV(v: ReadonlyVector3): Vector3 {
         const e = this.elements;
 
         const x = e[0] * v.x + e[3] * v.y + e[6] * v.z + e[9];
@@ -1951,7 +1958,7 @@ export class Matrix4A implements ReadonlyMatrix4A {
         this.set(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0);
     }
 
-    public setInverse(mat: Matrix4A): void {
+    public setInverse(mat: ReadonlyMatrix4A): void {
         const det = mat.determinant();
 
         if (det === 0) {
@@ -2050,7 +2057,7 @@ export class Matrix4A implements ReadonlyMatrix4A {
      * |  0   0   0    1 |   | 1 |
      * ```
      */
-    public transformPoint(p: Vector3): Vector3 {
+    public transformPoint(p: ReadonlyVector3): Vector3 {
         const e = this.elements;
 
         const x = e[0] * p.x + e[3] * p.y + e[6] * p.z + e[9];
@@ -2068,7 +2075,7 @@ export class Matrix4A implements ReadonlyMatrix4A {
      * |  0   0   0    1 |   | 0 |
      * ```
      */
-    public transformVector(v: Vector3): Vector3 {
+    public transformVector(v: ReadonlyVector3): Vector3 {
         const e = this.elements;
 
         const x = e[0] * v.x + e[3] * v.y + e[6] * v.z;
@@ -2210,7 +2217,7 @@ export class Matrix4 implements ReadonlyMatrix4 {
     /**
      * Creates a matrix from `mat`.
      */
-    public static fromMat3(mat: Matrix3): Matrix4 {
+    public static fromMat3(mat: ReadonlyMatrix3): Matrix4 {
         const e = mat.elements;
         return new Matrix4([e[0], e[1], e[2], 0, e[3], e[4], e[5], 0, e[6], e[7], e[8], 0, 0, 0, 0, 1]);
     }
@@ -2218,7 +2225,7 @@ export class Matrix4 implements ReadonlyMatrix4 {
     /**
      * Creates a matrix from `mat`.
      */
-    public static fromMat4A(mat: Matrix4A): Matrix4 {
+    public static fromMat4A(mat: ReadonlyMatrix4A): Matrix4 {
         const e = mat.elements;
         return new Matrix4([e[0], e[1], e[2], 0, e[3], e[4], e[5], 0, e[6], e[7], e[8], 0, e[9], e[10], e[11], 1]);
     }
@@ -2433,7 +2440,7 @@ export class Matrix4 implements ReadonlyMatrix4 {
     /**
      * Returns a view matrix where `x` is right, `y` is up and `-z` is forward.
      */
-    public static fromView(offset: Vector3, direction: Vector3, up: Vector3): Matrix4 {
+    public static fromView(offset: ReadonlyVector3, direction: ReadonlyVector3, up: ReadonlyVector3): Matrix4 {
         // Orthonormal basis
         const v3 = direction.neg().unit();
         const v1 = up.cross(v3).unit();
@@ -2470,7 +2477,7 @@ export class Matrix4 implements ReadonlyMatrix4 {
         return new Matrix4([e0, e1, e2, 0, e4, e5, e6, 0, e8, e9, e10, 0, e12, e13, e14, 1]);
     }
 
-    public add(mat: Matrix4): Matrix4 {
+    public add(mat: ReadonlyMatrix4): Matrix4 {
         const ea = this.elements;
         const eb = mat.elements;
 
@@ -2494,7 +2501,7 @@ export class Matrix4 implements ReadonlyMatrix4 {
         return new Matrix4([e0, e1, e2, e3, e4, e5, e6, e7, e8, e9, e10, e11, e12, e13, e14, e15]);
     }
 
-    public addSet(mat1: Matrix4, mat2: Matrix4): void {
+    public addSet(mat1: ReadonlyMatrix4, mat2: ReadonlyMatrix4): void {
         const ea = mat1.elements;
         const eb = mat2.elements;
 
@@ -2525,7 +2532,7 @@ export class Matrix4 implements ReadonlyMatrix4 {
     /**
      * Copies values from `mat` into this matrix.
      */
-    public copyFromMat4(mat: Matrix4): void {
+    public copyFromMat4(mat: ReadonlyMatrix4): void {
         const ea = this.elements;
         const eb = mat.elements;
 
@@ -2550,7 +2557,7 @@ export class Matrix4 implements ReadonlyMatrix4 {
     /**
      * Copies values from `mat` into this matrix.
      */
-    public copyFromMat4A(mat: Matrix4A): void {
+    public copyFromMat4A(mat: ReadonlyMatrix4A): void {
         const ea = this.elements;
         const eb = mat.elements;
 
@@ -2601,7 +2608,7 @@ export class Matrix4 implements ReadonlyMatrix4 {
         return a - b + c - d;
     }
 
-    public eq(mat: Matrix4): boolean {
+    public eq(mat: ReadonlyMatrix4): boolean {
         const ea = this.elements;
         const eb = mat.elements;
 
@@ -2761,7 +2768,7 @@ export class Matrix4 implements ReadonlyMatrix4 {
      * | ea3  ea7  ea11  ea15 |   | eb3  eb7  eb11  eb15 |
      * ```
      */
-    public mul(mat: Matrix4): Matrix4 {
+    public mul(mat: ReadonlyMatrix4): Matrix4 {
         const ea = this.elements;
         const eb = mat.elements;
 
@@ -2796,7 +2803,7 @@ export class Matrix4 implements ReadonlyMatrix4 {
      * | ea3  ea7  ea11  ea15 |   | eb3  eb7  eb11  eb15 |
      * ```
      */
-    public mulSet(mat1: Matrix4, mat2: Matrix4): void {
+    public mulSet(mat1: ReadonlyMatrix4, mat2: ReadonlyMatrix4): void {
         const ea = mat1.elements;
         const eb = mat2.elements;
 
@@ -2831,7 +2838,7 @@ export class Matrix4 implements ReadonlyMatrix4 {
      * | e3  e7  e11  e15 |   | w |
      * ```
      */
-    public mulV(v: Vector4): Vector4 {
+    public mulV(v: ReadonlyVector4): Vector4 {
         const e = this.elements;
 
         const x = e[0] * v.x + e[4] * v.y + e[8] * v.z + e[12] * v.w;
@@ -3120,7 +3127,7 @@ export class Matrix4 implements ReadonlyMatrix4 {
         this.set(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
     }
 
-    public setInverse(mat: Matrix4): void {
+    public setInverse(mat: ReadonlyMatrix4): void {
         const det = mat.determinant();
 
         if (det === 0) {
@@ -3332,7 +3339,7 @@ export class Matrix4 implements ReadonlyMatrix4 {
         this.set(e0, 0, 0, 0, 0, e5, 0, 0, 0, 0, e10, -1, 0, 0, e14, 0);
     }
 
-    public sub(mat: Matrix4): Matrix4 {
+    public sub(mat: ReadonlyMatrix4): Matrix4 {
         const ea = this.elements;
         const eb = mat.elements;
 
@@ -3356,7 +3363,7 @@ export class Matrix4 implements ReadonlyMatrix4 {
         return new Matrix4([e0, e1, e2, e3, e4, e5, e6, e7, e8, e9, e10, e11, e12, e13, e14, e15]);
     }
 
-    public subSet(mat1: Matrix4, mat2: Matrix4): void {
+    public subSet(mat1: ReadonlyMatrix4, mat2: ReadonlyMatrix4): void {
         const ea = mat1.elements;
         const eb = mat2.elements;
 
@@ -3404,7 +3411,7 @@ export class Matrix4 implements ReadonlyMatrix4 {
      * | e3  e7  e11  e15 |   | 1 |
      * ```
      */
-    public transformPoint(p: Vector3): Vector3 {
+    public transformPoint(p: ReadonlyVector3): Vector3 {
         const e = this.elements;
 
         const x = e[0] * p.x + e[4] * p.y + e[8] * p.z + e[12];
@@ -3423,7 +3430,7 @@ export class Matrix4 implements ReadonlyMatrix4 {
      * | e3  e7  e11  e15 |   | 0 |
      * ```
      */
-    public transformVector(v: Vector3): Vector3 {
+    public transformVector(v: ReadonlyVector3): Vector3 {
         const e = this.elements;
 
         const x = e[0] * v.x + e[4] * v.y + e[8] * v.z;

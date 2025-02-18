@@ -1,6 +1,6 @@
-import type { Matrix3, Matrix3A, Matrix4, Matrix4A } from "./matrix.js";
-import type { Ray2, Ray3 } from "./ray.js";
-import { Vector2, Vector3 } from "./vector.js";
+import type { ReadonlyMatrix3, ReadonlyMatrix3A, ReadonlyMatrix4, ReadonlyMatrix4A } from "./matrix.js";
+import type { ReadonlyRay2, ReadonlyRay3 } from "./ray.js";
+import { Vector2, Vector3, type ReadonlyVector2, type ReadonlyVector3 } from "./vector.js";
 
 export type Box2Like = {
     readonly x0: number;
@@ -24,24 +24,24 @@ export interface ReadonlyBox2 {
     readonly y0: number;
     readonly y1: number;
 
-    addMinkowski(box: Box2): Box2;
+    addMinkowski(box: ReadonlyBox2): Box2;
     clone(): Box2;
-    contains(p: Vector2): boolean;
-    containsInclusive(p: Vector2): boolean;
+    contains(p: ReadonlyVector2): boolean;
+    containsInclusive(p: ReadonlyVector2): boolean;
     dx(): number;
     dy(): number;
     getCenter(): Vector2;
-    intersects(b: Box2): boolean;
-    intersectsInclusive(b: Box2): boolean;
-    intersectsRay(ray: Ray2): boolean;
+    intersects(b: ReadonlyBox2): boolean;
+    intersectsInclusive(b: ReadonlyBox2): boolean;
+    intersectsRay(ray: ReadonlyRay2): boolean;
     isEmpty(): boolean;
     isPoint(): boolean;
     scale(fx: number, fy: number): Box2;
     scaleAbsolute(dx: number, dy: number): Box2;
-    subMinkowski(box: Box2): Box2;
+    subMinkowski(box: ReadonlyBox2): Box2;
     toArray(): [number, number, number, number];
     toString(): string;
-    transform(mat: Matrix3 | Matrix3A): Box2;
+    transform(mat: ReadonlyMatrix3 | ReadonlyMatrix3A): Box2;
 }
 
 export interface ReadonlyBox3 {
@@ -52,25 +52,25 @@ export interface ReadonlyBox3 {
     readonly z0: number;
     readonly z1: number;
 
-    addMinkowski(box: Box3): Box3;
+    addMinkowski(box: ReadonlyBox3): Box3;
     clone(): Box3;
-    contains(p: Vector3): boolean;
-    containsInclusive(p: Vector3): boolean;
+    contains(p: ReadonlyVector3): boolean;
+    containsInclusive(p: ReadonlyVector3): boolean;
     dx(): number;
     dy(): number;
     dz(): number;
     getCenter(): Vector3;
-    intersects(b: Box3): boolean;
-    intersectsInclusive(b: Box3): boolean;
-    intersectsRay(ray: Ray3): boolean;
+    intersects(b: ReadonlyBox3): boolean;
+    intersectsInclusive(b: ReadonlyBox3): boolean;
+    intersectsRay(ray: ReadonlyRay3): boolean;
     isEmpty(): boolean;
     isPoint(): boolean;
     scale(fx: number, fy: number, fz: number): Box3;
     scaleAbsolute(dx: number, dy: number, dz: number): Box3;
-    subMinkowski(box: Box3): Box3;
+    subMinkowski(box: ReadonlyBox3): Box3;
     toArray(): [number, number, number, number, number, number];
     toString(): string;
-    transform(mat: Matrix4 | Matrix4A): Box3;
+    transform(mat: ReadonlyMatrix4 | ReadonlyMatrix4A): Box3;
 }
 
 export class Box2 implements ReadonlyBox2 {
@@ -106,7 +106,7 @@ export class Box2 implements ReadonlyBox2 {
         return new Box2(obj.x0, obj.y0, obj.x1, obj.y1);
     }
 
-    public static fromPoints(p0: Vector2, p1: Vector2): Box2 {
+    public static fromPoints(p0: ReadonlyVector2, p1: ReadonlyVector2): Box2 {
         const x0 = Math.min(p0.x, p1.x);
         const y0 = Math.min(p0.y, p1.y);
         const x1 = Math.max(p0.x, p1.x);
@@ -124,14 +124,14 @@ export class Box2 implements ReadonlyBox2 {
         return new Box2(x0, y0, x1, y1);
     }
 
-    public static toObject(box: Box2): Box2Like {
+    public static toObject(box: ReadonlyBox2): Box2Like {
         return { x0: box.x0, y0: box.y0, x1: box.x1, y1: box.y1 };
     }
 
     /**
      * Returns the Minkowski sum of the boxes.
      */
-    public addMinkowski(box: Box2): Box2 {
+    public addMinkowski(box: ReadonlyBox2): Box2 {
         const x0 = this.x0 - box.x1;
         const y0 = this.y0 - box.y1;
         const x1 = this.x1 - box.x0;
@@ -144,11 +144,11 @@ export class Box2 implements ReadonlyBox2 {
         return new Box2(this.x0, this.y0, this.x1, this.y1);
     }
 
-    public contains(p: Vector2): boolean {
+    public contains(p: ReadonlyVector2): boolean {
         return this.x0 < p.x && this.y0 < p.y && this.x1 > p.x && this.y1 > p.y;
     }
 
-    public containsInclusive(p: Vector2): boolean {
+    public containsInclusive(p: ReadonlyVector2): boolean {
         return this.x0 <= p.x && this.y0 <= p.y && this.x1 >= p.x && this.y1 >= p.y;
     }
 
@@ -160,14 +160,14 @@ export class Box2 implements ReadonlyBox2 {
         return this.y1 - this.y0;
     }
 
-    public enclose(p: Vector2): void {
+    public enclose(p: ReadonlyVector2): void {
         this.x0 = Math.min(this.x0, p.x);
         this.y0 = Math.min(this.y0, p.y);
         this.x1 = Math.max(this.x1, p.x);
         this.y1 = Math.max(this.y1, p.y);
     }
 
-    public encloseWithTransform(p: Vector2, mat: Matrix3 | Matrix3A): void {
+    public encloseWithTransform(p: ReadonlyVector2, mat: ReadonlyMatrix3 | ReadonlyMatrix3A): void {
         const pp = mat.transformPoint(p);
         this.enclose(pp);
     }
@@ -176,15 +176,15 @@ export class Box2 implements ReadonlyBox2 {
         return new Vector2(0.5 * (this.x0 + this.x1), 0.5 * (this.y0 + this.y1));
     }
 
-    public intersects(b: Box2): boolean {
+    public intersects(b: ReadonlyBox2): boolean {
         return this.x0 < b.x1 && this.x1 > b.x0 && this.y0 < b.y1 && this.y1 > b.y0;
     }
 
-    public intersectsInclusive(b: Box2): boolean {
+    public intersectsInclusive(b: ReadonlyBox2): boolean {
         return this.x0 <= b.x1 && this.x1 >= b.x0 && this.y0 <= b.y1 && this.y1 >= b.y0;
     }
 
-    public intersectsRay(ray: Ray2): boolean {
+    public intersectsRay(ray: ReadonlyRay2): boolean {
         let tmin = Number.NEGATIVE_INFINITY;
         let tmax = Number.POSITIVE_INFINITY;
 
@@ -234,7 +234,7 @@ export class Box2 implements ReadonlyBox2 {
     /**
      * Returns the Minkowski difference of the boxes.
      */
-    public subMinkowski(box: Box2): Box2 {
+    public subMinkowski(box: ReadonlyBox2): Box2 {
         const x0 = this.x0 + box.x1;
         const y0 = this.y0 + box.y1;
         const x1 = this.x1 + box.x0;
@@ -251,7 +251,7 @@ export class Box2 implements ReadonlyBox2 {
         return `{x0: ${this.x0}, y0: ${this.y0}, x1: ${this.x1}, y1: ${this.y1}}`;
     }
 
-    public transform(mat: Matrix3 | Matrix3A): Box2 {
+    public transform(mat: ReadonlyMatrix3 | ReadonlyMatrix3A): Box2 {
         const box = Box2.createEmpty();
 
         box.encloseWithTransform(new Vector2(this.x0, this.y0), mat);
@@ -262,7 +262,7 @@ export class Box2 implements ReadonlyBox2 {
         return box;
     }
 
-    public union(b: Box2): void {
+    public union(b: ReadonlyBox2): void {
         this.x0 = Math.min(this.x0, b.x0);
         this.y0 = Math.min(this.y0, b.y0);
         this.x1 = Math.max(this.x1, b.x1);
@@ -316,7 +316,7 @@ export class Box3 implements ReadonlyBox3 {
         return new Box3(obj.x0, obj.y0, obj.z0, obj.x1, obj.y1, obj.z1);
     }
 
-    public static fromPoints(p0: Vector3, p1: Vector3): Box3 {
+    public static fromPoints(p0: ReadonlyVector3, p1: ReadonlyVector3): Box3 {
         const x0 = Math.min(p0.x, p1.x);
         const y0 = Math.min(p0.y, p1.y);
         const z0 = Math.min(p0.z, p1.z);
@@ -338,14 +338,14 @@ export class Box3 implements ReadonlyBox3 {
         return new Box3(x0, y0, z0, x1, y1, z1);
     }
 
-    public static toObject(box: Box3): Box3Like {
+    public static toObject(box: ReadonlyBox3): Box3Like {
         return { x0: box.x0, y0: box.y0, z0: box.z0, x1: box.x1, y1: box.y1, z1: box.z1 };
     }
 
     /**
      * Returns the Minkowski sum of the boxes.
      */
-    public addMinkowski(box: Box3): Box3 {
+    public addMinkowski(box: ReadonlyBox3): Box3 {
         const x0 = this.x0 - box.x1;
         const y0 = this.y0 - box.y1;
         const z0 = this.z0 - box.z1;
@@ -360,11 +360,11 @@ export class Box3 implements ReadonlyBox3 {
         return new Box3(this.x0, this.y0, this.z0, this.x1, this.y1, this.z1);
     }
 
-    public contains(p: Vector3): boolean {
+    public contains(p: ReadonlyVector3): boolean {
         return this.x0 < p.x && this.y0 < p.y && this.z0 < p.z && this.x1 > p.x && this.y1 > p.y && this.z1 > p.z;
     }
 
-    public containsInclusive(p: Vector3): boolean {
+    public containsInclusive(p: ReadonlyVector3): boolean {
         return this.x0 <= p.x && this.y0 <= p.y && this.z0 <= p.z && this.x1 >= p.x && this.y1 >= p.y && this.z1 >= p.z;
     }
 
@@ -380,7 +380,7 @@ export class Box3 implements ReadonlyBox3 {
         return this.z1 - this.z0;
     }
 
-    public enclose(p: Vector3): void {
+    public enclose(p: ReadonlyVector3): void {
         this.x0 = Math.min(this.x0, p.x);
         this.y0 = Math.min(this.y0, p.y);
         this.z0 = Math.min(this.z0, p.z);
@@ -389,7 +389,7 @@ export class Box3 implements ReadonlyBox3 {
         this.z1 = Math.max(this.z1, p.z);
     }
 
-    public encloseWithTransform(p: Vector3, mat: Matrix4 | Matrix4A): void {
+    public encloseWithTransform(p: ReadonlyVector3, mat: ReadonlyMatrix4 | ReadonlyMatrix4A): void {
         const pp = mat.transformPoint(p);
         this.enclose(pp);
     }
@@ -398,11 +398,11 @@ export class Box3 implements ReadonlyBox3 {
         return new Vector3(0.5 * (this.x0 + this.x1), 0.5 * (this.y0 + this.y1), 0.5 * (this.z0 + this.z1));
     }
 
-    public intersects(b: Box3): boolean {
+    public intersects(b: ReadonlyBox3): boolean {
         return this.x0 < b.x1 && this.x1 > b.x0 && this.y0 < b.y1 && this.y1 > b.y0 && this.z0 < b.z1 && this.z1 > b.z0;
     }
 
-    public intersectsInclusive(b: Box3): boolean {
+    public intersectsInclusive(b: ReadonlyBox3): boolean {
         return (
             this.x0 <= b.x1 &&
             this.x1 >= b.x0 &&
@@ -413,7 +413,7 @@ export class Box3 implements ReadonlyBox3 {
         );
     }
 
-    public intersectsRay(ray: Ray3): boolean {
+    public intersectsRay(ray: ReadonlyRay3): boolean {
         let tmin = Number.NEGATIVE_INFINITY;
         let tmax = Number.POSITIVE_INFINITY;
 
@@ -473,7 +473,7 @@ export class Box3 implements ReadonlyBox3 {
     /**
      * Returns the Minkowski difference of the boxes.
      */
-    public subMinkowski(box: Box3): Box3 {
+    public subMinkowski(box: ReadonlyBox3): Box3 {
         const x0 = this.x0 + box.x1;
         const y0 = this.y0 + box.y1;
         const z0 = this.z0 + box.z1;
@@ -492,7 +492,7 @@ export class Box3 implements ReadonlyBox3 {
         return `{x0: ${this.x0}, y0: ${this.y0}, z0: ${this.z0}, x1: ${this.x1}, y1: ${this.y1}}, z1: ${this.z1}}`;
     }
 
-    public transform(mat: Matrix4 | Matrix4A): Box3 {
+    public transform(mat: ReadonlyMatrix4 | ReadonlyMatrix4A): Box3 {
         const box = Box3.createEmpty();
 
         box.encloseWithTransform(new Vector3(this.x0, this.y0, this.z0), mat);
@@ -507,7 +507,7 @@ export class Box3 implements ReadonlyBox3 {
         return box;
     }
 
-    public union(b: Box3): void {
+    public union(b: ReadonlyBox3): void {
         this.x0 = Math.min(this.x0, b.x0);
         this.y0 = Math.min(this.y0, b.y0);
         this.z0 = Math.min(this.z0, b.z0);

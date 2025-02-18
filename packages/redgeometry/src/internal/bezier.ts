@@ -1,6 +1,6 @@
 import type { Bezier1Curve2, Bezier2Curve2, Bezier3Curve2, BezierCurve2, BezierRCurve2 } from "../primitives/bezier.js";
 import type { Box2 } from "../primitives/box.js";
-import { Vector2, type Vector3 } from "../primitives/vector.js";
+import { Vector2, type ReadonlyVector2, type Vector3 } from "../primitives/vector.js";
 import { log } from "../utility/debug.js";
 import { Interval } from "../utility/interval.js";
 import { lerp } from "../utility/scalar.js";
@@ -17,7 +17,7 @@ export function encloseCurveAt(c: BezierCurve2, box: Box2, t: number): void {
 
 export function minimizeCurveDistanceAt(
     c: BezierCurve2,
-    p: Vector2,
+    p: ReadonlyVector2,
     t: number,
     min: { param: number; distSq: number },
 ): void {

@@ -1,6 +1,6 @@
 import { assertUnreachable } from "../utility/debug.js";
 import { eqApproxAbs, eqApproxRel, lerp } from "../utility/scalar.js";
-import { Vector3 } from "./vector.js";
+import { Vector3, type ReadonlyVector3 } from "./vector.js";
 
 export type QuaternionLike = {
     readonly a: number;
@@ -15,26 +15,26 @@ export interface ReadonlyQuaternion {
     readonly c: number;
     readonly d: number;
 
-    add(q: Quaternion): Quaternion;
-    angleTo(q: Quaternion): number;
+    add(q: ReadonlyQuaternion): Quaternion;
+    angleTo(q: ReadonlyQuaternion): number;
     axis(): Vector3;
     axisAngle(): number;
     clone(): Quaternion;
     conjugate(): Quaternion;
-    eq(q: Quaternion): boolean;
-    eqApproxAbs(q: Quaternion, eps: number): boolean;
-    eqApproxRel(q: Quaternion, eps: number): boolean;
+    eq(q: ReadonlyQuaternion): boolean;
+    eqApproxAbs(q: ReadonlyQuaternion, eps: number): boolean;
+    eqApproxRel(q: ReadonlyQuaternion, eps: number): boolean;
     getEulerAngles(order: RotationOrder): { x: number; y: number; z: number };
     inverse(): Quaternion;
     isIdentity(): boolean;
     len(): number;
     lenSq(): number;
-    lerp(q: Quaternion, t: number): Quaternion;
-    mul(q: Quaternion): Quaternion;
-    mulV(v: Vector3): Vector3;
+    lerp(q: ReadonlyQuaternion, t: number): Quaternion;
+    mul(q: ReadonlyQuaternion): Quaternion;
+    mulV(v: ReadonlyVector3): Vector3;
     pow(x: number): Quaternion;
-    slerp(q: Quaternion, t: number): Quaternion;
-    sub(q: Quaternion): Quaternion;
+    slerp(q: ReadonlyQuaternion, t: number): Quaternion;
+    sub(q: ReadonlyQuaternion): Quaternion;
     toArray(): number[];
     toString(): string;
     unit(): Quaternion;
@@ -99,7 +99,7 @@ export class Quaternion implements ReadonlyQuaternion {
         return new Quaternion(cos, 0, 0, sin);
     }
 
-    public static fromRotationAxis(v: Vector3, angle: number): Quaternion {
+    public static fromRotationAxis(v: ReadonlyVector3, angle: number): Quaternion {
         const sin = Math.sin(0.5 * angle);
         const cos = Math.cos(0.5 * angle);
 
@@ -110,7 +110,7 @@ export class Quaternion implements ReadonlyQuaternion {
     /**
      * Returns a quaternion with minimal rotation from `v1` to `v2`.
      */
-    public static fromRotationBetween(v1: Vector3, v2: Vector3): Quaternion {
+    public static fromRotationBetween(v1: ReadonlyVector3, v2: ReadonlyVector3): Quaternion {
         const v1u = v1.unit();
         const v2u = v2.unit();
 
@@ -231,11 +231,11 @@ export class Quaternion implements ReadonlyQuaternion {
         return new Quaternion(w, x, y, z);
     }
 
-    public static toObject(q: Quaternion): QuaternionLike {
+    public static toObject(q: ReadonlyQuaternion): QuaternionLike {
         return { a: q.a, b: q.b, c: q.c, d: q.d };
     }
 
-    public add(q: Quaternion): Quaternion {
+    public add(q: ReadonlyQuaternion): Quaternion {
         return new Quaternion(this.a + q.a, this.b + q.b, this.c + q.c, this.d + q.d);
     }
 
@@ -244,7 +244,7 @@ export class Quaternion implements ReadonlyQuaternion {
      *
      * Note: The returned value is unsigned and less than `2 * PI`.
      */
-    public angleTo(q: Quaternion): number {
+    public angleTo(q: ReadonlyQuaternion): number {
         // Glenn Davis formula (referenced by Ken Shoemake)
         const dot = this.a * q.a + this.b * q.b + this.c * q.c + this.d * q.d;
         const lenSq2 = this.lenSq() * q.lenSq();
@@ -286,11 +286,11 @@ export class Quaternion implements ReadonlyQuaternion {
         return new Quaternion(this.a, -this.b, -this.c, -this.d);
     }
 
-    public eq(q: Quaternion): boolean {
+    public eq(q: ReadonlyQuaternion): boolean {
         return this.a === q.a && this.b === q.b && this.c === q.c && this.d === q.d;
     }
 
-    public eqApproxAbs(q: Quaternion, eps: number): boolean {
+    public eqApproxAbs(q: ReadonlyQuaternion, eps: number): boolean {
         return (
             eqApproxAbs(this.a, q.a, eps) &&
             eqApproxAbs(this.b, q.b, eps) &&
@@ -299,7 +299,7 @@ export class Quaternion implements ReadonlyQuaternion {
         );
     }
 
-    public eqApproxRel(q: Quaternion, eps: number): boolean {
+    public eqApproxRel(q: ReadonlyQuaternion, eps: number): boolean {
         return (
             eqApproxRel(this.a, q.a, eps) &&
             eqApproxRel(this.b, q.b, eps) &&
@@ -398,7 +398,7 @@ export class Quaternion implements ReadonlyQuaternion {
      *
      * Note: For the more common spherical linear interpolation see `slerp`.
      */
-    public lerp(q: Quaternion, t: number): Quaternion {
+    public lerp(q: ReadonlyQuaternion, t: number): Quaternion {
         const qa = lerp(this.a, q.a, t);
         const qb = lerp(this.b, q.b, t);
         const qc = lerp(this.c, q.c, t);
@@ -414,7 +414,7 @@ export class Quaternion implements ReadonlyQuaternion {
      * | d |   | qd |
      * ```
      */
-    public mul(q: Quaternion): Quaternion {
+    public mul(q: ReadonlyQuaternion): Quaternion {
         return new Quaternion(
             this.a * q.a - this.b * q.b - this.c * q.c - this.d * q.d,
             this.a * q.b + this.b * q.a + this.c * q.d - this.d * q.c,
@@ -431,7 +431,7 @@ export class Quaternion implements ReadonlyQuaternion {
      * | d |   | vz |   | -d |
      * ```
      */
-    public mulV(v: Vector3): Vector3 {
+    public mulV(v: ReadonlyVector3): Vector3 {
         const qa = this.b * v.x + this.c * v.y + this.d * v.z;
         const qb = this.a * v.x + this.c * v.z - this.d * v.y;
         const qc = this.a * v.y - this.b * v.z + this.d * v.x;
@@ -593,7 +593,7 @@ export class Quaternion implements ReadonlyQuaternion {
         this.d = d;
     }
 
-    public setAdd(q1: Quaternion, q2: Quaternion): void {
+    public setAdd(q1: ReadonlyQuaternion, q2: ReadonlyQuaternion): void {
         const qa = q1.a + q2.a;
         const qb = q1.b + q2.b;
         const qc = q1.c + q2.c;
@@ -601,7 +601,7 @@ export class Quaternion implements ReadonlyQuaternion {
         this.set(qa, qb, qc, qd);
     }
 
-    public setMul(q1: Quaternion, q2: Quaternion): void {
+    public setMul(q1: ReadonlyQuaternion, q2: ReadonlyQuaternion): void {
         const qa = q1.a * q2.a - q1.b * q2.b - q1.c * q2.c - q1.d * q2.d;
         const qb = q1.a * q2.b + q1.b * q2.a + q1.c * q2.d - q1.d * q2.c;
         const qc = q1.a * q2.c - q1.b * q2.d + q1.c * q2.a + q1.d * q2.b;
@@ -609,7 +609,7 @@ export class Quaternion implements ReadonlyQuaternion {
         this.set(qa, qb, qc, qd);
     }
 
-    public setSub(q1: Quaternion, q2: Quaternion): void {
+    public setSub(q1: ReadonlyQuaternion, q2: ReadonlyQuaternion): void {
         const qa = q1.a - q2.a;
         const qb = q1.b - q2.b;
         const qc = q1.c - q2.c;
@@ -620,7 +620,7 @@ export class Quaternion implements ReadonlyQuaternion {
     /**
      * Returns the spherical linear interpolation of the current quaternion and `q`.
      */
-    public slerp(q: Quaternion, t: number): Quaternion {
+    public slerp(q: ReadonlyQuaternion, t: number): Quaternion {
         // Glenn Davis formula (referenced by Ken Shoemake)
         const dot = this.a * q.a + this.b * q.b + this.c * q.c + this.d * q.d;
         const lenSq2 = this.lenSq() * q.lenSq();
@@ -648,7 +648,7 @@ export class Quaternion implements ReadonlyQuaternion {
         return new Quaternion(qa, qb, qc, qd);
     }
 
-    public sub(q: Quaternion): Quaternion {
+    public sub(q: ReadonlyQuaternion): Quaternion {
         return new Quaternion(this.a - q.a, this.b - q.b, this.c - q.c, this.d - q.d);
     }
 

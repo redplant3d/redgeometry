@@ -23,31 +23,31 @@ export interface ReadonlyVector2 {
     readonly y: number;
 
     abs(): Vector2;
-    add(v: Vector2): Vector2;
-    addMulS(v: Vector2, s: number): Vector2;
+    add(v: ReadonlyVector2): Vector2;
+    addMulS(v: ReadonlyVector2, s: number): Vector2;
     angle(): number;
-    angleTo(v: Vector2): number;
-    clamp(vmin: Vector2, vmax: Vector2): Vector2;
+    angleTo(v: ReadonlyVector2): number;
+    clamp(vmin: ReadonlyVector2, vmax: ReadonlyVector2): Vector2;
     clone(): Vector2;
     copyTo(data: number[], offset?: number): void;
-    cross(v: Vector2): number;
-    distanceTo(p: Vector2): number;
+    cross(v: ReadonlyVector2): number;
+    distanceTo(p: ReadonlyVector2): number;
     divS(s: number): Vector2;
-    dot(v: Vector2): number;
-    eq(v: Vector2): boolean;
-    eqApproxAbs(v: Vector2, eps: number): boolean;
-    eqApproxRel(v: Vector2, eps: number): boolean;
+    dot(v: ReadonlyVector2): number;
+    eq(v: ReadonlyVector2): boolean;
+    eqApproxAbs(v: ReadonlyVector2, eps: number): boolean;
+    eqApproxRel(v: ReadonlyVector2, eps: number): boolean;
     isFinite(): boolean;
     isOne(): boolean;
     isZero(): boolean;
     len(): number;
     lenSq(): number;
-    lerp(v: Vector2, t: number): Vector2;
+    lerp(v: ReadonlyVector2, t: number): Vector2;
     mulS(s: number): Vector2;
     neg(): Vector2;
     normal(): Vector2;
-    slerp(v: Vector2, t: number): Vector2;
-    sub(v: Vector2): Vector2;
+    slerp(v: ReadonlyVector2, t: number): Vector2;
+    sub(v: ReadonlyVector2): Vector2;
     toArray(): [number, number];
     toString(): string;
     unit(): Vector2;
@@ -60,35 +60,35 @@ export interface ReadonlyVector3 {
     readonly z: number;
 
     abs(): Vector3;
-    add(v: Vector3): Vector3;
-    addMulS(v: Vector3, s: number): Vector3;
-    angleTo(v: Vector3): number;
-    clamp(vmin: Vector3, vmax: Vector3): Vector3;
+    add(v: ReadonlyVector3): Vector3;
+    addMulS(v: ReadonlyVector3, s: number): Vector3;
+    angleTo(v: ReadonlyVector3): number;
+    clamp(vmin: ReadonlyVector3, vmax: ReadonlyVector3): Vector3;
     clone(): Vector3;
     copyTo(data: number[], number?: number): void;
-    cross(v: Vector3): Vector3;
-    distanceTo(p: Vector3): number;
+    cross(v: ReadonlyVector3): Vector3;
+    distanceTo(p: ReadonlyVector3): number;
     divS(s: number): Vector3;
-    dot(v: Vector3): number;
-    eq(v: Vector3): boolean;
-    eqApproxAbs(v: Vector3, eps: number): boolean;
-    eqApproxRel(v: Vector3, eps: number): boolean;
+    dot(v: ReadonlyVector3): number;
+    eq(v: ReadonlyVector3): boolean;
+    eqApproxAbs(v: ReadonlyVector3, eps: number): boolean;
+    eqApproxRel(v: ReadonlyVector3, eps: number): boolean;
     isFinite(): boolean;
     isOne(): boolean;
     isZero(): boolean;
     len(): number;
     lenSq(): number;
-    lerp(v: Vector3, t: number): Vector3;
+    lerp(v: ReadonlyVector3, t: number): Vector3;
     mulS(s: number): Vector3;
     neg(): Vector3;
-    normalAround(v: Vector3): Vector3;
+    normalAround(v: ReadonlyVector3): Vector3;
     normalAroundAny(): Vector3;
     normalAroundX(): Vector3;
     normalAroundY(): Vector3;
     normalAroundZ(): Vector3;
     orthonormalBasis(): { n1: Vector3; n2: Vector3 };
-    slerp(v: Vector3, t: number): Vector3;
-    sub(v: Vector3): Vector3;
+    slerp(v: ReadonlyVector3, t: number): Vector3;
+    sub(v: ReadonlyVector3): Vector3;
     toArray(): [number, number, number];
     toString(): string;
     unit(): Vector3;
@@ -102,25 +102,25 @@ export interface ReadonlyVector4 {
     readonly z: number;
 
     abs(): Vector4;
-    add(v: Vector4): Vector4;
-    addMulS(v: Vector4, s: number): Vector4;
-    clamp(vmin: Vector4, vmax: Vector4): Vector4;
+    add(v: ReadonlyVector4): Vector4;
+    addMulS(v: ReadonlyVector4, s: number): Vector4;
+    clamp(vmin: ReadonlyVector4, vmax: ReadonlyVector4): Vector4;
     clone(): Vector4;
     copyTo(data: number[], offset?: number): void;
     divS(s: number): Vector4;
-    dot(v: Vector4): number;
-    eq(v: Vector4): boolean;
-    eqApproxAbs(v: Vector4, eps: number): boolean;
-    eqApproxRel(v: Vector4, eps: number): boolean;
+    dot(v: ReadonlyVector4): number;
+    eq(v: ReadonlyVector4): boolean;
+    eqApproxAbs(v: ReadonlyVector4, eps: number): boolean;
+    eqApproxRel(v: ReadonlyVector4, eps: number): boolean;
     isFinite(): boolean;
     isOne(): boolean;
     isZero(): boolean;
     len(): number;
     lenSq(): number;
-    lerp(v: Vector4, t: number): Vector4;
+    lerp(v: ReadonlyVector4, t: number): Vector4;
     mulS(s: number): Vector4;
     neg(): Vector4;
-    sub(v: Vector4): Vector4;
+    sub(v: ReadonlyVector4): Vector4;
     toArray(): [number, number, number, number];
     toString(): string;
     unit(): Vector4;
@@ -179,7 +179,7 @@ export class Vector2 implements ReadonlyVector2 {
     /**
      * Checks if `v` is clockwise between `v1` and `v2`.
      */
-    public static isBetweenCcw(v: Vector2, v1: Vector2, v2: Vector2): boolean {
+    public static isBetweenCcw(v: ReadonlyVector2, v1: ReadonlyVector2, v2: ReadonlyVector2): boolean {
         if (v1.cross(v2) > 0) {
             // `v2` is clockwise to `v1`
             return v1.cross(v) > 0 && v2.cross(v) < 0;
@@ -196,7 +196,12 @@ export class Vector2 implements ReadonlyVector2 {
      * - *Triangle Interior*.
      *   https://mathworld.wolfram.com/TriangleInterior.html
      */
-    public static isPointInTriangle(p0: Vector2, p1: Vector2, p2: Vector2, p: Vector2): boolean {
+    public static isPointInTriangle(
+        p0: ReadonlyVector2,
+        p1: ReadonlyVector2,
+        p2: ReadonlyVector2,
+        p: ReadonlyVector2,
+    ): boolean {
         const v = p.sub(p0);
         const v1 = p1.sub(p0);
         const v2 = p2.sub(p0);
@@ -216,13 +221,13 @@ export class Vector2 implements ReadonlyVector2 {
      * Returns a rounded vector from `v` with specified precision where `k` denotes the
      * reciprocal of the minimum interval that the rounded number is able to represent
      */
-    public static roundToPrecision(v: Vector2, k: number): Vector2 {
+    public static roundToPrecision(v: ReadonlyVector2, k: number): Vector2 {
         const x = roundToPrecision(v.x, k);
         const y = roundToPrecision(v.y, k);
         return new Vector2(x, y);
     }
 
-    public static signedArea(p0: Vector2, p1: Vector2, p: Vector2): number {
+    public static signedArea(p0: ReadonlyVector2, p1: ReadonlyVector2, p: ReadonlyVector2): number {
         // `result < 0` -> `p` is below `(p0, p1)`
         // `result > 0` -> `p` is above `(p0, p1)`
         const v1 = p1.sub(p0);
@@ -230,7 +235,7 @@ export class Vector2 implements ReadonlyVector2 {
         return v1.cross(v2);
     }
 
-    public static toObject(v: Vector2): Vector2Like {
+    public static toObject(v: ReadonlyVector2): Vector2Like {
         return { x: v.x, y: v.y };
     }
 
@@ -243,14 +248,14 @@ export class Vector2 implements ReadonlyVector2 {
     /**
      * Returns the sum of the current vector and a vector `v`.
      */
-    public add(v: Vector2): Vector2 {
+    public add(v: ReadonlyVector2): Vector2 {
         return new Vector2(this.x + v.x, this.y + v.y);
     }
 
     /**
      * Returns the sum of the current vector and a vector `v` multiplied by a scalar `s`.
      */
-    public addMulS(v: Vector2, s: number): Vector2 {
+    public addMulS(v: ReadonlyVector2, s: number): Vector2 {
         return new Vector2(this.x + s * v.x, this.y + s * v.y);
     }
 
@@ -266,7 +271,7 @@ export class Vector2 implements ReadonlyVector2 {
      *
      * Note: The returned value is unsigned and less than `PI`.
      */
-    public angleTo(v: Vector2): number {
+    public angleTo(v: ReadonlyVector2): number {
         const dot = this.dot(v);
         const lenSq2 = this.lenSq() * v.lenSq();
 
@@ -280,7 +285,7 @@ export class Vector2 implements ReadonlyVector2 {
         return Math.acos(cos);
     }
 
-    public clamp(vmin: Vector2, vmax: Vector2): Vector2 {
+    public clamp(vmin: ReadonlyVector2, vmax: ReadonlyVector2): Vector2 {
         const x = clamp(this.x, vmin.x, vmax.x);
         const y = clamp(this.y, vmin.y, vmax.y);
         return new Vector2(x, y);
@@ -303,11 +308,11 @@ export class Vector2 implements ReadonlyVector2 {
      *
      * Identity relating to the dot product: `v1 cross v2 === v1 dot normal(v2)`
      */
-    public cross(v: Vector2): number {
+    public cross(v: ReadonlyVector2): number {
         return this.x * v.y - this.y * v.x;
     }
 
-    public distanceTo(p: Vector2): number {
+    public distanceTo(p: ReadonlyVector2): number {
         const x = this.x - p.x;
         const y = this.y - p.y;
         return Math.sqrt(x * x + y * y);
@@ -328,19 +333,19 @@ export class Vector2 implements ReadonlyVector2 {
      *
      * Identity relating to the cross product: `v1 dot v2 === normal(v1) cross v2`
      */
-    public dot(v: Vector2): number {
+    public dot(v: ReadonlyVector2): number {
         return this.x * v.x + this.y * v.y;
     }
 
-    public eq(v: Vector2): boolean {
+    public eq(v: ReadonlyVector2): boolean {
         return this.x === v.x && this.y === v.y;
     }
 
-    public eqApproxAbs(v: Vector2, eps: number): boolean {
+    public eqApproxAbs(v: ReadonlyVector2, eps: number): boolean {
         return eqApproxAbs(this.x, v.x, eps) && eqApproxAbs(this.y, v.y, eps);
     }
 
-    public eqApproxRel(v: Vector2, eps: number): boolean {
+    public eqApproxRel(v: ReadonlyVector2, eps: number): boolean {
         return eqApproxRel(this.x, v.x, eps) && eqApproxRel(this.y, v.y, eps);
     }
 
@@ -364,7 +369,7 @@ export class Vector2 implements ReadonlyVector2 {
         return this.x * this.x + this.y * this.y;
     }
 
-    public lerp(v: Vector2, t: number): Vector2 {
+    public lerp(v: ReadonlyVector2, t: number): Vector2 {
         const x = lerp(this.x, v.x, t);
         const y = lerp(this.y, v.y, t);
         return new Vector2(x, y);
@@ -396,31 +401,31 @@ export class Vector2 implements ReadonlyVector2 {
         this.y = y;
     }
 
-    public setAdd(v1: Vector2, v2: Vector2): void {
+    public setAdd(v1: ReadonlyVector2, v2: ReadonlyVector2): void {
         const vx = v1.x + v2.x;
         const vy = v1.y + v2.y;
         this.set(vx, vy);
     }
 
-    public setAddMulS(v1: Vector2, s: number, v2: Vector2): void {
+    public setAddMulS(v1: ReadonlyVector2, s: number, v2: ReadonlyVector2): void {
         const vx = v1.x + s * v2.x;
         const vy = v1.y + s * v2.y;
         this.set(vx, vy);
     }
 
-    public setDivS(v: Vector2, s: number): void {
+    public setDivS(v: ReadonlyVector2, s: number): void {
         const vx = v.x / s;
         const vy = v.y / s;
         this.set(vx, vy);
     }
 
-    public setMulS(s: number, v: Vector2): void {
+    public setMulS(s: number, v: ReadonlyVector2): void {
         const vx = s * v.x;
         const vy = s * v.y;
         this.set(vx, vy);
     }
 
-    public setSub(v1: Vector2, v2: Vector2): void {
+    public setSub(v1: ReadonlyVector2, v2: ReadonlyVector2): void {
         const vx = v1.x - v2.x;
         const vy = v1.y - v2.y;
         this.set(vx, vy);
@@ -429,7 +434,7 @@ export class Vector2 implements ReadonlyVector2 {
     /**
      * Returns the spherical linear interpolation of the current vector and `v`.
      */
-    public slerp(v: Vector2, t: number): Vector2 {
+    public slerp(v: ReadonlyVector2, t: number): Vector2 {
         const dot = this.dot(v);
         const lenSq2 = this.lenSq() * v.lenSq();
 
@@ -456,7 +461,7 @@ export class Vector2 implements ReadonlyVector2 {
     /**
      * Returns the difference of the current vector and a vector `v`.
      */
-    public sub(v: Vector2): Vector2 {
+    public sub(v: ReadonlyVector2): Vector2 {
         return new Vector2(this.x - v.x, this.y - v.y);
     }
 
@@ -550,14 +555,14 @@ export class Vector3 implements ReadonlyVector3 {
      * Returns a rounded vector from `v` with specified precision where `k` denotes the
      * reciprocal of the minimum interval that the rounded number is able to represent
      */
-    public static roundToPrecision(v: Vector3, k: number): Vector3 {
+    public static roundToPrecision(v: ReadonlyVector3, k: number): Vector3 {
         const x = roundToPrecision(v.x, k);
         const y = roundToPrecision(v.y, k);
         const z = roundToPrecision(v.z, k);
         return new Vector3(x, y, z);
     }
 
-    public static toObject(v: Vector3): Vector3Like {
+    public static toObject(v: ReadonlyVector3): Vector3Like {
         return { x: v.x, y: v.y, z: v.z };
     }
 
@@ -571,14 +576,14 @@ export class Vector3 implements ReadonlyVector3 {
     /**
      * Returns the sum of the current vector and a vector `v`.
      */
-    public add(v: Vector3): Vector3 {
+    public add(v: ReadonlyVector3): Vector3 {
         return new Vector3(this.x + v.x, this.y + v.y, this.z + v.z);
     }
 
     /**
      * Returns the sum of the current vector and a vector `v` multiplied by a scalar `s`.
      */
-    public addMulS(v: Vector3, s: number): Vector3 {
+    public addMulS(v: ReadonlyVector3, s: number): Vector3 {
         return new Vector3(this.x + s * v.x, this.y + s * v.y, this.z + s * v.z);
     }
 
@@ -587,7 +592,7 @@ export class Vector3 implements ReadonlyVector3 {
      *
      * Note: The returned value is unsigned and less than `PI`.
      */
-    public angleTo(v: Vector3): number {
+    public angleTo(v: ReadonlyVector3): number {
         const dot = this.dot(v);
         const lenSq2 = this.lenSq() * v.lenSq();
 
@@ -601,7 +606,7 @@ export class Vector3 implements ReadonlyVector3 {
         return Math.acos(cos);
     }
 
-    public clamp(vmin: Vector3, vmax: Vector3): Vector3 {
+    public clamp(vmin: ReadonlyVector3, vmax: ReadonlyVector3): Vector3 {
         const x = clamp(this.x, vmin.x, vmax.x);
         const y = clamp(this.y, vmin.y, vmax.y);
         const z = clamp(this.z, vmin.z, vmax.z);
@@ -618,14 +623,14 @@ export class Vector3 implements ReadonlyVector3 {
         data[offset + 2] = this.z;
     }
 
-    public cross(v: Vector3): Vector3 {
+    public cross(v: ReadonlyVector3): Vector3 {
         const x = this.y * v.z - this.z * v.y;
         const y = this.z * v.x - this.x * v.z;
         const z = this.x * v.y - this.y * v.x;
         return new Vector3(x, y, z);
     }
 
-    public distanceTo(p: Vector3): number {
+    public distanceTo(p: ReadonlyVector3): number {
         const x = this.x - p.x;
         const y = this.y - p.y;
         const z = this.z - p.z;
@@ -641,19 +646,19 @@ export class Vector3 implements ReadonlyVector3 {
         return new Vector3(this.x / s, this.y / s, this.z / s);
     }
 
-    public dot(v: Vector3): number {
+    public dot(v: ReadonlyVector3): number {
         return this.x * v.x + this.y * v.y + this.z * v.z;
     }
 
-    public eq(v: Vector3): boolean {
+    public eq(v: ReadonlyVector3): boolean {
         return this.x === v.x && this.y === v.y && this.z === v.z;
     }
 
-    public eqApproxAbs(v: Vector3, eps: number): boolean {
+    public eqApproxAbs(v: ReadonlyVector3, eps: number): boolean {
         return eqApproxAbs(this.x, v.x, eps) && eqApproxAbs(this.y, v.y, eps) && eqApproxAbs(this.z, v.z, eps);
     }
 
-    public eqApproxRel(v: Vector3, eps: number): boolean {
+    public eqApproxRel(v: ReadonlyVector3, eps: number): boolean {
         return eqApproxRel(this.x, v.x, eps) && eqApproxRel(this.y, v.y, eps) && eqApproxRel(this.z, v.z, eps);
     }
 
@@ -677,7 +682,7 @@ export class Vector3 implements ReadonlyVector3 {
         return this.x * this.x + this.y * this.y + this.z * this.z;
     }
 
-    public lerp(v: Vector3, t: number): Vector3 {
+    public lerp(v: ReadonlyVector3, t: number): Vector3 {
         const x = lerp(this.x, v.x, t);
         const y = lerp(this.y, v.y, t);
         const z = lerp(this.z, v.z, t);
@@ -695,7 +700,7 @@ export class Vector3 implements ReadonlyVector3 {
         return new Vector3(-this.x, -this.y, -this.z);
     }
 
-    public normalAround(v: Vector3): Vector3 {
+    public normalAround(v: ReadonlyVector3): Vector3 {
         return this.cross(v);
     }
 
@@ -778,42 +783,42 @@ export class Vector3 implements ReadonlyVector3 {
         this.z = z;
     }
 
-    public setAdd(v1: Vector3, v2: Vector3): void {
+    public setAdd(v1: ReadonlyVector3, v2: ReadonlyVector3): void {
         const vx = v1.x + v2.x;
         const vy = v1.y + v2.y;
         const vz = v1.z + v2.z;
         this.set(vx, vy, vz);
     }
 
-    public setAddMulS(v1: Vector3, s: number, v2: Vector3): void {
+    public setAddMulS(v1: ReadonlyVector3, s: number, v2: ReadonlyVector3): void {
         const vx = v1.x + s * v2.x;
         const vy = v1.y + s * v2.y;
         const vz = v1.z + s * v2.z;
         this.set(vx, vy, vz);
     }
 
-    public setCross(v1: Vector3, v2: Vector3): void {
+    public setCross(v1: ReadonlyVector3, v2: ReadonlyVector3): void {
         const vx = v1.y * v2.z - v1.z * v2.y;
         const vy = v1.z * v2.x - v1.x * v2.z;
         const vz = v1.x * v2.y - v1.y * v2.x;
         this.set(vx, vy, vz);
     }
 
-    public setDivS(v: Vector3, s: number): void {
+    public setDivS(v: ReadonlyVector3, s: number): void {
         const vx = v.x / s;
         const vy = v.y / s;
         const vz = v.z / s;
         this.set(vx, vy, vz);
     }
 
-    public setMulS(s: number, v: Vector3): void {
+    public setMulS(s: number, v: ReadonlyVector3): void {
         const vx = s * v.x;
         const vy = s * v.y;
         const vz = s * v.z;
         this.set(vx, vy, vz);
     }
 
-    public setSub(v1: Vector3, v2: Vector3): void {
+    public setSub(v1: ReadonlyVector3, v2: ReadonlyVector3): void {
         const vx = v1.x - v2.x;
         const vy = v1.y - v2.y;
         const vz = v1.z - v2.z;
@@ -823,7 +828,7 @@ export class Vector3 implements ReadonlyVector3 {
     /**
      * Returns the spherical linear interpolation of the current vector and `v`.
      */
-    public slerp(v: Vector3, t: number): Vector3 {
+    public slerp(v: ReadonlyVector3, t: number): Vector3 {
         const dot = this.dot(v);
         const lenSq2 = this.lenSq() * v.lenSq();
 
@@ -851,7 +856,7 @@ export class Vector3 implements ReadonlyVector3 {
     /**
      * Returns the difference of the current vector and a vector `v`.
      */
-    public sub(v: Vector3): Vector3 {
+    public sub(v: ReadonlyVector3): Vector3 {
         return new Vector3(this.x - v.x, this.y - v.y, this.z - v.z);
     }
 
@@ -946,7 +951,7 @@ export class Vector4 implements ReadonlyVector4 {
      * Returns a rounded vector from `v` with specified precision where `k` denotes the
      * reciprocal of the minimum interval that the rounded number is able to represent
      */
-    public static roundToPrecision(v: Vector4, k: number): Vector4 {
+    public static roundToPrecision(v: ReadonlyVector4, k: number): Vector4 {
         const x = roundToPrecision(v.x, k);
         const y = roundToPrecision(v.y, k);
         const z = roundToPrecision(v.z, k);
@@ -954,7 +959,7 @@ export class Vector4 implements ReadonlyVector4 {
         return new Vector4(x, y, z, w);
     }
 
-    public static toObject(v: Vector4): Vector4Like {
+    public static toObject(v: ReadonlyVector4): Vector4Like {
         return { x: v.x, y: v.y, z: v.z, w: v.w };
     }
 
@@ -969,18 +974,18 @@ export class Vector4 implements ReadonlyVector4 {
     /**
      * Returns the sum of the current vector and a vector `v`.
      */
-    public add(v: Vector4): Vector4 {
+    public add(v: ReadonlyVector4): Vector4 {
         return new Vector4(this.x + v.x, this.y + v.y, this.z + v.z, this.w + v.w);
     }
 
     /**
      * Returns the sum of the current vector and a vector `v` multiplied by a scalar `s`.
      */
-    public addMulS(v: Vector4, s: number): Vector4 {
+    public addMulS(v: ReadonlyVector4, s: number): Vector4 {
         return new Vector4(this.x + s * v.x, this.y + s * v.y, this.z + s * v.z, this.w + s * v.w);
     }
 
-    public clamp(vmin: Vector4, vmax: Vector4): Vector4 {
+    public clamp(vmin: ReadonlyVector4, vmax: ReadonlyVector4): Vector4 {
         const x = clamp(this.x, vmin.x, vmax.x);
         const y = clamp(this.y, vmin.y, vmax.y);
         const z = clamp(this.z, vmin.z, vmax.z);
@@ -1008,15 +1013,15 @@ export class Vector4 implements ReadonlyVector4 {
         return new Vector4(this.x / s, this.y / s, this.z / s, this.w / s);
     }
 
-    public dot(v: Vector4): number {
+    public dot(v: ReadonlyVector4): number {
         return this.x * v.x + this.y * v.y + this.z * v.z + this.w * v.w;
     }
 
-    public eq(v: Vector4): boolean {
+    public eq(v: ReadonlyVector4): boolean {
         return this.x === v.x && this.y === v.y && this.z === v.z && this.w === v.w;
     }
 
-    public eqApproxAbs(v: Vector4, eps: number): boolean {
+    public eqApproxAbs(v: ReadonlyVector4, eps: number): boolean {
         return (
             eqApproxAbs(this.x, v.x, eps) &&
             eqApproxAbs(this.y, v.y, eps) &&
@@ -1025,7 +1030,7 @@ export class Vector4 implements ReadonlyVector4 {
         );
     }
 
-    public eqApproxRel(v: Vector4, eps: number): boolean {
+    public eqApproxRel(v: ReadonlyVector4, eps: number): boolean {
         return (
             eqApproxRel(this.x, v.x, eps) &&
             eqApproxRel(this.y, v.y, eps) &&
@@ -1054,7 +1059,7 @@ export class Vector4 implements ReadonlyVector4 {
         return this.x * this.x + this.y * this.y + this.z * this.z + this.w * this.w;
     }
 
-    public lerp(v: Vector4, t: number): Vector4 {
+    public lerp(v: ReadonlyVector4, t: number): Vector4 {
         const x = lerp(this.x, v.x, t);
         const y = lerp(this.y, v.y, t);
         const z = lerp(this.z, v.z, t);
@@ -1080,7 +1085,7 @@ export class Vector4 implements ReadonlyVector4 {
         this.w = w;
     }
 
-    public setAdd(v1: Vector4, v2: Vector4): void {
+    public setAdd(v1: ReadonlyVector4, v2: ReadonlyVector4): void {
         const vx = v1.x + v2.x;
         const vy = v1.y + v2.y;
         const vz = v1.z + v2.z;
@@ -1088,7 +1093,7 @@ export class Vector4 implements ReadonlyVector4 {
         this.set(vx, vy, vz, vw);
     }
 
-    public setAddMulS(v1: Vector4, s: number, v2: Vector4): void {
+    public setAddMulS(v1: ReadonlyVector4, s: number, v2: ReadonlyVector4): void {
         const vx = v1.x + s * v2.x;
         const vy = v1.y + s * v2.y;
         const vz = v1.z + s * v2.z;
@@ -1096,7 +1101,7 @@ export class Vector4 implements ReadonlyVector4 {
         this.set(vx, vy, vz, vw);
     }
 
-    public setDivS(v: Vector4, s: number): void {
+    public setDivS(v: ReadonlyVector4, s: number): void {
         const vx = v.x / s;
         const vy = v.y / s;
         const vz = v.z / s;
@@ -1104,7 +1109,7 @@ export class Vector4 implements ReadonlyVector4 {
         this.set(vx, vy, vz, vw);
     }
 
-    public setMulS(s: number, v: Vector4): void {
+    public setMulS(s: number, v: ReadonlyVector4): void {
         const vx = s * v.x;
         const vy = s * v.y;
         const vz = s * v.z;
@@ -1112,7 +1117,7 @@ export class Vector4 implements ReadonlyVector4 {
         this.set(vx, vy, vz, vw);
     }
 
-    public setSub(v1: Vector4, v2: Vector4): void {
+    public setSub(v1: ReadonlyVector4, v2: ReadonlyVector4): void {
         const vx = v1.x - v2.x;
         const vy = v1.y - v2.y;
         const vz = v1.z - v2.z;
@@ -1120,7 +1125,7 @@ export class Vector4 implements ReadonlyVector4 {
         this.set(vx, vy, vz, vw);
     }
 
-    public sub(v: Vector4): Vector4 {
+    public sub(v: ReadonlyVector4): Vector4 {
         return new Vector4(this.x - v.x, this.y - v.y, this.z - v.z, this.w - v.w);
     }
 

@@ -11,7 +11,7 @@ import { Interval } from "../utility/interval.js";
 import { RootType, solveCubic, solveLinear, solveQuadratic } from "../utility/solve.js";
 import { Box2 } from "./box.js";
 import { Edge2 } from "./edge.js";
-import { Vector2, Vector3, type Vector2Like } from "./vector.js";
+import { Vector2, Vector3, type ReadonlyVector2, type ReadonlyVector3, type Vector2Like } from "./vector.js";
 
 export type Bezier1Curve2Like = {
     readonly p0: Vector2Like;
@@ -54,8 +54,8 @@ export interface ReadonlyBezier1Curve2 {
     getTangentEnd(): Vector2;
     getTangentStart(): Vector2;
     getValueAt(t: number): Vector2;
-    getWindingAt(p: Vector2): number;
-    getWindingFracAt(p: Vector2, step: number): number;
+    getWindingAt(p: ReadonlyVector2): number;
+    getWindingFracAt(p: ReadonlyVector2, step: number): number;
     isFinite(): boolean;
     isPoint(): boolean;
     reverse(): Bezier1Curve2;
@@ -77,7 +77,7 @@ export interface ReadonlyBezier2Curve2 {
 
     clone(): Bezier2Curve2;
     getBounds(): Box2;
-    getClosestParameter(p: Vector2): number;
+    getClosestParameter(p: ReadonlyVector2): number;
     getCoefficients(): [Vector2, Vector2, Vector2];
     getControlBounds(): Box2;
     getCurvatureAt(t: number): number;
@@ -91,10 +91,10 @@ export interface ReadonlyBezier2Curve2 {
     getTangentStart(): Vector2;
     getValueAt(t: number): Vector2;
     getVertexParameter(): number;
-    getWindingAt(p: Vector2): number;
-    getWindingFracAt(p: Vector2, step: number): number;
-    intersectLine(c: Bezier1Curve2, output: number[]): void;
-    intersectQuad(c: Bezier2Curve2, output: Vector2[]): void;
+    getWindingAt(p: ReadonlyVector2): number;
+    getWindingFracAt(p: ReadonlyVector2, step: number): number;
+    intersectLine(c: ReadonlyBezier1Curve2, output: number[]): void;
+    intersectQuad(c: ReadonlyBezier2Curve2, output: Vector2[]): void;
     isCollinear(): boolean;
     isFinite(): boolean;
     isPoint(): boolean;
@@ -129,8 +129,8 @@ export interface ReadonlyBezier3Curve2 {
     getTangentEnd(): Vector2;
     getTangentStart(): Vector2;
     getValueAt(t: number): Vector2;
-    getWindingAt(p: Vector2): number;
-    getWindingFracAt(p: Vector2, step: number): number;
+    getWindingAt(p: ReadonlyVector2): number;
+    getWindingFracAt(p: ReadonlyVector2, step: number): number;
     isCollinear(): boolean;
     isFinite(): boolean;
     isPoint(): boolean;
@@ -147,9 +147,9 @@ export interface ReadonlyBezierRCurve2 {
     readonly p0: Vector2;
     readonly p1: Vector2;
     readonly p2: Vector2;
-    readonly w: number;
     readonly pn: Vector2;
     readonly type: CurveType.BezierR;
+    readonly w: number;
 
     clone(): BezierRCurve2;
     getBounds(): Box2;
@@ -161,8 +161,8 @@ export interface ReadonlyBezierRCurve2 {
     getTangentEnd(): Vector2;
     getTangentStart(): Vector2;
     getValueAt(t: number): Vector2;
-    getWindingAt(p: Vector2): number;
-    getWindingFracAt(p: Vector2, step: number): number;
+    getWindingAt(p: ReadonlyVector2): number;
+    getWindingFracAt(p: ReadonlyVector2, step: number): number;
     isFinite(): boolean;
     isPoint(): boolean;
     reverse(): BezierRCurve2;
@@ -173,6 +173,12 @@ export interface ReadonlyBezierRCurve2 {
     toArray(): [number, number, number, number, number, number, number];
     toString(): string;
 }
+
+export type ReadonlyBezierCurve2 =
+    | ReadonlyBezier1Curve2
+    | ReadonlyBezier2Curve2
+    | ReadonlyBezier3Curve2
+    | ReadonlyBezierRCurve2;
 
 export enum CurveType {
     Bezier1,
@@ -218,7 +224,7 @@ export class Bezier1Curve2 implements ReadonlyBezier1Curve2 {
         return new Bezier1Curve2(p0, p1);
     }
 
-    public static toObject(c: Bezier1Curve2): Bezier1Curve2Like {
+    public static toObject(c: ReadonlyBezier1Curve2): Bezier1Curve2Like {
         const p0 = Vector2.toObject(c.p0);
         const p1 = Vector2.toObject(c.p1);
         return { p0, p1 };
@@ -261,7 +267,7 @@ export class Bezier1Curve2 implements ReadonlyBezier1Curve2 {
         return this.p0.lerp(this.p1, t);
     }
 
-    public getWindingAt(p: Vector2): number {
+    public getWindingAt(p: ReadonlyVector2): number {
         const v0 = this.p0.y - p.y;
         const v1 = this.p1.y - this.p0.y;
 
@@ -270,7 +276,7 @@ export class Bezier1Curve2 implements ReadonlyBezier1Curve2 {
         return getWindingAtParameterLinear(this, x, p.x);
     }
 
-    public getWindingFracAt(p: Vector2, step: number): number {
+    public getWindingFracAt(p: ReadonlyVector2, step: number): number {
         const vv = this.getDerivative();
 
         let sum = 0;
@@ -389,7 +395,7 @@ export class Bezier2Curve2 implements ReadonlyBezier2Curve2 {
         return new Bezier2Curve2(p0, p1, p2);
     }
 
-    public static toObject(c: Bezier2Curve2): Bezier2Curve2Like {
+    public static toObject(c: ReadonlyBezier2Curve2): Bezier2Curve2Like {
         const p0 = Vector2.toObject(c.p0);
         const p1 = Vector2.toObject(c.p1);
         const p2 = Vector2.toObject(c.p2);
@@ -413,7 +419,7 @@ export class Bezier2Curve2 implements ReadonlyBezier2Curve2 {
         return box;
     }
 
-    public getClosestParameter(p: Vector2): number {
+    public getClosestParameter(p: ReadonlyVector2): number {
         // Solve `(C(t) - P) dot C'(t) = 0` for `t`
         const v0 = this.p0.sub(p);
         const v1 = this.p1.sub(this.p0);
@@ -587,7 +593,7 @@ export class Bezier2Curve2 implements ReadonlyBezier2Curve2 {
         return qqa.dot(qqb.neg()) / qqa.lenSq();
     }
 
-    public getWindingAt(p: Vector2): number {
+    public getWindingAt(p: ReadonlyVector2): number {
         const v0 = this.p0.y - p.y;
         const v1 = this.p1.y - this.p0.y;
         const v2 = this.p2.y - this.p1.y;
@@ -604,7 +610,7 @@ export class Bezier2Curve2 implements ReadonlyBezier2Curve2 {
         return wind;
     }
 
-    public getWindingFracAt(p: Vector2, step: number): number {
+    public getWindingFracAt(p: ReadonlyVector2, step: number): number {
         let sum = 0;
 
         for (let t = 0; t < 1; t += step) {
@@ -782,7 +788,7 @@ export class Bezier3Curve2 implements ReadonlyBezier3Curve2 {
         return new Bezier3Curve2(p0, p1, p2, p3);
     }
 
-    public static toObject(c: Bezier3Curve2): Bezier3Curve2Like {
+    public static toObject(c: ReadonlyBezier3Curve2): Bezier3Curve2Like {
         const p0 = Vector2.toObject(c.p0);
         const p1 = Vector2.toObject(c.p1);
         const p2 = Vector2.toObject(c.p2);
@@ -980,7 +986,7 @@ export class Bezier3Curve2 implements ReadonlyBezier3Curve2 {
         return p012.lerp(p123, t);
     }
 
-    public getWindingAt(p: Vector2): number {
+    public getWindingAt(p: ReadonlyVector2): number {
         const v0 = this.p0.y - p.y;
         const v1 = this.p1.y - this.p0.y;
         const v2 = this.p2.y - this.p1.y;
@@ -1001,7 +1007,7 @@ export class Bezier3Curve2 implements ReadonlyBezier3Curve2 {
         return wind;
     }
 
-    public getWindingFracAt(p: Vector2, step: number): number {
+    public getWindingFracAt(p: ReadonlyVector2, step: number): number {
         let sum = 0;
 
         for (let t = 0; t < 1; t += step) {
@@ -1149,7 +1155,7 @@ export class BezierRCurve2 implements ReadonlyBezierRCurve2 {
         return new BezierRCurve2(p0, p1, p2, w);
     }
 
-    public static fromCenterPoint(p0: Vector2, p1: Vector2, p2: Vector2, pc: Vector2): BezierRCurve2 {
+    public static fromCenterPoint(p0: Vector2, p1: Vector2, p2: Vector2, pc: ReadonlyVector2): BezierRCurve2 {
         const pm = p0.lerp(p2, 0.5);
         const dm = pm.distanceTo(pc);
         const d1 = p1.distanceTo(pc);
@@ -1164,7 +1170,7 @@ export class BezierRCurve2 implements ReadonlyBezierRCurve2 {
         return new BezierRCurve2(p0, p1, p2, obj.w);
     }
 
-    public static fromProjectivePoints(p0: Vector3, p1: Vector3, p2: Vector3): BezierRCurve2 {
+    public static fromProjectivePoints(p0: ReadonlyVector3, p1: ReadonlyVector3, p2: ReadonlyVector3): BezierRCurve2 {
         const pp0 = Vector2.fromXYW(p0.x, p0.y, p0.z);
         const pp1 = Vector2.fromXYW(p1.x, p1.y, p1.z);
         const pp2 = Vector2.fromXYW(p2.x, p2.y, p2.z);
@@ -1193,14 +1199,14 @@ export class BezierRCurve2 implements ReadonlyBezierRCurve2 {
         return w1 / Math.sqrt(w0 * w2);
     }
 
-    public static getWeightFromVectors(pc: Vector2, p1: Vector2, p2: Vector2): number {
+    public static getWeightFromVectors(pc: ReadonlyVector2, p1: ReadonlyVector2, p2: ReadonlyVector2): number {
         const v1 = p1.sub(pc);
         const v2 = p2.sub(pc);
 
         return v1.dot(v2) / Math.sqrt(v1.lenSq() * v2.lenSq());
     }
 
-    public static toObject(c: BezierRCurve2): BezierRCurve2Like {
+    public static toObject(c: ReadonlyBezierRCurve2): BezierRCurve2Like {
         const p0 = Vector2.toObject(c.p0);
         const p1 = Vector2.toObject(c.p1);
         const p2 = Vector2.toObject(c.p2);
@@ -1380,7 +1386,7 @@ export class BezierRCurve2 implements ReadonlyBezierRCurve2 {
         return Vector2.fromXYW(p.x, p.y, p.z);
     }
 
-    public getWindingAt(p: Vector2): number {
+    public getWindingAt(p: ReadonlyVector2): number {
         const y1 = this.w * this.p1.y - this.w * p.y + p.y;
 
         const v0 = this.p0.y - p.y;
@@ -1399,7 +1405,7 @@ export class BezierRCurve2 implements ReadonlyBezierRCurve2 {
         return wind;
     }
 
-    public getWindingFracAt(p: Vector2, step: number): number {
+    public getWindingFracAt(p: ReadonlyVector2, step: number): number {
         let sum = 0;
 
         for (let t = 0; t < 1; t += step) {

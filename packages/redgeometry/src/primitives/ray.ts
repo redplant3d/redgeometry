@@ -81,7 +81,7 @@ export class Ray2 implements ReadonlyRay2 {
         return new Ray2(p, v);
     }
 
-    public static getIntersection(ray1: Ray2, ray2: Ray2): Vector2 | undefined {
+    public static getIntersection(ray1: ReadonlyRay2, ray2: ReadonlyRay2): Vector2 | undefined {
         const v1 = ray1.v;
         const v2 = ray2.v;
         const den = v1.cross(v2);
@@ -98,7 +98,7 @@ export class Ray2 implements ReadonlyRay2 {
         return ray1.getValueAt(t);
     }
 
-    public static getIntersectionParameter(ray1: Ray2, ray2: Ray2): [number, number] {
+    public static getIntersectionParameter(ray1: ReadonlyRay2, ray2: ReadonlyRay2): [number, number] {
         const v1 = ray1.v;
         const v2 = ray2.v;
         const den = v1.cross(v2);
@@ -117,7 +117,7 @@ export class Ray2 implements ReadonlyRay2 {
         return [t, u];
     }
 
-    public static toObject(ray: Ray2): Ray2Like {
+    public static toObject(ray: ReadonlyRay2): Ray2Like {
         const p = Vector2.toObject(ray.p);
         const v = Vector2.toObject(ray.v);
         return { p, v };
@@ -221,7 +221,7 @@ export class Ray3 implements ReadonlyRay3 {
      * Returns the parameters of the closest points which lie on the rays `ray1` and `ray2`
      * or `undefined` if the rays are parallel.
      */
-    public static getClosestParameter(ray1: Ray3, ray2: Ray3): [number, number] | undefined {
+    public static getClosestParameter(ray1: Ray3, ray2: ReadonlyRay3): [number, number] | undefined {
         // Reference: https://math.stackexchange.com/a/4764188
         // ```
         // p1 + t1 * v1 = p2 + t2 * v2
@@ -259,7 +259,7 @@ export class Ray3 implements ReadonlyRay3 {
         return [t1, t2];
     }
 
-    public static toObject(ray: Ray3): Ray3Like {
+    public static toObject(ray: ReadonlyRay3): Ray3Like {
         const p = Vector3.toObject(ray.p);
         const v = Vector3.toObject(ray.v);
         return { p, v };
