@@ -32,6 +32,8 @@ export interface ReadonlyComplex {
  * A complex number to be used for 2D rotations.
  */
 export class Complex implements ReadonlyComplex {
+    public static readonly IDENTITY: ReadonlyComplex = Complex.createIdentity();
+
     public a: number;
     public b: number;
 

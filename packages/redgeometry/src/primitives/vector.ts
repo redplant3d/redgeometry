@@ -128,6 +128,11 @@ export interface ReadonlyVector4 {
 }
 
 export class Vector2 implements ReadonlyVector2 {
+    public static readonly ONE: ReadonlyVector2 = Vector2.createOne();
+    public static readonly UNIT_X: ReadonlyVector2 = Vector2.createUnitX();
+    public static readonly UNIT_Y: ReadonlyVector2 = Vector2.createUnitY();
+    public static readonly ZERO: ReadonlyVector2 = Vector2.createZero();
+
     public x: number;
     public y: number;
 
@@ -490,6 +495,12 @@ export class Vector2 implements ReadonlyVector2 {
 }
 
 export class Vector3 implements ReadonlyVector3 {
+    public static readonly ONE: ReadonlyVector3 = Vector3.createOne();
+    public static readonly UNIT_X: ReadonlyVector3 = Vector3.createUnitX();
+    public static readonly UNIT_Y: ReadonlyVector3 = Vector3.createUnitY();
+    public static readonly UNIT_Z: ReadonlyVector3 = Vector3.createUnitZ();
+    public static readonly ZERO: ReadonlyVector3 = Vector3.createZero();
+
     public x: number;
     public y: number;
     public z: number;
@@ -885,6 +896,13 @@ export class Vector3 implements ReadonlyVector3 {
 }
 
 export class Vector4 implements ReadonlyVector4 {
+    public static readonly ONE: ReadonlyVector4 = Vector4.createOne();
+    public static readonly UNIT_W: ReadonlyVector4 = Vector4.createUnitW();
+    public static readonly UNIT_X: ReadonlyVector4 = Vector4.createUnitX();
+    public static readonly UNIT_Y: ReadonlyVector4 = Vector4.createUnitY();
+    public static readonly UNIT_Z: ReadonlyVector4 = Vector4.createUnitZ();
+    public static readonly ZERO: ReadonlyVector4 = Vector4.createZero();
+
     public w: number;
     public x: number;
     public y: number;

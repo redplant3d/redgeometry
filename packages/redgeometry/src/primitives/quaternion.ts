@@ -57,6 +57,8 @@ export enum RotationOrder {
  * - https://danceswithcode.net/engineeringnotes/quaternions/quaternions.html
  */
 export class Quaternion implements ReadonlyQuaternion {
+    public static readonly IDENTITY: ReadonlyQuaternion = Quaternion.createIdentity();
+
     public a: number;
     public b: number;
     public c: number;

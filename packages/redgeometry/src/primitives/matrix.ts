@@ -120,6 +120,8 @@ export enum MatrixType {
  * ```
  */
 export class Matrix3A implements ReadonlyMatrix3A {
+    public static readonly IDENTITY: ReadonlyMatrix3A = Matrix3A.createIdentity();
+
     public readonly elements: MatrixElements3A;
 
     /**
@@ -620,6 +622,8 @@ export class Matrix3A implements ReadonlyMatrix3A {
  * ```
  */
 export class Matrix3 implements ReadonlyMatrix3 {
+    public static readonly IDENTITY: ReadonlyMatrix3 = Matrix3.createIdentity();
+
     public readonly elements: MatrixElements3;
 
     /**
@@ -1273,6 +1277,8 @@ export class Matrix3 implements ReadonlyMatrix3 {
  * ```
  */
 export class Matrix4A implements ReadonlyMatrix4A {
+    public static readonly IDENTITY: ReadonlyMatrix4A = Matrix4A.createIdentity();
+
     public readonly elements: MatrixElements4A;
 
     /**
@@ -2148,6 +2154,8 @@ export class Matrix4A implements ReadonlyMatrix4A {
  * ```
  */
 export class Matrix4 implements ReadonlyMatrix4 {
+    public static readonly IDENTITY: ReadonlyMatrix4 = Matrix4.createIdentity();
+
     public readonly elements: MatrixElements4;
 
     /**
