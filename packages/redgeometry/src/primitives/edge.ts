@@ -119,6 +119,12 @@ export class Edge2 implements ReadonlyEdge2 {
         return new Edge2(p0, p1);
     }
 
+    public static fromReadonly(p0: ReadonlyVector2, p1: ReadonlyVector2): ReadonlyEdge2 {
+        const pp0 = p0 as Vector2;
+        const pp1 = p1 as Vector2;
+        return new Edge2(pp0, pp1) as ReadonlyEdge2;
+    }
+
     public static fromXY(x0: number, y0: number, x1: number, y1: number): Edge2 {
         const p0 = new Vector2(x0, y0);
         const p1 = new Vector2(x1, y1);
@@ -479,6 +485,12 @@ export class Edge3 implements ReadonlyEdge3 {
         const p0 = Vector3.fromObject(obj.p0);
         const p1 = Vector3.fromObject(obj.p1);
         return new Edge3(p0, p1);
+    }
+
+    public static fromReadonly(p0: ReadonlyVector3, p1: ReadonlyVector3): ReadonlyEdge3 {
+        const pp0 = p0 as Vector3;
+        const pp1 = p1 as Vector3;
+        return new Edge3(pp0, pp1) as ReadonlyEdge3;
     }
 
     public static fromXYZ(x0: number, y0: number, z0: number, x1: number, y1: number, z1: number): Edge3 {

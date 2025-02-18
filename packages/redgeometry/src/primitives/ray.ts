@@ -75,6 +75,12 @@ export class Ray2 implements ReadonlyRay2 {
         return new Ray2(p0, v);
     }
 
+    public static fromReadonly(v: ReadonlyVector2, p: ReadonlyVector2): ReadonlyRay2 {
+        const pp = p as Vector2;
+        const vv = v as Vector2;
+        return new Ray2(pp, vv) as ReadonlyRay2;
+    }
+
     public static fromXY(px: number, py: number, vx: number, vy: number): Ray2 {
         const p = new Vector2(px, py);
         const v = new Vector2(vx, vy);
@@ -209,6 +215,12 @@ export class Ray3 implements ReadonlyRay3 {
     public static fromPoints(p0: Vector3, p1: Vector3): Ray3 {
         const v = p1.sub(p0);
         return new Ray3(p0, v);
+    }
+
+    public static fromReadonly(v: ReadonlyVector3, p: ReadonlyVector3): ReadonlyRay3 {
+        const pp = p as Vector3;
+        const vv = v as Vector3;
+        return new Ray3(pp, vv) as ReadonlyRay3;
     }
 
     public static fromXYZ(px: number, py: number, pz: number, vx: number, vy: number, vz: number): Ray3 {
