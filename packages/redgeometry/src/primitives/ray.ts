@@ -22,14 +22,14 @@ export interface ReadonlyRay2 {
     readonly v: ReadonlyVector2;
 
     clone(): Ray2;
-    getParameterFromPoint(p: Vector2): number;
-    getSignedDistanceFromPoint(p: Vector2): number;
+    getParameterFromPoint(p: ReadonlyVector2): number;
+    getSignedDistanceFromPoint(p: ReadonlyVector2): number;
     getValueAt(t: number): Vector2;
     normal(): Ray2;
     reverse(): Ray2;
     toArray(): [number, number, number, number];
     toString(): string;
-    translate(v: Vector2): Ray2;
+    translate(v: ReadonlyVector2): Ray2;
 }
 
 export interface ReadonlyRay3 {
@@ -37,15 +37,15 @@ export interface ReadonlyRay3 {
     readonly v: ReadonlyVector3;
 
     clone(): Ray3;
-    getDistanceFromPoint(p: Vector3): number;
-    getNormalAround(v: Vector3): Ray3;
-    getParameterFromPoint(p: Vector3): number;
+    getDistanceFromPoint(p: ReadonlyVector3): number;
+    getNormalAround(v: ReadonlyVector3): Ray3;
+    getParameterFromPoint(p: ReadonlyVector3): number;
     getValueAt(t: number): Vector3;
     isFinite(): boolean;
     reverse(): Ray3;
     toArray(): [number, number, number, number, number, number];
     toString(): string;
-    translate(v: Vector3): Ray3;
+    translate(v: ReadonlyVector3): Ray3;
 }
 
 export class Ray2 implements ReadonlyRay2 {
@@ -136,7 +136,7 @@ export class Ray2 implements ReadonlyRay2 {
     /**
      * Returns the parameterized value where a point `p` is orthogonal on the ray.
      */
-    public getParameterFromPoint(p: Vector2): number {
+    public getParameterFromPoint(p: ReadonlyVector2): number {
         const v1 = this.v;
         const v2 = p.sub(this.p);
         return v1.dot(v2) / v1.lenSq();
@@ -145,7 +145,7 @@ export class Ray2 implements ReadonlyRay2 {
     /**
      * Returns the signed distance to where a point `p` is orthogonal to the ray.
      */
-    public getSignedDistanceFromPoint(p: Vector2): number {
+    public getSignedDistanceFromPoint(p: ReadonlyVector2): number {
         const v1 = this.v;
         const v2 = this.p.sub(p);
         return v1.cross(v2) / v1.len();
@@ -184,7 +184,7 @@ export class Ray2 implements ReadonlyRay2 {
         return `{p: ${this.p}, p: ${this.p}}`;
     }
 
-    public translate(v: Vector2): Ray2 {
+    public translate(v: ReadonlyVector2): Ray2 {
         const p = this.p.add(v);
         return new Ray2(p, this.v);
     }
@@ -233,7 +233,7 @@ export class Ray3 implements ReadonlyRay3 {
      * Returns the parameters of the closest points which lie on the rays `ray1` and `ray2`
      * or `undefined` if the rays are parallel.
      */
-    public static getClosestParameter(ray1: Ray3, ray2: ReadonlyRay3): [number, number] | undefined {
+    public static getClosestParameter(ray1: ReadonlyRay3, ray2: ReadonlyRay3): [number, number] | undefined {
         // Reference: https://math.stackexchange.com/a/4764188
         // ```
         // p1 + t1 * v1 = p2 + t2 * v2
@@ -284,20 +284,20 @@ export class Ray3 implements ReadonlyRay3 {
     /**
      * Returns the distance to where a point `p` is orthogonal to the ray.
      */
-    public getDistanceFromPoint(p: Vector3): number {
+    public getDistanceFromPoint(p: ReadonlyVector3): number {
         const v1 = this.v;
         const v2 = this.p.sub(p);
         return v1.cross(v2).len() / v1.len();
     }
 
-    public getNormalAround(v: Vector3): Ray3 {
+    public getNormalAround(v: ReadonlyVector3): Ray3 {
         return new Ray3(this.p, this.v.cross(v));
     }
 
     /**
      * Returns the parameterized value where a point `p` is orthogonal on the ray.
      */
-    public getParameterFromPoint(p: Vector3): number {
+    public getParameterFromPoint(p: ReadonlyVector3): number {
         const v1 = this.v;
         const v2 = p.sub(this.p);
         return v1.dot(v2) / v1.lenSq();
@@ -336,7 +336,7 @@ export class Ray3 implements ReadonlyRay3 {
         return `{p: ${this.p}, p: ${this.p}}`;
     }
 
-    public translate(v: Vector3): Ray3 {
+    public translate(v: ReadonlyVector3): Ray3 {
         const p = this.p.add(v);
         return new Ray3(p, this.v);
     }

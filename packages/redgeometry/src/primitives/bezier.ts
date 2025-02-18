@@ -41,8 +41,8 @@ export type BezierRCurve2Like = {
 export type BezierCurve2 = Bezier1Curve2 | Bezier2Curve2 | Bezier3Curve2 | BezierRCurve2;
 
 export interface ReadonlyBezier1Curve2 {
-    readonly p0: Vector2;
-    readonly p1: Vector2;
+    readonly p0: ReadonlyVector2;
+    readonly p1: ReadonlyVector2;
     readonly pn: Vector2;
     readonly type: CurveType.Bezier1;
 
@@ -69,9 +69,9 @@ export interface ReadonlyBezier1Curve2 {
 }
 
 export interface ReadonlyBezier2Curve2 {
-    readonly p0: Vector2;
-    readonly p1: Vector2;
-    readonly p2: Vector2;
+    readonly p0: ReadonlyVector2;
+    readonly p1: ReadonlyVector2;
+    readonly p2: ReadonlyVector2;
     readonly pn: Vector2;
     readonly type: CurveType.Bezier2;
 
@@ -108,10 +108,10 @@ export interface ReadonlyBezier2Curve2 {
 }
 
 export interface ReadonlyBezier3Curve2 {
-    readonly p0: Vector2;
-    readonly p1: Vector2;
-    readonly p2: Vector2;
-    readonly p3: Vector2;
+    readonly p0: ReadonlyVector2;
+    readonly p1: ReadonlyVector2;
+    readonly p2: ReadonlyVector2;
+    readonly p3: ReadonlyVector2;
     readonly pn: Vector2;
     readonly type: CurveType.Bezier3;
 
@@ -144,9 +144,9 @@ export interface ReadonlyBezier3Curve2 {
 }
 
 export interface ReadonlyBezierRCurve2 {
-    readonly p0: Vector2;
-    readonly p1: Vector2;
-    readonly p2: Vector2;
+    readonly p0: ReadonlyVector2;
+    readonly p1: ReadonlyVector2;
+    readonly p2: ReadonlyVector2;
     readonly pn: Vector2;
     readonly type: CurveType.BezierR;
     readonly w: number;
@@ -636,7 +636,7 @@ export class Bezier2Curve2 implements ReadonlyBezier2Curve2 {
         return step * sum;
     }
 
-    public intersectLine(c: Bezier1Curve2, output: number[]): void {
+    public intersectLine(c: ReadonlyBezier1Curve2, output: number[]): void {
         const a0 = Vector2.signedArea(c.p0, c.p1, this.p0);
         const a1 = Vector2.signedArea(c.p0, c.p1, this.p1);
         const a2 = Vector2.signedArea(c.p0, c.p1, this.p2);

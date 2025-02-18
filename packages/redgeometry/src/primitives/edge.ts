@@ -23,8 +23,8 @@ export type Edge3Like = {
 };
 
 export interface ReadonlyEdge2 {
-    readonly p0: Vector2;
-    readonly p1: Vector2;
+    readonly p0: ReadonlyVector2;
+    readonly p1: ReadonlyVector2;
 
     clone(): Edge2;
     eq(e: ReadonlyEdge2): boolean;
@@ -48,8 +48,8 @@ export interface ReadonlyEdge2 {
 }
 
 export interface ReadonlyEdge3 {
-    readonly p0: Vector3;
-    readonly p1: Vector3;
+    readonly p0: ReadonlyVector3;
+    readonly p1: ReadonlyVector3;
 
     clone(): Edge3;
     eq(e: ReadonlyEdge3): boolean;
@@ -79,7 +79,7 @@ export class Edge2 implements ReadonlyEdge2 {
         this.p1 = p1;
     }
 
-    public static clip(e: Edge2, ...clipEdges: Edge2[]): Edge2 | undefined {
+    public static clip(e: Edge2, ...clipEdges: ReadonlyEdge2[]): Edge2 | undefined {
         let clipped = e;
 
         for (const clipEdge of clipEdges) {

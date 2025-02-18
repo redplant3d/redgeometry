@@ -73,7 +73,7 @@ export class ColorRgba implements ReadonlyColorRgba {
         return new ColorRgba(obj.r, obj.g, obj.b, obj.a);
     }
 
-    public static toObject(c: ColorRgba): ColorRgbaLike {
+    public static toObject(c: ReadonlyColorRgba): ColorRgbaLike {
         return { r: c.r, g: c.g, b: c.b, a: c.a };
     }
 
