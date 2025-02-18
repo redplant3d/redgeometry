@@ -1,12 +1,18 @@
-import type { Bezier1Curve2, Bezier2Curve2, Bezier3Curve2, BezierCurve2, BezierRCurve2 } from "../primitives/bezier.js";
+import type {
+    ReadonlyBezier1Curve2,
+    ReadonlyBezier2Curve2,
+    ReadonlyBezier3Curve2,
+    ReadonlyBezierCurve2,
+    ReadonlyBezierRCurve2,
+} from "../primitives/bezier.js";
 import type { Box2 } from "../primitives/box.js";
-import { Vector2, type ReadonlyVector2, type Vector3 } from "../primitives/vector.js";
+import { Vector2, type ReadonlyVector2, type ReadonlyVector3 } from "../primitives/vector.js";
 import { log } from "../utility/debug.js";
 import { Interval } from "../utility/interval.js";
 import { lerp } from "../utility/scalar.js";
 import { RootType, solveCubic, solveQuadratic } from "../utility/solve.js";
 
-export function encloseCurveAt(c: BezierCurve2, box: Box2, t: number): void {
+export function encloseCurveAt(c: ReadonlyBezierCurve2, box: Box2, t: number): void {
     if (!isInParameterRange(t)) {
         return;
     }
@@ -16,7 +22,7 @@ export function encloseCurveAt(c: BezierCurve2, box: Box2, t: number): void {
 }
 
 export function minimizeCurveDistanceAt(
-    c: BezierCurve2,
+    c: ReadonlyBezierCurve2,
     p: ReadonlyVector2,
     t: number,
     min: { param: number; distSq: number },
@@ -33,7 +39,7 @@ export function minimizeCurveDistanceAt(
     }
 }
 
-export function getWindingAtParameterLinear(c: Bezier1Curve2, t: number, px: number): number {
+export function getWindingAtParameterLinear(c: ReadonlyBezier1Curve2, t: number, px: number): number {
     if (!isInParameterRange(t)) {
         return 0;
     }
@@ -44,7 +50,7 @@ export function getWindingAtParameterLinear(c: Bezier1Curve2, t: number, px: num
     return getWinding(t, px, x, yy);
 }
 
-export function getWindingAtParameterQuadratic(c: Bezier2Curve2, t: number, px: number): number {
+export function getWindingAtParameterQuadratic(c: ReadonlyBezier2Curve2, t: number, px: number): number {
     if (!isInParameterRange(t)) {
         return 0;
     }
@@ -58,7 +64,7 @@ export function getWindingAtParameterQuadratic(c: Bezier2Curve2, t: number, px: 
     return getWinding(t, px, x, yy);
 }
 
-export function getWindingAtParameterCubic(c: Bezier3Curve2, t: number, px: number): number {
+export function getWindingAtParameterCubic(c: ReadonlyBezier3Curve2, t: number, px: number): number {
     if (!isInParameterRange(t)) {
         return 0;
     }
@@ -76,7 +82,7 @@ export function getWindingAtParameterCubic(c: Bezier3Curve2, t: number, px: numb
     return getWinding(t, px, x, yy);
 }
 
-export function getWindingAtParameterConic(c: BezierRCurve2, t: number, px: number): number {
+export function getWindingAtParameterConic(c: ReadonlyBezierRCurve2, t: number, px: number): number {
     if (!isInParameterRange(t)) {
         return 0;
     }
@@ -96,9 +102,9 @@ export function getWindingAtParameterConic(c: BezierRCurve2, t: number, px: numb
 }
 
 export function checkIntervalQuadQuad(
-    c1: Bezier2Curve2,
+    c1: ReadonlyBezier2Curve2,
     i1: Interval,
-    c2: Bezier2Curve2,
+    c2: ReadonlyBezier2Curve2,
     i2: Interval,
     ii: Interval,
     output: Vector2[],
@@ -124,9 +130,9 @@ export function checkIntervalQuadQuad(
 }
 
 export function getIntersectionQuadQuad(
-    c1: Bezier2Curve2,
+    c1: ReadonlyBezier2Curve2,
     i1: Interval,
-    c2: Bezier2Curve2,
+    c2: ReadonlyBezier2Curve2,
     i2: Interval,
     output: Vector2[],
 ): void {
@@ -165,7 +171,7 @@ export function getIntersectionQuadQuad(
     }
 }
 
-export function getArcLengthQuadratic(c: Bezier2Curve2): number {
+export function getArcLengthQuadratic(c: ReadonlyBezier2Curve2): number {
     let sum = 0;
 
     const [qqa, qqb] = c.getDerivativeCoefficients();
@@ -179,7 +185,7 @@ export function getArcLengthQuadratic(c: Bezier2Curve2): number {
     return sum;
 }
 
-export function getArcLengthCubic(c: Bezier3Curve2): number {
+export function getArcLengthCubic(c: ReadonlyBezier3Curve2): number {
     let sum = 0;
 
     const [qqa, qqb, qqc] = c.getDerivativeCoefficients();
@@ -197,7 +203,7 @@ export function getArcLengthCubic(c: Bezier3Curve2): number {
     return sum;
 }
 
-export function getArcLengthConic(c: BezierRCurve2): number {
+export function getArcLengthConic(c: ReadonlyBezierRCurve2): number {
     let sum = 0;
 
     const [qqa, qqb, qqc] = c.getDerivativeCoefficients();
@@ -215,7 +221,7 @@ export function getArcLengthConic(c: BezierRCurve2): number {
     return sum;
 }
 
-export function getParameterAtArcLengthQuadratic(c: Bezier2Curve2, d: number): number {
+export function getParameterAtArcLengthQuadratic(c: ReadonlyBezier2Curve2, d: number): number {
     const d1 = c.p1.distanceTo(c.p0);
     const d2 = c.p2.distanceTo(c.p1);
 
@@ -229,7 +235,7 @@ export function getParameterAtArcLengthQuadratic(c: Bezier2Curve2, d: number): n
     return 1;
 }
 
-export function getParameterAtArcLengthCubic(c: Bezier3Curve2, d: number): number {
+export function getParameterAtArcLengthCubic(c: ReadonlyBezier3Curve2, d: number): number {
     const d1 = c.p1.distanceTo(c.p0);
     const d2 = c.p2.distanceTo(c.p1);
     const d3 = c.p2.distanceTo(c.p1);
@@ -243,7 +249,7 @@ export function getParameterAtArcLengthCubic(c: Bezier3Curve2, d: number): numbe
     return r.x;
 }
 
-export function getParameterAtArcLengthConic(c: BezierRCurve2, d: number): number {
+export function getParameterAtArcLengthConic(c: ReadonlyBezierRCurve2, d: number): number {
     const d1 = c.p1.distanceTo(c.p0);
     const d2 = c.p2.distanceTo(c.p1);
     const dw = c.w * d1;
@@ -283,17 +289,29 @@ function getWinding(t: number, px: number, x: number, yy: number): number {
     return 0;
 }
 
-function sampleArcLengthQuadratic(wz: number, xz: number, qqa: Vector2, qqb: Vector2): number {
+function sampleArcLengthQuadratic(wz: number, xz: number, qqa: ReadonlyVector2, qqb: ReadonlyVector2): number {
     const v = qqa.mulS(xz).add(qqb);
     return wz * v.len();
 }
 
-function sampleArcLengthCubic(wz: number, xz: number, qqa: Vector2, qqb: Vector2, qqc: Vector2): number {
+function sampleArcLengthCubic(
+    wz: number,
+    xz: number,
+    qqa: ReadonlyVector2,
+    qqb: ReadonlyVector2,
+    qqc: ReadonlyVector2,
+): number {
     const v = qqa.mulS(xz).add(qqb).mulS(xz).add(qqc);
     return wz * v.len();
 }
 
-function sampleArcLengthConic(wz: number, xz: number, qqa: Vector3, qqb: Vector3, qqc: Vector3): number {
+function sampleArcLengthConic(
+    wz: number,
+    xz: number,
+    qqa: ReadonlyVector3,
+    qqb: ReadonlyVector3,
+    qqc: ReadonlyVector3,
+): number {
     const vv = qqa.mulS(xz).add(qqb).mulS(xz).add(qqc);
     const v = Vector2.fromXYW(vv.x, vv.y, vv.z * vv.z);
     return wz * v.len();

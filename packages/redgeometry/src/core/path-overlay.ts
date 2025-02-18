@@ -1,7 +1,7 @@
 import { PathOverlayState2 } from "../internal/path-overlay.js";
 import { PathSweepEvent2, createSweepEventQueue } from "../internal/path-sweep.js";
-import { Bezier1Curve2, type BezierCurve2 } from "../primitives/bezier.js";
-import type { Edge2 } from "../primitives/edge.js";
+import { Bezier1Curve2, type ReadonlyBezierCurve2 } from "../primitives/bezier.js";
+import type { ReadonlyEdge2 } from "../primitives/edge.js";
 import { ArrayMultiSet, arrayEquals } from "../utility/array.js";
 import { assertDebug, log } from "../utility/debug.js";
 import { MeshChain2, MeshEdge2, type Mesh2 } from "./mesh.js";
@@ -36,11 +36,11 @@ export class PathOverlay2 {
         this.windingOperator = DEFAULT_PATH_CLIP_OPTIONS.windingOperatorA;
     }
 
-    public addCurve(c: BezierCurve2, set = 0, weight = 1, snap = false, data?: unknown): void {
+    public addCurve(c: ReadonlyBezierCurve2, set = 0, weight = 1, snap = false, data?: unknown): void {
         this.snapRound.addSegment(c, set, weight, snap, data);
     }
 
-    public addEdge(e: Edge2, set = 0, weight = 1, snap = false, data?: unknown): void {
+    public addEdge(e: ReadonlyEdge2, set = 0, weight = 1, snap = false, data?: unknown): void {
         this.snapRound.addSegment(e.toBezier(), set, weight, snap, data);
     }
 
@@ -88,8 +88,8 @@ export class PathOverlay2 {
 
                 // Quickly reject unnecessary edges (same tags)
                 if (!arrayEquals(data1.tag, data2.tag)) {
-                    const seg1 = new Bezier1Curve2(left.p1, left.p0);
-                    const seg2 = new Bezier1Curve2(left.p0, left.p1);
+                    const seg1 = Bezier1Curve2.fromReadonly(left.p1, left.p0);
+                    const seg2 = Bezier1Curve2.fromReadonly(left.p0, left.p1);
 
                     this.addSegmentPair(output, seg1, seg2, data1, data2);
                 }
@@ -113,8 +113,8 @@ export class PathOverlay2 {
 
     private addSegmentPair(
         output: Mesh2,
-        seg1: BezierCurve2,
-        seg2: BezierCurve2,
+        seg1: ReadonlyBezierCurve2,
+        seg2: ReadonlyBezierCurve2,
         data1: PathOverlayData2,
         data2: PathOverlayData2,
     ): void {

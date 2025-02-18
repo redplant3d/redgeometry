@@ -8,8 +8,8 @@ import {
     type StrokeCaps,
 } from "../core/path-options.js";
 import { Path2 } from "../core/path.js";
-import { Bezier2Curve2, type Bezier1Curve2 } from "../primitives/bezier.js";
-import { Vector2 } from "../primitives/vector.js";
+import { Bezier2Curve2, type ReadonlyBezier1Curve2, type ReadonlyBezier2Curve2 } from "../primitives/bezier.js";
+import { Vector2, type ReadonlyVector2 } from "../primitives/vector.js";
 import {
     getDashArcLengthLinear,
     getDashArcLengthQuadratic,
@@ -35,7 +35,7 @@ export class StrokeState {
     public leftFirst: Path2;
     public leftMain: Path2;
     public miterLimit: number;
-    public ms: Vector2;
+    public ms: ReadonlyVector2;
     public output: Path2;
     public right: Path2;
     public rightFirst: Path2;
@@ -92,7 +92,7 @@ export class StrokeState {
         }
     }
 
-    public finalizePoint(p: Vector2): void {
+    public finalizePoint(p: ReadonlyVector2): void {
         const m = Vector2.createUnitX();
         this.insertMoveStroke(p, m);
         this.finalizeOpen();
@@ -117,7 +117,7 @@ export class StrokeState {
         }
     }
 
-    public strokeFirstOrJoin(p: Vector2, m0: Vector2, m1: Vector2): void {
+    public strokeFirstOrJoin(p: ReadonlyVector2, m0: ReadonlyVector2, m1: ReadonlyVector2): void {
         if (this.isDash) {
             this.insertFirstOrJoinDashStroke(p, m0, m1);
         } else {
@@ -125,7 +125,7 @@ export class StrokeState {
         }
     }
 
-    public strokeLinear(c0: Bezier1Curve2, m: Vector2): void {
+    public strokeLinear(c0: ReadonlyBezier1Curve2, m: ReadonlyVector2): void {
         if (this.isDash) {
             this.insertLinearDashStroke(c0);
         } else {
@@ -133,7 +133,7 @@ export class StrokeState {
         }
     }
 
-    public strokeQuadraticDegenerate(p0: Vector2, p1: Vector2, p2: Vector2): void {
+    public strokeQuadraticDegenerate(p0: ReadonlyVector2, p1: ReadonlyVector2, p2: ReadonlyVector2): void {
         if (this.isDash) {
             this.insertQuadraticDegenerateDashStroke(p0, p1, p2);
         } else {
@@ -141,7 +141,7 @@ export class StrokeState {
         }
     }
 
-    public strokeQuadraticSimple(c0: Bezier2Curve2): void {
+    public strokeQuadraticSimple(c0: ReadonlyBezier2Curve2): void {
         if (this.isDash) {
             this.insertQuadraticSimpleDashStroke(c0);
         } else {
@@ -245,13 +245,13 @@ export class StrokeState {
         this.miterLimit = options.miterLimit;
     }
 
-    private insertFirstOrJoinDashStroke(p: Vector2, m0: Vector2, m1: Vector2): void {
+    private insertFirstOrJoinDashStroke(p: ReadonlyVector2, m0: ReadonlyVector2, m1: ReadonlyVector2): void {
         if (this.currentPhase) {
             this.insertFirstOrJoinStroke(p, m0, m1);
         }
     }
 
-    private insertFirstOrJoinStroke(p: Vector2, m0: Vector2, m1: Vector2): void {
+    private insertFirstOrJoinStroke(p: ReadonlyVector2, m0: ReadonlyVector2, m1: ReadonlyVector2): void {
         if (m0.isZero()) {
             this.insertMoveStroke(p, m1);
             this.ms = m1;
@@ -260,7 +260,7 @@ export class StrokeState {
         }
     }
 
-    private insertLinearDashStroke(c0: Bezier1Curve2): void {
+    private insertLinearDashStroke(c0: ReadonlyBezier1Curve2): void {
         let lenRem = this.getDashLength() - this.currentLength;
         let len = getDashArcLengthLinear(c0);
         let c = c0;
@@ -291,23 +291,23 @@ export class StrokeState {
         }
     }
 
-    private insertLinearStroke(p: Vector2, m: Vector2): void {
+    private insertLinearStroke(p: ReadonlyVector2, m: ReadonlyVector2): void {
         const v = m.unit().normal().mulS(this.distance);
 
         this.left.lineTo(p.add(v));
         this.right.lineTo(p.sub(v));
     }
 
-    private insertMoveStroke(p0: Vector2, m: Vector2): void {
+    private insertMoveStroke(p0: ReadonlyVector2, m: ReadonlyVector2): void {
         const v = m.unit().normal().mulS(this.distance);
 
         this.left.moveTo(p0.add(v));
         this.right.moveTo(p0.sub(v));
     }
 
-    private insertQuadraticDegenerateDashStroke(p0: Vector2, p1: Vector2, p2: Vector2): void {
-        const c1 = new Bezier2Curve2(p0, p1, p1);
-        const c2 = new Bezier2Curve2(p1, p1, p2);
+    private insertQuadraticDegenerateDashStroke(p0: ReadonlyVector2, p1: ReadonlyVector2, p2: ReadonlyVector2): void {
+        const c1 = Bezier2Curve2.fromReadonly(p0, p1, p1);
+        const c2 = Bezier2Curve2.fromReadonly(p1, p1, p2);
 
         const n0 = p1.sub(p0).unit().normal();
         const n1 = p2.sub(p1).unit().normal();
@@ -322,9 +322,9 @@ export class StrokeState {
         this.insertQuadraticSimpleStroke(c2);
     }
 
-    private insertQuadraticDegenerateStroke(p0: Vector2, p1: Vector2, p2: Vector2): void {
-        const c1 = new Bezier2Curve2(p0, p1, p1);
-        const c2 = new Bezier2Curve2(p1, p1, p2);
+    private insertQuadraticDegenerateStroke(p0: ReadonlyVector2, p1: ReadonlyVector2, p2: ReadonlyVector2): void {
+        const c1 = Bezier2Curve2.fromReadonly(p0, p1, p1);
+        const c2 = Bezier2Curve2.fromReadonly(p1, p1, p2);
 
         const n0 = p1.sub(p0).unit().normal();
         const n1 = p2.sub(p1).unit().normal();
@@ -337,7 +337,7 @@ export class StrokeState {
         this.insertQuadraticSimpleStroke(c2);
     }
 
-    private insertQuadraticSimpleDashStroke(c0: Bezier2Curve2): void {
+    private insertQuadraticSimpleDashStroke(c0: ReadonlyBezier2Curve2): void {
         let lenRem = this.getDashLength() - this.currentLength;
         let len = getDashArcLengthQuadratic(c0);
         let c = c0;
@@ -367,7 +367,7 @@ export class StrokeState {
         }
     }
 
-    private insertQuadraticSimpleStroke(c: Bezier2Curve2): void {
+    private insertQuadraticSimpleStroke(c: ReadonlyBezier2Curve2): void {
         // Check for possible null vector (curve is a point)
         let v1 = c.getTangentStart();
         let v2 = c.getTangentEnd();
@@ -419,9 +419,9 @@ export class StrokeState {
 export function insertStrokeJoin(
     left: Path2,
     right: Path2,
-    p: Vector2,
-    m0: Vector2,
-    m1: Vector2,
+    p: ReadonlyVector2,
+    m0: ReadonlyVector2,
+    m1: ReadonlyVector2,
     d: number,
     ml: number,
     join: JoinType,
@@ -441,7 +441,7 @@ export function insertStrokeJoin(
     }
 }
 
-export function insertStrokeCap(path: Path2, p1: Vector2, cap: CapType | CustomCap): void {
+export function insertStrokeCap(path: Path2, p1: ReadonlyVector2, cap: CapType | CustomCap): void {
     switch (cap) {
         case CapType.Butt: {
             path.lineTo(p1);

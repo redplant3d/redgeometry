@@ -1,8 +1,8 @@
 import { SnapRound2, type EdgeSegment2 } from "redgeometry/src/core/snapround";
 import { Bezier1Curve2 } from "redgeometry/src/primitives/bezier";
-import { Box2 } from "redgeometry/src/primitives/box";
+import { Box2, type ReadonlyBox2 } from "redgeometry/src/primitives/box";
 import { Edge2 } from "redgeometry/src/primitives/edge";
-import { Vector2 } from "redgeometry/src/primitives/vector";
+import { Vector2, type ReadonlyVector2 } from "redgeometry/src/primitives/vector";
 import { log } from "redgeometry/src/utility/debug";
 import { RandomXSR128 } from "redgeometry/src/utility/random";
 import type { AppContextPlugin } from "../ecs-modules/app-context.js";
@@ -21,12 +21,12 @@ type AppPartMainData = {
 
 type AppPartRemoteData = {
     dataId: "app-part-remote";
-    errors: Box2[];
+    errors: ReadonlyBox2[];
     inputSegments: Edge2[];
-    intersections: Vector2[];
-    magnets: Box2[];
+    intersections: ReadonlyVector2[];
+    magnets: ReadonlyBox2[];
     outputSegments: Edge2[];
-    pins: Vector2[];
+    pins: ReadonlyVector2[];
 };
 
 type AppPartStateData = {
@@ -138,8 +138,8 @@ function renderSystem(world: World): void {
     ctx.fillPoints(intersections, "#FF0000", 5);
 }
 
-function addEdge(snapRound: SnapRound2, p0: Vector2, p1: Vector2, snap = false): void {
-    const c = new Bezier1Curve2(p0, p1);
+function addEdge(snapRound: SnapRound2, p0: ReadonlyVector2, p1: ReadonlyVector2, snap = false): void {
+    const c = Bezier1Curve2.fromReadonly(p0, p1);
     snapRound.addSegment(c, 0, 1, snap, undefined);
 }
 
@@ -226,7 +226,7 @@ function fillEdges(
     }
 }
 
-function transformBox(points: Vector2[], scale: number): Box2[] {
+function transformBox(points: ReadonlyVector2[], scale: number): Box2[] {
     const result: Box2[] = [];
 
     for (const point of points) {
@@ -239,7 +239,7 @@ function transformBox(points: Vector2[], scale: number): Box2[] {
     return result;
 }
 
-function transformPoints(points: Vector2[], scale: number): Vector2[] {
+function transformPoints(points: ReadonlyVector2[], scale: number): Vector2[] {
     const result: Vector2[] = [];
 
     for (const point of points) {

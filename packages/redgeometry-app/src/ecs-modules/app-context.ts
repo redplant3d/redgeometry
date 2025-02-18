@@ -1,11 +1,11 @@
 import type { Mesh2, MeshFace2 } from "redgeometry/src/core/mesh";
 import { PathCommandType, type Path2 } from "redgeometry/src/core/path";
 import type { Polygon2 } from "redgeometry/src/core/polygon";
-import type { Box2 } from "redgeometry/src/primitives/box";
-import type { Edge2 } from "redgeometry/src/primitives/edge";
-import type { Matrix3A } from "redgeometry/src/primitives/matrix";
-import type { Ray2 } from "redgeometry/src/primitives/ray";
-import { Vector2 } from "redgeometry/src/primitives/vector";
+import type { ReadonlyBox2 } from "redgeometry/src/primitives/box";
+import type { Edge2, ReadonlyEdge2 } from "redgeometry/src/primitives/edge";
+import type { ReadonlyMatrix3A } from "redgeometry/src/primitives/matrix";
+import type { ReadonlyRay2 } from "redgeometry/src/primitives/ray";
+import { Vector2, type ReadonlyVector2 } from "redgeometry/src/primitives/vector";
 import type { Image2 } from "redgeometry/src/render/image";
 import { assertUnreachable, throwError } from "redgeometry/src/utility/debug";
 import type { Random } from "redgeometry/src/utility/random";
@@ -87,7 +87,7 @@ export class AppContextPlugin implements WorldPlugin {
         return this.context.createPattern(canvas, "repeat");
     }
 
-    public drawBox(box: Box2, style: CanvasStyle = "#000000", width = 1): void {
+    public drawBox(box: ReadonlyBox2, style: CanvasStyle = "#000000", width = 1): void {
         const ctx = this.context;
         ctx.save();
         ctx.lineWidth = width;
@@ -96,7 +96,7 @@ export class AppContextPlugin implements WorldPlugin {
         ctx.restore();
     }
 
-    public drawBoxes(boxes: Box2[], style: CanvasStyle = "#000000", width = 1): void {
+    public drawBoxes(boxes: ReadonlyBox2[], style: CanvasStyle = "#000000", width = 1): void {
         const ctx = this.context;
         ctx.beginPath();
 
@@ -111,7 +111,7 @@ export class AppContextPlugin implements WorldPlugin {
         ctx.restore();
     }
 
-    public drawEdge(edge: Edge2, style: CanvasStyle = "#000000", width = 1): void {
+    public drawEdge(edge: ReadonlyEdge2, style: CanvasStyle = "#000000", width = 1): void {
         const ctx = this.context;
         ctx.beginPath();
         ctx.moveTo(edge.p0.x, edge.p0.y);
@@ -125,7 +125,7 @@ export class AppContextPlugin implements WorldPlugin {
         ctx.restore();
     }
 
-    public drawEdges(edges: readonly Edge2[], style: CanvasStyle = "#000000", width = 1): void {
+    public drawEdges(edges: readonly ReadonlyEdge2[], style: CanvasStyle = "#000000", width = 1): void {
         const ctx = this.context;
         ctx.beginPath();
 
@@ -188,7 +188,7 @@ export class AppContextPlugin implements WorldPlugin {
         ctx.restore();
     }
 
-    public drawRay(edge: Ray2, style: CanvasStyle = "#000000", width = 1): void {
+    public drawRay(edge: ReadonlyRay2, style: CanvasStyle = "#000000", width = 1): void {
         const ctx = this.context;
         ctx.beginPath();
         ctx.moveTo(edge.p.x, edge.p.y);
@@ -202,7 +202,7 @@ export class AppContextPlugin implements WorldPlugin {
         ctx.restore();
     }
 
-    public fillBox(box: Box2, style: CanvasStyle = "#000000"): void {
+    public fillBox(box: ReadonlyBox2, style: CanvasStyle = "#000000"): void {
         const ctx = this.context;
         ctx.save();
         ctx.fillStyle = style;
@@ -210,7 +210,7 @@ export class AppContextPlugin implements WorldPlugin {
         ctx.restore();
     }
 
-    public fillBoxes(boxes: Box2[], style: CanvasStyle = "#000000"): void {
+    public fillBoxes(boxes: ReadonlyBox2[], style: CanvasStyle = "#000000"): void {
         const ctx = this.context;
         ctx.beginPath();
 
@@ -281,7 +281,7 @@ export class AppContextPlugin implements WorldPlugin {
         ctx.restore();
     }
 
-    public fillPoints(points: readonly Vector2[], style: CanvasStyle = "#000000", width = 1): void {
+    public fillPoints(points: readonly ReadonlyVector2[], style: CanvasStyle = "#000000", width = 1): void {
         const ctx = this.context;
         ctx.beginPath();
 
@@ -308,7 +308,7 @@ export class AppContextPlugin implements WorldPlugin {
         ctx.restore();
     }
 
-    public fillText(text: string, pc: Vector2, style: CanvasStyle = "#000000", font = "16px Verdana"): void {
+    public fillText(text: string, pc: ReadonlyVector2, style: CanvasStyle = "#000000", font = "16px Verdana"): void {
         const ctx = this.context;
 
         ctx.save();
@@ -349,13 +349,17 @@ export class AppContextPlugin implements WorldPlugin {
         canvas.height = height;
     }
 
-    public setTransform(mat: Matrix3A): void {
+    public setTransform(mat: ReadonlyMatrix3A): void {
         const ctx = this.context;
         const el = mat.elements;
         ctx.setTransform(el[0], el[1], el[2], el[3], el[4], el[5]);
     }
 
-    private addCircle(ctx: CanvasRenderingContext2D | OffscreenCanvasRenderingContext2D, c: Vector2, r: number): void {
+    private addCircle(
+        ctx: CanvasRenderingContext2D | OffscreenCanvasRenderingContext2D,
+        c: ReadonlyVector2,
+        r: number,
+    ): void {
         ctx.moveTo(c.x + r, c.y);
         ctx.arcTo(c.x + r, c.y + r, c.x, c.y + r, r);
         ctx.arcTo(c.x - r, c.y + r, c.x - r, c.y, r);
@@ -389,7 +393,7 @@ export class AppContextPlugin implements WorldPlugin {
         let cIdx = 0;
         let pIdx = 0;
 
-        let p0 = Vector2.createZero();
+        let p0: ReadonlyVector2 = Vector2.createZero();
 
         while (cIdx < commands.length) {
             const command = commands[cIdx++];

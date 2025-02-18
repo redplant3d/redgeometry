@@ -1,6 +1,6 @@
 import { Path2 } from "redgeometry/src/core/path";
 import { Bezier2Curve2 } from "redgeometry/src/primitives/bezier";
-import { Vector2 } from "redgeometry/src/primitives/vector";
+import { Vector2, type ReadonlyVector2 } from "redgeometry/src/primitives/vector";
 import type { AppContextPlugin } from "../ecs-modules/app-context.js";
 import { AppContextModule } from "../ecs-modules/app-context.js";
 import type { AppInputData } from "../ecs-modules/app-input.js";
@@ -18,7 +18,7 @@ type AppPartMainData = {
 type AppPartRemoteData = {
     dataId: "app-part-remote";
     path: Path2;
-    points: Vector2[];
+    points: ReadonlyVector2[];
 };
 
 type AppPartStateData = {

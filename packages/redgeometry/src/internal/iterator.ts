@@ -1,8 +1,14 @@
 import type { MeshEdge2 } from "../core/mesh.js";
 import { PathCommandType, type PathCommand } from "../core/path.js";
-import { Bezier1Curve2, Bezier2Curve2, Bezier3Curve2, BezierRCurve2, type BezierCurve2 } from "../primitives/bezier.js";
-import { Edge2 } from "../primitives/edge.js";
-import { Vector2 } from "../primitives/vector.js";
+import {
+    Bezier1Curve2,
+    Bezier2Curve2,
+    Bezier3Curve2,
+    BezierRCurve2,
+    type ReadonlyBezierCurve2,
+} from "../primitives/bezier.js";
+import { Edge2, type ReadonlyEdge2 } from "../primitives/edge.js";
+import { Vector2, type ReadonlyVector2 } from "../primitives/vector.js";
 import { assertUnreachable } from "../utility/debug.js";
 
 export class Mesh2LnextIterator implements IterableIterator<MeshEdge2> {
@@ -59,15 +65,15 @@ export class Mesh2OnextIterator implements IterableIterator<MeshEdge2> {
     }
 }
 
-export class Path2CurveIterator implements IterableIterator<BezierCurve2> {
+export class Path2CurveIterator implements IterableIterator<ReadonlyBezierCurve2> {
     public cIdx: number;
     public commands: PathCommand[];
-    public p0: Vector2;
+    public p0: ReadonlyVector2;
     public pIdx: number;
-    public points: Vector2[];
-    public ps: Vector2;
+    public points: ReadonlyVector2[];
+    public ps: ReadonlyVector2;
 
-    public constructor(commands: PathCommand[], points: Vector2[]) {
+    public constructor(commands: PathCommand[], points: ReadonlyVector2[]) {
         this.commands = commands;
         this.points = points;
 
@@ -78,11 +84,11 @@ export class Path2CurveIterator implements IterableIterator<BezierCurve2> {
         this.p0 = Vector2.createZero();
     }
 
-    public [Symbol.iterator](): IterableIterator<BezierCurve2> {
+    public [Symbol.iterator](): IterableIterator<ReadonlyBezierCurve2> {
         return this;
     }
 
-    public next(): IteratorResult<BezierCurve2> {
+    public next(): IteratorResult<ReadonlyBezierCurve2> {
         const commands = this.commands;
         const points = this.points;
 
@@ -96,31 +102,36 @@ export class Path2CurveIterator implements IterableIterator<BezierCurve2> {
                     break;
                 }
                 case PathCommandType.Linear: {
-                    const c = new Bezier1Curve2(this.p0, points[this.pIdx++]);
+                    const c = Bezier1Curve2.fromReadonly(this.p0, points[this.pIdx++]);
                     this.p0 = c.p1;
 
                     return { done: false, value: c };
                 }
                 case PathCommandType.Quadratic: {
-                    const c = new Bezier2Curve2(this.p0, points[this.pIdx++], points[this.pIdx++]);
+                    const c = Bezier2Curve2.fromReadonly(this.p0, points[this.pIdx++], points[this.pIdx++]);
                     this.p0 = c.p2;
 
                     return { done: false, value: c };
                 }
                 case PathCommandType.Cubic: {
-                    const c = new Bezier3Curve2(this.p0, points[this.pIdx++], points[this.pIdx++], points[this.pIdx++]);
+                    const c = Bezier3Curve2.fromReadonly(
+                        this.p0,
+                        points[this.pIdx++],
+                        points[this.pIdx++],
+                        points[this.pIdx++],
+                    );
                     this.p0 = c.p3;
 
                     return { done: false, value: c };
                 }
                 case PathCommandType.Conic: {
-                    const c = new BezierRCurve2(this.p0, points[this.pIdx++], points[this.pIdx++], command.w);
+                    const c = BezierRCurve2.fromReadonly(this.p0, points[this.pIdx++], points[this.pIdx++], command.w);
                     this.p0 = c.p2;
 
                     return { done: false, value: c };
                 }
                 case PathCommandType.Close: {
-                    const c = new Bezier1Curve2(this.p0, this.ps);
+                    const c = Bezier1Curve2.fromReadonly(this.p0, this.ps);
                     this.p0 = c.p1;
 
                     if (!c.isPoint()) {
@@ -139,29 +150,29 @@ export class Path2CurveIterator implements IterableIterator<BezierCurve2> {
     }
 }
 
-export class Polygon2EdgeIterator implements IterableIterator<Edge2> {
+export class Polygon2EdgeIterator implements IterableIterator<ReadonlyEdge2> {
     public idx: number;
-    public points: Vector2[];
+    public points: ReadonlyVector2[];
 
-    public constructor(points: Vector2[]) {
+    public constructor(points: ReadonlyVector2[]) {
         this.points = points;
         this.idx = 1;
     }
 
-    public [Symbol.iterator](): IterableIterator<Edge2> {
+    public [Symbol.iterator](): IterableIterator<ReadonlyEdge2> {
         return this;
     }
 
-    public next(): IteratorResult<Edge2> {
+    public next(): IteratorResult<ReadonlyEdge2> {
         const points = this.points;
         const idx = this.idx;
 
         if (idx < points.length) {
-            const e = new Edge2(points[idx - 1], points[idx]);
+            const e = Edge2.fromReadonly(points[idx - 1], points[idx]);
             this.idx += 1;
             return { done: false, value: e };
         } else if (idx === points.length) {
-            const e = new Edge2(points[idx - 1], points[0]);
+            const e = Edge2.fromReadonly(points[idx - 1], points[0]);
             this.idx += 1;
             return { done: false, value: e };
         } else {

@@ -1,9 +1,9 @@
 import { Path2CurveIterator } from "../internal/iterator.js";
 import { copyCommandsReversed, isWindingInside } from "../internal/path.js";
-import { CurveType, type BezierCurve2 } from "../primitives/bezier.js";
+import { CurveType, type ReadonlyBezierCurve2 } from "../primitives/bezier.js";
 import { Box2 } from "../primitives/box.js";
-import { Matrix3A, type Matrix3 } from "../primitives/matrix.js";
-import { Vector2, type Vector2Like } from "../primitives/vector.js";
+import { Matrix3A, type ReadonlyMatrix3, type ReadonlyMatrix3A } from "../primitives/matrix.js";
+import { Vector2, type ReadonlyVector2, type Vector2Like } from "../primitives/vector.js";
 import { copyArray, copyArrayReversed } from "../utility/array.js";
 import { assertUnreachable } from "../utility/debug.js";
 import { Mesh2 } from "./mesh.js";
@@ -31,11 +31,11 @@ import { Polygon2 } from "./polygon.js";
 
 export interface PathSink2 {
     close(): void;
-    conicTo(p1: Vector2, p2: Vector2, w: number): void;
-    cubicTo(p1: Vector2, p2: Vector2, p3: Vector2): void;
-    lineTo(p1: Vector2): void;
-    moveTo(p0: Vector2): void;
-    quadTo(p1: Vector2, p2: Vector2): void;
+    conicTo(p1: ReadonlyVector2, p2: ReadonlyVector2, w: number): void;
+    cubicTo(p1: ReadonlyVector2, p2: ReadonlyVector2, p3: ReadonlyVector2): void;
+    lineTo(p1: ReadonlyVector2): void;
+    moveTo(p0: ReadonlyVector2): void;
+    quadTo(p1: ReadonlyVector2, p2: ReadonlyVector2): void;
 }
 
 export enum PathCommandType {
@@ -69,9 +69,9 @@ export type PathCommand =
 
 export class Path2 implements PathSink2 {
     private commands: PathCommand[];
-    private points: Vector2[];
+    private points: ReadonlyVector2[];
 
-    public constructor(commands: PathCommand[], points: Vector2[]) {
+    public constructor(commands: PathCommand[], points: ReadonlyVector2[]) {
         this.commands = commands;
         this.points = points;
     }
@@ -92,12 +92,12 @@ export class Path2 implements PathSink2 {
         return { commands, points };
     }
 
-    public addArc(p0: Vector2, p1: Vector2, p2: Vector2): void {
+    public addArc(p0: ReadonlyVector2, p1: ReadonlyVector2, p2: ReadonlyVector2): void {
         this.moveTo(p0);
         this.arcTo(p1, p2);
     }
 
-    public addCircle(p: Vector2, r: number): void {
+    public addCircle(p: ReadonlyVector2, r: number): void {
         this.addCircleXY(p.x, p.y, r);
     }
 
@@ -109,17 +109,17 @@ export class Path2 implements PathSink2 {
         this.arcToXY(x + r, y - r, x + r, y);
     }
 
-    public addConic(p0: Vector2, p1: Vector2, p2: Vector2, w: number): void {
+    public addConic(p0: ReadonlyVector2, p1: ReadonlyVector2, p2: ReadonlyVector2, w: number): void {
         this.moveTo(p0);
         this.conicTo(p1, p2, w);
     }
 
-    public addCubic(p0: Vector2, p1: Vector2, p2: Vector2, p3: Vector2): void {
+    public addCubic(p0: ReadonlyVector2, p1: ReadonlyVector2, p2: ReadonlyVector2, p3: ReadonlyVector2): void {
         this.moveTo(p0);
         this.cubicTo(p1, p2, p3);
     }
 
-    public addCurveSplines(...curves: BezierCurve2[]): void {
+    public addCurveSplines(...curves: ReadonlyBezierCurve2[]): void {
         if (curves.length === 0) {
             return;
         }
@@ -153,7 +153,7 @@ export class Path2 implements PathSink2 {
         }
     }
 
-    public addEllipse(p: Vector2, rx: number, ry: number): void {
+    public addEllipse(p: ReadonlyVector2, rx: number, ry: number): void {
         this.addEllipseXY(p.x, p.y, rx, ry);
     }
 
@@ -166,7 +166,7 @@ export class Path2 implements PathSink2 {
         this.close();
     }
 
-    public addLine(p0: Vector2, p1: Vector2): void {
+    public addLine(p0: ReadonlyVector2, p1: ReadonlyVector2): void {
         this.moveTo(p0);
         this.lineTo(p1);
     }
@@ -197,7 +197,7 @@ export class Path2 implements PathSink2 {
         }
     }
 
-    public addPie(pc: Vector2, rx: number, ry: number, startAngle: number, sweepAngle: number): void {
+    public addPie(pc: ReadonlyVector2, rx: number, ry: number, startAngle: number, sweepAngle: number): void {
         let a = sweepAngle;
 
         // Full circle is allowed
@@ -261,12 +261,12 @@ export class Path2 implements PathSink2 {
         this.close();
     }
 
-    public addQuad(p0: Vector2, p1: Vector2, p2: Vector2): void {
+    public addQuad(p0: ReadonlyVector2, p1: ReadonlyVector2, p2: ReadonlyVector2): void {
         this.moveTo(p0);
         this.quadTo(p1, p2);
     }
 
-    public addRect(p0: Vector2, p1: Vector2): void {
+    public addRect(p0: ReadonlyVector2, p1: ReadonlyVector2): void {
         this.addRectXY(p0.x, p0.y, p1.x, p1.y);
     }
 
@@ -278,7 +278,7 @@ export class Path2 implements PathSink2 {
         this.close();
     }
 
-    public arcTo(p1: Vector2, p2: Vector2): void {
+    public arcTo(p1: ReadonlyVector2, p2: ReadonlyVector2): void {
         this.conicTo(p1, p2, Math.SQRT1_2);
     }
 
@@ -310,7 +310,7 @@ export class Path2 implements PathSink2 {
         this.commands.push({ type: PathCommandType.Close });
     }
 
-    public conicTo(p1: Vector2, p2: Vector2, w: number): void {
+    public conicTo(p1: ReadonlyVector2, p2: ReadonlyVector2, w: number): void {
         this.commands.push({ type: PathCommandType.Conic, w });
         this.points.push(p1);
         this.points.push(p2);
@@ -327,7 +327,7 @@ export class Path2 implements PathSink2 {
         this.points = path.points.slice();
     }
 
-    public cubicTo(p1: Vector2, p2: Vector2, p3: Vector2): void {
+    public cubicTo(p1: ReadonlyVector2, p2: ReadonlyVector2, p3: ReadonlyVector2): void {
         this.commands.push({ type: PathCommandType.Cubic });
         this.points.push(p1);
         this.points.push(p2);
@@ -377,7 +377,7 @@ export class Path2 implements PathSink2 {
         return this.commands[0];
     }
 
-    public getFirstPoint(): Vector2 | undefined {
+    public getFirstPoint(): ReadonlyVector2 | undefined {
         return this.points[0];
     }
 
@@ -385,11 +385,11 @@ export class Path2 implements PathSink2 {
         return this.commands[this.commands.length - 1];
     }
 
-    public getLastPoint(): Vector2 | undefined {
+    public getLastPoint(): ReadonlyVector2 | undefined {
         return this.points[this.points.length - 1];
     }
 
-    public getPoints(): readonly Vector2[] {
+    public getPoints(): readonly ReadonlyVector2[] {
         return this.points;
     }
 
@@ -464,7 +464,7 @@ export class Path2 implements PathSink2 {
         return svgData;
     }
 
-    public hasPointInside(p: Vector2, windingOperator: WindingOperator | CustomWindingOperator): boolean {
+    public hasPointInside(p: ReadonlyVector2, windingOperator: WindingOperator | CustomWindingOperator): boolean {
         if (!this.isValid()) {
             return false;
         }
@@ -486,7 +486,7 @@ export class Path2 implements PathSink2 {
     }
 
     public hasPointInsideFrac(
-        p: Vector2,
+        p: ReadonlyVector2,
         windingOperator: WindingOperator | CustomWindingOperator,
         stepSize?: number,
     ): boolean {
@@ -517,7 +517,7 @@ export class Path2 implements PathSink2 {
         return this.getFirstCommand()?.type === PathCommandType.Move;
     }
 
-    public lineTo(p1: Vector2): void {
+    public lineTo(p1: ReadonlyVector2): void {
         this.commands.push({ type: PathCommandType.Linear });
         this.points.push(p1);
     }
@@ -527,7 +527,7 @@ export class Path2 implements PathSink2 {
         this.lineTo(p1);
     }
 
-    public moveTo(p0: Vector2): void {
+    public moveTo(p0: ReadonlyVector2): void {
         this.commands.push({ type: PathCommandType.Move });
         this.points.push(p0);
     }
@@ -544,7 +544,7 @@ export class Path2 implements PathSink2 {
         return output;
     }
 
-    public quadTo(p1: Vector2, p2: Vector2): void {
+    public quadTo(p1: ReadonlyVector2, p2: ReadonlyVector2): void {
         this.commands.push({ type: PathCommandType.Quadratic });
         this.points.push(p1);
         this.points.push(p2);
@@ -571,7 +571,7 @@ export class Path2 implements PathSink2 {
     }
 
     public svgArcTo(
-        p1: Vector2,
+        p1: ReadonlyVector2,
         rx: number,
         ry: number,
         xAxisRotation: number,
@@ -617,8 +617,8 @@ export class Path2 implements PathSink2 {
         mat.scale(1 / sx, 1 / sy);
 
         // Calculate unit coordinates
-        let pp0 = mat.transformPoint(p0);
-        let pp1 = mat.transformPoint(p1);
+        let pp0: ReadonlyVector2 = mat.transformPoint(p0);
+        let pp1: ReadonlyVector2 = mat.transformPoint(p1);
 
         // New vector from center (unit midpoint)
         v = pp1.sub(pp0).mulS(0.5);
@@ -740,7 +740,7 @@ export class Path2 implements PathSink2 {
         return mesh.getFaces().map((f) => new Polygon2(f.getPoints()));
     }
 
-    public transform(mat: Matrix3 | Matrix3A): void {
+    public transform(mat: ReadonlyMatrix3 | ReadonlyMatrix3A): void {
         const points = this.points;
         for (let i = 0; i < points.length; i++) {
             points[i] = mat.transformPoint(points[i]);

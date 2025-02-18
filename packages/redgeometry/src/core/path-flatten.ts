@@ -4,8 +4,15 @@ import {
     simplifyParameterStepConic,
     simplifyParameterStepCubic,
 } from "../internal/path-simplify.js";
-import { Bezier2Curve2, Bezier3Curve2, BezierRCurve2 } from "../primitives/bezier.js";
-import { Vector2 } from "../primitives/vector.js";
+import {
+    Bezier2Curve2,
+    Bezier3Curve2,
+    BezierRCurve2,
+    type ReadonlyBezier2Curve2,
+    type ReadonlyBezier3Curve2,
+    type ReadonlyBezierRCurve2,
+} from "../primitives/bezier.js";
+import { Vector2, type ReadonlyVector2 } from "../primitives/vector.js";
 import { assertUnreachable } from "../utility/debug.js";
 import type { PathQualityOptions } from "./path-options.js";
 import { PathCommandType, type Path2 } from "./path.js";
@@ -44,8 +51,8 @@ export class PathFlattenIncremental2 implements PathFlatten2 {
         let cIdx = 0;
         let pIdx = 0;
 
-        let ps = Vector2.createZero();
-        let p0 = Vector2.createZero();
+        let ps: ReadonlyVector2 = Vector2.createZero();
+        let p0: ReadonlyVector2 = Vector2.createZero();
 
         while (cIdx < commands.length) {
             const command = commands[cIdx++];
@@ -66,19 +73,19 @@ export class PathFlattenIncremental2 implements PathFlatten2 {
                     break;
                 }
                 case PathCommandType.Quadratic: {
-                    const c = new Bezier2Curve2(p0, points[pIdx++], points[pIdx++]);
+                    const c = Bezier2Curve2.fromReadonly(p0, points[pIdx++], points[pIdx++]);
                     this.flattenQuadratic(c, output);
                     p0 = c.p2;
                     break;
                 }
                 case PathCommandType.Cubic: {
-                    const c = new Bezier3Curve2(p0, points[pIdx++], points[pIdx++], points[pIdx++]);
+                    const c = Bezier3Curve2.fromReadonly(p0, points[pIdx++], points[pIdx++], points[pIdx++]);
                     this.flattenCubic(c, output);
                     p0 = c.p3;
                     break;
                 }
                 case PathCommandType.Conic: {
-                    const c = new BezierRCurve2(p0, points[pIdx++], points[pIdx++], command.w);
+                    const c = BezierRCurve2.fromReadonly(p0, points[pIdx++], points[pIdx++], command.w);
                     this.flattenConic(c, output);
                     p0 = c.p2;
                     break;
@@ -107,7 +114,7 @@ export class PathFlattenIncremental2 implements PathFlatten2 {
         this.simplifyTolerance = options.simplifyTolerance;
     }
 
-    private flattenConic(c0: BezierRCurve2, output: Path2): void {
+    private flattenConic(c0: ReadonlyBezierRCurve2, output: Path2): void {
         let t = simplifyParameterStepConic(c0, 4, this.simplifyTolerance);
         let c = c0;
 
@@ -123,7 +130,7 @@ export class PathFlattenIncremental2 implements PathFlatten2 {
         this.flattenQuadratic(simplifyConic(c), output);
     }
 
-    private flattenCubic(c0: Bezier3Curve2, output: Path2): void {
+    private flattenCubic(c0: ReadonlyBezier3Curve2, output: Path2): void {
         let t = simplifyParameterStepCubic(c0, 54, this.simplifyTolerance);
         let c = c0;
 
@@ -139,7 +146,7 @@ export class PathFlattenIncremental2 implements PathFlatten2 {
         this.flattenQuadratic(simplifyCubicMidpoint(c), output);
     }
 
-    private flattenQuadratic(c0: Bezier2Curve2, output: Path2): void {
+    private flattenQuadratic(c0: ReadonlyBezier2Curve2, output: Path2): void {
         const [qa, qb, qc] = c0.getCoefficients();
 
         // Smallest parameter step to satisfy tolerance condition
@@ -177,8 +184,8 @@ export class PathFlattenRecursive2 implements PathFlatten2 {
         let cIdx = 0;
         let pIdx = 0;
 
-        let ps = Vector2.createZero();
-        let p0 = Vector2.createZero();
+        let ps: ReadonlyVector2 = Vector2.createZero();
+        let p0: ReadonlyVector2 = Vector2.createZero();
 
         while (cIdx < commands.length) {
             const command = commands[cIdx++];
@@ -199,19 +206,19 @@ export class PathFlattenRecursive2 implements PathFlatten2 {
                     break;
                 }
                 case PathCommandType.Quadratic: {
-                    const c = new Bezier2Curve2(p0, points[pIdx++], points[pIdx++]);
+                    const c = Bezier2Curve2.fromReadonly(p0, points[pIdx++], points[pIdx++]);
                     this.flattenQuadratic(c, output);
                     p0 = c.p2;
                     break;
                 }
                 case PathCommandType.Cubic: {
-                    const c = new Bezier3Curve2(p0, points[pIdx++], points[pIdx++], points[pIdx++]);
+                    const c = Bezier3Curve2.fromReadonly(p0, points[pIdx++], points[pIdx++], points[pIdx++]);
                     this.flattenCubic(c, output);
                     p0 = c.p3;
                     break;
                 }
                 case PathCommandType.Conic: {
-                    const c = new BezierRCurve2(p0, points[pIdx++], points[pIdx++], command.w);
+                    const c = BezierRCurve2.fromReadonly(p0, points[pIdx++], points[pIdx++], command.w);
                     this.flattenConic(c, output);
                     p0 = c.p2;
                     break;
@@ -239,11 +246,11 @@ export class PathFlattenRecursive2 implements PathFlatten2 {
         this.tolerance = options.flattenTolerance;
     }
 
-    private flattenConic(c0: BezierRCurve2, output: Path2): void {
+    private flattenConic(c0: ReadonlyBezierRCurve2, output: Path2): void {
         // Expected area from flatness criterion (squared)
         const tol2 = this.tolerance * this.tolerance;
 
-        const flattenConicRecursive = (c: BezierRCurve2): void => {
+        const flattenConicRecursive = (c: ReadonlyBezierRCurve2): void => {
             // Vector between endpoints
             const v = c.p2.sub(c.p0);
 
@@ -268,14 +275,14 @@ export class PathFlattenRecursive2 implements PathFlatten2 {
         flattenConicRecursive(c0);
     }
 
-    private flattenCubic(c0: Bezier3Curve2, output: Path2): void {
+    private flattenCubic(c0: ReadonlyBezier3Curve2, output: Path2): void {
         // The maximum deviation for cubic curves is 75% of the control point distance (squared)
         const k2 = 1 / (0.75 * 0.75);
 
         // Expected area from flatness criterion (squared)
         const tol2 = k2 * this.tolerance * this.tolerance;
 
-        const flattenCubicRecursive = (c: Bezier3Curve2): void => {
+        const flattenCubicRecursive = (c: ReadonlyBezier3Curve2): void => {
             // Vector between endpoints
             let v = c.p3.sub(c.p0);
 
@@ -304,14 +311,14 @@ export class PathFlattenRecursive2 implements PathFlatten2 {
         flattenCubicRecursive(c0);
     }
 
-    private flattenQuadratic(c0: Bezier2Curve2, output: Path2): void {
+    private flattenQuadratic(c0: ReadonlyBezier2Curve2, output: Path2): void {
         // The maximum deviation for quadratic curves is 50% of the control point distance (squared)
         const k2 = 1 / (0.5 * 0.5);
 
         // Expected area from flatness criterion (squared)
         const tol2 = k2 * this.tolerance * this.tolerance;
 
-        const flattenQuadraticRecursive = (c: Bezier2Curve2): void => {
+        const flattenQuadraticRecursive = (c: ReadonlyBezier2Curve2): void => {
             // Vector between endpoints
             const v = c.p2.sub(c.p0);
 

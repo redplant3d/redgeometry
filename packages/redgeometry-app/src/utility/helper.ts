@@ -9,7 +9,7 @@ import {
     type CustomWindingOperator,
 } from "redgeometry/src/core/path-options";
 import { Polygon2 } from "redgeometry/src/core/polygon";
-import type { Box2 } from "redgeometry/src/primitives/box";
+import type { ReadonlyBox2 } from "redgeometry/src/primitives/box";
 import { ColorRgba } from "redgeometry/src/primitives/color";
 import { Edge2 } from "redgeometry/src/primitives/edge";
 import { Vector2 } from "redgeometry/src/primitives/vector";
@@ -19,7 +19,7 @@ export function createRandomColor(random: Random, s: number, v: number, a: numbe
     return ColorRgba.fromHSV(random.nextFloat(), s, v, a);
 }
 
-export function createRandomEdge(random: Random, box: Box2): Edge2 {
+export function createRandomEdge(random: Random, box: ReadonlyBox2): Edge2 {
     const p0 = createRandomPoint(random, box);
     const p1 = createRandomPoint(random, box);
 
@@ -104,7 +104,7 @@ export function createRandomPath(
     return path;
 }
 
-export function createRandomPoint(random: Random, box: Box2): Vector2 {
+export function createRandomPoint(random: Random, box: ReadonlyBox2): Vector2 {
     const x = random.nextFloatBetween(box.x0, box.x1);
     const y = random.nextFloatBetween(box.y0, box.y1);
 
@@ -219,7 +219,7 @@ export function createRandomPolygonPair(
 
 export function createRandomPolygonSimple(
     random: Random,
-    box: Box2,
+    box: ReadonlyBox2,
     count: number,
     irregularity: number,
     roundness: number,

@@ -10,8 +10,16 @@ import {
     simplifyParameterStepQuad,
 } from "../internal/path-simplify.js";
 import { StrokeState } from "../internal/path-stroke.js";
-import { Bezier1Curve2, Bezier2Curve2, Bezier3Curve2, BezierRCurve2 } from "../primitives/bezier.js";
-import { Vector2 } from "../primitives/vector.js";
+import {
+    Bezier1Curve2,
+    Bezier2Curve2,
+    Bezier3Curve2,
+    BezierRCurve2,
+    type ReadonlyBezier2Curve2,
+    type ReadonlyBezier3Curve2,
+    type ReadonlyBezierRCurve2,
+} from "../primitives/bezier.js";
+import { Vector2, type ReadonlyVector2 } from "../primitives/vector.js";
 import { assertUnreachable } from "../utility/debug.js";
 import { MAX_PARAMETER, type PathQualityOptions, type PathStrokeOptions } from "./path-options.js";
 import { PathCommandType, type Path2 } from "./path.js";
@@ -58,9 +66,9 @@ export class PathStrokeIncremental2 implements PathStroke2 {
 
         let ct0 = PathCommandType.Move;
 
-        let ps = Vector2.createZero();
-        let p0 = Vector2.createZero();
-        let m0 = Vector2.createZero();
+        let ps: ReadonlyVector2 = Vector2.createZero();
+        let p0: ReadonlyVector2 = Vector2.createZero();
+        let m0: ReadonlyVector2 = Vector2.createZero();
 
         this.state.initialize(output, options);
 
@@ -82,7 +90,7 @@ export class PathStrokeIncremental2 implements PathStroke2 {
                     break;
                 }
                 case PathCommandType.Linear: {
-                    const c = new Bezier1Curve2(p0, points[pIdx++]);
+                    const c = Bezier1Curve2.fromReadonly(p0, points[pIdx++]);
                     const m = c.getDerivative();
 
                     if (!m.isZero()) {
@@ -96,7 +104,7 @@ export class PathStrokeIncremental2 implements PathStroke2 {
                     break;
                 }
                 case PathCommandType.Quadratic: {
-                    const c = new Bezier2Curve2(p0, points[pIdx++], points[pIdx++]);
+                    const c = Bezier2Curve2.fromReadonly(p0, points[pIdx++], points[pIdx++]);
                     const m = c.getTangentStart();
 
                     if (!m.isZero()) {
@@ -110,7 +118,7 @@ export class PathStrokeIncremental2 implements PathStroke2 {
                     break;
                 }
                 case PathCommandType.Cubic: {
-                    const c = new Bezier3Curve2(p0, points[pIdx++], points[pIdx++], points[pIdx++]);
+                    const c = Bezier3Curve2.fromReadonly(p0, points[pIdx++], points[pIdx++], points[pIdx++]);
                     const m = c.getTangentStart();
 
                     if (!m.isZero()) {
@@ -124,7 +132,7 @@ export class PathStrokeIncremental2 implements PathStroke2 {
                     break;
                 }
                 case PathCommandType.Conic: {
-                    const c = new BezierRCurve2(p0, points[pIdx++], points[pIdx++], cmd.w);
+                    const c = BezierRCurve2.fromReadonly(p0, points[pIdx++], points[pIdx++], cmd.w);
                     const m = c.getTangentStart();
 
                     if (!m.isZero()) {
@@ -138,7 +146,7 @@ export class PathStrokeIncremental2 implements PathStroke2 {
                     break;
                 }
                 case PathCommandType.Close: {
-                    const c = new Bezier1Curve2(p0, ps);
+                    const c = Bezier1Curve2.fromReadonly(p0, ps);
                     const m = c.getDerivative();
 
                     if (!m.isZero()) {
@@ -180,7 +188,7 @@ export class PathStrokeIncremental2 implements PathStroke2 {
         this.tanOffsetTolerance = Math.tan(options.offsetTolerance);
     }
 
-    private strokeConic(c0: BezierRCurve2): void {
+    private strokeConic(c0: ReadonlyBezierRCurve2): void {
         let t = simplifyParameterStepConic(c0, 4, this.simplifyTolerance);
         let c = c0;
 
@@ -198,7 +206,7 @@ export class PathStrokeIncremental2 implements PathStroke2 {
         this.strokeQuadratic(cc);
     }
 
-    private strokeCubic(c0: Bezier3Curve2): void {
+    private strokeCubic(c0: ReadonlyBezier3Curve2): void {
         let t = simplifyParameterStepCubic(c0, 54, this.simplifyTolerance);
         let c = c0;
 
@@ -218,7 +226,7 @@ export class PathStrokeIncremental2 implements PathStroke2 {
         this.strokeQuadratic(cc2);
     }
 
-    private strokeQuadratic(c0: Bezier2Curve2): void {
+    private strokeQuadratic(c0: ReadonlyBezier2Curve2): void {
         const [tc, td] = c0.getOffsetCuspParameter(this.state.distance);
 
         const t1 = tc - td;
@@ -260,7 +268,7 @@ export class PathStrokeIncremental2 implements PathStroke2 {
         }
     }
 
-    private strokeQuadraticSimplify(c0: Bezier2Curve2): void {
+    private strokeQuadraticSimplify(c0: ReadonlyBezier2Curve2): void {
         let t = simplifyParameterStepQuad(c0, this.tanOffsetTolerance);
         let c = c0;
 
@@ -314,9 +322,9 @@ export class PathStrokeRecursive2 implements PathStroke2 {
         let cIdx = 0;
         let pIdx = 0;
 
-        let ps = Vector2.createZero();
-        let p0 = Vector2.createZero();
-        let m0 = Vector2.createZero();
+        let ps: ReadonlyVector2 = Vector2.createZero();
+        let p0: ReadonlyVector2 = Vector2.createZero();
+        let m0: ReadonlyVector2 = Vector2.createZero();
 
         this.state.initialize(output, options);
 
@@ -338,7 +346,7 @@ export class PathStrokeRecursive2 implements PathStroke2 {
                     break;
                 }
                 case PathCommandType.Linear: {
-                    const c = new Bezier1Curve2(p0, points[pIdx++]);
+                    const c = Bezier1Curve2.fromReadonly(p0, points[pIdx++]);
                     const m = c.getDerivative();
 
                     if (!m.isZero()) {
@@ -352,7 +360,7 @@ export class PathStrokeRecursive2 implements PathStroke2 {
                     break;
                 }
                 case PathCommandType.Quadratic: {
-                    const c = new Bezier2Curve2(p0, points[pIdx++], points[pIdx++]);
+                    const c = Bezier2Curve2.fromReadonly(p0, points[pIdx++], points[pIdx++]);
                     const m = c.getTangentStart();
 
                     if (!m.isZero()) {
@@ -366,7 +374,7 @@ export class PathStrokeRecursive2 implements PathStroke2 {
                     break;
                 }
                 case PathCommandType.Cubic: {
-                    const c = new Bezier3Curve2(p0, points[pIdx++], points[pIdx++], points[pIdx++]);
+                    const c = Bezier3Curve2.fromReadonly(p0, points[pIdx++], points[pIdx++], points[pIdx++]);
                     const m = c.getTangentStart();
 
                     if (!m.isZero()) {
@@ -380,7 +388,7 @@ export class PathStrokeRecursive2 implements PathStroke2 {
                     break;
                 }
                 case PathCommandType.Conic: {
-                    const c = new BezierRCurve2(p0, points[pIdx++], points[pIdx++], cmd.w);
+                    const c = BezierRCurve2.fromReadonly(p0, points[pIdx++], points[pIdx++], cmd.w);
                     const m = c.getTangentStart();
 
                     if (!m.isZero()) {
@@ -394,7 +402,7 @@ export class PathStrokeRecursive2 implements PathStroke2 {
                     break;
                 }
                 case PathCommandType.Close: {
-                    const c = new Bezier1Curve2(p0, ps);
+                    const c = Bezier1Curve2.fromReadonly(p0, ps);
                     const m = c.getDerivative();
 
                     if (!m.isZero()) {
@@ -436,10 +444,10 @@ export class PathStrokeRecursive2 implements PathStroke2 {
         this.cosOffsetTolerance = Math.cos(options.offsetTolerance);
     }
 
-    private strokeConic(c0: BezierRCurve2): void {
+    private strokeConic(c0: ReadonlyBezierRCurve2): void {
         const tol = 4 * this.simplifyTolerance;
 
-        const strokeConicRecursive = (c: BezierRCurve2): void => {
+        const strokeConicRecursive = (c: ReadonlyBezierRCurve2): void => {
             if (isSimpleConic(c, tol)) {
                 const cc = simplifyConic(c);
                 this.strokeQuadratic(cc);
@@ -453,11 +461,11 @@ export class PathStrokeRecursive2 implements PathStroke2 {
         strokeConicRecursive(c0);
     }
 
-    private strokeCubic(c0: Bezier3Curve2): void {
+    private strokeCubic(c0: ReadonlyBezier3Curve2): void {
         const tol = 54 * this.simplifyTolerance;
         const d = simplifyDistanceCubic(c0);
 
-        const strokeCubicRecursive = (c: Bezier3Curve2, d: number): void => {
+        const strokeCubicRecursive = (c: ReadonlyBezier3Curve2, d: number): void => {
             if (tol > d) {
                 const [cc1, cc2] = simplifyCubicContinious(c);
                 this.strokeQuadratic(cc1);
@@ -472,7 +480,7 @@ export class PathStrokeRecursive2 implements PathStroke2 {
         strokeCubicRecursive(c0, d);
     }
 
-    private strokeQuadratic(c0: Bezier2Curve2): void {
+    private strokeQuadratic(c0: ReadonlyBezier2Curve2): void {
         const [tc, td] = c0.getOffsetCuspParameter(this.state.distance);
 
         const t1 = tc - td;
@@ -514,10 +522,10 @@ export class PathStrokeRecursive2 implements PathStroke2 {
         }
     }
 
-    private strokeQuadraticSimplify(c0: Bezier2Curve2): void {
+    private strokeQuadraticSimplify(c0: ReadonlyBezier2Curve2): void {
         const tol = this.cosOffsetTolerance;
 
-        const strokeQuadraticRecursive = (c: Bezier2Curve2): void => {
+        const strokeQuadraticRecursive = (c: ReadonlyBezier2Curve2): void => {
             if (isSimpleQuad(c, tol)) {
                 this.state.strokeQuadraticSimple(c);
             } else {

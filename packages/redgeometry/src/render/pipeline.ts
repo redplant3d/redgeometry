@@ -2,8 +2,8 @@ import type { PathFlatten2 } from "../core/path-flatten.js";
 import { DEFAULT_PATH_QUALITY_OPTIONS, createPathFlatten, createPathStroke } from "../core/path-options.js";
 import type { PathStroke2 } from "../core/path-stroke.js";
 import { Path2 } from "../core/path.js";
-import type { Matrix3A } from "../primitives/matrix.js";
-import { Vector2 } from "../primitives/vector.js";
+import type { ReadonlyMatrix3A } from "../primitives/matrix.js";
+import { Vector2, type ReadonlyVector2 } from "../primitives/vector.js";
 import { clamp } from "../utility/scalar.js";
 import { SoftwareCompositor } from "./compositor.js";
 import { FillRule, StrokeTransformOrder, type ContextFillOptions, type ContextStrokeOptions } from "./context.js";
@@ -11,8 +11,8 @@ import type { Image2 } from "./image.js";
 import { SoftwareRasterizerAliased } from "./rasterizer.js";
 
 export interface RenderPipeline {
-    addFill(path: Path2, mat: Matrix3A): void;
-    addStroke(path: Path2, mat: Matrix3A, options: ContextStrokeOptions): void;
+    addFill(path: Path2, mat: ReadonlyMatrix3A): void;
+    addStroke(path: Path2, mat: ReadonlyMatrix3A, options: ContextStrokeOptions): void;
     begin(image: Image2): void;
     clear(options: ContextFillOptions): void;
     end(): void;
@@ -39,7 +39,7 @@ export class SoftwareRenderPipeline implements RenderPipeline {
         this.pathStroke = createPathStroke(DEFAULT_PATH_QUALITY_OPTIONS);
     }
 
-    public addFill(path: Path2, mat: Matrix3A): void {
+    public addFill(path: Path2, mat: ReadonlyMatrix3A): void {
         const input = this.rentPath();
         input.copyFrom(path);
         input.transform(mat);
@@ -48,7 +48,7 @@ export class SoftwareRenderPipeline implements RenderPipeline {
         this.returnPath(input);
     }
 
-    public addStroke(path: Path2, mat: Matrix3A, options: ContextStrokeOptions): void {
+    public addStroke(path: Path2, mat: ReadonlyMatrix3A, options: ContextStrokeOptions): void {
         const stroke = this.rentPath();
 
         if (options.transformOrder === StrokeTransformOrder.Pre) {
@@ -108,7 +108,7 @@ export class SoftwareRenderPipeline implements RenderPipeline {
         return;
     }
 
-    private clipPolyline(polyline: readonly Vector2[], rect: Rectangle2): void {
+    private clipPolyline(polyline: readonly ReadonlyVector2[], rect: Rectangle2): void {
         const rasterizer = this.rasterizer;
         let p1 = polyline[0];
 
@@ -211,10 +211,10 @@ class Rectangle2 {
     }
 }
 
-function getHorizontalIntersection(p1: Vector2, p2: Vector2, y: number): Vector2 {
+function getHorizontalIntersection(p1: ReadonlyVector2, p2: ReadonlyVector2, y: number): Vector2 {
     return new Vector2(p1.x + ((p2.x - p1.x) * (y - p1.y)) / (p2.y - p1.y), y);
 }
 
-function getVerticalIntersection(p1: Vector2, p2: Vector2, x: number): Vector2 {
+function getVerticalIntersection(p1: ReadonlyVector2, p2: ReadonlyVector2, x: number): Vector2 {
     return new Vector2(x, p1.y + ((p2.y - p1.y) * (x - p1.x)) / (p2.x - p1.x));
 }

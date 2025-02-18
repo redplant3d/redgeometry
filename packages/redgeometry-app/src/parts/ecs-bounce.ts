@@ -1,5 +1,5 @@
 import { Path2 } from "redgeometry/src/core/path";
-import { Vector2 } from "redgeometry/src/primitives/vector";
+import { Vector2, type ReadonlyVector2 } from "redgeometry/src/primitives/vector";
 import { log } from "redgeometry/src/utility/debug";
 import { RandomXSR128, type Random } from "redgeometry/src/utility/random";
 import { AppContextModule, AppContextPlugin } from "../ecs-modules/app-context.js";
@@ -46,9 +46,9 @@ type RectangleComponent = {
 type ObjectComponent = {
     componentId: "object";
     color: string;
-    position: Vector2;
+    position: ReadonlyVector2;
     size: number;
-    velocity: Vector2;
+    velocity: ReadonlyVector2;
 };
 
 function initMainSystem(world: World): void {

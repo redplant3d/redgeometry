@@ -1,6 +1,6 @@
 import { Mesh2, MeshEdge2, type MeshFace2 } from "redgeometry/src/core/mesh";
 import { Edge2 } from "redgeometry/src/primitives/edge";
-import { Vector2 } from "redgeometry/src/primitives/vector";
+import { Vector2, type ReadonlyVector2 } from "redgeometry/src/primitives/vector";
 import { assertDebug, log } from "redgeometry/src/utility/debug";
 import { RootType, solveLinear, solveQuadratic, type Root1, type Root2 } from "redgeometry/src/utility/solve";
 
@@ -12,14 +12,14 @@ export enum KineticEventType {
 }
 
 export class KineticVertex {
-    public n1: Vector2;
-    public n2: Vector2;
-    public orig: Vector2;
+    public n1: ReadonlyVector2;
+    public n2: ReadonlyVector2;
+    public orig: ReadonlyVector2;
     public t0: number;
     public t1: number;
-    public vel: Vector2;
+    public vel: ReadonlyVector2;
 
-    public constructor(orig: Vector2, n1: Vector2, n2: Vector2, t0: number) {
+    public constructor(orig: ReadonlyVector2, n1: ReadonlyVector2, n2: ReadonlyVector2, t0: number) {
         this.orig = orig;
         this.vel = KineticVertex.getVelocity(n1, n2);
         this.n1 = n1;
@@ -40,7 +40,7 @@ export class KineticVertex {
         return new KineticVertex(orig, n1, n2, 0);
     }
 
-    public static getVelocity(n1: Vector2, n2: Vector2): Vector2 {
+    public static getVelocity(n1: ReadonlyVector2, n2: ReadonlyVector2): Vector2 {
         const k = n1.add(n2);
         return k.mulS(2).divS(k.lenSq());
     }

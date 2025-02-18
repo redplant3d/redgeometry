@@ -1,8 +1,8 @@
-import type { ColorRgba } from "redgeometry/src/primitives/color";
+import type { ReadonlyColorRgba } from "redgeometry/src/primitives/color";
 import type { AssetId } from "./asset.js";
 
 export type Material = {
-    color: ColorRgba;
+    color: ReadonlyColorRgba;
 };
 
 export type MaterialComponent = {

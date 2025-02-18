@@ -1,6 +1,6 @@
 import { Mesh2LnextIterator, Mesh2OnextIterator } from "../internal/iterator.js";
-import { Bezier1Curve2, type BezierCurve2 } from "../primitives/bezier.js";
-import { Vector2 } from "../primitives/vector.js";
+import { Bezier1Curve2, type ReadonlyBezierCurve2 } from "../primitives/bezier.js";
+import { Vector2, type ReadonlyVector2 } from "../primitives/vector.js";
 import { ArrayMultiMap } from "../utility/array.js";
 import { assertDebug, log } from "../utility/debug.js";
 import { Path2 } from "./path.js";
@@ -36,11 +36,11 @@ export class MeshEdge2 {
     public face: MeshFace2 | undefined;
     public lnext: MeshEdge2;
     public onext: MeshEdge2;
-    public p0: Vector2;
-    public seg: BezierCurve2 | undefined;
+    public p0: ReadonlyVector2;
+    public seg: ReadonlyBezierCurve2 | undefined;
     public sym: MeshEdge2;
 
-    public constructor(p0: Vector2, seg: BezierCurve2 | undefined, data: unknown) {
+    public constructor(p0: ReadonlyVector2, seg: ReadonlyBezierCurve2 | undefined, data: unknown) {
         this.p0 = p0;
         this.seg = seg;
         this.data = data;
@@ -61,7 +61,7 @@ export class MeshEdge2 {
         return this.sym.lnext;
     }
 
-    public get p1(): Vector2 {
+    public get p1(): ReadonlyVector2 {
         return this.sym.p0;
     }
 
@@ -121,7 +121,7 @@ export class MeshEdge2 {
     /**
      * Creates a symmetric pair of half edges and returns the first one.
      */
-    public static createPair(seg1: BezierCurve2, seg2?: BezierCurve2): MeshEdge2 {
+    public static createPair(seg1: ReadonlyBezierCurve2, seg2?: ReadonlyBezierCurve2): MeshEdge2 {
         const e1 = new MeshEdge2(seg1.p0, seg1, undefined);
         const e2 = new MeshEdge2(seg1.p1, seg2, undefined);
 
@@ -144,7 +144,7 @@ export class MeshEdge2 {
     /**
      * Find the edge around `e` so that `v` lies between the found edge and its `onext`.
      */
-    public static findConnectingEdge(e: MeshEdge2, v: Vector2): MeshEdge2 {
+    public static findConnectingEdge(e: MeshEdge2, v: ReadonlyVector2): MeshEdge2 {
         // Check if `e` is the only edge around its origin
         if (e === e.onext) {
             return e;
@@ -242,7 +242,7 @@ export class MeshEdge2 {
         MeshEdge2.splice(e.sym, b.lnext);
 
         // Update segment
-        const seg = new Bezier1Curve2(a.p1, b.p1);
+        const seg = Bezier1Curve2.fromReadonly(a.p1, b.p1);
 
         e.p0 = seg.p0;
         e.seg = seg;
@@ -463,8 +463,8 @@ export class MeshFace2 {
     /**
      * Returns an array containing the origin points of the face.
      */
-    public getPoints(): Vector2[] {
-        const points: Vector2[] = [];
+    public getPoints(): ReadonlyVector2[] {
+        const points: ReadonlyVector2[] = [];
 
         for (const e of this.getEdgeIterator()) {
             points.push(e.p0);
@@ -481,7 +481,7 @@ export class MeshFace2 {
 
         for (const e of this.getEdgeIterator()) {
             // If segment does not exist, use origin points as fallback
-            const seg = e.seg ?? new Bezier1Curve2(e.p0, e.p1);
+            const seg = e.seg ?? Bezier1Curve2.fromReadonly(e.p0, e.p1);
             area += seg.getSignedArea();
         }
 
@@ -491,12 +491,12 @@ export class MeshFace2 {
     /**
      * Returns `true` if a point `p` is inside the face.
      */
-    public hasPointInside(p: Vector2): boolean {
+    public hasPointInside(p: ReadonlyVector2): boolean {
         let wind = 0;
 
         for (const e of this.getEdgeIterator()) {
             // If segment does not exist, use origin points as fallback
-            const seg = e.seg ?? new Bezier1Curve2(e.p0, e.p1);
+            const seg = e.seg ?? Bezier1Curve2.fromReadonly(e.p0, e.p1);
             wind += seg.getWindingAt(p);
         }
 
@@ -632,7 +632,7 @@ export class Mesh2 {
         return mesh;
     }
 
-    public addChainSegment(seg: BezierCurve2, data?: unknown): MeshEdge2 {
+    public addChainSegment(seg: ReadonlyBezierCurve2, data?: unknown): MeshEdge2 {
         // Create and add new edge
         const edge = this.createEdge(seg);
         edge.data = data;
@@ -783,7 +783,7 @@ export class Mesh2 {
             MeshEdge2.splice(e1, e2);
         } else {
             // We need to insert a new edge
-            const c = new Bezier1Curve2(e1.p0, e2.p0);
+            const c = Bezier1Curve2.fromReadonly(e1.p0, e2.p0);
             const e = this.createEdge(c, c.reverse());
 
             MeshEdge2.splice(e1, e);
@@ -819,7 +819,7 @@ export class Mesh2 {
         return chain;
     }
 
-    public createEdge(seg1: BezierCurve2, seg2?: BezierCurve2): MeshEdge2 {
+    public createEdge(seg1: ReadonlyBezierCurve2, seg2?: ReadonlyBezierCurve2): MeshEdge2 {
         const edge = MeshEdge2.createPair(seg1, seg2);
         this.edges.push(edge, edge.sym);
         return edge;
@@ -1044,16 +1044,16 @@ export class Mesh2 {
      *
      * The point will be ignored if it is not inside any of them.
      */
-    public triangulateAddPoint(p: Vector2): void {
+    public triangulateAddPoint(p: ReadonlyVector2): void {
         for (const face1 of this.faces) {
             if (face1.hasPointInside(p)) {
                 const e1 = face1.start;
                 const e2 = e1.lnext;
                 const e3 = e2.lnext;
 
-                const c1 = new Bezier1Curve2(p, e1.p0);
-                const c2 = new Bezier1Curve2(p, e2.p0);
-                const c3 = new Bezier1Curve2(p, e3.p0);
+                const c1 = Bezier1Curve2.fromReadonly(p, e1.p0);
+                const c2 = Bezier1Curve2.fromReadonly(p, e2.p0);
+                const c3 = Bezier1Curve2.fromReadonly(p, e3.p0);
 
                 const ee1 = this.createEdge(c1, c1.reverse());
                 const ee2 = this.createEdge(c2, c2.reverse());

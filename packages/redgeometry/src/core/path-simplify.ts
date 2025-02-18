@@ -6,8 +6,14 @@ import {
     simplifyParameterStepConic,
     simplifyParameterStepCubic,
 } from "../internal/path-simplify.js";
-import { Bezier2Curve2, Bezier3Curve2, BezierRCurve2 } from "../primitives/bezier.js";
-import { Vector2 } from "../primitives/vector.js";
+import {
+    Bezier2Curve2,
+    Bezier3Curve2,
+    BezierRCurve2,
+    type ReadonlyBezier3Curve2,
+    type ReadonlyBezierRCurve2,
+} from "../primitives/bezier.js";
+import { Vector2, type ReadonlyVector2 } from "../primitives/vector.js";
 import { assertUnreachable } from "../utility/debug.js";
 import type { PathQualityOptions } from "./path-options.js";
 import { PathCommandType, type Path2 } from "./path.js";
@@ -43,7 +49,7 @@ export class PathSimplifyIncremental2 implements PathSimplify2 {
         let cIdx = 0;
         let pIdx = 0;
 
-        let p0 = Vector2.createZero();
+        let p0: ReadonlyVector2 = Vector2.createZero();
 
         while (cIdx < commands.length) {
             const command = commands[cIdx++];
@@ -60,19 +66,19 @@ export class PathSimplifyIncremental2 implements PathSimplify2 {
                     break;
                 }
                 case PathCommandType.Quadratic: {
-                    const c = new Bezier2Curve2(p0, points[pIdx++], points[pIdx++]);
+                    const c = Bezier2Curve2.fromReadonly(p0, points[pIdx++], points[pIdx++]);
                     output.quadTo(c.p1, c.p2);
                     p0 = c.p2;
                     break;
                 }
                 case PathCommandType.Cubic: {
-                    const c = new Bezier3Curve2(p0, points[pIdx++], points[pIdx++], points[pIdx++]);
+                    const c = Bezier3Curve2.fromReadonly(p0, points[pIdx++], points[pIdx++], points[pIdx++]);
                     this.simplifyCubic(output, c);
                     p0 = c.p3;
                     break;
                 }
                 case PathCommandType.Conic: {
-                    const c = new BezierRCurve2(p0, points[pIdx++], points[pIdx++], command.w);
+                    const c = BezierRCurve2.fromReadonly(p0, points[pIdx++], points[pIdx++], command.w);
                     this.simplifyConic(output, c);
                     p0 = c.p2;
                     break;
@@ -92,7 +98,7 @@ export class PathSimplifyIncremental2 implements PathSimplify2 {
         this.tolerance = options.simplifyTolerance;
     }
 
-    private simplifyConic(output: Path2, c0: BezierRCurve2): void {
+    private simplifyConic(output: Path2, c0: ReadonlyBezierRCurve2): void {
         let t = simplifyParameterStepConic(c0, 4, this.tolerance);
         let c = c0;
 
@@ -110,7 +116,7 @@ export class PathSimplifyIncremental2 implements PathSimplify2 {
         output.quadTo(cc.p1, cc.p2);
     }
 
-    private simplifyCubic(output: Path2, c0: Bezier3Curve2): void {
+    private simplifyCubic(output: Path2, c0: ReadonlyBezier3Curve2): void {
         let t = simplifyParameterStepCubic(c0, 54, this.tolerance);
         let c = c0;
 
@@ -157,7 +163,7 @@ export class PathSimplifyRecursive2 implements PathSimplify2 {
         let cIdx = 0;
         let pIdx = 0;
 
-        let p0 = Vector2.createZero();
+        let p0: ReadonlyVector2 = Vector2.createZero();
 
         while (cIdx < commands.length) {
             const command = commands[cIdx++];
@@ -174,19 +180,19 @@ export class PathSimplifyRecursive2 implements PathSimplify2 {
                     break;
                 }
                 case PathCommandType.Quadratic: {
-                    const c = new Bezier2Curve2(p0, points[pIdx++], points[pIdx++]);
+                    const c = Bezier2Curve2.fromReadonly(p0, points[pIdx++], points[pIdx++]);
                     output.quadTo(c.p1, c.p2);
                     p0 = c.p2;
                     break;
                 }
                 case PathCommandType.Cubic: {
-                    const c = new Bezier3Curve2(p0, points[pIdx++], points[pIdx++], points[pIdx++]);
+                    const c = Bezier3Curve2.fromReadonly(p0, points[pIdx++], points[pIdx++], points[pIdx++]);
                     this.simplifyCubic(output, c);
                     p0 = c.p3;
                     break;
                 }
                 case PathCommandType.Conic: {
-                    const c = new BezierRCurve2(p0, points[pIdx++], points[pIdx++], command.w);
+                    const c = BezierRCurve2.fromReadonly(p0, points[pIdx++], points[pIdx++], command.w);
                     this.simplifyConic(output, c);
                     p0 = c.p2;
                     break;
@@ -206,10 +212,10 @@ export class PathSimplifyRecursive2 implements PathSimplify2 {
         this.tolerance = options.simplifyTolerance;
     }
 
-    private simplifyConic(output: Path2, c0: BezierRCurve2): void {
+    private simplifyConic(output: Path2, c0: ReadonlyBezierRCurve2): void {
         const tol = 4 * this.tolerance;
 
-        const simplifyConicRecursive = (c: BezierRCurve2): void => {
+        const simplifyConicRecursive = (c: ReadonlyBezierRCurve2): void => {
             if (isSimpleConic(c, tol)) {
                 const cc = simplifyConic(c);
                 output.quadTo(cc.p1, cc.p2);
@@ -223,11 +229,11 @@ export class PathSimplifyRecursive2 implements PathSimplify2 {
         simplifyConicRecursive(c0);
     }
 
-    private simplifyCubic(output: Path2, c0: Bezier3Curve2): void {
+    private simplifyCubic(output: Path2, c0: ReadonlyBezier3Curve2): void {
         const tol = 54 * this.tolerance;
         const d = simplifyDistanceCubic(c0);
 
-        const simplifyCubicRecursive = (c: Bezier3Curve2, d: number): void => {
+        const simplifyCubicRecursive = (c: ReadonlyBezier3Curve2, d: number): void => {
             if (tol > d) {
                 const [cc1, cc2] = simplifyCubicContinious(c);
                 output.quadTo(cc1.p1, cc1.p2);

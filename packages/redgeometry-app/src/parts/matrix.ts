@@ -1,5 +1,5 @@
-import { Edge2, Edge3 } from "redgeometry/src/primitives/edge";
-import { Matrix4 } from "redgeometry/src/primitives/matrix";
+import { Edge2, Edge3, type ReadonlyEdge3 } from "redgeometry/src/primitives/edge";
+import { Matrix4, type ReadonlyMatrix4 } from "redgeometry/src/primitives/matrix";
 import { Quaternion, RotationOrder } from "redgeometry/src/primitives/quaternion";
 import { Vector2, Vector3 } from "redgeometry/src/primitives/vector";
 import type { AppContextPlugin } from "../ecs-modules/app-context.js";
@@ -158,7 +158,7 @@ function createCube(): Edge3[] {
     return edges;
 }
 
-function transformEdges(edges: Edge3[], mat: Matrix4): Edge2[] {
+function transformEdges(edges: ReadonlyEdge3[], mat: ReadonlyMatrix4): Edge2[] {
     const output: Edge2[] = [];
 
     for (const e of edges) {

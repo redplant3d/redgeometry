@@ -1,4 +1,4 @@
-import type { ColorRgba } from "../primitives/color.js";
+import type { ReadonlyColorRgba } from "../primitives/color.js";
 import { CompositeOperation } from "./context.js";
 import type { Image2 } from "./image.js";
 
@@ -43,7 +43,7 @@ export class SoftwareCompositor {
         this.mask = new Uint8Array(image.getWidth());
     }
 
-    public setColor(c: ColorRgba): void {
+    public setColor(c: ReadonlyColorRgba): void {
         // Premultiply
         this.sr = mulDiv255(c.r, c.a);
         this.sg = mulDiv255(c.g, c.a);

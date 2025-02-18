@@ -1,8 +1,8 @@
 import { Polygon2EdgeIterator } from "../internal/iterator.js";
 import { Box2 } from "../primitives/box.js";
-import { Edge2 } from "../primitives/edge.js";
-import type { Matrix3, Matrix3A } from "../primitives/matrix.js";
-import { Vector2, type Vector2Like } from "../primitives/vector.js";
+import { Edge2, type ReadonlyEdge2 } from "../primitives/edge.js";
+import type { ReadonlyMatrix3, ReadonlyMatrix3A } from "../primitives/matrix.js";
+import { Vector2, type ReadonlyVector2, type Vector2Like } from "../primitives/vector.js";
 import { Path2 } from "./path.js";
 
 export type Polygon2Like = {
@@ -10,9 +10,9 @@ export type Polygon2Like = {
 };
 
 export class Polygon2 {
-    public points: Vector2[];
+    public points: ReadonlyVector2[];
 
-    public constructor(points: Vector2[]) {
+    public constructor(points: ReadonlyVector2[]) {
         this.points = points;
     }
 
@@ -57,7 +57,7 @@ export class Polygon2 {
         return false;
     }
 
-    public static isPointInside(poly: Polygon2, p: Vector2, isNonZero: boolean): boolean {
+    public static isPointInside(poly: Polygon2, p: ReadonlyVector2, isNonZero: boolean): boolean {
         let wind = 0;
 
         for (const e of poly.getEdgeIterator()) {
@@ -86,7 +86,7 @@ export class Polygon2 {
         return { points };
     }
 
-    public addPoint(p: Vector2): void {
+    public addPoint(p: ReadonlyVector2): void {
         this.points.push(p);
     }
 
@@ -103,9 +103,9 @@ export class Polygon2 {
         return new Polygon2(points);
     }
 
-    public findClosestEdgePoint(p: Vector2): Edge2 | undefined {
+    public findClosestEdgePoint(p: ReadonlyVector2): ReadonlyEdge2 | undefined {
         let minDistSq = Number.POSITIVE_INFINITY;
-        let closestEdge: Edge2 | undefined;
+        let closestEdge: ReadonlyEdge2 | undefined;
 
         // Find the edge with the closest point on it
         for (const edge of this.getEdgeIterator()) {
@@ -196,8 +196,8 @@ export class Polygon2 {
         return new Polygon2EdgeIterator(this.points);
     }
 
-    public getEdges(): Edge2[] {
-        const edges: Edge2[] = [];
+    public getEdges(): ReadonlyEdge2[] {
+        const edges: ReadonlyEdge2[] = [];
 
         for (const e of this.getEdgeIterator()) {
             edges.push(e);
@@ -336,7 +336,7 @@ export class Polygon2 {
         return path;
     }
 
-    public transform(mat: Matrix3 | Matrix3A): void {
+    public transform(mat: ReadonlyMatrix3 | ReadonlyMatrix3A): void {
         const points = this.points;
         for (let i = 0; i < points.length; i++) {
             points[i] = mat.transformPoint(points[i]);

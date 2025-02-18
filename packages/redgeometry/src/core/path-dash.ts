@@ -10,8 +10,16 @@ import {
     simplifyParameterStepCubic,
     simplifyParameterStepQuad,
 } from "../internal/path-simplify.js";
-import { Bezier1Curve2, Bezier2Curve2, Bezier3Curve2, BezierRCurve2 } from "../primitives/bezier.js";
-import { Vector2 } from "../primitives/vector.js";
+import {
+    Bezier1Curve2,
+    Bezier2Curve2,
+    Bezier3Curve2,
+    BezierRCurve2,
+    type ReadonlyBezier2Curve2,
+    type ReadonlyBezier3Curve2,
+    type ReadonlyBezierRCurve2,
+} from "../primitives/bezier.js";
+import { Vector2, type ReadonlyVector2 } from "../primitives/vector.js";
 import { assertUnreachable } from "../utility/debug.js";
 import { MAX_PARAMETER, type PathDashOptions, type PathQualityOptions } from "./path-options.js";
 import { PathCommandType, type Path2 } from "./path.js";
@@ -45,9 +53,9 @@ export class PathDashIncremental2 implements PathDash2 {
         let cIdx = 0;
         let pIdx = 0;
 
-        let ps = Vector2.createZero();
-        let p0 = Vector2.createZero();
-        let m0 = Vector2.createZero();
+        let ps: ReadonlyVector2 = Vector2.createZero();
+        let p0: ReadonlyVector2 = Vector2.createZero();
+        let m0: ReadonlyVector2 = Vector2.createZero();
 
         this.initialize(output, options);
 
@@ -66,7 +74,7 @@ export class PathDashIncremental2 implements PathDash2 {
                     break;
                 }
                 case PathCommandType.Linear: {
-                    const c = new Bezier1Curve2(p0, points[pIdx++]);
+                    const c = Bezier1Curve2.fromReadonly(p0, points[pIdx++]);
                     const m = c.getDerivative();
 
                     if (!m.isZero()) {
@@ -80,7 +88,7 @@ export class PathDashIncremental2 implements PathDash2 {
                     break;
                 }
                 case PathCommandType.Quadratic: {
-                    const c = new Bezier2Curve2(p0, points[pIdx++], points[pIdx++]);
+                    const c = Bezier2Curve2.fromReadonly(p0, points[pIdx++], points[pIdx++]);
                     const m = c.getTangentStart();
 
                     if (!m.isZero()) {
@@ -94,7 +102,7 @@ export class PathDashIncremental2 implements PathDash2 {
                     break;
                 }
                 case PathCommandType.Cubic: {
-                    const c = new Bezier3Curve2(p0, points[pIdx++], points[pIdx++], points[pIdx++]);
+                    const c = Bezier3Curve2.fromReadonly(p0, points[pIdx++], points[pIdx++], points[pIdx++]);
                     const m = c.getTangentStart();
 
                     if (!m.isZero()) {
@@ -108,7 +116,7 @@ export class PathDashIncremental2 implements PathDash2 {
                     break;
                 }
                 case PathCommandType.Conic: {
-                    const c = new BezierRCurve2(p0, points[pIdx++], points[pIdx++], command.w);
+                    const c = BezierRCurve2.fromReadonly(p0, points[pIdx++], points[pIdx++], command.w);
                     const m = c.getTangentStart();
 
                     if (!m.isZero()) {
@@ -122,7 +130,7 @@ export class PathDashIncremental2 implements PathDash2 {
                     break;
                 }
                 case PathCommandType.Close: {
-                    const c = new Bezier1Curve2(p0, ps);
+                    const c = Bezier1Curve2.fromReadonly(p0, ps);
                     const m = c.getDerivative();
 
                     if (!m.isZero()) {
@@ -155,7 +163,7 @@ export class PathDashIncremental2 implements PathDash2 {
         this.tanOffsetTolerance = Math.tan(options.offsetTolerance);
     }
 
-    private dashConic(c0: BezierRCurve2): void {
+    private dashConic(c0: ReadonlyBezierRCurve2): void {
         let t = simplifyParameterStepConic(c0, 4, this.simplifyTolerance);
         let c = c0;
 
@@ -173,7 +181,7 @@ export class PathDashIncremental2 implements PathDash2 {
         this.dashQuadratic(cc);
     }
 
-    private dashCubic(c0: Bezier3Curve2): void {
+    private dashCubic(c0: ReadonlyBezier3Curve2): void {
         let t = simplifyParameterStepCubic(c0, 54, this.simplifyTolerance);
         let c = c0;
 
@@ -193,7 +201,7 @@ export class PathDashIncremental2 implements PathDash2 {
         this.dashQuadratic(cc2);
     }
 
-    private dashQuadratic(c0: Bezier2Curve2): void {
+    private dashQuadratic(c0: ReadonlyBezier2Curve2): void {
         const tc = c0.getVertexParameter();
 
         // Considers `NaN` parameters to be outside
@@ -206,7 +214,7 @@ export class PathDashIncremental2 implements PathDash2 {
         }
     }
 
-    private dashQuadraticSimplify(c0: Bezier2Curve2): void {
+    private dashQuadraticSimplify(c0: ReadonlyBezier2Curve2): void {
         let t = simplifyParameterStepQuad(c0, this.tanOffsetTolerance);
         let c = c0;
 
@@ -251,9 +259,9 @@ export class PathDashRecursive2 implements PathDash2 {
         let cIdx = 0;
         let pIdx = 0;
 
-        let ps = Vector2.createZero();
-        let p0 = Vector2.createZero();
-        let m0 = Vector2.createZero();
+        let ps: ReadonlyVector2 = Vector2.createZero();
+        let p0: ReadonlyVector2 = Vector2.createZero();
+        let m0: ReadonlyVector2 = Vector2.createZero();
 
         this.state.initialize(output, options);
 
@@ -272,7 +280,7 @@ export class PathDashRecursive2 implements PathDash2 {
                     break;
                 }
                 case PathCommandType.Linear: {
-                    const c = new Bezier1Curve2(p0, points[pIdx++]);
+                    const c = Bezier1Curve2.fromReadonly(p0, points[pIdx++]);
                     const m = c.getDerivative();
 
                     if (!m.isZero()) {
@@ -286,7 +294,7 @@ export class PathDashRecursive2 implements PathDash2 {
                     break;
                 }
                 case PathCommandType.Quadratic: {
-                    const c = new Bezier2Curve2(p0, points[pIdx++], points[pIdx++]);
+                    const c = Bezier2Curve2.fromReadonly(p0, points[pIdx++], points[pIdx++]);
                     const m = c.getTangentStart();
 
                     if (!m.isZero()) {
@@ -300,7 +308,7 @@ export class PathDashRecursive2 implements PathDash2 {
                     break;
                 }
                 case PathCommandType.Cubic: {
-                    const c = new Bezier3Curve2(p0, points[pIdx++], points[pIdx++], points[pIdx++]);
+                    const c = Bezier3Curve2.fromReadonly(p0, points[pIdx++], points[pIdx++], points[pIdx++]);
                     const m = c.getTangentStart();
 
                     if (!m.isZero()) {
@@ -314,7 +322,7 @@ export class PathDashRecursive2 implements PathDash2 {
                     break;
                 }
                 case PathCommandType.Conic: {
-                    const c = new BezierRCurve2(p0, points[pIdx++], points[pIdx++], command.w);
+                    const c = BezierRCurve2.fromReadonly(p0, points[pIdx++], points[pIdx++], command.w);
                     const m = c.getTangentStart();
 
                     if (!m.isZero()) {
@@ -328,7 +336,7 @@ export class PathDashRecursive2 implements PathDash2 {
                     break;
                 }
                 case PathCommandType.Close: {
-                    const c = new Bezier1Curve2(p0, ps);
+                    const c = Bezier1Curve2.fromReadonly(p0, ps);
                     const m = c.getDerivative();
 
                     if (!m.isZero()) {
@@ -361,10 +369,10 @@ export class PathDashRecursive2 implements PathDash2 {
         this.cosOffsetTolerance = Math.cos(options.offsetTolerance);
     }
 
-    private dashConic(c0: BezierRCurve2): void {
+    private dashConic(c0: ReadonlyBezierRCurve2): void {
         const tol = 4 * this.simplifyTolerance;
 
-        const dashConicRecursive = (c: BezierRCurve2): void => {
+        const dashConicRecursive = (c: ReadonlyBezierRCurve2): void => {
             if (isSimpleConic(c, tol)) {
                 const cc = simplifyConic(c);
                 this.dashQuadratic(cc);
@@ -378,11 +386,11 @@ export class PathDashRecursive2 implements PathDash2 {
         dashConicRecursive(c0);
     }
 
-    private dashCubic(c0: Bezier3Curve2): void {
+    private dashCubic(c0: ReadonlyBezier3Curve2): void {
         const tol = 54 * this.simplifyTolerance;
         const d = simplifyDistanceCubic(c0);
 
-        const dashCubicRecursive = (c: Bezier3Curve2, d: number): void => {
+        const dashCubicRecursive = (c: ReadonlyBezier3Curve2, d: number): void => {
             if (tol > d) {
                 const [cc1, cc2] = simplifyCubicContinious(c);
                 this.dashQuadratic(cc1);
@@ -397,7 +405,7 @@ export class PathDashRecursive2 implements PathDash2 {
         dashCubicRecursive(c0, d);
     }
 
-    private dashQuadratic(c0: Bezier2Curve2): void {
+    private dashQuadratic(c0: ReadonlyBezier2Curve2): void {
         const tc = c0.getVertexParameter();
 
         // Considers `NaN` parameters to be outside
@@ -410,10 +418,10 @@ export class PathDashRecursive2 implements PathDash2 {
         }
     }
 
-    private dashQuadraticSimplify(c0: Bezier2Curve2): void {
+    private dashQuadraticSimplify(c0: ReadonlyBezier2Curve2): void {
         const tol = this.cosOffsetTolerance;
 
-        const dashQuadraticRecursive = (c: Bezier2Curve2): void => {
+        const dashQuadraticRecursive = (c: ReadonlyBezier2Curve2): void => {
             if (isSimpleQuad(c, tol)) {
                 this.state.dashQuadraticSimple(c);
             } else {

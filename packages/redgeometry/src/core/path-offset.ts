@@ -10,8 +10,16 @@ import {
     simplifyParameterStepCubic,
     simplifyParameterStepQuad,
 } from "../internal/path-simplify.js";
-import { Bezier1Curve2, Bezier2Curve2, Bezier3Curve2, BezierRCurve2 } from "../primitives/bezier.js";
-import { Vector2 } from "../primitives/vector.js";
+import {
+    Bezier1Curve2,
+    Bezier2Curve2,
+    Bezier3Curve2,
+    BezierRCurve2,
+    type ReadonlyBezier2Curve2,
+    type ReadonlyBezier3Curve2,
+    type ReadonlyBezierRCurve2,
+} from "../primitives/bezier.js";
+import { Vector2, type ReadonlyVector2 } from "../primitives/vector.js";
 import { assertUnreachable } from "../utility/debug.js";
 import { JoinType, MAX_PARAMETER, type PathOffsetOptions, type PathQualityOptions } from "./path-options.js";
 import { Path2, PathCommandType } from "./path.js";
@@ -37,8 +45,8 @@ export class PathOffsetIncremental2 implements PathOffset2 {
     private d: number;
     private join: JoinType;
     private miterLimit: number;
-    private ms: Vector2;
-    private ps: Vector2;
+    private ms: ReadonlyVector2;
+    private ps: ReadonlyVector2;
     private simplifyTolerance: number;
     private tanOffsetTolerance: number;
 
@@ -93,7 +101,7 @@ export class PathOffsetIncremental2 implements PathOffset2 {
                     break;
                 }
                 case PathCommandType.Linear: {
-                    const c = new Bezier1Curve2(p0, points[pIdx++]);
+                    const c = Bezier1Curve2.fromReadonly(p0, points[pIdx++]);
                     const m = c.getDerivative();
 
                     if (!m.isZero()) {
@@ -107,7 +115,7 @@ export class PathOffsetIncremental2 implements PathOffset2 {
                     break;
                 }
                 case PathCommandType.Quadratic: {
-                    const c = new Bezier2Curve2(p0, points[pIdx++], points[pIdx++]);
+                    const c = Bezier2Curve2.fromReadonly(p0, points[pIdx++], points[pIdx++]);
                     const m = c.getTangentStart();
 
                     if (!m.isZero()) {
@@ -121,7 +129,7 @@ export class PathOffsetIncremental2 implements PathOffset2 {
                     break;
                 }
                 case PathCommandType.Cubic: {
-                    const c = new Bezier3Curve2(p0, points[pIdx++], points[pIdx++], points[pIdx++]);
+                    const c = Bezier3Curve2.fromReadonly(p0, points[pIdx++], points[pIdx++], points[pIdx++]);
                     const m = c.getTangentStart();
 
                     if (!m.isZero()) {
@@ -135,7 +143,7 @@ export class PathOffsetIncremental2 implements PathOffset2 {
                     break;
                 }
                 case PathCommandType.Conic: {
-                    const c = new BezierRCurve2(p0, points[pIdx++], points[pIdx++], command.w);
+                    const c = BezierRCurve2.fromReadonly(p0, points[pIdx++], points[pIdx++], command.w);
                     const m = c.getTangentStart();
 
                     if (!m.isZero()) {
@@ -149,7 +157,7 @@ export class PathOffsetIncremental2 implements PathOffset2 {
                     break;
                 }
                 case PathCommandType.Close: {
-                    const c = new Bezier1Curve2(p0, this.ps);
+                    const c = Bezier1Curve2.fromReadonly(p0, this.ps);
                     const m = c.getDerivative();
 
                     if (!m.isZero()) {
@@ -197,7 +205,7 @@ export class PathOffsetIncremental2 implements PathOffset2 {
         this.buffer.clear();
     }
 
-    private offsetConic(c0: BezierRCurve2): void {
+    private offsetConic(c0: ReadonlyBezierRCurve2): void {
         let t = simplifyParameterStepConic(c0, 4, this.simplifyTolerance);
         let c = c0;
 
@@ -215,7 +223,7 @@ export class PathOffsetIncremental2 implements PathOffset2 {
         this.offsetQuadratic(cc);
     }
 
-    private offsetCubic(c0: Bezier3Curve2): void {
+    private offsetCubic(c0: ReadonlyBezier3Curve2): void {
         let t = simplifyParameterStepCubic(c0, 54, this.simplifyTolerance);
         let c = c0;
 
@@ -235,7 +243,7 @@ export class PathOffsetIncremental2 implements PathOffset2 {
         this.offsetQuadratic(cc2);
     }
 
-    private offsetFirstOrJoin(p: Vector2, m0: Vector2, m1: Vector2): void {
+    private offsetFirstOrJoin(p: ReadonlyVector2, m0: ReadonlyVector2, m1: ReadonlyVector2): void {
         if (m0.isZero()) {
             this.offsetMove(p, m1);
             this.ms = m1;
@@ -244,19 +252,19 @@ export class PathOffsetIncremental2 implements PathOffset2 {
         }
     }
 
-    private offsetLinear(p1: Vector2, m: Vector2): void {
+    private offsetLinear(p1: ReadonlyVector2, m: ReadonlyVector2): void {
         const v = m.unit().normal().mulS(this.d);
 
         this.buffer.lineTo(p1.add(v));
     }
 
-    private offsetMove(p0: Vector2, m: Vector2): void {
+    private offsetMove(p0: ReadonlyVector2, m: ReadonlyVector2): void {
         const v = m.unit().normal().mulS(this.d);
 
         this.buffer.moveTo(p0.add(v));
     }
 
-    private offsetQuadratic(c0: Bezier2Curve2): void {
+    private offsetQuadratic(c0: ReadonlyBezier2Curve2): void {
         const [tc, td] = c0.getOffsetCuspParameter(this.d);
 
         const t1 = tc - td;
@@ -296,7 +304,7 @@ export class PathOffsetIncremental2 implements PathOffset2 {
         }
     }
 
-    private offsetQuadraticSimplify(c0: Bezier2Curve2, d: number): void {
+    private offsetQuadraticSimplify(c0: ReadonlyBezier2Curve2, d: number): void {
         let t = simplifyParameterStepQuad(c0, this.tanOffsetTolerance);
         let c = c0;
 
@@ -330,8 +338,8 @@ export class PathOffsetRecursive2 implements PathOffset2 {
     private d: number;
     private join: JoinType;
     private miterLimit: number;
-    private ms: Vector2;
-    private ps: Vector2;
+    private ms: ReadonlyVector2;
+    private ps: ReadonlyVector2;
     private simplifyTolerance: number;
 
     public constructor(qualityOptions: PathQualityOptions) {
@@ -385,7 +393,7 @@ export class PathOffsetRecursive2 implements PathOffset2 {
                     break;
                 }
                 case PathCommandType.Linear: {
-                    const c = new Bezier1Curve2(p0, points[pIdx++]);
+                    const c = Bezier1Curve2.fromReadonly(p0, points[pIdx++]);
                     const m = c.getDerivative();
 
                     if (!m.isZero()) {
@@ -399,7 +407,7 @@ export class PathOffsetRecursive2 implements PathOffset2 {
                     break;
                 }
                 case PathCommandType.Quadratic: {
-                    const c = new Bezier2Curve2(p0, points[pIdx++], points[pIdx++]);
+                    const c = Bezier2Curve2.fromReadonly(p0, points[pIdx++], points[pIdx++]);
                     const m = c.getTangentStart();
 
                     if (!m.isZero()) {
@@ -413,7 +421,7 @@ export class PathOffsetRecursive2 implements PathOffset2 {
                     break;
                 }
                 case PathCommandType.Cubic: {
-                    const c = new Bezier3Curve2(p0, points[pIdx++], points[pIdx++], points[pIdx++]);
+                    const c = Bezier3Curve2.fromReadonly(p0, points[pIdx++], points[pIdx++], points[pIdx++]);
                     const m = c.getTangentStart();
 
                     if (!m.isZero()) {
@@ -427,7 +435,7 @@ export class PathOffsetRecursive2 implements PathOffset2 {
                     break;
                 }
                 case PathCommandType.Conic: {
-                    const c = new BezierRCurve2(p0, points[pIdx++], points[pIdx++], command.w);
+                    const c = BezierRCurve2.fromReadonly(p0, points[pIdx++], points[pIdx++], command.w);
                     const m = c.getTangentStart();
 
                     if (!m.isZero()) {
@@ -441,7 +449,7 @@ export class PathOffsetRecursive2 implements PathOffset2 {
                     break;
                 }
                 case PathCommandType.Close: {
-                    const c = new Bezier1Curve2(p0, this.ps);
+                    const c = Bezier1Curve2.fromReadonly(p0, this.ps);
                     const m = c.getDerivative();
 
                     if (!m.isZero()) {
@@ -489,10 +497,10 @@ export class PathOffsetRecursive2 implements PathOffset2 {
         this.buffer.clear();
     }
 
-    private offsetConic(c0: BezierRCurve2): void {
+    private offsetConic(c0: ReadonlyBezierRCurve2): void {
         const tol = 4 * this.simplifyTolerance;
 
-        const offsetConicRecursive = (c: BezierRCurve2): void => {
+        const offsetConicRecursive = (c: ReadonlyBezierRCurve2): void => {
             if (isSimpleConic(c, tol)) {
                 const cc = simplifyConic(c);
                 this.offsetQuadratic(cc);
@@ -506,11 +514,11 @@ export class PathOffsetRecursive2 implements PathOffset2 {
         offsetConicRecursive(c0);
     }
 
-    private offsetCubic(c0: Bezier3Curve2): void {
+    private offsetCubic(c0: ReadonlyBezier3Curve2): void {
         const tol = 54 * this.simplifyTolerance;
         const d = simplifyDistanceCubic(c0);
 
-        const offsetCubicRecursive = (c: Bezier3Curve2, d: number): void => {
+        const offsetCubicRecursive = (c: ReadonlyBezier3Curve2, d: number): void => {
             if (tol > d) {
                 const [cc1, cc2] = simplifyCubicContinious(c);
                 this.offsetQuadratic(cc1);
@@ -525,7 +533,7 @@ export class PathOffsetRecursive2 implements PathOffset2 {
         offsetCubicRecursive(c0, d);
     }
 
-    private offsetFirstOrJoin(p: Vector2, m0: Vector2, m1: Vector2): void {
+    private offsetFirstOrJoin(p: ReadonlyVector2, m0: ReadonlyVector2, m1: ReadonlyVector2): void {
         if (m0.isZero()) {
             this.offsetMove(p, m1);
             this.ms = m1;
@@ -534,19 +542,19 @@ export class PathOffsetRecursive2 implements PathOffset2 {
         }
     }
 
-    private offsetLinear(p1: Vector2, m: Vector2): void {
+    private offsetLinear(p1: ReadonlyVector2, m: ReadonlyVector2): void {
         const v = m.unit().normal().mulS(this.d);
 
         this.buffer.lineTo(p1.add(v));
     }
 
-    private offsetMove(p0: Vector2, m: Vector2): void {
+    private offsetMove(p0: ReadonlyVector2, m: ReadonlyVector2): void {
         const v = m.unit().normal().mulS(this.d);
 
         this.buffer.moveTo(p0.add(v));
     }
 
-    private offsetQuadratic(c0: Bezier2Curve2): void {
+    private offsetQuadratic(c0: ReadonlyBezier2Curve2): void {
         const [tc, td] = c0.getOffsetCuspParameter(this.d);
 
         const t1 = tc - td;
@@ -586,10 +594,10 @@ export class PathOffsetRecursive2 implements PathOffset2 {
         }
     }
 
-    private offsetQuadraticSimplify(c0: Bezier2Curve2, d: number): void {
+    private offsetQuadraticSimplify(c0: ReadonlyBezier2Curve2, d: number): void {
         const tol = this.cosOffsetTolerance;
 
-        const offsetQuadraticRecursive = (c: Bezier2Curve2): void => {
+        const offsetQuadraticRecursive = (c: ReadonlyBezier2Curve2): void => {
             if (isSimpleQuad(c, tol)) {
                 offsetQuadraticSimple(this.buffer, c, d);
             } else {

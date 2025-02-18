@@ -1,4 +1,4 @@
-import type { Matrix4 } from "redgeometry/src/primitives/matrix";
+import type { ReadonlyMatrix4 } from "redgeometry/src/primitives/matrix";
 import { type Float32Buffer, type NumberBuffer } from "redgeometry/src/utility/buffer";
 import { assertDebug, log } from "redgeometry/src/utility/debug";
 import type { ComponentIdsOf, DefaultSystemStage, EntityId, WorldModule } from "../ecs/types.js";
@@ -269,7 +269,7 @@ function createPipelineContext(device: GPUDevice, format: GPUTextureFormat): GPU
     return { vertexState, fragmentState, bindGroupLayouts, pipelineLayout };
 }
 
-function createBindGroup0(device: GPUDevice, pipelineContext: GPUPipelineContext, mat: Matrix4): GPUBindGroup {
+function createBindGroup0(device: GPUDevice, pipelineContext: GPUPipelineContext, mat: ReadonlyMatrix4): GPUBindGroup {
     return device.createBindGroup({
         entries: [
             {
@@ -317,7 +317,7 @@ function createColorBuffer(device: GPUDevice, color: GPUColorDict): GPUBuffer {
     return gpuBuffer;
 }
 
-function createMatrixBuffer(device: GPUDevice, mat: Matrix4): GPUBuffer {
+function createMatrixBuffer(device: GPUDevice, mat: ReadonlyMatrix4): GPUBuffer {
     const gpuBuffer = device.createBuffer({
         size: 64,
         usage: GPUBufferUsage.UNIFORM,

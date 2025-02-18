@@ -1,4 +1,4 @@
-import { Box2 } from "redgeometry/src/primitives/box";
+import { Box2, type ReadonlyBox2 } from "redgeometry/src/primitives/box";
 import { Image2 } from "redgeometry/src/render/image";
 import { assertUnreachable } from "redgeometry/src/utility/debug";
 import { RandomXSR128, type Random } from "redgeometry/src/utility/random";
@@ -28,7 +28,7 @@ type AppPartMainData = {
 
 type AppPartRemoteData = {
     dataId: "app-part-remote";
-    boxes: Box2[];
+    boxes: ReadonlyBox2[];
     image: Image2;
 };
 

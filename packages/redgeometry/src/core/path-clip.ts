@@ -1,6 +1,6 @@
 import { PathSweepEvent2, createSweepEventQueue, isInWinding, isIncOutBoolean } from "../internal/path-sweep.js";
-import { Bezier1Curve2, type BezierCurve2 } from "../primitives/bezier.js";
-import type { Edge2 } from "../primitives/edge.js";
+import { Bezier1Curve2, type ReadonlyBezierCurve2 } from "../primitives/bezier.js";
+import type { ReadonlyEdge2 } from "../primitives/edge.js";
 import { ArrayMultiSet } from "../utility/array.js";
 import { log } from "../utility/debug.js";
 import type { Mesh2 } from "./mesh.js";
@@ -36,11 +36,11 @@ export class PathClip2 {
         this.windingOperatorB = DEFAULT_PATH_CLIP_OPTIONS.windingOperatorB;
     }
 
-    public addCurve(c: BezierCurve2, set = 0, weight = 1, snap = false, data?: unknown): void {
+    public addCurve(c: ReadonlyBezierCurve2, set = 0, weight = 1, snap = false, data?: unknown): void {
         this.snapRound.addSegment(c, set, weight, snap, data);
     }
 
-    public addEdge(e: Edge2, set = 0, weight = 1, snap = false, data?: unknown): void {
+    public addEdge(e: ReadonlyEdge2, set = 0, weight = 1, snap = false, data?: unknown): void {
         this.snapRound.addSegment(e.toBezier(), set, weight, snap, data);
     }
 
@@ -101,10 +101,10 @@ export class PathClip2 {
                 const [inc, out] = this.isIncOut(left);
 
                 if (inc) {
-                    const c = new Bezier1Curve2(left.p0, left.p1);
+                    const c = Bezier1Curve2.fromReadonly(left.p0, left.p1);
                     output.addChainSegment(c, left.seg.ref.data);
                 } else if (out) {
-                    const c = new Bezier1Curve2(left.p1, left.p0);
+                    const c = Bezier1Curve2.fromReadonly(left.p1, left.p0);
                     output.addChainSegment(c, left.seg.ref.data);
                 }
 

@@ -1,6 +1,6 @@
 import { BUTT_CAPS, JoinType, type StrokeCaps } from "../core/path-options.js";
 import type { Path2 } from "../core/path.js";
-import { ColorRgba } from "../primitives/color.js";
+import { ColorRgba, type ReadonlyColorRgba } from "../primitives/color.js";
 import { Matrix3A } from "../primitives/matrix.js";
 import type { Image2 } from "./image.js";
 import { SoftwareRenderPipeline, type RenderPipeline } from "./pipeline.js";
@@ -21,14 +21,14 @@ export enum StrokeTransformOrder {
 }
 
 export type ContextFillOptions = {
-    color: ColorRgba;
+    color: ReadonlyColorRgba;
     compOp: CompositeOperation;
     rule: FillRule;
 };
 
 export type ContextStrokeOptions = {
     caps: StrokeCaps;
-    color: ColorRgba;
+    color: ReadonlyColorRgba;
     compOp: CompositeOperation;
     dashArray: number[];
     dashCaps: StrokeCaps;
@@ -63,12 +63,12 @@ export interface RenderContext2 {
     dashArray: number[];
     dashCaps: StrokeCaps;
     dashOffset: number;
-    fillColor: ColorRgba;
+    fillColor: ReadonlyColorRgba;
     fillCompOp: CompositeOperation;
     fillRule: FillRule;
     join: JoinType;
     miterLimit: number;
-    strokeColor: ColorRgba;
+    strokeColor: ReadonlyColorRgba;
     strokeCompOp: CompositeOperation;
     strokeWidth: number;
     transformOrder: StrokeTransformOrder;
@@ -132,11 +132,11 @@ export class SoftwareRenderContext2 implements RenderContext2 {
         this.strokeOptions.dashOffset = offset;
     }
 
-    public get fillColor(): ColorRgba {
+    public get fillColor(): ReadonlyColorRgba {
         return this.fillOptions.color;
     }
 
-    public set fillColor(color: ColorRgba) {
+    public set fillColor(color: ReadonlyColorRgba) {
         this.fillOptions.color = color;
     }
 
@@ -172,11 +172,11 @@ export class SoftwareRenderContext2 implements RenderContext2 {
         this.strokeOptions.miterLimit = ml;
     }
 
-    public get strokeColor(): ColorRgba {
+    public get strokeColor(): ReadonlyColorRgba {
         return this.strokeOptions.color;
     }
 
-    public set strokeColor(color: ColorRgba) {
+    public set strokeColor(color: ReadonlyColorRgba) {
         this.strokeOptions.color = color;
     }
 

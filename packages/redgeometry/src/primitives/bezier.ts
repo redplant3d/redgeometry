@@ -657,7 +657,7 @@ export class Bezier2Curve2 implements ReadonlyBezier2Curve2 {
         }
     }
 
-    public intersectQuad(c: Bezier2Curve2, output: Vector2[]): void {
+    public intersectQuad(c: ReadonlyBezier2Curve2, output: Vector2[]): void {
         const i1 = new Interval(0, 1);
         const i2 = new Interval(0, 1);
 

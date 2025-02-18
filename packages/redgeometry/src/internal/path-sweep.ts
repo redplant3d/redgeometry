@@ -1,16 +1,16 @@
 import { BooleanOperator, WindingOperator, type CustomWindingOperator } from "../core/path-options.js";
 import type { EdgeSegment2, SnapRound2 } from "../core/snapround.js";
-import { Vector2 } from "../primitives/vector.js";
+import { Vector2, type ReadonlyVector2 } from "../primitives/vector.js";
 import { log } from "../utility/debug.js";
 
 export class PathSweepEvent2 {
     public left: boolean;
-    public p0: Vector2;
-    public p1: Vector2;
+    public p0: ReadonlyVector2;
+    public p1: ReadonlyVector2;
     public seg: EdgeSegment2;
     public wind: number;
 
-    public constructor(p0: Vector2, p1: Vector2, seg: EdgeSegment2, wind: number, left: boolean) {
+    public constructor(p0: ReadonlyVector2, p1: ReadonlyVector2, seg: EdgeSegment2, wind: number, left: boolean) {
         this.p0 = p0;
         this.p1 = p1;
         this.seg = seg;
