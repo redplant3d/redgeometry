@@ -29,7 +29,6 @@ export interface ReadonlyVector2 {
     angleTo(v: ReadonlyVector2): number;
     clamp(vmin: ReadonlyVector2, vmax: ReadonlyVector2): Vector2;
     clone(): Vector2;
-    copyTo(data: number[], offset?: number): void;
     cross(v: ReadonlyVector2): number;
     distanceTo(p: ReadonlyVector2): number;
     divS(s: number): Vector2;
@@ -65,7 +64,6 @@ export interface ReadonlyVector3 {
     angleTo(v: ReadonlyVector3): number;
     clamp(vmin: ReadonlyVector3, vmax: ReadonlyVector3): Vector3;
     clone(): Vector3;
-    copyTo(data: number[], number?: number): void;
     cross(v: ReadonlyVector3): Vector3;
     distanceTo(p: ReadonlyVector3): number;
     divS(s: number): Vector3;
@@ -106,7 +104,6 @@ export interface ReadonlyVector4 {
     addMulS(v: ReadonlyVector4, s: number): Vector4;
     clamp(vmin: ReadonlyVector4, vmax: ReadonlyVector4): Vector4;
     clone(): Vector4;
-    copyTo(data: number[], offset?: number): void;
     divS(s: number): Vector4;
     dot(v: ReadonlyVector4): number;
     eq(v: ReadonlyVector4): boolean;
@@ -298,11 +295,6 @@ export class Vector2 implements ReadonlyVector2 {
 
     public clone(): Vector2 {
         return new Vector2(this.x, this.y);
-    }
-
-    public copyTo(data: number[], offset = 0): void {
-        data[offset] = this.x;
-        data[offset + 1] = this.y;
     }
 
     /**
@@ -626,12 +618,6 @@ export class Vector3 implements ReadonlyVector3 {
 
     public clone(): Vector3 {
         return new Vector3(this.x, this.y, this.z);
-    }
-
-    public copyTo(data: number[], offset = 0): void {
-        data[offset] = this.x;
-        data[offset + 1] = this.y;
-        data[offset + 2] = this.z;
     }
 
     public cross(v: ReadonlyVector3): Vector3 {
@@ -1013,13 +999,6 @@ export class Vector4 implements ReadonlyVector4 {
 
     public clone(): Vector4 {
         return new Vector4(this.x, this.y, this.z, this.w);
-    }
-
-    public copyTo(data: number[], offset = 0): void {
-        data[offset] = this.x;
-        data[offset + 1] = this.y;
-        data[offset + 2] = this.z;
-        data[offset + 3] = this.w;
     }
 
     /**
