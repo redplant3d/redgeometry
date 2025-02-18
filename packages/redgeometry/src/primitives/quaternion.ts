@@ -9,6 +9,37 @@ export type QuaternionLike = {
     readonly d: number;
 };
 
+export interface ReadonlyQuaternion {
+    readonly a: number;
+    readonly b: number;
+    readonly c: number;
+    readonly d: number;
+
+    add(q: Quaternion): Quaternion;
+    angleTo(q: Quaternion): number;
+    axis(): Vector3;
+    axisAngle(): number;
+    clone(): Quaternion;
+    conjugate(): Quaternion;
+    eq(q: Quaternion): boolean;
+    eqApproxAbs(q: Quaternion, eps: number): boolean;
+    eqApproxRel(q: Quaternion, eps: number): boolean;
+    getEulerAngles(order: RotationOrder): { x: number; y: number; z: number };
+    inverse(): Quaternion;
+    isIdentity(): boolean;
+    len(): number;
+    lenSq(): number;
+    lerp(q: Quaternion, t: number): Quaternion;
+    mul(q: Quaternion): Quaternion;
+    mulV(v: Vector3): Vector3;
+    pow(x: number): Quaternion;
+    slerp(q: Quaternion, t: number): Quaternion;
+    sub(q: Quaternion): Quaternion;
+    toArray(): number[];
+    toString(): string;
+    unit(): Quaternion;
+}
+
 export enum RotationOrder {
     XYZ,
     XZY,
@@ -25,7 +56,7 @@ export enum RotationOrder {
  * - https://en.wikipedia.org/wiki/Quaternions_and_spatial_rotation
  * - https://danceswithcode.net/engineeringnotes/quaternions/quaternions.html
  */
-export class Quaternion {
+export class Quaternion implements ReadonlyQuaternion {
     public a: number;
     public b: number;
     public c: number;

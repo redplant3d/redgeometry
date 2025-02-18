@@ -6,10 +6,32 @@ export type ComplexLike = {
     readonly b: number;
 };
 
+export interface ReadonlyComplex {
+    readonly a: number;
+    readonly b: number;
+
+    angleTo(z: Complex): number;
+    clone(): Complex;
+    conjugate(): Complex;
+    eq(z: Complex): boolean;
+    eqApproxAbs(z: Complex, eps: number): boolean;
+    eqApproxRel(z: Complex, eps: number): boolean;
+    inverse(): Complex;
+    isIdentity(): boolean;
+    len(): number;
+    lenSq(): number;
+    mul(z: Complex): Complex;
+    mulV(v: Vector2): Vector2;
+    sub(z: Complex): Complex;
+    toArray(): [number, number];
+    toString(): string;
+    unit(): Complex;
+}
+
 /**
  * A complex number to be used for 2D rotations.
  */
-export class Complex {
+export class Complex implements ReadonlyComplex {
     public a: number;
     public b: number;
 

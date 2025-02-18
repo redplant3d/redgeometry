@@ -40,6 +40,140 @@ export type BezierRCurve2Like = {
 
 export type BezierCurve2 = Bezier1Curve2 | Bezier2Curve2 | Bezier3Curve2 | BezierRCurve2;
 
+export interface ReadonlyBezier1Curve2 {
+    readonly p0: Vector2;
+    readonly p1: Vector2;
+    readonly pn: Vector2;
+    readonly type: CurveType.Bezier1;
+
+    clone(): Bezier1Curve2;
+    getBounds(): Box2;
+    getControlBounds(): Box2;
+    getDerivative(): Vector2;
+    getSignedArea(): number;
+    getTangentEnd(): Vector2;
+    getTangentStart(): Vector2;
+    getValueAt(t: number): Vector2;
+    getWindingAt(p: Vector2): number;
+    getWindingFracAt(p: Vector2, step: number): number;
+    isFinite(): boolean;
+    isPoint(): boolean;
+    reverse(): Bezier1Curve2;
+    splitAfter(t: number): Bezier1Curve2;
+    splitAt(t: number): [Bezier1Curve2, Bezier1Curve2];
+    splitBefore(t: number): Bezier1Curve2;
+    splitBetween(t0: number, t1: number): Bezier1Curve2;
+    toArray(): [number, number, number, number];
+    toEdge(): Edge2;
+    toString(): string;
+}
+
+export interface ReadonlyBezier2Curve2 {
+    readonly p0: Vector2;
+    readonly p1: Vector2;
+    readonly p2: Vector2;
+    readonly pn: Vector2;
+    readonly type: CurveType.Bezier2;
+
+    clone(): Bezier2Curve2;
+    getBounds(): Box2;
+    getClosestParameter(p: Vector2): number;
+    getCoefficients(): [Vector2, Vector2, Vector2];
+    getControlBounds(): Box2;
+    getCurvatureAt(t: number): number;
+    getCurvatureMetric(): number;
+    getDerivativeAt(t: number): Vector2;
+    getDerivativeCoefficients(): [Vector2, Vector2];
+    getEvoluteAt(t: number): Vector2;
+    getOffsetCuspParameter(rad: number): [number, number];
+    getSignedArea(): number;
+    getTangentEnd(): Vector2;
+    getTangentStart(): Vector2;
+    getValueAt(t: number): Vector2;
+    getVertexParameter(): number;
+    getWindingAt(p: Vector2): number;
+    getWindingFracAt(p: Vector2, step: number): number;
+    intersectLine(c: Bezier1Curve2, output: number[]): void;
+    intersectQuad(c: Bezier2Curve2, output: Vector2[]): void;
+    isCollinear(): boolean;
+    isFinite(): boolean;
+    isPoint(): boolean;
+    reverse(): Bezier2Curve2;
+    splitAfter(t: number): Bezier2Curve2;
+    splitAt(t: number): [Bezier2Curve2, Bezier2Curve2];
+    splitBefore(t: number): Bezier2Curve2;
+    splitBetween(t0: number, t1: number): Bezier2Curve2;
+    toArray(): [number, number, number, number, number, number];
+    toString(): string;
+}
+
+export interface ReadonlyBezier3Curve2 {
+    readonly p0: Vector2;
+    readonly p1: Vector2;
+    readonly p2: Vector2;
+    readonly p3: Vector2;
+    readonly pn: Vector2;
+    readonly type: CurveType.Bezier3;
+
+    clone(): Bezier3Curve2;
+    getBounds(): Box2;
+    getCoefficients(): [Vector2, Vector2, Vector2, Vector2];
+    getControlBounds(): Box2;
+    getCurvatureAt(t: number): number;
+    getCurvatureMetric(): number;
+    getDerivativeAt(t: number): Vector2;
+    getDerivativeCoefficients(): [Vector2, Vector2, Vector2];
+    getEvoluteAt(t: number): Vector2;
+    getInflectionParameter(): [number, number];
+    getSignedArea(): number;
+    getTangentEnd(): Vector2;
+    getTangentStart(): Vector2;
+    getValueAt(t: number): Vector2;
+    getWindingAt(p: Vector2): number;
+    getWindingFracAt(p: Vector2, step: number): number;
+    isCollinear(): boolean;
+    isFinite(): boolean;
+    isPoint(): boolean;
+    reverse(): Bezier3Curve2;
+    splitAfter(t: number): Bezier3Curve2;
+    splitAt(t: number): [Bezier3Curve2, Bezier3Curve2];
+    splitBefore(t: number): Bezier3Curve2;
+    splitBetween(t0: number, t1: number): Bezier3Curve2;
+    toArray(): [number, number, number, number, number, number, number, number];
+    toString(): string;
+}
+
+export interface ReadonlyBezierRCurve2 {
+    readonly p0: Vector2;
+    readonly p1: Vector2;
+    readonly p2: Vector2;
+    readonly w: number;
+    readonly pn: Vector2;
+    readonly type: CurveType.BezierR;
+
+    clone(): BezierRCurve2;
+    getBounds(): Box2;
+    getControlBounds(): Box2;
+    getDerivativeAt(t: number): Vector2;
+    getDerivativeCoefficients(): [Vector3, Vector3, Vector3];
+    getProjectivePoints(): [Vector3, Vector3, Vector3];
+    getSignedArea(): number;
+    getTangentEnd(): Vector2;
+    getTangentStart(): Vector2;
+    getValueAt(t: number): Vector2;
+    getWindingAt(p: Vector2): number;
+    getWindingFracAt(p: Vector2, step: number): number;
+    isFinite(): boolean;
+    isPoint(): boolean;
+    reverse(): BezierRCurve2;
+    splitAfter(t: number): BezierRCurve2;
+    splitAt(t: number): [BezierRCurve2, BezierRCurve2];
+    splitBefore(t: number): BezierRCurve2;
+    splitBetween(t0: number, t1: number): BezierRCurve2;
+    toArray(): [number, number, number, number, number, number, number];
+    toString(): string;
+}
+
 export enum CurveType {
     Bezier1,
     Bezier2,
@@ -47,7 +181,7 @@ export enum CurveType {
     BezierR,
 }
 
-export class Bezier1Curve2 {
+export class Bezier1Curve2 implements ReadonlyBezier1Curve2 {
     public p0: Vector2;
     public p1: Vector2;
 
@@ -213,7 +347,7 @@ export class Bezier1Curve2 {
     }
 }
 
-export class Bezier2Curve2 {
+export class Bezier2Curve2 implements ReadonlyBezier2Curve2 {
     public p0: Vector2;
     public p1: Vector2;
     public p2: Vector2;
@@ -592,7 +726,7 @@ export class Bezier2Curve2 {
     }
 }
 
-export class Bezier3Curve2 {
+export class Bezier3Curve2 implements ReadonlyBezier3Curve2 {
     public p0: Vector2;
     public p1: Vector2;
     public p2: Vector2;
@@ -985,7 +1119,7 @@ export class Bezier3Curve2 {
     }
 }
 
-export class BezierRCurve2 {
+export class BezierRCurve2 implements ReadonlyBezierRCurve2 {
     public p0: Vector2;
     public p1: Vector2;
     public p2: Vector2;

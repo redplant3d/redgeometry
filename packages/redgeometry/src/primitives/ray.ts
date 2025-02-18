@@ -1,4 +1,11 @@
-import { Vector2, Vector3, type Vector2Like, type Vector3Like } from "./vector.js";
+import {
+    Vector2,
+    Vector3,
+    type ReadonlyVector2,
+    type ReadonlyVector3,
+    type Vector2Like,
+    type Vector3Like,
+} from "./vector.js";
 
 export type Ray2Like = {
     readonly p: Vector2Like;
@@ -10,7 +17,38 @@ export type Ray3Like = {
     readonly v: Vector3Like;
 };
 
-export class Ray2 {
+export interface ReadonlyRay2 {
+    readonly p: ReadonlyVector2;
+    readonly v: ReadonlyVector2;
+
+    clone(): Ray2;
+    getParameterFromPoint(p: Vector2): number;
+    getSignedDistanceFromPoint(p: Vector2): number;
+    getValueAt(t: number): Vector2;
+    normal(): Ray2;
+    reverse(): Ray2;
+    toArray(): [number, number, number, number];
+    toString(): string;
+    translate(v: Vector2): Ray2;
+}
+
+export interface ReadonlyRay3 {
+    readonly p: ReadonlyVector3;
+    readonly v: ReadonlyVector3;
+
+    clone(): Ray3;
+    getDistanceFromPoint(p: Vector3): number;
+    getNormalAround(v: Vector3): Ray3;
+    getParameterFromPoint(p: Vector3): number;
+    getValueAt(t: number): Vector3;
+    isFinite(): boolean;
+    reverse(): Ray3;
+    toArray(): [number, number, number, number, number, number];
+    toString(): string;
+    translate(v: Vector3): Ray3;
+}
+
+export class Ray2 implements ReadonlyRay2 {
     public p: Vector2;
     public v: Vector2;
 
@@ -146,7 +184,7 @@ export class Ray2 {
     }
 }
 
-export class Ray3 {
+export class Ray3 implements ReadonlyRay3 {
     public p: Vector3;
     public v: Vector3;
 

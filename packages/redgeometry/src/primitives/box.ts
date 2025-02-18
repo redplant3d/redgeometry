@@ -18,7 +18,62 @@ export type Box3Like = {
     readonly z1: number;
 };
 
-export class Box2 {
+export interface ReadonlyBox2 {
+    readonly x0: number;
+    readonly x1: number;
+    readonly y0: number;
+    readonly y1: number;
+
+    addMinkowski(box: Box2): Box2;
+    clone(): Box2;
+    contains(p: Vector2): boolean;
+    containsInclusive(p: Vector2): boolean;
+    dx(): number;
+    dy(): number;
+    getCenter(): Vector2;
+    intersects(b: Box2): boolean;
+    intersectsInclusive(b: Box2): boolean;
+    intersectsRay(ray: Ray2): boolean;
+    isEmpty(): boolean;
+    isPoint(): boolean;
+    scale(fx: number, fy: number): Box2;
+    scaleAbsolute(dx: number, dy: number): Box2;
+    subMinkowski(box: Box2): Box2;
+    toArray(): [number, number, number, number];
+    toString(): string;
+    transform(mat: Matrix3 | Matrix3A): Box2;
+}
+
+export interface ReadonlyBox3 {
+    readonly x0: number;
+    readonly x1: number;
+    readonly y0: number;
+    readonly y1: number;
+    readonly z0: number;
+    readonly z1: number;
+
+    addMinkowski(box: Box3): Box3;
+    clone(): Box3;
+    contains(p: Vector3): boolean;
+    containsInclusive(p: Vector3): boolean;
+    dx(): number;
+    dy(): number;
+    dz(): number;
+    getCenter(): Vector3;
+    intersects(b: Box3): boolean;
+    intersectsInclusive(b: Box3): boolean;
+    intersectsRay(ray: Ray3): boolean;
+    isEmpty(): boolean;
+    isPoint(): boolean;
+    scale(fx: number, fy: number, fz: number): Box3;
+    scaleAbsolute(dx: number, dy: number, dz: number): Box3;
+    subMinkowski(box: Box3): Box3;
+    toArray(): [number, number, number, number, number, number];
+    toString(): string;
+    transform(mat: Matrix4 | Matrix4A): Box3;
+}
+
+export class Box2 implements ReadonlyBox2 {
     public x0: number;
     public x1: number;
     public y0: number;
@@ -215,7 +270,7 @@ export class Box2 {
     }
 }
 
-export class Box3 {
+export class Box3 implements ReadonlyBox3 {
     public x0: number;
     public x1: number;
     public y0: number;

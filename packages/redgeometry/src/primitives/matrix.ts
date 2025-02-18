@@ -24,6 +24,81 @@ export type Matrix4Like = {
     readonly elements: MatrixElements4;
 };
 
+export interface ReadonlyMatrix3A {
+    readonly elements: MatrixElements3A;
+    readonly type: MatrixType.Affine;
+
+    clone(): Matrix3A;
+    determinant(): number;
+    eq(mat: Matrix3A): boolean;
+    extractSRT(): { s: Vector2; r: Complex; t: Vector2 };
+    inverse(): Matrix3A;
+    mul(mat: Matrix3A): Matrix3A;
+    mulV(v: Vector2): Vector2;
+    toArray(): MatrixElements3A;
+    toString(): string;
+    transformPoint(p: Vector2): Vector2;
+    transformVector(v: Vector2): Vector2;
+    transpose(): Matrix3;
+}
+
+export interface ReadonlyMatrix3 {
+    readonly elements: MatrixElements3;
+    readonly type: MatrixType.Projective;
+
+    add(mat: Matrix3): Matrix3;
+    clone(): Matrix3;
+    determinant(): number;
+    eq(mat: Matrix3): boolean;
+    extractSRT(): { s: Vector2; r: Complex; t: Vector2 };
+    inverse(): Matrix3;
+    mul(mat: Matrix3): Matrix3;
+    mulV(v: Vector3): Vector3;
+    toArray(): MatrixElements3;
+    toString(): string;
+    transformPoint(p: Vector2): Vector2;
+    transformVector(v: Vector2): Vector2;
+    transpose(): Matrix3;
+}
+
+export interface ReadonlyMatrix4A {
+    readonly elements: MatrixElements4A;
+    readonly type: MatrixType.Affine;
+
+    clone(): Matrix4A;
+    determinant(): number;
+    eq(mat: Matrix4A): boolean;
+    extractSRT(): { s: Vector3; r: Quaternion; t: Vector3 };
+    inverse(): Matrix4A;
+    mul(mat: Matrix4A): Matrix4A;
+    mulV(v: Vector3): Vector3;
+    toArray(): MatrixElements4A;
+    toString(): string;
+    transformPoint(p: Vector3): Vector3;
+    transformVector(v: Vector3): Vector3;
+    transpose(): Matrix4;
+}
+
+export interface ReadonlyMatrix4 {
+    readonly elements: MatrixElements4;
+    readonly type: MatrixType.Projective;
+
+    add(mat: Matrix4): Matrix4;
+    clone(): Matrix4;
+    determinant(): number;
+    eq(mat: Matrix4): boolean;
+    extractSRT(): { s: Vector3; r: Quaternion; t: Vector3 };
+    inverse(): Matrix4;
+    mul(mat: Matrix4): Matrix4;
+    mulV(v: Vector4): Vector4;
+    sub(mat: Matrix4): Matrix4;
+    toArray(): MatrixElements4;
+    toString(): string;
+    transformPoint(p: Vector3): Vector3;
+    transformVector(v: Vector3): Vector3;
+    transpose(): Matrix4;
+}
+
 export enum MatrixType {
     Affine,
     Projective,
@@ -37,7 +112,7 @@ export enum MatrixType {
  * |  0   0   1 |
  * ```
  */
-export class Matrix3A {
+export class Matrix3A implements ReadonlyMatrix3A {
     public readonly elements: MatrixElements3A;
 
     /**
@@ -537,7 +612,7 @@ export class Matrix3A {
  * | e2  e5  e8 |
  * ```
  */
-export class Matrix3 {
+export class Matrix3 implements ReadonlyMatrix3 {
     public readonly elements: MatrixElements3;
 
     /**
@@ -1190,7 +1265,7 @@ export class Matrix3 {
  * |  0   0   0    1 |
  * ```
  */
-export class Matrix4A {
+export class Matrix4A implements ReadonlyMatrix4A {
     public readonly elements: MatrixElements4A;
 
     /**
@@ -2065,7 +2140,7 @@ export class Matrix4A {
  * | e3  e7  e11  e15 |
  * ```
  */
-export class Matrix4 {
+export class Matrix4 implements ReadonlyMatrix4 {
     public readonly elements: MatrixElements4;
 
     /**

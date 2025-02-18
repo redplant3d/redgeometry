@@ -15,7 +15,55 @@ export type Edge3Like = {
     readonly p1: Vector3Like;
 };
 
-export class Edge2 {
+export interface ReadonlyEdge2 {
+    readonly p0: Vector2;
+    readonly p1: Vector2;
+
+    clone(): Edge2;
+    eq(e: Edge2): boolean;
+    getBounds(): Box2;
+    getClosestPoint(p: Vector2): Vector2;
+    getClosestPointDistance(p: Vector2): number;
+    getParameterFromPoint(p: Vector2): number;
+    getSignedDistanceFromPoint(p: Vector2): number;
+    getValueAt(t: number): Vector2;
+    isFinite(): boolean;
+    isPoint(): boolean;
+    isPointInside(p: Vector2): boolean;
+    normal(): Edge2;
+    reverse(): Edge2;
+    toArray(): [number, number, number, number];
+    toBezier(): Bezier1Curve2;
+    toRay(): Ray2;
+    toString(): string;
+    translate(v: Vector2): Edge2;
+    vector(): Vector2;
+}
+
+export interface ReadonlyEdge3 {
+    readonly p0: Vector3;
+    readonly p1: Vector3;
+
+    clone(): Edge3;
+    eq(e: Edge3): boolean;
+    getBounds(): Box3;
+    getClosestPoint(p: Vector3): Vector3;
+    getClosestPointDistance(p: Vector3): number;
+    getDistanceFromPoint(p: Vector3): number;
+    getNormalAround(v: Vector3): Edge3;
+    getParameterFromPoint(p: Vector3): number;
+    getProjectedEdge(p0: Vector2, p1: Vector2): Edge3;
+    getValueAt(t: number): Vector3;
+    isFinite(): boolean;
+    reverse(): Edge3;
+    toArray(): [number, number, number, number, number, number];
+    toRay(): Ray3;
+    toString(): string;
+    translate(v: Vector3): Edge3;
+    vector(): Vector3;
+}
+
+export class Edge2 implements ReadonlyEdge2 {
     public p0: Vector2;
     public p1: Vector2;
 
@@ -400,7 +448,7 @@ export class Edge2 {
     }
 }
 
-export class Edge3 {
+export class Edge3 implements ReadonlyEdge3 {
     public p0: Vector3;
     public p1: Vector3;
 

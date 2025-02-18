@@ -7,7 +7,18 @@ export type ColorRgbaLike = {
     readonly r: number;
 };
 
-export class ColorRgba {
+export interface ReadonlyColorRgba {
+    readonly a: number;
+    readonly b: number;
+    readonly g: number;
+    readonly r: number;
+
+    clone(): ColorRgba;
+    style(): string;
+    toArray(): [number, number, number, number];
+}
+
+export class ColorRgba implements ReadonlyColorRgba {
     public a: number;
     public b: number;
     public g: number;

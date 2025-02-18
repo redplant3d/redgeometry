@@ -18,7 +18,116 @@ export type Vector4Like = {
     readonly w: number;
 };
 
-export class Vector2 {
+export interface ReadonlyVector2 {
+    readonly x: number;
+    readonly y: number;
+
+    abs(): Vector2;
+    add(v: Vector2): Vector2;
+    addMulS(v: Vector2, s: number): Vector2;
+    angle(): number;
+    angleTo(v: Vector2): number;
+    clamp(vmin: Vector2, vmax: Vector2): Vector2;
+    clone(): Vector2;
+    copyTo(data: number[], offset?: number): void;
+    cross(v: Vector2): number;
+    distanceTo(p: Vector2): number;
+    divS(s: number): Vector2;
+    dot(v: Vector2): number;
+    eq(v: Vector2): boolean;
+    eqApproxAbs(v: Vector2, eps: number): boolean;
+    eqApproxRel(v: Vector2, eps: number): boolean;
+    isFinite(): boolean;
+    isOne(): boolean;
+    isZero(): boolean;
+    len(): number;
+    lenSq(): number;
+    lerp(v: Vector2, t: number): Vector2;
+    mulS(s: number): Vector2;
+    neg(): Vector2;
+    normal(): Vector2;
+    slerp(v: Vector2, t: number): Vector2;
+    sub(v: Vector2): Vector2;
+    toArray(): [number, number];
+    toString(): string;
+    unit(): Vector2;
+    unitOrZero(): Vector2;
+}
+
+export interface ReadonlyVector3 {
+    readonly x: number;
+    readonly y: number;
+    readonly z: number;
+
+    abs(): Vector3;
+    add(v: Vector3): Vector3;
+    addMulS(v: Vector3, s: number): Vector3;
+    angleTo(v: Vector3): number;
+    clamp(vmin: Vector3, vmax: Vector3): Vector3;
+    clone(): Vector3;
+    copyTo(data: number[], number?: number): void;
+    cross(v: Vector3): Vector3;
+    distanceTo(p: Vector3): number;
+    divS(s: number): Vector3;
+    dot(v: Vector3): number;
+    eq(v: Vector3): boolean;
+    eqApproxAbs(v: Vector3, eps: number): boolean;
+    eqApproxRel(v: Vector3, eps: number): boolean;
+    isFinite(): boolean;
+    isOne(): boolean;
+    isZero(): boolean;
+    len(): number;
+    lenSq(): number;
+    lerp(v: Vector3, t: number): Vector3;
+    mulS(s: number): Vector3;
+    neg(): Vector3;
+    normalAround(v: Vector3): Vector3;
+    normalAroundAny(): Vector3;
+    normalAroundX(): Vector3;
+    normalAroundY(): Vector3;
+    normalAroundZ(): Vector3;
+    orthonormalBasis(): { n1: Vector3; n2: Vector3 };
+    slerp(v: Vector3, t: number): Vector3;
+    sub(v: Vector3): Vector3;
+    toArray(): [number, number, number];
+    toString(): string;
+    unit(): Vector3;
+    unitOrZero(): Vector3;
+}
+
+export interface ReadonlyVector4 {
+    readonly w: number;
+    readonly x: number;
+    readonly y: number;
+    readonly z: number;
+
+    abs(): Vector4;
+    add(v: Vector4): Vector4;
+    addMulS(v: Vector4, s: number): Vector4;
+    clamp(vmin: Vector4, vmax: Vector4): Vector4;
+    clone(): Vector4;
+    copyTo(data: number[], offset?: number): void;
+    divS(s: number): Vector4;
+    dot(v: Vector4): number;
+    eq(v: Vector4): boolean;
+    eqApproxAbs(v: Vector4, eps: number): boolean;
+    eqApproxRel(v: Vector4, eps: number): boolean;
+    isFinite(): boolean;
+    isOne(): boolean;
+    isZero(): boolean;
+    len(): number;
+    lenSq(): number;
+    lerp(v: Vector4, t: number): Vector4;
+    mulS(s: number): Vector4;
+    neg(): Vector4;
+    sub(v: Vector4): Vector4;
+    toArray(): [number, number, number, number];
+    toString(): string;
+    unit(): Vector4;
+    unitOrZero(): Vector4;
+}
+
+export class Vector2 implements ReadonlyVector2 {
     public x: number;
     public y: number;
 
@@ -375,7 +484,7 @@ export class Vector2 {
     }
 }
 
-export class Vector3 {
+export class Vector3 implements ReadonlyVector3 {
     public x: number;
     public y: number;
     public z: number;
@@ -770,11 +879,11 @@ export class Vector3 {
     }
 }
 
-export class Vector4 {
+export class Vector4 implements ReadonlyVector4 {
+    public w: number;
     public x: number;
     public y: number;
     public z: number;
-    public w: number;
 
     public constructor(x: number, y: number, z: number, w: number) {
         this.x = x;
