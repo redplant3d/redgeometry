@@ -200,36 +200,6 @@ export class Matrix3A implements ReadonlyMatrix3A {
     }
 
     /**
-     * Copies values from `mat` into this matrix.
-     */
-    public copyFromMat3(mat: ReadonlyMatrix3): void {
-        const ea = this.elements;
-        const eb = mat.elements;
-
-        ea[0] = eb[0];
-        ea[1] = eb[1];
-        ea[2] = eb[3];
-        ea[3] = eb[4];
-        ea[4] = eb[6];
-        ea[5] = eb[7];
-    }
-
-    /**
-     * Copies values from `mat` into this matrix.
-     */
-    public copyFromMat3A(mat: ReadonlyMatrix3A): void {
-        const ea = this.elements;
-        const eb = mat.elements;
-
-        ea[0] = eb[0];
-        ea[1] = eb[1];
-        ea[2] = eb[2];
-        ea[3] = eb[3];
-        ea[4] = eb[4];
-        ea[5] = eb[5];
-    }
-
-    /**
      * Returns the determinant of the matrix.
      */
     public determinant(): number {
@@ -242,12 +212,12 @@ export class Matrix3A implements ReadonlyMatrix3A {
         const eb = mat.elements;
 
         return (
-            eb[0] === ea[0] &&
-            eb[1] === ea[1] &&
-            eb[2] === ea[2] &&
-            eb[3] === ea[3] &&
-            eb[4] === ea[4] &&
-            eb[5] === ea[5]
+            ea[0] === eb[0] &&
+            ea[1] === eb[1] &&
+            ea[2] === eb[2] &&
+            ea[3] === eb[3] &&
+            ea[4] === eb[4] &&
+            ea[5] === eb[5]
         );
     }
 
@@ -281,14 +251,14 @@ export class Matrix3A implements ReadonlyMatrix3A {
         }
 
         const detInv = 1 / det;
-        const e = this.elements;
+        const ea = this.elements;
 
-        const e0 = detInv * e[3];
-        const e1 = detInv * -e[1];
-        const e2 = detInv * -e[2];
-        const e3 = detInv * e[0];
-        const e4 = -(e[4] * e0 + e[5] * e2);
-        const e5 = -(e[4] * e1 + e[5] * e3);
+        const e0 = detInv * ea[3];
+        const e1 = detInv * -ea[1];
+        const e2 = detInv * -ea[2];
+        const e3 = detInv * ea[0];
+        const e4 = -(ea[4] * e0 + ea[5] * e2);
+        const e5 = -(ea[4] * e1 + ea[5] * e3);
 
         return new Matrix3A([e0, e1, e2, e3, e4, e5]);
     }
@@ -318,29 +288,6 @@ export class Matrix3A implements ReadonlyMatrix3A {
 
     /**
      * ```
-     * | ea0  ea2  ea4 |   | eb0  eb2  eb4 |
-     * | ea1  ea3  ea5 | * | eb1  eb3  eb5 |
-     * |   0    0    1 |   |   0    0    1 |
-     * ```
-     */
-    public mulSet(mat1: ReadonlyMatrix3A, mat2: ReadonlyMatrix3A): void {
-        const ea = mat1.elements;
-        const eb = mat2.elements;
-
-        const e0 = ea[0] * eb[0] + ea[2] * eb[1];
-        const e1 = ea[1] * eb[0] + ea[3] * eb[1];
-
-        const e2 = ea[0] * eb[2] + ea[2] * eb[3];
-        const e3 = ea[1] * eb[2] + ea[3] * eb[3];
-
-        const e4 = ea[0] * eb[4] + ea[2] * eb[5] + ea[4];
-        const e5 = ea[1] * eb[4] + ea[3] * eb[5] + ea[5];
-
-        this.set(e0, e1, e2, e3, e4, e5);
-    }
-
-    /**
-     * ```
      * | e0  e2  e4 |   | x |
      * | e1  e3  e5 | * | y |
      * |  0   0   1 |   | 1 |
@@ -353,127 +300,6 @@ export class Matrix3A implements ReadonlyMatrix3A {
         const y = e[1] * v.x + e[3] * v.y + e[5];
 
         return new Vector2(x, y);
-    }
-
-    /**
-     * ```
-     * | z0  z2  0 |   | e0  e2  e4 |
-     * | z1  z3  0 | * | e1  e3  e5 |
-     * |  0   0  1 |   |  0   0   1 |
-     * ```
-     */
-    public rotate(za: number, zb: number): void {
-        const z0 = za;
-        const z1 = zb;
-        const z2 = -zb;
-        const z3 = za;
-
-        const e = this.elements;
-
-        const e0 = z0 * e[0] + z2 * e[1];
-        const e1 = z1 * e[0] + z3 * e[1];
-        e[0] = e0;
-        e[1] = e1;
-
-        const e2 = z0 * e[2] + z2 * e[3];
-        const e3 = z1 * e[2] + z3 * e[3];
-        e[2] = e2;
-        e[3] = e3;
-
-        const e4 = z0 * e[4] + z2 * e[5];
-        const e5 = z1 * e[4] + z3 * e[5];
-        e[4] = e4;
-        e[5] = e5;
-    }
-
-    /**
-     * ```
-     * | e0  e2  e4 |   | z0  z2  0 |
-     * | e1  e3  e5 | * | z1  z3  0 |
-     * |  0   0   1 |   |  0   0  1 |
-     * ```
-     */
-    public rotatePre(za: number, zb: number): void {
-        const z0 = za;
-        const z1 = zb;
-        const z2 = -zb;
-        const z3 = za;
-
-        const e = this.elements;
-
-        const e0 = e[0] * z0 + e[2] * z1;
-        const e2 = e[0] * z2 + e[2] * z3;
-        e[0] = e0;
-        e[2] = e2;
-
-        const e1 = e[1] * z0 + e[3] * z1;
-        const e3 = e[1] * z2 + e[3] * z3;
-        e[1] = e1;
-        e[3] = e3;
-    }
-
-    /**
-     * ```
-     * | z0  z2  0 |
-     * | z1  z3  0 |
-     * |  0   0  1 |
-     * ```
-     */
-    public rotateSet(za: number, zb: number): void {
-        const z0 = za;
-        const z1 = zb;
-        const z2 = -zb;
-        const z3 = za;
-
-        this.set(z0, z1, z2, z3, 0, 0);
-    }
-
-    /**
-     * ```
-     * | sx   0  0 |   | e0  e2  e4 |
-     * |  0  sy  0 | * | e1  e3  e5 |
-     * |  0   0  1 |   |  0   0   1 |
-     * ```
-     */
-    public scale(sx: number, sy: number): void {
-        const e = this.elements;
-
-        e[0] *= sx;
-        e[1] *= sy;
-
-        e[2] *= sx;
-        e[3] *= sy;
-
-        e[4] *= sx;
-        e[5] *= sy;
-    }
-
-    /**
-     * ```
-     * | e0  e2  e4 |   | sx   0  0 |
-     * | e1  e3  e5 | * |  0  sy  0 |
-     * |  0   0   1 |   |  0   0  1 |
-     * ```
-     */
-    public scalePre(sx: number, sy: number): void {
-        const e = this.elements;
-
-        e[0] *= sx;
-        e[1] *= sx;
-
-        e[2] *= sy;
-        e[3] *= sy;
-    }
-
-    /**
-     * ```
-     * | sx   0  0 |
-     * |  0  sy  0 |
-     * |  0   0  1 |
-     * ```
-     */
-    public scaleSet(sx: number, sy: number): void {
-        this.set(sx, 0, 0, sy, 0, 0);
     }
 
     /**
@@ -494,6 +320,74 @@ export class Matrix3A implements ReadonlyMatrix3A {
         e[5] = e5;
     }
 
+    /**
+     * Copies values from `mat` into this matrix.
+     */
+    public setFromMat3(mat: ReadonlyMatrix3): void {
+        const ea = mat.elements;
+        const e = this.elements;
+
+        e[0] = ea[0];
+        e[1] = ea[1];
+        e[2] = ea[3];
+        e[3] = ea[4];
+        e[4] = ea[6];
+        e[5] = ea[7];
+    }
+
+    /**
+     * Copies values from `mat` into this matrix.
+     */
+    public setFromMat3A(mat: ReadonlyMatrix3A): void {
+        const ea = mat.elements;
+        const e = this.elements;
+
+        e[0] = ea[0];
+        e[1] = ea[1];
+        e[2] = ea[2];
+        e[3] = ea[3];
+        e[4] = ea[4];
+        e[5] = ea[5];
+    }
+
+    /**
+     * ```
+     * | z0  z2  0 |
+     * | z1  z3  0 |
+     * |  0   0  1 |
+     * ```
+     */
+    public setFromRotation(za: number, zb: number): void {
+        const z0 = za;
+        const z1 = zb;
+        const z2 = -zb;
+        const z3 = za;
+
+        this.set(z0, z1, z2, z3, 0, 0);
+    }
+
+    /**
+     * ```
+     * | sx   0  0 |
+     * |  0  sy  0 |
+     * |  0   0  1 |
+     * ```
+     */
+    public setFromScale(sx: number, sy: number): void {
+        this.set(sx, 0, 0, sy, 0, 0);
+    }
+
+    /**
+     * ```
+     * | 1  0  ty |
+     * | 0  1  ty |
+     * | 0  0   1 |
+     * ```
+     */
+    public setFromTranslation(tx: number, ty: number): void {
+        this.set(1, 0, 0, 1, tx, ty);
+    }
+
     public setIdentity(): void {
         this.set(1, 0, 0, 1, 0, 0);
     }
@@ -507,16 +401,167 @@ export class Matrix3A implements ReadonlyMatrix3A {
         }
 
         const detInv = 1 / det;
-        const e = mat.elements;
+        const ea = mat.elements;
 
-        const e0 = detInv * e[3];
-        const e1 = detInv * -e[1];
-        const e2 = detInv * -e[2];
-        const e3 = detInv * e[0];
-        const e4 = -(e[4] * e0 + e[5] * e2);
-        const e5 = -(e[4] * e1 + e[5] * e3);
+        const e0 = detInv * ea[3];
+        const e1 = detInv * -ea[1];
+        const e2 = detInv * -ea[2];
+        const e3 = detInv * ea[0];
+        const e4 = -(ea[4] * e0 + ea[5] * e2);
+        const e5 = -(ea[4] * e1 + ea[5] * e3);
 
         this.set(e0, e1, e2, e3, e4, e5);
+    }
+
+    /**
+     * ```
+     * | ea0  ea2  ea4 |   | eb0  eb2  eb4 |
+     * | ea1  ea3  ea5 | * | eb1  eb3  eb5 |
+     * |   0    0    1 |   |   0    0    1 |
+     * ```
+     */
+    public setMul(mat1: ReadonlyMatrix3A, mat2: ReadonlyMatrix3A): void {
+        const ea = mat1.elements;
+        const eb = mat2.elements;
+
+        const e0 = ea[0] * eb[0] + ea[2] * eb[1];
+        const e1 = ea[1] * eb[0] + ea[3] * eb[1];
+
+        const e2 = ea[0] * eb[2] + ea[2] * eb[3];
+        const e3 = ea[1] * eb[2] + ea[3] * eb[3];
+
+        const e4 = ea[0] * eb[4] + ea[2] * eb[5] + ea[4];
+        const e5 = ea[1] * eb[4] + ea[3] * eb[5] + ea[5];
+
+        this.set(e0, e1, e2, e3, e4, e5);
+    }
+
+    /**
+     * ```
+     * | z0  z2  0 |   | ea0  ea2  ea4 |
+     * | z1  z3  0 | * | ea1  ea3  ea5 |
+     * |  0   0  1 |   |   0    0    1 |
+     * ```
+     */
+    public setRotate(mat: ReadonlyMatrix3A, za: number, zb: number): void {
+        const z0 = za;
+        const z1 = zb;
+        const z2 = -zb;
+        const z3 = za;
+
+        const ea = mat.elements;
+        const e = this.elements;
+
+        const e0 = z0 * ea[0] + z2 * ea[1];
+        const e1 = z1 * ea[0] + z3 * ea[1];
+        e[0] = e0;
+        e[1] = e1;
+
+        const e2 = z0 * ea[2] + z2 * ea[3];
+        const e3 = z1 * ea[2] + z3 * ea[3];
+        e[2] = e2;
+        e[3] = e3;
+
+        const e4 = z0 * ea[4] + z2 * ea[5];
+        const e5 = z1 * ea[4] + z3 * ea[5];
+        e[4] = e4;
+        e[5] = e5;
+    }
+
+    /**
+     * ```
+     * | ea0  ea2  ea4 |   | z0  z2  0 |
+     * | ea1  ea3  ea5 | * | z1  z3  0 |
+     * |   0    0    1 |   |  0   0  1 |
+     * ```
+     */
+    public setRotatePre(mat: ReadonlyMatrix3A, za: number, zb: number): void {
+        const z0 = za;
+        const z1 = zb;
+        const z2 = -zb;
+        const z3 = za;
+
+        const ea = mat.elements;
+        const e = this.elements;
+
+        const e0 = ea[0] * z0 + ea[2] * z1;
+        const e2 = ea[0] * z2 + ea[2] * z3;
+        e[0] = e0;
+        e[2] = e2;
+
+        const e1 = ea[1] * z0 + ea[3] * z1;
+        const e3 = ea[1] * z2 + ea[3] * z3;
+        e[1] = e1;
+        e[3] = e3;
+    }
+
+    /**
+     * ```
+     * | sx   0  0 |   | ea0  ea2  ea4 |
+     * |  0  sy  0 | * | ea1  ea3  ea5 |
+     * |  0   0  1 |   |   0    0    1 |
+     * ```
+     */
+    public setScale(mat: ReadonlyMatrix3A, sx: number, sy: number): void {
+        const ea = mat.elements;
+        const e = this.elements;
+
+        e[0] = sx * ea[0];
+        e[1] = sy * ea[1];
+
+        e[2] = sx * ea[2];
+        e[3] = sy * ea[3];
+
+        e[4] = sx * ea[4];
+        e[5] = sy * ea[5];
+    }
+
+    /**
+     * ```
+     * | ea0  ea2  ea4 |   | sx   0  0 |
+     * | ea1  ea3  ea5 | * |  0  sy  0 |
+     * |   0    0    1 |   |  0   0  1 |
+     * ```
+     */
+    public setScalePre(mat: ReadonlyMatrix3A, sx: number, sy: number): void {
+        const ea = mat.elements;
+        const e = this.elements;
+
+        e[0] = ea[0] * sx;
+        e[1] = ea[1] * sx;
+
+        e[2] = ea[2] * sy;
+        e[3] = ea[3] * sy;
+    }
+
+    /**
+     * ```
+     * | 1  0  tx |   | ea0  ea2  ea4 |
+     * | 0  1  ty | * | ea1  ea3  ea5 |
+     * | 0  0   1 |   |   0    0    1 |
+     * ```
+     */
+    public setTranslate(mat: ReadonlyMatrix3A, tx: number, ty: number): void {
+        const ea = mat.elements;
+        const e = this.elements;
+
+        e[4] = tx + ea[4];
+        e[5] = ty + ea[5];
+    }
+
+    /**
+     * ```
+     * | ea0  ea2  ea4 |   | 1  0  tx |
+     * | ea1  ea3  ea5 | * | 0  1  ty |
+     * |   0    0    1 |   | 0  0   1 |
+     * ```
+     */
+    public setTranslatePre(mat: ReadonlyMatrix3A, tx: number, ty: number): void {
+        const ea = mat.elements;
+        const e = this.elements;
+
+        e[4] = ea[0] * tx + ea[2] * ty + ea[4];
+        e[5] = ea[1] * tx + ea[3] * ty + ea[5];
     }
 
     public toArray(): MatrixElements3A {
@@ -563,45 +608,6 @@ export class Matrix3A implements ReadonlyMatrix3A {
         const y = e[1] * v.x + e[3] * v.y;
 
         return new Vector2(x, y);
-    }
-
-    /**
-     * ```
-     * | 1  0  tx |   | e0  e2  e4 |
-     * | 0  1  ty | * | e1  e3  e5 |
-     * | 0  0   1 |   |  0   0   1 |
-     * ```
-     */
-    public translate(tx: number, ty: number): void {
-        const e = this.elements;
-
-        e[4] += tx;
-        e[5] += ty;
-    }
-
-    /**
-     * ```
-     * | e0  e2  e4 |   | 1  0  tx |
-     * | e1  e3  e5 | * | 0  1  ty |
-     * |  0   0   1 |   | 0  0   1 |
-     * ```
-     */
-    public translatePre(tx: number, ty: number): void {
-        const e = this.elements;
-
-        e[4] += e[0] * tx + e[2] * ty;
-        e[5] += e[1] * tx + e[3] * ty;
-    }
-
-    /**
-     * ```
-     * | 1  0  ty |
-     * | 0  1  ty |
-     * | 0  0   1 |
-     * ```
-     */
-    public translateSet(tx: number, ty: number): void {
-        this.set(1, 0, 0, 1, tx, ty);
     }
 
     /**
@@ -724,6 +730,13 @@ export class Matrix3 implements ReadonlyMatrix3 {
         return new Matrix3([1, 0, 0, 0, 1, 0, tx, ty, 1]);
     }
 
+    /**
+     * ```
+     * | ea0  ea3  ea6 |   | eb0  eb3  eb6 |
+     * | ea1  ea4  ea7 | + | eb1  eb4  eb7 |
+     * | ea2  ea5  ea8 |   | eb2  eb5  eb8 |
+     * ```
+     */
     public add(mat: ReadonlyMatrix3): Matrix3 {
         const ea = this.elements;
         const eb = mat.elements;
@@ -741,61 +754,8 @@ export class Matrix3 implements ReadonlyMatrix3 {
         return new Matrix3([e0, e1, e2, e3, e4, e5, e6, e7, e8]);
     }
 
-    public addSet(mat1: ReadonlyMatrix3, mat2: ReadonlyMatrix3): void {
-        const ea = mat1.elements;
-        const eb = mat2.elements;
-
-        const e0 = ea[0] + eb[0];
-        const e1 = ea[1] + eb[1];
-        const e2 = ea[2] + eb[2];
-        const e3 = ea[3] + eb[3];
-        const e4 = ea[4] + eb[4];
-        const e5 = ea[5] + eb[5];
-        const e6 = ea[6] + eb[6];
-        const e7 = ea[7] + eb[7];
-        const e8 = ea[8] + eb[8];
-
-        this.set(e0, e1, e2, e3, e4, e5, e6, e7, e8);
-    }
-
     public clone(): Matrix3 {
         return new Matrix3([...this.elements]);
-    }
-
-    /**
-     * Copies values from `mat` into this matrix.
-     */
-    public copyFromMat3(mat: ReadonlyMatrix3): void {
-        const ea = this.elements;
-        const eb = mat.elements;
-
-        ea[0] = eb[0];
-        ea[1] = eb[1];
-        ea[2] = eb[2];
-        ea[3] = eb[3];
-        ea[4] = eb[4];
-        ea[5] = eb[5];
-        ea[6] = eb[6];
-        ea[7] = eb[7];
-        ea[8] = eb[8];
-    }
-
-    /**
-     * Copies values from `mat` into this matrix.
-     */
-    public copyFromMat3A(mat: ReadonlyMatrix3A): void {
-        const ea = this.elements;
-        const eb = mat.elements;
-
-        ea[0] = eb[0];
-        ea[1] = eb[1];
-        ea[2] = 0;
-        ea[3] = eb[2];
-        ea[4] = eb[3];
-        ea[5] = 0;
-        ea[6] = eb[4];
-        ea[7] = eb[5];
-        ea[8] = 1;
     }
 
     /**
@@ -816,15 +776,15 @@ export class Matrix3 implements ReadonlyMatrix3 {
         const eb = mat.elements;
 
         return (
-            eb[0] === ea[0] &&
-            eb[1] === ea[1] &&
-            eb[2] === ea[2] &&
-            eb[3] === ea[3] &&
-            eb[4] === ea[4] &&
-            eb[5] === ea[5] &&
-            eb[6] === ea[6] &&
-            eb[7] === ea[7] &&
-            eb[8] === ea[8]
+            ea[0] === eb[0] &&
+            ea[1] === eb[1] &&
+            ea[2] === eb[2] &&
+            ea[3] === eb[3] &&
+            ea[4] === eb[4] &&
+            ea[5] === eb[5] &&
+            ea[6] === eb[6] &&
+            ea[7] === eb[7] &&
+            ea[8] === eb[8]
         );
     }
 
@@ -858,17 +818,17 @@ export class Matrix3 implements ReadonlyMatrix3 {
         }
 
         const detInv = 1 / det;
-        const e = this.elements;
+        const ea = this.elements;
 
-        const e0 = detInv * (e[4] * e[8] - e[5] * e[7]);
-        const e1 = detInv * (e[2] * e[7] - e[1] * e[8]);
-        const e2 = detInv * (e[1] * e[5] - e[2] * e[4]);
-        const e3 = detInv * (e[5] * e[6] - e[3] * e[8]);
-        const e4 = detInv * (e[0] * e[8] - e[2] * e[6]);
-        const e5 = detInv * (e[2] * e[3] - e[0] * e[5]);
-        const e6 = detInv * (e[3] * e[7] - e[4] * e[6]);
-        const e7 = detInv * (e[1] * e[6] - e[0] * e[7]);
-        const e8 = detInv * (e[0] * e[4] - e[1] * e[3]);
+        const e0 = detInv * (ea[4] * ea[8] - ea[5] * ea[7]);
+        const e1 = detInv * (ea[2] * ea[7] - ea[1] * ea[8]);
+        const e2 = detInv * (ea[1] * ea[5] - ea[2] * ea[4]);
+        const e3 = detInv * (ea[5] * ea[6] - ea[3] * ea[8]);
+        const e4 = detInv * (ea[0] * ea[8] - ea[2] * ea[6]);
+        const e5 = detInv * (ea[2] * ea[3] - ea[0] * ea[5]);
+        const e6 = detInv * (ea[3] * ea[7] - ea[4] * ea[6]);
+        const e7 = detInv * (ea[1] * ea[6] - ea[0] * ea[7]);
+        const e8 = detInv * (ea[0] * ea[4] - ea[1] * ea[3]);
 
         return new Matrix3([e0, e1, e2, e3, e4, e5, e6, e7, e8]);
     }
@@ -901,32 +861,6 @@ export class Matrix3 implements ReadonlyMatrix3 {
 
     /**
      * ```
-     * | ea0  ea3  ea6 |   | eb0  eb3  eb6 |
-     * | ea1  ea4  ea7 | * | eb1  eb4  eb7 |
-     * | ea2  ea5  ea8 |   | eb2  eb5  eb8 |
-     * ```
-     */
-    public mulSet(mat1: ReadonlyMatrix3, mat2: ReadonlyMatrix3): void {
-        const ea = mat1.elements;
-        const eb = mat2.elements;
-
-        const e0 = ea[0] * eb[0] + ea[3] * eb[1] + ea[6] * eb[2];
-        const e1 = ea[1] * eb[0] + ea[4] * eb[1] + ea[7] * eb[2];
-        const e2 = ea[2] * eb[0] + ea[5] * eb[1] + ea[8] * eb[2];
-
-        const e3 = ea[0] * eb[3] + ea[3] * eb[4] + ea[6] * eb[5];
-        const e4 = ea[1] * eb[3] + ea[4] * eb[4] + ea[7] * eb[5];
-        const e5 = ea[2] * eb[3] + ea[5] * eb[4] + ea[8] * eb[5];
-
-        const e6 = ea[0] * eb[6] + ea[3] * eb[7] + ea[6] * eb[8];
-        const e7 = ea[1] * eb[6] + ea[4] * eb[7] + ea[7] * eb[8];
-        const e8 = ea[2] * eb[6] + ea[5] * eb[7] + ea[8] * eb[8];
-
-        this.set(e0, e1, e2, e3, e4, e5, e6, e7, e8);
-    }
-
-    /**
-     * ```
      * | e0  e3  e6 |   | x |
      * | e1  e4  e7 | * | y |
      * | e2  e5  e8 |   | z |
@@ -940,134 +874,6 @@ export class Matrix3 implements ReadonlyMatrix3 {
         const z = e[2] * v.x + e[5] * v.y + e[8] * v.z;
 
         return new Vector3(x, y, z);
-    }
-
-    /**
-     * ```
-     * | z0  z2  0 |   | e0  e3  e6 |
-     * | z1  z3  0 | * | e1  e4  e7 |
-     * |  0   0  1 |   | e2  e5  e8 |
-     * ```
-     */
-    public rotate(za: number, zb: number): void {
-        const z0 = za;
-        const z1 = zb;
-        const z2 = -zb;
-        const z3 = za;
-
-        const e = this.elements;
-
-        const e0 = z0 * e[0] + z2 * e[1];
-        const e1 = z1 * e[0] + z3 * e[1];
-        e[0] = e0;
-        e[1] = e1;
-
-        const e3 = z0 * e[3] + z2 * e[4];
-        const e4 = z1 * e[3] + z3 * e[4];
-        e[3] = e3;
-        e[4] = e4;
-
-        const e6 = z0 * e[6] + z2 * e[7];
-        const e7 = z1 * e[6] + z3 * e[7];
-        e[6] = e6;
-        e[7] = e7;
-    }
-
-    /**
-     * ```
-     * | e0  e3  e6 |   | z0  z2  0 |
-     * | e1  e4  e7 | * | z1  z3  0 |
-     * | e2  e5  e8 |   |  0   0  1 |
-     * ```
-     */
-    public rotatePre(za: number, zb: number): void {
-        const z0 = za;
-        const z1 = zb;
-        const z2 = -zb;
-        const z3 = za;
-
-        const e = this.elements;
-
-        const e0 = e[0] * z0 + e[3] * z1;
-        const e3 = e[0] * z2 + e[3] * z3;
-        e[0] = e0;
-        e[3] = e3;
-
-        const e1 = e[1] * z0 + e[4] * z1;
-        const e4 = e[1] * z2 + e[4] * z3;
-        e[1] = e1;
-        e[4] = e4;
-
-        const e2 = e[2] * z0 + e[5] * z1;
-        const e5 = e[2] * z2 + e[5] * z3;
-        e[2] = e2;
-        e[5] = e5;
-    }
-
-    /**
-     * ```
-     * | z0  z2  0 |
-     * | z1  z3  0 |
-     * |  0   0  1 |
-     * ```
-     */
-    public rotateSet(za: number, zb: number): void {
-        const z0 = za;
-        const z1 = zb;
-        const z2 = -zb;
-        const z3 = za;
-
-        this.set(z0, z1, 0, z2, z3, 0, 0, 0, 1);
-    }
-
-    /**
-     * ```
-     * | sx   0  0 |   | e0  e3  e6 |
-     * |  0  sy  0 | * | e1  e4  e7 |
-     * |  0   0  1 |   | e2  e5  e8 |
-     * ```
-     */
-    public scale(sx: number, sy: number): void {
-        const e = this.elements;
-
-        e[0] *= sx;
-        e[1] *= sy;
-
-        e[3] *= sx;
-        e[4] *= sy;
-
-        e[6] *= sx;
-        e[7] *= sy;
-    }
-
-    /**
-     * ```
-     * | e0  e3  e6 |   | sx   0  0 |
-     * | e1  e4  e7 | * |  0  sy  0 |
-     * | e2  e5  e8 |   |  0   0  1 |
-     * ```
-     */
-    public scalePre(sx: number, sy: number): void {
-        const e = this.elements;
-
-        e[0] *= sx;
-        e[1] *= sx;
-        e[2] *= sx;
-
-        e[3] *= sy;
-        e[4] *= sy;
-        e[5] *= sy;
-    }
-
-    /**
-     * ```
-     * | sx   0  0 |
-     * |  0  sy  0 |
-     * |  0   0  1 |
-     * ```
-     */
-    public scaleSet(sx: number, sy: number): void {
-        this.set(sx, 0, 0, 0, sy, 0, 0, 0, 1);
     }
 
     /**
@@ -1101,6 +907,103 @@ export class Matrix3 implements ReadonlyMatrix3 {
         e[8] = e8;
     }
 
+    /**
+     * ```
+     * | ea0  ea3  ea6 |   | eb0  eb3  eb6 |
+     * | ea1  ea4  ea7 | + | eb1  eb4  eb7 |
+     * | ea2  ea5  ea8 |   | eb2  eb5  eb8 |
+     * ```
+     */
+    public setAdd(mat1: ReadonlyMatrix3, mat2: ReadonlyMatrix3): void {
+        const ea = mat1.elements;
+        const eb = mat2.elements;
+        const e = this.elements;
+
+        e[0] = ea[0] + eb[0];
+        e[1] = ea[1] + eb[1];
+        e[2] = ea[2] + eb[2];
+        e[3] = ea[3] + eb[3];
+        e[4] = ea[4] + eb[4];
+        e[5] = ea[5] + eb[5];
+        e[6] = ea[6] + eb[6];
+        e[7] = ea[7] + eb[7];
+        e[8] = ea[8] + eb[8];
+    }
+
+    /**
+     * Copies values from `mat` into this matrix.
+     */
+    public setFromMat3(mat: ReadonlyMatrix3): void {
+        const ea = mat.elements;
+        const e = this.elements;
+
+        e[0] = ea[0];
+        e[1] = ea[1];
+        e[2] = ea[2];
+        e[3] = ea[3];
+        e[4] = ea[4];
+        e[5] = ea[5];
+        e[6] = ea[6];
+        e[7] = ea[7];
+        e[8] = ea[8];
+    }
+
+    /**
+     * Copies values from `mat` into this matrix.
+     */
+    public setFromMat3A(mat: ReadonlyMatrix3A): void {
+        const ea = mat.elements;
+        const e = this.elements;
+
+        e[0] = ea[0];
+        e[1] = ea[1];
+        e[2] = 0;
+        e[3] = ea[2];
+        e[4] = ea[3];
+        e[5] = 0;
+        e[6] = ea[4];
+        e[7] = ea[5];
+        e[8] = 1;
+    }
+
+    /**
+     * ```
+     * | z0  z2  0 |
+     * | z1  z3  0 |
+     * |  0   0  1 |
+     * ```
+     */
+    public setFromRotation(za: number, zb: number): void {
+        const z0 = za;
+        const z1 = zb;
+        const z2 = -zb;
+        const z3 = za;
+
+        this.set(z0, z1, 0, z2, z3, 0, 0, 0, 1);
+    }
+
+    /**
+     * ```
+     * | sx   0  0 |
+     * |  0  sy  0 |
+     * |  0   0  1 |
+     * ```
+     */
+    public setFromScale(sx: number, sy: number): void {
+        this.set(sx, 0, 0, 0, sy, 0, 0, 0, 1);
+    }
+
+    /**
+     * ```
+     * |  1   0  0 |
+     * |  0   1  0 |
+     * | tx  ty  1 |
+     * ```
+     */
+    public setFromTranslation(tx: number, ty: number): void {
+        this.set(1, 0, 0, 0, 1, 0, tx, ty, 1);
+    }
+
     public setIdentity(): void {
         this.set(1, 0, 0, 0, 1, 0, 0, 0, 1);
     }
@@ -1114,21 +1017,219 @@ export class Matrix3 implements ReadonlyMatrix3 {
         }
 
         const detInv = 1 / det;
-        const e = mat.elements;
+        const ea = mat.elements;
 
-        const e0 = detInv * (e[4] * e[8] - e[5] * e[7]);
-        const e1 = detInv * (e[2] * e[7] - e[1] * e[8]);
-        const e2 = detInv * (e[1] * e[5] - e[2] * e[4]);
-        const e3 = detInv * (e[5] * e[6] - e[3] * e[8]);
-        const e4 = detInv * (e[0] * e[8] - e[2] * e[6]);
-        const e5 = detInv * (e[2] * e[3] - e[0] * e[5]);
-        const e6 = detInv * (e[3] * e[7] - e[4] * e[6]);
-        const e7 = detInv * (e[1] * e[6] - e[0] * e[7]);
-        const e8 = detInv * (e[0] * e[4] - e[1] * e[3]);
+        const e0 = detInv * (ea[4] * ea[8] - ea[5] * ea[7]);
+        const e1 = detInv * (ea[2] * ea[7] - ea[1] * ea[8]);
+        const e2 = detInv * (ea[1] * ea[5] - ea[2] * ea[4]);
+        const e3 = detInv * (ea[5] * ea[6] - ea[3] * ea[8]);
+        const e4 = detInv * (ea[0] * ea[8] - ea[2] * ea[6]);
+        const e5 = detInv * (ea[2] * ea[3] - ea[0] * ea[5]);
+        const e6 = detInv * (ea[3] * ea[7] - ea[4] * ea[6]);
+        const e7 = detInv * (ea[1] * ea[6] - ea[0] * ea[7]);
+        const e8 = detInv * (ea[0] * ea[4] - ea[1] * ea[3]);
 
         this.set(e0, e1, e2, e3, e4, e5, e6, e7, e8);
     }
 
+    /**
+     * ```
+     * | ea0  ea3  ea6 |   | eb0  eb3  eb6 |
+     * | ea1  ea4  ea7 | * | eb1  eb4  eb7 |
+     * | ea2  ea5  ea8 |   | eb2  eb5  eb8 |
+     * ```
+     */
+    public setMul(mat1: ReadonlyMatrix3, mat2: ReadonlyMatrix3): void {
+        const ea = mat1.elements;
+        const eb = mat2.elements;
+
+        const e0 = ea[0] * eb[0] + ea[3] * eb[1] + ea[6] * eb[2];
+        const e1 = ea[1] * eb[0] + ea[4] * eb[1] + ea[7] * eb[2];
+        const e2 = ea[2] * eb[0] + ea[5] * eb[1] + ea[8] * eb[2];
+
+        const e3 = ea[0] * eb[3] + ea[3] * eb[4] + ea[6] * eb[5];
+        const e4 = ea[1] * eb[3] + ea[4] * eb[4] + ea[7] * eb[5];
+        const e5 = ea[2] * eb[3] + ea[5] * eb[4] + ea[8] * eb[5];
+
+        const e6 = ea[0] * eb[6] + ea[3] * eb[7] + ea[6] * eb[8];
+        const e7 = ea[1] * eb[6] + ea[4] * eb[7] + ea[7] * eb[8];
+        const e8 = ea[2] * eb[6] + ea[5] * eb[7] + ea[8] * eb[8];
+
+        this.set(e0, e1, e2, e3, e4, e5, e6, e7, e8);
+    }
+
+    /**
+     * ```
+     * | z0  z2  0 |   | ea0  ea3  ea6 |
+     * | z1  z3  0 | * | ea1  ea4  ea7 |
+     * |  0   0  1 |   | ea2  ea5  ea8 |
+     * ```
+     */
+    public setRotate(mat: ReadonlyMatrix3, za: number, zb: number): void {
+        const z0 = za;
+        const z1 = zb;
+        const z2 = -zb;
+        const z3 = za;
+
+        const ea = mat.elements;
+        const e = this.elements;
+
+        const e0 = z0 * ea[0] + z2 * ea[1];
+        const e1 = z1 * ea[0] + z3 * ea[1];
+        e[0] = e0;
+        e[1] = e1;
+
+        const e3 = z0 * ea[3] + z2 * ea[4];
+        const e4 = z1 * ea[3] + z3 * ea[4];
+        e[3] = e3;
+        e[4] = e4;
+
+        const e6 = z0 * ea[6] + z2 * ea[7];
+        const e7 = z1 * ea[6] + z3 * ea[7];
+        e[6] = e6;
+        e[7] = e7;
+    }
+
+    /**
+     * ```
+     * | ea0  ea3  ea6 |   | z0  z2  0 |
+     * | ea1  ea4  ea7 | * | z1  z3  0 |
+     * | ea2  ea5  ea8 |   |  0   0  1 |
+     * ```
+     */
+    public setRotatePre(mat: ReadonlyMatrix3, za: number, zb: number): void {
+        const z0 = za;
+        const z1 = zb;
+        const z2 = -zb;
+        const z3 = za;
+
+        const ea = mat.elements;
+        const e = this.elements;
+
+        const e0 = ea[0] * z0 + ea[3] * z1;
+        const e3 = ea[0] * z2 + ea[3] * z3;
+        e[0] = e0;
+        e[3] = e3;
+
+        const e1 = ea[1] * z0 + ea[4] * z1;
+        const e4 = ea[1] * z2 + ea[4] * z3;
+        e[1] = e1;
+        e[4] = e4;
+
+        const e2 = ea[2] * z0 + ea[5] * z1;
+        const e5 = ea[2] * z2 + ea[5] * z3;
+        e[2] = e2;
+        e[5] = e5;
+    }
+
+    /**
+     * ```
+     * | sx   0  0 |   | ea0  ea3  ea6 |
+     * |  0  sy  0 | * | ea1  ea4  ea7 |
+     * |  0   0  1 |   | ea2  ea5  ea8 |
+     * ```
+     */
+    public setScale(mat: ReadonlyMatrix3, sx: number, sy: number): void {
+        const ea = mat.elements;
+        const e = this.elements;
+
+        e[0] = sx * ea[0];
+        e[1] = sy * ea[1];
+
+        e[3] = sx * ea[3];
+        e[4] = sy * ea[4];
+
+        e[6] = sx * ea[6];
+        e[7] = sy * ea[7];
+    }
+
+    /**
+     * ```
+     * | ea0  ea3  ea6 |   | sx   0  0 |
+     * | ea1  ea4  ea7 | * |  0  sy  0 |
+     * | ea2  ea5  ea8 |   |  0   0  1 |
+     * ```
+     */
+    public setScalePre(mat: ReadonlyMatrix3, sx: number, sy: number): void {
+        const ea = mat.elements;
+        const e = this.elements;
+
+        e[0] = ea[0] * sx;
+        e[1] = ea[1] * sx;
+        e[2] = ea[2] * sx;
+
+        e[3] = ea[3] * sy;
+        e[4] = ea[4] * sy;
+        e[5] = ea[5] * sy;
+    }
+
+    /**
+     * ```
+     * | ea0  ea3  ea6 |   | eb0  eb3  eb6 |
+     * | ea1  ea4  ea7 | - | eb1  eb4  eb7 |
+     * | ea2  ea5  ea8 |   | eb2  eb5  eb8 |
+     * ```
+     */
+    public setSub(mat1: ReadonlyMatrix3, mat2: ReadonlyMatrix3): void {
+        const ea = mat1.elements;
+        const eb = mat2.elements;
+        const e = this.elements;
+
+        e[0] = ea[0] - eb[0];
+        e[1] = ea[1] - eb[1];
+        e[2] = ea[2] - eb[2];
+        e[3] = ea[3] - eb[3];
+        e[4] = ea[4] - eb[4];
+        e[5] = ea[5] - eb[5];
+        e[6] = ea[6] - eb[6];
+        e[7] = ea[7] - eb[7];
+        e[8] = ea[8] - eb[8];
+    }
+
+    /**
+     * ```
+     * | 1  0  tx |   | ea0  ea3  ea6 |
+     * | 0  1  ty | * | ea1  ea4  ea7 |
+     * | 0  0   1 |   | ea2  ea5  ea8 |
+     * ```
+     */
+    public setTranslate(mat: ReadonlyMatrix3, tx: number, ty: number): void {
+        const ea = mat.elements;
+        const e = this.elements;
+
+        e[0] = ea[0] + tx * ea[2];
+        e[1] = ea[1] + ty * ea[2];
+
+        e[3] = ea[3] + tx * ea[5];
+        e[4] = ea[4] + ty * ea[5];
+
+        e[6] = ea[6] + tx * ea[8];
+        e[7] = ea[7] + ty * ea[8];
+    }
+
+    /**
+     * ```
+     * | ea0  ea3  ea6 |   | 1  0  tx |
+     * | ea1  ea4  ea7 | * | 0  1  ty |
+     * | ea2  ea5  ea8 |   | 0  0   1 |
+     * ```
+     */
+    public setTranslatePre(mat: ReadonlyMatrix3, tx: number, ty: number): void {
+        const ea = mat.elements;
+        const e = this.elements;
+
+        e[6] = ea[0] * tx + ea[3] * ty + ea[6];
+        e[7] = ea[1] * tx + ea[4] * ty + ea[7];
+        e[8] = ea[2] * tx + ea[5] * ty + ea[8];
+    }
+
+    /**
+     * ```
+     * | ea0  ea3  ea6 |   | eb0  eb3  eb6 |
+     * | ea1  ea4  ea7 | - | eb1  eb4  eb7 |
+     * | ea2  ea5  ea8 |   | eb2  eb5  eb8 |
+     * ```
+     */
     public sub(mat: ReadonlyMatrix3): Matrix3 {
         const ea = this.elements;
         const eb = mat.elements;
@@ -1144,23 +1245,6 @@ export class Matrix3 implements ReadonlyMatrix3 {
         const e8 = ea[8] - eb[8];
 
         return new Matrix3([e0, e1, e2, e3, e4, e5, e6, e7, e8]);
-    }
-
-    public subSet(mat1: ReadonlyMatrix3, mat2: ReadonlyMatrix3): void {
-        const ea = mat1.elements;
-        const eb = mat2.elements;
-
-        const e0 = ea[0] - eb[0];
-        const e1 = ea[1] - eb[1];
-        const e2 = ea[2] - eb[2];
-        const e3 = ea[3] - eb[3];
-        const e4 = ea[4] - eb[4];
-        const e5 = ea[5] - eb[5];
-        const e6 = ea[6] - eb[6];
-        const e7 = ea[7] - eb[7];
-        const e8 = ea[8] - eb[8];
-
-        this.set(e0, e1, e2, e3, e4, e5, e6, e7, e8);
     }
 
     public toArray(): MatrixElements3 {
@@ -1210,52 +1294,6 @@ export class Matrix3 implements ReadonlyMatrix3 {
         const w = e[2] * v.x + e[5] * v.y;
 
         return Vector2.fromXYW(x, y, w);
-    }
-
-    /**
-     * ```
-     * | 1  0  tx |   | e0  e3  e6 |
-     * | 0  1  ty | * | e1  e4  e7 |
-     * | 0  0   1 |   | e2  e5  e8 |
-     * ```
-     */
-    public translate(tx: number, ty: number): void {
-        const e = this.elements;
-
-        e[0] += tx * e[2];
-        e[1] += ty * e[2];
-
-        e[3] += tx * e[5];
-        e[4] += ty * e[5];
-
-        e[6] += tx * e[8];
-        e[7] += ty * e[8];
-    }
-
-    /**
-     * ```
-     * | e0  e3  e6 |   | 1  0  tx |
-     * | e1  e4  e7 | * | 0  1  ty |
-     * | e2  e5  e8 |   | 0  0   1 |
-     * ```
-     */
-    public translatePre(tx: number, ty: number): void {
-        const e = this.elements;
-
-        e[6] += e[0] * tx + e[3] * ty;
-        e[7] += e[1] * tx + e[4] * ty;
-        e[8] += e[2] * tx + e[5] * ty;
-    }
-
-    /**
-     * ```
-     * |  1   0  0 |
-     * |  0   1  0 |
-     * | tx  ty  1 |
-     * ```
-     */
-    public translateSet(tx: number, ty: number): void {
-        this.set(1, 0, 0, 0, 1, 0, tx, ty, 1);
     }
 
     /**
@@ -1489,48 +1527,6 @@ export class Matrix4A implements ReadonlyMatrix4A {
     }
 
     /**
-     * Copies values from `mat` into this matrix.
-     */
-    public copyFromMat4(mat: ReadonlyMatrix4): void {
-        const ea = this.elements;
-        const eb = mat.elements;
-
-        ea[0] = eb[0];
-        ea[1] = eb[1];
-        ea[2] = eb[2];
-        ea[3] = eb[4];
-        ea[4] = eb[5];
-        ea[5] = eb[6];
-        ea[6] = eb[8];
-        ea[7] = eb[9];
-        ea[8] = eb[10];
-        ea[9] = eb[12];
-        ea[10] = eb[13];
-        ea[11] = eb[14];
-    }
-
-    /**
-     * Copies values from `mat` into this matrix.
-     */
-    public copyFromMat4A(mat: ReadonlyMatrix4A): void {
-        const ea = this.elements;
-        const eb = mat.elements;
-
-        ea[0] = eb[0];
-        ea[1] = eb[1];
-        ea[2] = eb[2];
-        ea[3] = eb[3];
-        ea[4] = eb[4];
-        ea[5] = eb[5];
-        ea[6] = eb[6];
-        ea[7] = eb[7];
-        ea[8] = eb[8];
-        ea[9] = eb[9];
-        ea[10] = eb[10];
-        ea[11] = eb[11];
-    }
-
-    /**
      * Returns the determinant of the matrix.
      */
     public determinant(): number {
@@ -1548,18 +1544,18 @@ export class Matrix4A implements ReadonlyMatrix4A {
         const eb = mat.elements;
 
         return (
-            eb[0] === ea[0] &&
-            eb[1] === ea[1] &&
-            eb[2] === ea[2] &&
-            eb[3] === ea[3] &&
-            eb[4] === ea[4] &&
-            eb[5] === ea[5] &&
-            eb[6] === ea[6] &&
-            eb[7] === ea[7] &&
-            eb[8] === ea[8] &&
-            eb[9] === ea[9] &&
-            eb[10] === ea[10] &&
-            eb[11] === ea[11]
+            ea[0] === eb[0] &&
+            ea[1] === eb[1] &&
+            ea[2] === eb[2] &&
+            ea[3] === eb[3] &&
+            ea[4] === eb[4] &&
+            ea[5] === eb[5] &&
+            ea[6] === eb[6] &&
+            ea[7] === eb[7] &&
+            ea[8] === eb[8] &&
+            ea[9] === eb[9] &&
+            ea[10] === eb[10] &&
+            ea[11] === eb[11]
         );
     }
 
@@ -1606,20 +1602,20 @@ export class Matrix4A implements ReadonlyMatrix4A {
         }
 
         const detInv = 1 / det;
-        const e = this.elements;
+        const ea = this.elements;
 
-        const e0 = detInv * (e[4] * e[8] - e[5] * e[7]);
-        const e1 = detInv * (e[2] * e[7] - e[1] * e[8]);
-        const e2 = detInv * (e[1] * e[5] - e[2] * e[4]);
-        const e3 = detInv * (e[5] * e[6] - e[3] * e[8]);
-        const e4 = detInv * (e[0] * e[8] - e[2] * e[6]);
-        const e5 = detInv * (e[2] * e[3] - e[0] * e[5]);
-        const e6 = detInv * (e[3] * e[7] - e[4] * e[6]);
-        const e7 = detInv * (e[1] * e[6] - e[0] * e[7]);
-        const e8 = detInv * (e[0] * e[4] - e[1] * e[3]);
-        const e9 = -(e[9] * e0 + e[10] * e3 + e[11] * e6);
-        const e10 = -(e[9] * e1 + e[10] * e4 + e[11] * e7);
-        const e11 = -(e[9] * e2 + e[10] * e5 + e[11] * e8);
+        const e0 = detInv * (ea[4] * ea[8] - ea[5] * ea[7]);
+        const e1 = detInv * (ea[2] * ea[7] - ea[1] * ea[8]);
+        const e2 = detInv * (ea[1] * ea[5] - ea[2] * ea[4]);
+        const e3 = detInv * (ea[5] * ea[6] - ea[3] * ea[8]);
+        const e4 = detInv * (ea[0] * ea[8] - ea[2] * ea[6]);
+        const e5 = detInv * (ea[2] * ea[3] - ea[0] * ea[5]);
+        const e6 = detInv * (ea[3] * ea[7] - ea[4] * ea[6]);
+        const e7 = detInv * (ea[1] * ea[6] - ea[0] * ea[7]);
+        const e8 = detInv * (ea[0] * ea[4] - ea[1] * ea[3]);
+        const e9 = -(ea[9] * e0 + ea[10] * e3 + ea[11] * e6);
+        const e10 = -(ea[9] * e1 + ea[10] * e4 + ea[11] * e7);
+        const e11 = -(ea[9] * e2 + ea[10] * e5 + ea[11] * e8);
 
         return new Matrix4A([e0, e1, e2, e3, e4, e5, e6, e7, e8, e9, e10, e11]);
     }
@@ -1657,37 +1653,6 @@ export class Matrix4A implements ReadonlyMatrix4A {
 
     /**
      * ```
-     * | ea0  ea3  ea6   ea9 |   | eb0  eb3  eb6   eb9 |
-     * | ea1  ea4  ea7  ea10 | * | eb1  eb4  eb7  ea10 |
-     * | ea2  ea5  ea8  ea11 |   | eb2  eb5  eb8  eb11 |
-     * |   0    0    0     1 |   |   0    0    0     1 |
-     * ```
-     */
-    public mulSet(mat1: ReadonlyMatrix4A, mat2: ReadonlyMatrix4A): void {
-        const ea = mat1.elements;
-        const eb = mat2.elements;
-
-        const e0 = ea[0] * eb[0] + ea[3] * eb[1] + ea[6] * eb[2];
-        const e1 = ea[1] * eb[0] + ea[4] * eb[1] + ea[7] * eb[2];
-        const e2 = ea[2] * eb[0] + ea[5] * eb[1] + ea[8] * eb[2];
-
-        const e3 = ea[0] * eb[3] + ea[3] * eb[4] + ea[6] * eb[5];
-        const e4 = ea[1] * eb[3] + ea[4] * eb[4] + ea[7] * eb[5];
-        const e5 = ea[2] * eb[3] + ea[5] * eb[4] + ea[8] * eb[5];
-
-        const e6 = ea[0] * eb[6] + ea[3] * eb[7] + ea[6] * eb[8];
-        const e7 = ea[1] * eb[6] + ea[4] * eb[7] + ea[7] * eb[8];
-        const e8 = ea[2] * eb[6] + ea[5] * eb[7] + ea[8] * eb[8];
-
-        const e9 = ea[0] * eb[9] + ea[3] * eb[10] + ea[6] * eb[11] + ea[9];
-        const e10 = ea[1] * eb[9] + ea[4] * eb[10] + ea[7] * eb[11] + ea[10];
-        const e11 = ea[2] * eb[9] + ea[5] * eb[10] + ea[8] * eb[11] + ea[11];
-
-        this.set(e0, e1, e2, e3, e4, e5, e6, e7, e8, e9, e10, e11);
-    }
-
-    /**
-     * ```
      * | e0  e3  e6   e9 |   | x |
      * | e1  e4  e7  e10 | * | y |
      * | e2  e5  e8  e11 |   | z |
@@ -1702,224 +1667,6 @@ export class Matrix4A implements ReadonlyMatrix4A {
         const z = e[2] * v.x + e[5] * v.y + e[8] * v.z + e[11];
 
         return new Vector3(x, y, z);
-    }
-
-    /**
-     * ```
-     * | q0  q3  q6  0 |   | e0  e3  e6   e9 |
-     * | q1  q4  q7  0 | * | e1  e4  e7  e10 |
-     * | q2  q5  q8  0 |   | e2  e5  e8  e11 |
-     * |  0   0   0  1 |   |  0   0   0    1 |
-     * ```
-     */
-    public rotate(qa: number, qb: number, qc: number, qd: number): void {
-        const qaa = qa * qa;
-        const qbb = qb * qb;
-        const qcc = qc * qc;
-        const qdd = qd * qd;
-        const q0 = qaa + qbb - qcc - qdd;
-        const q4 = qaa - qbb + qcc - qdd;
-        const q8 = qaa - qbb - qcc + qdd;
-
-        const qbc = qb * qc;
-        const qad = qa * qd;
-        const q1 = qbc + qbc + qad + qad;
-        const q3 = qbc + qbc - qad - qad;
-
-        const qbd = qb * qd;
-        const qac = qa * qc;
-        const q2 = qbd + qbd - qac - qac;
-        const q6 = qbd + qbd + qac + qac;
-
-        const qcd = qc * qd;
-        const qab = qa * qb;
-        const q5 = qcd + qcd + qab + qab;
-        const q7 = qcd + qcd - qab - qab;
-
-        const e = this.elements;
-
-        const e0 = q0 * e[0] + q3 * e[1] + q6 * e[2];
-        const e1 = q1 * e[0] + q4 * e[1] + q7 * e[2];
-        const e2 = q2 * e[0] + q5 * e[1] + q8 * e[2];
-        e[0] = e0;
-        e[1] = e1;
-        e[2] = e2;
-
-        const e3 = q0 * e[3] + q3 * e[4] + q6 * e[5];
-        const e4 = q1 * e[3] + q4 * e[4] + q7 * e[5];
-        const e5 = q2 * e[3] + q5 * e[4] + q8 * e[5];
-        e[3] = e3;
-        e[4] = e4;
-        e[5] = e5;
-
-        const e6 = q0 * e[6] + q3 * e[7] + q6 * e[8];
-        const e7 = q1 * e[6] + q4 * e[7] + q7 * e[8];
-        const e8 = q2 * e[6] + q5 * e[7] + q8 * e[8];
-        e[6] = e6;
-        e[7] = e7;
-        e[8] = e8;
-
-        const e9 = q0 * e[9] + q3 * e[10] + q6 * e[11];
-        const e10 = q1 * e[9] + q4 * e[10] + q7 * e[11];
-        const e11 = q2 * e[9] + q5 * e[10] + q8 * e[11];
-        e[9] = e9;
-        e[10] = e10;
-        e[11] = e11;
-    }
-
-    /**
-     * ```
-     * | e0  e3  e6   e9 |   | q0  q3  q6  0 |
-     * | e1  e4  e7  e10 | * | q1  q4  q7  0 |
-     * | e2  e5  e8  e11 |   | q2  q5  q8  0 |
-     * |  0   0   0    1 |   |  0   0   0  1 |
-     * ```
-     */
-    public rotatePre(qa: number, qb: number, qc: number, qd: number): void {
-        const qaa = qa * qa;
-        const qbb = qb * qb;
-        const qcc = qc * qc;
-        const qdd = qd * qd;
-        const q0 = qaa + qbb - qcc - qdd;
-        const q4 = qaa - qbb + qcc - qdd;
-        const q8 = qaa - qbb - qcc + qdd;
-
-        const qbc = qb * qc;
-        const qad = qa * qd;
-        const q1 = qbc + qbc + qad + qad;
-        const q3 = qbc + qbc - qad - qad;
-
-        const qbd = qb * qd;
-        const qac = qa * qc;
-        const q2 = qbd + qbd - qac - qac;
-        const q6 = qbd + qbd + qac + qac;
-
-        const qcd = qc * qd;
-        const qab = qa * qb;
-        const q5 = qcd + qcd + qab + qab;
-        const q7 = qcd + qcd - qab - qab;
-
-        const e = this.elements;
-
-        const e0 = e[0] * q0 + e[3] * q1 + e[6] * q2;
-        const e3 = e[0] * q3 + e[3] * q4 + e[6] * q5;
-        const e6 = e[0] * q6 + e[3] * q7 + e[6] * q8;
-        e[0] = e0;
-        e[3] = e3;
-        e[6] = e6;
-
-        const e1 = e[1] * q0 + e[4] * q1 + e[7] * q2;
-        const e4 = e[1] * q3 + e[4] * q4 + e[7] * q5;
-        const e7 = e[1] * q6 + e[4] * q7 + e[7] * q8;
-        e[1] = e1;
-        e[4] = e4;
-        e[7] = e7;
-
-        const e2 = e[2] * q0 + e[5] * q1 + e[8] * q2;
-        const e5 = e[2] * q3 + e[5] * q4 + e[8] * q5;
-        const e8 = e[2] * q6 + e[5] * q7 + e[8] * q8;
-        e[2] = e2;
-        e[5] = e5;
-        e[8] = e8;
-    }
-
-    /**
-     * ```
-     * | q0  q3  q6  0 |
-     * | q1  q4  q7  0 |
-     * | q2  q5  q8  0 |
-     * |  0   0   0  1 |
-     * ```
-     */
-    public rotateSet(qa: number, qb: number, qc: number, qd: number): void {
-        const qaa = qa * qa;
-        const qbb = qb * qb;
-        const qcc = qc * qc;
-        const qdd = qd * qd;
-        const q0 = qaa + qbb - qcc - qdd;
-        const q4 = qaa - qbb + qcc - qdd;
-        const q8 = qaa - qbb - qcc + qdd;
-
-        const qbc = qb * qc;
-        const qad = qa * qd;
-        const q1 = qbc + qbc + qad + qad;
-        const q3 = qbc + qbc - qad - qad;
-
-        const qbd = qb * qd;
-        const qac = qa * qc;
-        const q2 = qbd + qbd - qac - qac;
-        const q6 = qbd + qbd + qac + qac;
-
-        const qcd = qc * qd;
-        const qab = qa * qb;
-        const q5 = qcd + qcd + qab + qab;
-        const q7 = qcd + qcd - qab - qab;
-
-        this.set(q0, q1, q2, q3, q4, q5, q6, q7, q8, 0, 0, 0);
-    }
-
-    /**
-     * ```
-     * | sx   0   0  0 |   | e0  e3  e6   e9 |
-     * |  0  sy   0  0 | * | e1  e4  e7  e10 |
-     * |  0   0  sz  0 |   | e2  e5  e8  e11 |
-     * |  0   0   0  1 |   |  0   0   0    1 |
-     * ```
-     */
-    public scale(sx: number, sy: number, sz: number): void {
-        const e = this.elements;
-
-        e[0] *= sx;
-        e[1] *= sy;
-        e[2] *= sz;
-
-        e[3] *= sx;
-        e[4] *= sy;
-        e[5] *= sz;
-
-        e[6] *= sx;
-        e[7] *= sy;
-        e[8] *= sz;
-
-        e[9] *= sx;
-        e[10] *= sy;
-        e[11] *= sz;
-    }
-
-    /**
-     * ```
-     * | e0  e3  e6   e9 |   | sx   0   0  0 |
-     * | e1  e4  e7  e10 | * |  0  sy   0  0 |
-     * | e2  e5  e8  e11 |   |  0   0  sz  0 |
-     * |  0   0   0    1 |   |  0   0   0  1 |
-     * ```
-     */
-    public scalePre(sx: number, sy: number, sz: number): void {
-        const e = this.elements;
-
-        e[0] *= sx;
-        e[1] *= sx;
-        e[2] *= sx;
-
-        e[3] *= sy;
-        e[4] *= sy;
-        e[5] *= sy;
-
-        e[6] *= sz;
-        e[7] *= sz;
-        e[8] *= sz;
-    }
-
-    /**
-     * ```
-     * | sx   0   0  0 |
-     * |  0  sy   0  0 |
-     * |  0   0  sz  0 |
-     * |  0   0   0  1 |
-     * ```
-     */
-    public scaleSet(sx: number, sy: number, sz: number): void {
-        this.set(sx, 0, 0, 0, sy, 0, 0, 0, sz, 0, 0, 0);
     }
 
     /**
@@ -1960,6 +1707,107 @@ export class Matrix4A implements ReadonlyMatrix4A {
         e[11] = e11;
     }
 
+    /**
+     * Copies values from `mat` into this matrix.
+     */
+    public setFromMat4(mat: ReadonlyMatrix4): void {
+        const e = this.elements;
+        const ea = mat.elements;
+
+        e[0] = ea[0];
+        e[1] = ea[1];
+        e[2] = ea[2];
+        e[3] = ea[4];
+        e[4] = ea[5];
+        e[5] = ea[6];
+        e[6] = ea[8];
+        e[7] = ea[9];
+        e[8] = ea[10];
+        e[9] = ea[12];
+        e[10] = ea[13];
+        e[11] = ea[14];
+    }
+
+    /**
+     * Copies values from `mat` into this matrix.
+     */
+    public setFromMat4A(mat: ReadonlyMatrix4A): void {
+        const ea = mat.elements;
+        const e = this.elements;
+
+        e[0] = ea[0];
+        e[1] = ea[1];
+        e[2] = ea[2];
+        e[3] = ea[3];
+        e[4] = ea[4];
+        e[5] = ea[5];
+        e[6] = ea[6];
+        e[7] = ea[7];
+        e[8] = ea[8];
+        e[9] = ea[9];
+        e[10] = ea[10];
+        e[11] = ea[11];
+    }
+
+    /**
+     * ```
+     * | q0  q3  q6  0 |
+     * | q1  q4  q7  0 |
+     * | q2  q5  q8  0 |
+     * |  0   0   0  1 |
+     * ```
+     */
+    public setFromRotation(qa: number, qb: number, qc: number, qd: number): void {
+        const qaa = qa * qa;
+        const qbb = qb * qb;
+        const qcc = qc * qc;
+        const qdd = qd * qd;
+        const q0 = qaa + qbb - qcc - qdd;
+        const q4 = qaa - qbb + qcc - qdd;
+        const q8 = qaa - qbb - qcc + qdd;
+
+        const qbc = qb * qc;
+        const qad = qa * qd;
+        const q1 = qbc + qbc + qad + qad;
+        const q3 = qbc + qbc - qad - qad;
+
+        const qbd = qb * qd;
+        const qac = qa * qc;
+        const q2 = qbd + qbd - qac - qac;
+        const q6 = qbd + qbd + qac + qac;
+
+        const qcd = qc * qd;
+        const qab = qa * qb;
+        const q5 = qcd + qcd + qab + qab;
+        const q7 = qcd + qcd - qab - qab;
+
+        this.set(q0, q1, q2, q3, q4, q5, q6, q7, q8, 0, 0, 0);
+    }
+
+    /**
+     * ```
+     * | sx   0   0  0 |
+     * |  0  sy   0  0 |
+     * |  0   0  sz  0 |
+     * |  0   0   0  1 |
+     * ```
+     */
+    public setFromScale(sx: number, sy: number, sz: number): void {
+        this.set(sx, 0, 0, 0, sy, 0, 0, 0, sz, 0, 0, 0);
+    }
+
+    /**
+     * ```
+     * | 1  0  0  tx |
+     * | 0  1  0  ty |
+     * | 0  0  1  tz |
+     * | 0  0  0   1 |
+     * ```
+     */
+    public setFromTranslation(tx: number, ty: number, tz: number): void {
+        this.set(1, 0, 0, 0, 1, 0, 0, 0, 1, tx, ty, tz);
+    }
+
     public setIdentity(): void {
         this.set(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0);
     }
@@ -1973,20 +1821,51 @@ export class Matrix4A implements ReadonlyMatrix4A {
         }
 
         const detInv = 1 / det;
-        const e = mat.elements;
+        const ea = mat.elements;
 
-        const e0 = detInv * (e[4] * e[8] - e[5] * e[7]);
-        const e1 = detInv * (e[2] * e[7] - e[1] * e[8]);
-        const e2 = detInv * (e[1] * e[5] - e[2] * e[4]);
-        const e3 = detInv * (e[5] * e[6] - e[3] * e[8]);
-        const e4 = detInv * (e[0] * e[8] - e[2] * e[6]);
-        const e5 = detInv * (e[2] * e[3] - e[0] * e[5]);
-        const e6 = detInv * (e[3] * e[7] - e[4] * e[6]);
-        const e7 = detInv * (e[1] * e[6] - e[0] * e[7]);
-        const e8 = detInv * (e[0] * e[4] - e[1] * e[3]);
-        const e9 = -(e[9] * e0 + e[10] * e3 + e[11] * e6);
-        const e10 = -(e[9] * e1 + e[10] * e4 + e[11] * e7);
-        const e11 = -(e[9] * e2 + e[10] * e5 + e[11] * e8);
+        const e0 = detInv * (ea[4] * ea[8] - ea[5] * ea[7]);
+        const e1 = detInv * (ea[2] * ea[7] - ea[1] * ea[8]);
+        const e2 = detInv * (ea[1] * ea[5] - ea[2] * ea[4]);
+        const e3 = detInv * (ea[5] * ea[6] - ea[3] * ea[8]);
+        const e4 = detInv * (ea[0] * ea[8] - ea[2] * ea[6]);
+        const e5 = detInv * (ea[2] * ea[3] - ea[0] * ea[5]);
+        const e6 = detInv * (ea[3] * ea[7] - ea[4] * ea[6]);
+        const e7 = detInv * (ea[1] * ea[6] - ea[0] * ea[7]);
+        const e8 = detInv * (ea[0] * ea[4] - ea[1] * ea[3]);
+        const e9 = -(ea[9] * e0 + ea[10] * e3 + ea[11] * e6);
+        const e10 = -(ea[9] * e1 + ea[10] * e4 + ea[11] * e7);
+        const e11 = -(ea[9] * e2 + ea[10] * e5 + ea[11] * e8);
+
+        this.set(e0, e1, e2, e3, e4, e5, e6, e7, e8, e9, e10, e11);
+    }
+
+    /**
+     * ```
+     * | ea0  ea3  ea6   ea9 |   | eb0  eb3  eb6   eb9 |
+     * | ea1  ea4  ea7  ea10 | * | eb1  eb4  eb7  ea10 |
+     * | ea2  ea5  ea8  ea11 |   | eb2  eb5  eb8  eb11 |
+     * |   0    0    0     1 |   |   0    0    0     1 |
+     * ```
+     */
+    public setMul(mat1: ReadonlyMatrix4A, mat2: ReadonlyMatrix4A): void {
+        const ea = mat1.elements;
+        const eb = mat2.elements;
+
+        const e0 = ea[0] * eb[0] + ea[3] * eb[1] + ea[6] * eb[2];
+        const e1 = ea[1] * eb[0] + ea[4] * eb[1] + ea[7] * eb[2];
+        const e2 = ea[2] * eb[0] + ea[5] * eb[1] + ea[8] * eb[2];
+
+        const e3 = ea[0] * eb[3] + ea[3] * eb[4] + ea[6] * eb[5];
+        const e4 = ea[1] * eb[3] + ea[4] * eb[4] + ea[7] * eb[5];
+        const e5 = ea[2] * eb[3] + ea[5] * eb[4] + ea[8] * eb[5];
+
+        const e6 = ea[0] * eb[6] + ea[3] * eb[7] + ea[6] * eb[8];
+        const e7 = ea[1] * eb[6] + ea[4] * eb[7] + ea[7] * eb[8];
+        const e8 = ea[2] * eb[6] + ea[5] * eb[7] + ea[8] * eb[8];
+
+        const e9 = ea[0] * eb[9] + ea[3] * eb[10] + ea[6] * eb[11] + ea[9];
+        const e10 = ea[1] * eb[9] + ea[4] * eb[10] + ea[7] * eb[11] + ea[10];
+        const e11 = ea[2] * eb[9] + ea[5] * eb[10] + ea[8] * eb[11] + ea[11];
 
         this.set(e0, e1, e2, e3, e4, e5, e6, e7, e8, e9, e10, e11);
     }
@@ -2040,6 +1919,215 @@ export class Matrix4A implements ReadonlyMatrix4A {
         this.set(e0, 0, 0, 0, e4, 0, 0, 0, e8, e9, e10, e11);
     }
 
+    /**
+     * ```
+     * | q0  q3  q6  0 |   | ea0  ea3  ea6   ea9 |
+     * | q1  q4  q7  0 | * | ea1  ea4  ea7  ea10 |
+     * | q2  q5  q8  0 |   | ea2  ea5  ea8  ea11 |
+     * |  0   0   0  1 |   |   0    0    0     1 |
+     * ```
+     */
+    public setRotate(mat: ReadonlyMatrix4A, qa: number, qb: number, qc: number, qd: number): void {
+        const qaa = qa * qa;
+        const qbb = qb * qb;
+        const qcc = qc * qc;
+        const qdd = qd * qd;
+        const q0 = qaa + qbb - qcc - qdd;
+        const q4 = qaa - qbb + qcc - qdd;
+        const q8 = qaa - qbb - qcc + qdd;
+
+        const qbc = qb * qc;
+        const qad = qa * qd;
+        const q1 = qbc + qbc + qad + qad;
+        const q3 = qbc + qbc - qad - qad;
+
+        const qbd = qb * qd;
+        const qac = qa * qc;
+        const q2 = qbd + qbd - qac - qac;
+        const q6 = qbd + qbd + qac + qac;
+
+        const qcd = qc * qd;
+        const qab = qa * qb;
+        const q5 = qcd + qcd + qab + qab;
+        const q7 = qcd + qcd - qab - qab;
+
+        const ea = mat.elements;
+        const e = this.elements;
+
+        const e0 = q0 * ea[0] + q3 * ea[1] + q6 * ea[2];
+        const e1 = q1 * ea[0] + q4 * ea[1] + q7 * ea[2];
+        const e2 = q2 * ea[0] + q5 * ea[1] + q8 * ea[2];
+        e[0] = e0;
+        e[1] = e1;
+        e[2] = e2;
+
+        const e3 = q0 * ea[3] + q3 * ea[4] + q6 * ea[5];
+        const e4 = q1 * ea[3] + q4 * ea[4] + q7 * ea[5];
+        const e5 = q2 * ea[3] + q5 * ea[4] + q8 * ea[5];
+        e[3] = e3;
+        e[4] = e4;
+        e[5] = e5;
+
+        const e6 = q0 * ea[6] + q3 * ea[7] + q6 * ea[8];
+        const e7 = q1 * ea[6] + q4 * ea[7] + q7 * ea[8];
+        const e8 = q2 * ea[6] + q5 * ea[7] + q8 * ea[8];
+        e[6] = e6;
+        e[7] = e7;
+        e[8] = e8;
+
+        const e9 = q0 * ea[9] + q3 * ea[10] + q6 * ea[11];
+        const e10 = q1 * ea[9] + q4 * ea[10] + q7 * ea[11];
+        const e11 = q2 * ea[9] + q5 * ea[10] + q8 * ea[11];
+        e[9] = e9;
+        e[10] = e10;
+        e[11] = e11;
+    }
+
+    /**
+     * ```
+     * | ea0  ea3  ea6   ea9 |   | q0  q3  q6  0 |
+     * | ea1  ea4  ea7  ea10 | * | q1  q4  q7  0 |
+     * | ea2  ea5  ea8  ea11 |   | q2  q5  q8  0 |
+     * |   0    0    0     1 |   |  0   0   0  1 |
+     * ```
+     */
+    public setRotatePre(mat: ReadonlyMatrix4A, qa: number, qb: number, qc: number, qd: number): void {
+        const qaa = qa * qa;
+        const qbb = qb * qb;
+        const qcc = qc * qc;
+        const qdd = qd * qd;
+        const q0 = qaa + qbb - qcc - qdd;
+        const q4 = qaa - qbb + qcc - qdd;
+        const q8 = qaa - qbb - qcc + qdd;
+
+        const qbc = qb * qc;
+        const qad = qa * qd;
+        const q1 = qbc + qbc + qad + qad;
+        const q3 = qbc + qbc - qad - qad;
+
+        const qbd = qb * qd;
+        const qac = qa * qc;
+        const q2 = qbd + qbd - qac - qac;
+        const q6 = qbd + qbd + qac + qac;
+
+        const qcd = qc * qd;
+        const qab = qa * qb;
+        const q5 = qcd + qcd + qab + qab;
+        const q7 = qcd + qcd - qab - qab;
+
+        const ea = mat.elements;
+        const e = this.elements;
+
+        const e0 = ea[0] * q0 + ea[3] * q1 + ea[6] * q2;
+        const e3 = ea[0] * q3 + ea[3] * q4 + ea[6] * q5;
+        const e6 = ea[0] * q6 + ea[3] * q7 + ea[6] * q8;
+        e[0] = e0;
+        e[3] = e3;
+        e[6] = e6;
+
+        const e1 = ea[1] * q0 + ea[4] * q1 + ea[7] * q2;
+        const e4 = ea[1] * q3 + ea[4] * q4 + ea[7] * q5;
+        const e7 = ea[1] * q6 + ea[4] * q7 + ea[7] * q8;
+        e[1] = e1;
+        e[4] = e4;
+        e[7] = e7;
+
+        const e2 = ea[2] * q0 + ea[5] * q1 + ea[8] * q2;
+        const e5 = ea[2] * q3 + ea[5] * q4 + ea[8] * q5;
+        const e8 = ea[2] * q6 + ea[5] * q7 + ea[8] * q8;
+        e[2] = e2;
+        e[5] = e5;
+        e[8] = e8;
+    }
+
+    /**
+     * ```
+     * | sx   0   0  0 |   | ea0  ea3  ea6   ea9 |
+     * |  0  sy   0  0 | * | ea1  ea4  ea7  ea10 |
+     * |  0   0  sz  0 |   | ea2  ea5  ea8  ea11 |
+     * |  0   0   0  1 |   |   0    0    0     1 |
+     * ```
+     */
+    public setScale(mat: ReadonlyMatrix4A, sx: number, sy: number, sz: number): void {
+        const ea = mat.elements;
+        const e = this.elements;
+
+        e[0] = sx * ea[0];
+        e[1] = sy * ea[1];
+        e[2] = sz * ea[2];
+
+        e[3] = sx * ea[3];
+        e[4] = sy * ea[4];
+        e[5] = sz * ea[5];
+
+        e[6] = sx * ea[6];
+        e[7] = sy * ea[7];
+        e[8] = sz * ea[8];
+
+        e[9] = sx * ea[9];
+        e[10] = sy * ea[10];
+        e[11] = sz * ea[11];
+    }
+
+    /**
+     * ```
+     * | ea0  ea3  ea6   ea9 |   | sx   0   0  0 |
+     * | ea1  ea4  ea7  ea10 | * |  0  sy   0  0 |
+     * | ea2  ea5  ea8  ea11 |   |  0   0  sz  0 |
+     * |   0    0    0     1 |   |  0   0   0  1 |
+     * ```
+     */
+    public setScalePre(mat: ReadonlyMatrix4A, sx: number, sy: number, sz: number): void {
+        const ea = mat.elements;
+        const e = this.elements;
+
+        e[0] = ea[0] * sx;
+        e[1] = ea[1] * sx;
+        e[2] = ea[2] * sx;
+
+        e[3] = ea[3] * sy;
+        e[4] = ea[4] * sy;
+        e[5] = ea[5] * sy;
+
+        e[6] = ea[6] * sz;
+        e[7] = ea[7] * sz;
+        e[8] = ea[8] * sz;
+    }
+
+    /**
+     * ```
+     * | 1  0  0  tx |   | ea0  ea3  ea6   ea9 |
+     * | 0  1  0  ty | * | ea1  ea4  ea7  ea10 |
+     * | 0  0  1  tz |   | ea2  ea5  ea8  ea11 |
+     * | 0  0  0   1 |   |   0    0    0     1 |
+     * ```
+     */
+    public setTranslate(mat: ReadonlyMatrix4A, tx: number, ty: number, tz: number): void {
+        const ea = mat.elements;
+        const e = this.elements;
+
+        e[9] = ea[9] + tx;
+        e[10] = ea[10] + ty;
+        e[11] = ea[11] + tz;
+    }
+
+    /**
+     * ```
+     * | ea0  ea3  ea6   ea9 |   | 1  0  0  tx |
+     * | ea1  ea4  ea7  ea10 | * | 0  1  0  ty |
+     * | ea2  ea5  ea8  ea11 |   | 0  0  1  tz |
+     * |   0    0    0     1 |   | 0  0  0   1 |
+     * ```
+     */
+    public setTranslatePre(mat: ReadonlyMatrix4A, tx: number, ty: number, tz: number): void {
+        const ea = mat.elements;
+        const e = this.elements;
+
+        e[9] = ea[0] * tx + ea[3] * ty + ea[6] * tz + ea[9];
+        e[10] = ea[1] * tx + ea[4] * ty + ea[7] * tz + ea[10];
+        e[11] = ea[2] * tx + ea[5] * ty + ea[8] * tz + ea[11];
+    }
+
     public toArray(): MatrixElements4A {
         return [...this.elements];
     }
@@ -2089,50 +2177,6 @@ export class Matrix4A implements ReadonlyMatrix4A {
         const z = e[2] * v.x + e[5] * v.y + e[8] * v.z;
 
         return new Vector3(x, y, z);
-    }
-
-    /**
-     * ```
-     * | 1  0  0  tx |   | e0  e3  e6   e9 |
-     * | 0  1  0  ty | * | e1  e4  e7  e10 |
-     * | 0  0  1  tz |   | e2  e5  e8  e11 |
-     * | 0  0  0   1 |   |  0   0   0    1 |
-     * ```
-     */
-    public translate(tx: number, ty: number, tz: number): void {
-        const e = this.elements;
-
-        e[9] += tx;
-        e[10] += ty;
-        e[11] += tz;
-    }
-
-    /**
-     * ```
-     * | e0  e3  e6   e9 |   | 1  0  0  tx |
-     * | e1  e4  e7  e10 | * | 0  1  0  ty |
-     * | e2  e5  e8  e11 |   | 0  0  1  tz |
-     * |  0   0   0    1 |   | 0  0  0   1 |
-     * ```
-     */
-    public translatePre(tx: number, ty: number, tz: number): void {
-        const e = this.elements;
-
-        e[9] += e[0] * tx + e[3] * ty + e[6] * tz;
-        e[10] += e[1] * tx + e[4] * ty + e[7] * tz;
-        e[11] += e[2] * tx + e[5] * ty + e[8] * tz;
-    }
-
-    /**
-     * ```
-     * | 1  0  0  tx |
-     * | 0  1  0  ty |
-     * | 0  0  1  tz |
-     * | 0  0  0   1 |
-     * ```
-     */
-    public translateSet(tx: number, ty: number, tz: number): void {
-        this.set(1, 0, 0, 0, 1, 0, 0, 0, 1, tx, ty, tz);
     }
 
     /**
@@ -2485,6 +2529,14 @@ export class Matrix4 implements ReadonlyMatrix4 {
         return new Matrix4([e0, e1, e2, 0, e4, e5, e6, 0, e8, e9, e10, 0, e12, e13, e14, 1]);
     }
 
+    /**
+     * ```
+     * | ea0  ea4   ea8  ea12 |   | eb0  eb4   eb8  eb12 |
+     * | ea1  ea5   ea9  ea13 | + | eb1  eb5   eb9  eb13 |
+     * | ea2  ea6  ea10  ea14 |   | eb2  eb6  eb10  eb14 |
+     * | ea3  ea7  ea11  ea15 |   | eb3  eb7  eb11  eb15 |
+     * ```
+     */
     public add(mat: ReadonlyMatrix4): Matrix4 {
         const ea = this.elements;
         const eb = mat.elements;
@@ -2509,82 +2561,8 @@ export class Matrix4 implements ReadonlyMatrix4 {
         return new Matrix4([e0, e1, e2, e3, e4, e5, e6, e7, e8, e9, e10, e11, e12, e13, e14, e15]);
     }
 
-    public addSet(mat1: ReadonlyMatrix4, mat2: ReadonlyMatrix4): void {
-        const ea = mat1.elements;
-        const eb = mat2.elements;
-
-        const e0 = ea[0] + eb[0];
-        const e1 = ea[1] + eb[1];
-        const e2 = ea[2] + eb[2];
-        const e3 = ea[3] + eb[3];
-        const e4 = ea[4] + eb[4];
-        const e5 = ea[5] + eb[5];
-        const e6 = ea[6] + eb[6];
-        const e7 = ea[7] + eb[7];
-        const e8 = ea[8] + eb[8];
-        const e9 = ea[9] + eb[9];
-        const e10 = ea[10] + eb[10];
-        const e11 = ea[11] + eb[11];
-        const e12 = ea[12] + eb[12];
-        const e13 = ea[13] + eb[13];
-        const e14 = ea[14] + eb[14];
-        const e15 = ea[15] + eb[15];
-
-        this.set(e0, e1, e2, e3, e4, e5, e6, e7, e8, e9, e10, e11, e12, e13, e14, e15);
-    }
-
     public clone(): Matrix4 {
         return new Matrix4([...this.elements]);
-    }
-
-    /**
-     * Copies values from `mat` into this matrix.
-     */
-    public copyFromMat4(mat: ReadonlyMatrix4): void {
-        const ea = this.elements;
-        const eb = mat.elements;
-
-        ea[0] = eb[0];
-        ea[1] = eb[1];
-        ea[2] = eb[2];
-        ea[3] = eb[3];
-        ea[4] = eb[4];
-        ea[5] = eb[5];
-        ea[6] = eb[6];
-        ea[7] = eb[7];
-        ea[8] = eb[8];
-        ea[9] = eb[9];
-        ea[10] = eb[10];
-        ea[11] = eb[11];
-        ea[12] = eb[12];
-        ea[13] = eb[13];
-        ea[14] = eb[14];
-        ea[15] = eb[15];
-    }
-
-    /**
-     * Copies values from `mat` into this matrix.
-     */
-    public copyFromMat4A(mat: ReadonlyMatrix4A): void {
-        const ea = this.elements;
-        const eb = mat.elements;
-
-        ea[0] = eb[0];
-        ea[1] = eb[1];
-        ea[2] = eb[2];
-        ea[3] = 0;
-        ea[4] = eb[3];
-        ea[5] = eb[4];
-        ea[6] = eb[5];
-        ea[7] = 0;
-        ea[8] = eb[6];
-        ea[9] = eb[7];
-        ea[10] = eb[8];
-        ea[11] = 0;
-        ea[12] = eb[9];
-        ea[13] = eb[10];
-        ea[14] = eb[11];
-        ea[15] = 1;
     }
 
     /**
@@ -2621,22 +2599,22 @@ export class Matrix4 implements ReadonlyMatrix4 {
         const eb = mat.elements;
 
         return (
-            eb[0] === ea[0] &&
-            eb[1] === ea[1] &&
-            eb[2] === ea[2] &&
-            eb[3] === ea[3] &&
-            eb[4] === ea[4] &&
-            eb[5] === ea[5] &&
-            eb[6] === ea[6] &&
-            eb[7] === ea[7] &&
-            eb[8] === ea[8] &&
-            eb[9] === ea[9] &&
-            eb[10] === ea[10] &&
-            eb[11] === ea[11] &&
-            eb[12] === ea[12] &&
-            eb[13] === ea[13] &&
-            eb[14] === ea[14] &&
-            eb[15] === ea[15]
+            ea[0] === eb[0] &&
+            ea[1] === eb[1] &&
+            ea[2] === eb[2] &&
+            ea[3] === eb[3] &&
+            ea[4] === eb[4] &&
+            ea[5] === eb[5] &&
+            ea[6] === eb[6] &&
+            ea[7] === eb[7] &&
+            ea[8] === eb[8] &&
+            ea[9] === eb[9] &&
+            ea[10] === eb[10] &&
+            ea[11] === eb[11] &&
+            ea[12] === eb[12] &&
+            ea[13] === eb[13] &&
+            ea[14] === eb[14] &&
+            ea[15] === eb[15]
         );
     }
 
@@ -2683,86 +2661,86 @@ export class Matrix4 implements ReadonlyMatrix4 {
         }
 
         const detInv = 1 / det;
-        const e = this.elements;
+        const ea = this.elements;
 
-        const e0a = e[15] * (e[5] * e[10] - e[6] * e[9]);
-        const e0b = e[14] * (e[5] * e[11] - e[7] * e[9]);
-        const e0c = e[13] * (e[6] * e[11] - e[7] * e[10]);
+        const e0a = ea[15] * (ea[5] * ea[10] - ea[6] * ea[9]);
+        const e0b = ea[14] * (ea[5] * ea[11] - ea[7] * ea[9]);
+        const e0c = ea[13] * (ea[6] * ea[11] - ea[7] * ea[10]);
         const e0 = detInv * (e0a - e0b + e0c);
 
-        const e1a = e[15] * (e[2] * e[9] - e[1] * e[10]);
-        const e1b = e[14] * (e[3] * e[9] - e[1] * e[11]);
-        const e1c = e[13] * (e[3] * e[10] - e[2] * e[11]);
+        const e1a = ea[15] * (ea[2] * ea[9] - ea[1] * ea[10]);
+        const e1b = ea[14] * (ea[3] * ea[9] - ea[1] * ea[11]);
+        const e1c = ea[13] * (ea[3] * ea[10] - ea[2] * ea[11]);
         const e1 = detInv * (e1a - e1b + e1c);
 
-        const e2a = e[15] * (e[1] * e[6] - e[2] * e[5]);
-        const e2b = e[14] * (e[1] * e[7] - e[3] * e[5]);
-        const e2c = e[13] * (e[2] * e[7] - e[3] * e[6]);
+        const e2a = ea[15] * (ea[1] * ea[6] - ea[2] * ea[5]);
+        const e2b = ea[14] * (ea[1] * ea[7] - ea[3] * ea[5]);
+        const e2c = ea[13] * (ea[2] * ea[7] - ea[3] * ea[6]);
         const e2 = detInv * (e2a - e2b + e2c);
 
-        const e3a = e[11] * (e[2] * e[5] - e[1] * e[6]);
-        const e3b = e[10] * (e[3] * e[5] - e[1] * e[7]);
-        const e3c = e[9] * (e[3] * e[6] - e[2] * e[7]);
+        const e3a = ea[11] * (ea[2] * ea[5] - ea[1] * ea[6]);
+        const e3b = ea[10] * (ea[3] * ea[5] - ea[1] * ea[7]);
+        const e3c = ea[9] * (ea[3] * ea[6] - ea[2] * ea[7]);
         const e3 = detInv * (e3a - e3b + e3c);
 
-        const e4a = e[15] * (e[6] * e[8] - e[4] * e[10]);
-        const e4b = e[14] * (e[7] * e[8] - e[4] * e[11]);
-        const e4c = e[12] * (e[7] * e[10] - e[6] * e[11]);
+        const e4a = ea[15] * (ea[6] * ea[8] - ea[4] * ea[10]);
+        const e4b = ea[14] * (ea[7] * ea[8] - ea[4] * ea[11]);
+        const e4c = ea[12] * (ea[7] * ea[10] - ea[6] * ea[11]);
         const e4 = detInv * (e4a - e4b + e4c);
 
-        const e5a = e[15] * (e[0] * e[10] - e[2] * e[8]);
-        const e5b = e[14] * (e[0] * e[11] - e[3] * e[8]);
-        const e5c = e[12] * (e[2] * e[11] - e[3] * e[10]);
+        const e5a = ea[15] * (ea[0] * ea[10] - ea[2] * ea[8]);
+        const e5b = ea[14] * (ea[0] * ea[11] - ea[3] * ea[8]);
+        const e5c = ea[12] * (ea[2] * ea[11] - ea[3] * ea[10]);
         const e5 = detInv * (e5a - e5b + e5c);
 
-        const e6a = e[15] * (e[2] * e[4] - e[0] * e[6]);
-        const e6b = e[14] * (e[3] * e[4] - e[0] * e[7]);
-        const e6c = e[12] * (e[3] * e[6] - e[2] * e[7]);
+        const e6a = ea[15] * (ea[2] * ea[4] - ea[0] * ea[6]);
+        const e6b = ea[14] * (ea[3] * ea[4] - ea[0] * ea[7]);
+        const e6c = ea[12] * (ea[3] * ea[6] - ea[2] * ea[7]);
         const e6 = detInv * (e6a - e6b + e6c);
 
-        const e7a = e[11] * (e[0] * e[6] - e[2] * e[4]);
-        const e7b = e[10] * (e[0] * e[7] - e[3] * e[4]);
-        const e7c = e[8] * (e[2] * e[7] - e[3] * e[6]);
+        const e7a = ea[11] * (ea[0] * ea[6] - ea[2] * ea[4]);
+        const e7b = ea[10] * (ea[0] * ea[7] - ea[3] * ea[4]);
+        const e7c = ea[8] * (ea[2] * ea[7] - ea[3] * ea[6]);
         const e7 = detInv * (e7a - e7b + e7c);
 
-        const e8a = e[15] * (e[4] * e[9] - e[5] * e[8]);
-        const e8b = e[13] * (e[4] * e[11] - e[7] * e[8]);
-        const e8c = e[12] * (e[5] * e[11] - e[7] * e[9]);
+        const e8a = ea[15] * (ea[4] * ea[9] - ea[5] * ea[8]);
+        const e8b = ea[13] * (ea[4] * ea[11] - ea[7] * ea[8]);
+        const e8c = ea[12] * (ea[5] * ea[11] - ea[7] * ea[9]);
         const e8 = detInv * (e8a - e8b + e8c);
 
-        const e9a = e[15] * (e[1] * e[8] - e[0] * e[9]);
-        const e9b = e[13] * (e[3] * e[8] - e[0] * e[11]);
-        const e9c = e[12] * (e[3] * e[9] - e[1] * e[11]);
+        const e9a = ea[15] * (ea[1] * ea[8] - ea[0] * ea[9]);
+        const e9b = ea[13] * (ea[3] * ea[8] - ea[0] * ea[11]);
+        const e9c = ea[12] * (ea[3] * ea[9] - ea[1] * ea[11]);
         const e9 = detInv * (e9a - e9b + e9c);
 
-        const e10a = e[15] * (e[0] * e[5] - e[1] * e[4]);
-        const e10b = e[13] * (e[0] * e[7] - e[3] * e[4]);
-        const e10c = e[12] * (e[1] * e[7] - e[3] * e[5]);
+        const e10a = ea[15] * (ea[0] * ea[5] - ea[1] * ea[4]);
+        const e10b = ea[13] * (ea[0] * ea[7] - ea[3] * ea[4]);
+        const e10c = ea[12] * (ea[1] * ea[7] - ea[3] * ea[5]);
         const e10 = detInv * (e10a - e10b + e10c);
 
-        const e11a = e[11] * (e[1] * e[4] - e[0] * e[5]);
-        const e11b = e[9] * (e[3] * e[4] - e[0] * e[7]);
-        const e11c = e[8] * (e[3] * e[5] - e[1] * e[7]);
+        const e11a = ea[11] * (ea[1] * ea[4] - ea[0] * ea[5]);
+        const e11b = ea[9] * (ea[3] * ea[4] - ea[0] * ea[7]);
+        const e11c = ea[8] * (ea[3] * ea[5] - ea[1] * ea[7]);
         const e11 = detInv * (e11a - e11b + e11c);
 
-        const e12a = e[14] * (e[5] * e[8] - e[4] * e[9]);
-        const e12b = e[13] * (e[6] * e[8] - e[4] * e[10]);
-        const e12c = e[12] * (e[6] * e[9] - e[5] * e[10]);
+        const e12a = ea[14] * (ea[5] * ea[8] - ea[4] * ea[9]);
+        const e12b = ea[13] * (ea[6] * ea[8] - ea[4] * ea[10]);
+        const e12c = ea[12] * (ea[6] * ea[9] - ea[5] * ea[10]);
         const e12 = detInv * (e12a - e12b + e12c);
 
-        const e13a = e[14] * (e[0] * e[9] - e[1] * e[8]);
-        const e13b = e[13] * (e[0] * e[10] - e[2] * e[8]);
-        const e13c = e[12] * (e[1] * e[10] - e[2] * e[9]);
+        const e13a = ea[14] * (ea[0] * ea[9] - ea[1] * ea[8]);
+        const e13b = ea[13] * (ea[0] * ea[10] - ea[2] * ea[8]);
+        const e13c = ea[12] * (ea[1] * ea[10] - ea[2] * ea[9]);
         const e13 = detInv * (e13a - e13b + e13c);
 
-        const e14a = e[14] * (e[1] * e[4] - e[0] * e[5]);
-        const e14b = e[13] * (e[2] * e[4] - e[0] * e[6]);
-        const e14c = e[12] * (e[2] * e[5] - e[1] * e[6]);
+        const e14a = ea[14] * (ea[1] * ea[4] - ea[0] * ea[5]);
+        const e14b = ea[13] * (ea[2] * ea[4] - ea[0] * ea[6]);
+        const e14c = ea[12] * (ea[2] * ea[5] - ea[1] * ea[6]);
         const e14 = detInv * (e14a - e14b + e14c);
 
-        const e15a = e[10] * (e[0] * e[5] - e[1] * e[4]);
-        const e15b = e[9] * (e[0] * e[6] - e[2] * e[4]);
-        const e15c = e[8] * (e[1] * e[6] - e[2] * e[5]);
+        const e15a = ea[10] * (ea[0] * ea[5] - ea[1] * ea[4]);
+        const e15b = ea[9] * (ea[0] * ea[6] - ea[2] * ea[4]);
+        const e15c = ea[8] * (ea[1] * ea[6] - ea[2] * ea[5]);
         const e15 = detInv * (e15a - e15b + e15c);
 
         return new Matrix4([e0, e1, e2, e3, e4, e5, e6, e7, e8, e9, e10, e11, e12, e13, e14, e15]);
@@ -2805,41 +2783,6 @@ export class Matrix4 implements ReadonlyMatrix4 {
 
     /**
      * ```
-     * | ea0  ea4   ea8  ea12 |   | eb0  eb4   eb8  eb12 |
-     * | ea1  ea5   ea9  ea13 | * | eb1  eb5   eb9  eb13 |
-     * | ea2  ea6  ea10  ea14 |   | eb2  eb6  eb10  eb14 |
-     * | ea3  ea7  ea11  ea15 |   | eb3  eb7  eb11  eb15 |
-     * ```
-     */
-    public mulSet(mat1: ReadonlyMatrix4, mat2: ReadonlyMatrix4): void {
-        const ea = mat1.elements;
-        const eb = mat2.elements;
-
-        const e0 = ea[0] * eb[0] + ea[4] * eb[1] + ea[8] * eb[2] + ea[12] * eb[3];
-        const e1 = ea[1] * eb[0] + ea[5] * eb[1] + ea[9] * eb[2] + ea[13] * eb[3];
-        const e2 = ea[2] * eb[0] + ea[6] * eb[1] + ea[10] * eb[2] + ea[14] * eb[3];
-        const e3 = ea[3] * eb[0] + ea[7] * eb[1] + ea[11] * eb[2] + ea[15] * eb[3];
-
-        const e4 = ea[0] * eb[4] + ea[4] * eb[5] + ea[8] * eb[6] + ea[12] * eb[7];
-        const e5 = ea[1] * eb[4] + ea[5] * eb[5] + ea[9] * eb[6] + ea[13] * eb[7];
-        const e6 = ea[2] * eb[4] + ea[6] * eb[5] + ea[10] * eb[6] + ea[14] * eb[7];
-        const e7 = ea[3] * eb[4] + ea[7] * eb[5] + ea[11] * eb[6] + ea[15] * eb[7];
-
-        const e8 = ea[0] * eb[8] + ea[4] * eb[9] + ea[8] * eb[10] + ea[12] * eb[11];
-        const e9 = ea[1] * eb[8] + ea[5] * eb[9] + ea[9] * eb[10] + ea[13] * eb[11];
-        const e10 = ea[2] * eb[8] + ea[6] * eb[9] + ea[10] * eb[10] + ea[14] * eb[11];
-        const e11 = ea[3] * eb[8] + ea[7] * eb[9] + ea[11] * eb[10] + ea[15] * eb[11];
-
-        const e12 = ea[0] * eb[12] + ea[4] * eb[13] + ea[8] * eb[14] + ea[12] * eb[15];
-        const e13 = ea[1] * eb[12] + ea[5] * eb[13] + ea[9] * eb[14] + ea[13] * eb[15];
-        const e14 = ea[2] * eb[12] + ea[6] * eb[13] + ea[10] * eb[14] + ea[14] * eb[15];
-        const e15 = ea[3] * eb[12] + ea[7] * eb[13] + ea[11] * eb[14] + ea[15] * eb[15];
-
-        this.set(e0, e1, e2, e3, e4, e5, e6, e7, e8, e9, e10, e11, e12, e13, e14, e15);
-    }
-
-    /**
-     * ```
      * | e0  e4   e8  e12 |   | x |
      * | e1  e5   e9  e13 | * | y |
      * | e2  e6  e10  e14 |   | z |
@@ -2855,234 +2798,6 @@ export class Matrix4 implements ReadonlyMatrix4 {
         const w = e[3] * v.x + e[7] * v.y + e[11] * v.z + e[15] * v.w;
 
         return new Vector4(x, y, z, w);
-    }
-
-    /**
-     * ```
-     * | q0  q3  q6  0 |   | e0  e4   e8  e12 |
-     * | q1  q4  q7  0 | * | e1  e5   e9  e13 |
-     * | q2  q5  q8  0 |   | e2  e6  e10  e14 |
-     * |  0   0   0  1 |   | e3  e7  e11  e15 |
-     * ```
-     */
-    public rotate(qa: number, qb: number, qc: number, qd: number): void {
-        const qaa = qa * qa;
-        const qbb = qb * qb;
-        const qcc = qc * qc;
-        const qdd = qd * qd;
-        const q0 = qaa + qbb - qcc - qdd;
-        const q4 = qaa - qbb + qcc - qdd;
-        const q8 = qaa - qbb - qcc + qdd;
-
-        const qbc = qb * qc;
-        const qad = qa * qd;
-        const q1 = qbc + qbc + qad + qad;
-        const q3 = qbc + qbc - qad - qad;
-
-        const qbd = qb * qd;
-        const qac = qa * qc;
-        const q2 = qbd + qbd - qac - qac;
-        const q6 = qbd + qbd + qac + qac;
-
-        const qcd = qc * qd;
-        const qab = qa * qb;
-        const q5 = qcd + qcd + qab + qab;
-        const q7 = qcd + qcd - qab - qab;
-
-        const e = this.elements;
-
-        const e0 = q0 * e[0] + q3 * e[1] + q6 * e[2];
-        const e1 = q1 * e[0] + q4 * e[1] + q7 * e[2];
-        const e2 = q2 * e[0] + q5 * e[1] + q8 * e[2];
-        e[0] = e0;
-        e[1] = e1;
-        e[2] = e2;
-
-        const e4 = q0 * e[4] + q3 * e[5] + q6 * e[6];
-        const e5 = q1 * e[4] + q4 * e[5] + q7 * e[6];
-        const e6 = q2 * e[4] + q5 * e[5] + q8 * e[6];
-        e[4] = e4;
-        e[5] = e5;
-        e[6] = e6;
-
-        const e8 = q0 * e[8] + q3 * e[9] + q6 * e[10];
-        const e9 = q1 * e[8] + q4 * e[9] + q7 * e[10];
-        const e10 = q2 * e[8] + q5 * e[9] + q8 * e[10];
-        e[8] = e8;
-        e[9] = e9;
-        e[10] = e10;
-
-        const e12 = q0 * e[12] + q3 * e[13] + q6 * e[14];
-        const e13 = q1 * e[12] + q4 * e[13] + q7 * e[14];
-        const e14 = q2 * e[12] + q5 * e[13] + q8 * e[14];
-        e[12] = e12;
-        e[13] = e13;
-        e[14] = e14;
-    }
-
-    /**
-     * ```
-     * | e0  e4   e8  e12 |   | q0  q3  q6  0 |
-     * | e1  e5   e9  e13 | * | q1  q4  q7  0 |
-     * | e2  e6  e10  e14 |   | q2  q5  q8  0 |
-     * | e3  e7  e11  e15 |   |  0   0   0  1 |
-     * ```
-     */
-    public rotatePre(qa: number, qb: number, qc: number, qd: number): void {
-        const qaa = qa * qa;
-        const qbb = qb * qb;
-        const qcc = qc * qc;
-        const qdd = qd * qd;
-        const q0 = qaa + qbb - qcc - qdd;
-        const q4 = qaa - qbb + qcc - qdd;
-        const q8 = qaa - qbb - qcc + qdd;
-
-        const qbc = qb * qc;
-        const qad = qa * qd;
-        const q1 = qbc + qbc + qad + qad;
-        const q3 = qbc + qbc - qad - qad;
-
-        const qbd = qb * qd;
-        const qac = qa * qc;
-        const q2 = qbd + qbd - qac - qac;
-        const q6 = qbd + qbd + qac + qac;
-
-        const qcd = qc * qd;
-        const qab = qa * qb;
-        const q5 = qcd + qcd + qab + qab;
-        const q7 = qcd + qcd - qab - qab;
-
-        const e = this.elements;
-
-        const e0 = e[0] * q0 + e[4] * q1 + e[8] * q2;
-        const e4 = e[0] * q3 + e[4] * q4 + e[8] * q5;
-        const e8 = e[0] * q6 + e[4] * q7 + e[8] * q8;
-        e[0] = e0;
-        e[4] = e4;
-        e[8] = e8;
-
-        const e1 = e[1] * q0 + e[5] * q1 + e[9] * q2;
-        const e5 = e[1] * q3 + e[5] * q4 + e[9] * q5;
-        const e9 = e[1] * q6 + e[5] * q7 + e[9] * q8;
-        e[1] = e1;
-        e[5] = e5;
-        e[9] = e9;
-
-        const e2 = e[2] * q0 + e[6] * q1 + e[10] * q2;
-        const e6 = e[2] * q1 + e[6] * q4 + e[10] * q5;
-        const e10 = e[2] * q2 + e[6] * q7 + e[10] * q8;
-        e[2] = e2;
-        e[6] = e6;
-        e[10] = e10;
-
-        const e3 = e[3] * q0 + e[7] * q1 + e[11] * q2;
-        const e7 = e[3] * q1 + e[7] * q4 + e[11] * q5;
-        const e11 = e[3] * q2 + e[7] * q7 + e[11] * q8;
-        e[3] = e3;
-        e[7] = e7;
-        e[11] = e11;
-    }
-
-    /**
-     * ```
-     * | q0  q3  q6  0 |
-     * | q1  q4  q7  0 |
-     * | q2  q5  q8  0 |
-     * |  0   0   0  1 |
-     * ```
-     */
-    public rotateSet(qa: number, qb: number, qc: number, qd: number): void {
-        const qaa = qa * qa;
-        const qbb = qb * qb;
-        const qcc = qc * qc;
-        const qdd = qd * qd;
-        const q0 = qaa + qbb - qcc - qdd;
-        const q4 = qaa - qbb + qcc - qdd;
-        const q8 = qaa - qbb - qcc + qdd;
-
-        const qbc = qb * qc;
-        const qad = qa * qd;
-        const q1 = qbc + qbc + qad + qad;
-        const q3 = qbc + qbc - qad - qad;
-
-        const qbd = qb * qd;
-        const qac = qa * qc;
-        const q2 = qbd + qbd - qac - qac;
-        const q6 = qbd + qbd + qac + qac;
-
-        const qcd = qc * qd;
-        const qab = qa * qb;
-        const q5 = qcd + qcd + qab + qab;
-        const q7 = qcd + qcd - qab - qab;
-
-        this.set(q0, q1, q2, 0, q3, q4, q5, 0, q6, q7, q8, 0, 0, 0, 0, 1);
-    }
-
-    /**
-     * ```
-     * | sx   0   0  0 |   | e0  e4   e8  e12 |
-     * |  0  sy   0  0 | * | e1  e5   e9  e13 |
-     * |  0   0  sz  0 |   | e2  e6  e10  e14 |
-     * |  0   0   0  1 |   | e3  e7  e11  e15 |
-     * ```
-     */
-    public scale(sx: number, sy: number, sz: number): void {
-        const e = this.elements;
-
-        e[0] *= sx;
-        e[1] *= sy;
-        e[2] *= sz;
-
-        e[4] *= sx;
-        e[5] *= sy;
-        e[6] *= sz;
-
-        e[8] *= sx;
-        e[9] *= sy;
-        e[10] *= sz;
-
-        e[12] *= sx;
-        e[13] *= sy;
-        e[14] *= sz;
-    }
-
-    /**
-     * ```
-     * | e0  e4   e8  e12 |   | sx   0   0  0 |
-     * | e1  e5   e9  e13 | * |  0  sy   0  0 |
-     * | e2  e6  e10  e14 |   |  0   0  sz  0 |
-     * | e3  e7  e11  e15 |   |  0   0   0  1 |
-     * ```
-     */
-    public scalePre(sx: number, sy: number, sz: number): void {
-        const e = this.elements;
-
-        e[0] *= sx;
-        e[1] *= sx;
-        e[2] *= sx;
-        e[3] *= sx;
-
-        e[4] *= sy;
-        e[5] *= sy;
-        e[6] *= sy;
-        e[7] *= sy;
-
-        e[8] *= sz;
-        e[9] *= sz;
-        e[10] *= sz;
-        e[11] *= sz;
-    }
-
-    /**
-     * ```
-     * | sx   0   0  0 |
-     * |  0  sy   0  0 |
-     * |  0   0  sz  0 |
-     * |  0   0   0  1 |
-     * ```
-     */
-    public scaleSet(sx: number, sy: number, sz: number): void {
-        this.set(sx, 0, 0, 0, 0, sy, 0, 0, 0, 0, sz, 0, 0, 0, 0, 1);
     }
 
     /**
@@ -3131,6 +2846,146 @@ export class Matrix4 implements ReadonlyMatrix4 {
         e[15] = e15;
     }
 
+    /**
+     * ```
+     * | ea0  ea4   ea8  ea12 |   | eb0  eb4   eb8  eb12 |
+     * | ea1  ea5   ea9  ea13 | + | eb1  eb5   eb9  eb13 |
+     * | ea2  ea6  ea10  ea14 |   | eb2  eb6  eb10  eb14 |
+     * | ea3  ea7  ea11  ea15 |   | eb3  eb7  eb11  eb15 |
+     * ```
+     */
+    public setAdd(mat1: ReadonlyMatrix4, mat2: ReadonlyMatrix4): void {
+        const ea = mat1.elements;
+        const eb = mat2.elements;
+        const e = this.elements;
+
+        e[0] = ea[0] + eb[0];
+        e[1] = ea[1] + eb[1];
+        e[2] = ea[2] + eb[2];
+        e[3] = ea[3] + eb[3];
+        e[4] = ea[4] + eb[4];
+        e[5] = ea[5] + eb[5];
+        e[6] = ea[6] + eb[6];
+        e[7] = ea[7] + eb[7];
+        e[8] = ea[8] + eb[8];
+        e[9] = ea[9] + eb[9];
+        e[10] = ea[10] + eb[10];
+        e[11] = ea[11] + eb[11];
+        e[12] = ea[12] + eb[12];
+        e[13] = ea[13] + eb[13];
+        e[14] = ea[14] + eb[14];
+        e[15] = ea[15] + eb[15];
+    }
+
+    /**
+     * Copies values from `mat` into this matrix.
+     */
+    public setFromMat4(mat: ReadonlyMatrix4): void {
+        const e = this.elements;
+        const ea = mat.elements;
+
+        e[0] = ea[0];
+        e[1] = ea[1];
+        e[2] = ea[2];
+        e[3] = ea[3];
+        e[4] = ea[4];
+        e[5] = ea[5];
+        e[6] = ea[6];
+        e[7] = ea[7];
+        e[8] = ea[8];
+        e[9] = ea[9];
+        e[10] = ea[10];
+        e[11] = ea[11];
+        e[12] = ea[12];
+        e[13] = ea[13];
+        e[14] = ea[14];
+        e[15] = ea[15];
+    }
+
+    /**
+     * Copies values from `mat` into this matrix.
+     */
+    public setFromMat4A(mat: ReadonlyMatrix4A): void {
+        const ea = mat.elements;
+        const e = this.elements;
+
+        e[0] = ea[0];
+        e[1] = ea[1];
+        e[2] = ea[2];
+        e[3] = 0;
+        e[4] = ea[3];
+        e[5] = ea[4];
+        e[6] = ea[5];
+        e[7] = 0;
+        e[8] = ea[6];
+        e[9] = ea[7];
+        e[10] = ea[8];
+        e[11] = 0;
+        e[12] = ea[9];
+        e[13] = ea[10];
+        e[14] = ea[11];
+        e[15] = 1;
+    }
+
+    /**
+     * ```
+     * | q0  q3  q6  0 |
+     * | q1  q4  q7  0 |
+     * | q2  q5  q8  0 |
+     * |  0   0   0  1 |
+     * ```
+     */
+    public setFromRotation(qa: number, qb: number, qc: number, qd: number): void {
+        const qaa = qa * qa;
+        const qbb = qb * qb;
+        const qcc = qc * qc;
+        const qdd = qd * qd;
+        const q0 = qaa + qbb - qcc - qdd;
+        const q4 = qaa - qbb + qcc - qdd;
+        const q8 = qaa - qbb - qcc + qdd;
+
+        const qbc = qb * qc;
+        const qad = qa * qd;
+        const q1 = qbc + qbc + qad + qad;
+        const q3 = qbc + qbc - qad - qad;
+
+        const qbd = qb * qd;
+        const qac = qa * qc;
+        const q2 = qbd + qbd - qac - qac;
+        const q6 = qbd + qbd + qac + qac;
+
+        const qcd = qc * qd;
+        const qab = qa * qb;
+        const q5 = qcd + qcd + qab + qab;
+        const q7 = qcd + qcd - qab - qab;
+
+        this.set(q0, q1, q2, 0, q3, q4, q5, 0, q6, q7, q8, 0, 0, 0, 0, 1);
+    }
+
+    /**
+     * ```
+     * | sx   0   0  0 |
+     * |  0  sy   0  0 |
+     * |  0   0  sz  0 |
+     * |  0   0   0  1 |
+     * ```
+     */
+    public setFromScale(sx: number, sy: number, sz: number): void {
+        this.set(sx, 0, 0, 0, 0, sy, 0, 0, 0, 0, sz, 0, 0, 0, 0, 1);
+    }
+
+    /**
+     * ```
+     * |  1   0   0  0 |
+     * |  0   1   0  0 |
+     * |  0   0   1  0 |
+     * | tx  ty  tz  1 |
+     * ```
+     */
+    public setFromTranslation(tx: number, ty: number, tz: number): void {
+        this.set(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, tx, ty, tz, 1);
+    }
+
     public setIdentity(): void {
         this.set(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
     }
@@ -3144,87 +2999,122 @@ export class Matrix4 implements ReadonlyMatrix4 {
         }
 
         const detInv = 1 / det;
-        const e = mat.elements;
+        const ea = mat.elements;
 
-        const e0a = e[15] * (e[5] * e[10] - e[6] * e[9]);
-        const e0b = e[14] * (e[5] * e[11] - e[7] * e[9]);
-        const e0c = e[13] * (e[6] * e[11] - e[7] * e[10]);
+        const e0a = ea[15] * (ea[5] * ea[10] - ea[6] * ea[9]);
+        const e0b = ea[14] * (ea[5] * ea[11] - ea[7] * ea[9]);
+        const e0c = ea[13] * (ea[6] * ea[11] - ea[7] * ea[10]);
         const e0 = detInv * (e0a - e0b + e0c);
 
-        const e1a = e[15] * (e[2] * e[9] - e[1] * e[10]);
-        const e1b = e[14] * (e[3] * e[9] - e[1] * e[11]);
-        const e1c = e[13] * (e[3] * e[10] - e[2] * e[11]);
+        const e1a = ea[15] * (ea[2] * ea[9] - ea[1] * ea[10]);
+        const e1b = ea[14] * (ea[3] * ea[9] - ea[1] * ea[11]);
+        const e1c = ea[13] * (ea[3] * ea[10] - ea[2] * ea[11]);
         const e1 = detInv * (e1a - e1b + e1c);
 
-        const e2a = e[15] * (e[1] * e[6] - e[2] * e[5]);
-        const e2b = e[14] * (e[1] * e[7] - e[3] * e[5]);
-        const e2c = e[13] * (e[2] * e[7] - e[3] * e[6]);
+        const e2a = ea[15] * (ea[1] * ea[6] - ea[2] * ea[5]);
+        const e2b = ea[14] * (ea[1] * ea[7] - ea[3] * ea[5]);
+        const e2c = ea[13] * (ea[2] * ea[7] - ea[3] * ea[6]);
         const e2 = detInv * (e2a - e2b + e2c);
 
-        const e3a = e[11] * (e[2] * e[5] - e[1] * e[6]);
-        const e3b = e[10] * (e[3] * e[5] - e[1] * e[7]);
-        const e3c = e[9] * (e[3] * e[6] - e[2] * e[7]);
+        const e3a = ea[11] * (ea[2] * ea[5] - ea[1] * ea[6]);
+        const e3b = ea[10] * (ea[3] * ea[5] - ea[1] * ea[7]);
+        const e3c = ea[9] * (ea[3] * ea[6] - ea[2] * ea[7]);
         const e3 = detInv * (e3a - e3b + e3c);
 
-        const e4a = e[15] * (e[6] * e[8] - e[4] * e[10]);
-        const e4b = e[14] * (e[7] * e[8] - e[4] * e[11]);
-        const e4c = e[12] * (e[7] * e[10] - e[6] * e[11]);
+        const e4a = ea[15] * (ea[6] * ea[8] - ea[4] * ea[10]);
+        const e4b = ea[14] * (ea[7] * ea[8] - ea[4] * ea[11]);
+        const e4c = ea[12] * (ea[7] * ea[10] - ea[6] * ea[11]);
         const e4 = detInv * (e4a - e4b + e4c);
 
-        const e5a = e[15] * (e[0] * e[10] - e[2] * e[8]);
-        const e5b = e[14] * (e[0] * e[11] - e[3] * e[8]);
-        const e5c = e[12] * (e[2] * e[11] - e[3] * e[10]);
+        const e5a = ea[15] * (ea[0] * ea[10] - ea[2] * ea[8]);
+        const e5b = ea[14] * (ea[0] * ea[11] - ea[3] * ea[8]);
+        const e5c = ea[12] * (ea[2] * ea[11] - ea[3] * ea[10]);
         const e5 = detInv * (e5a - e5b + e5c);
 
-        const e6a = e[15] * (e[2] * e[4] - e[0] * e[6]);
-        const e6b = e[14] * (e[3] * e[4] - e[0] * e[7]);
-        const e6c = e[12] * (e[3] * e[6] - e[2] * e[7]);
+        const e6a = ea[15] * (ea[2] * ea[4] - ea[0] * ea[6]);
+        const e6b = ea[14] * (ea[3] * ea[4] - ea[0] * ea[7]);
+        const e6c = ea[12] * (ea[3] * ea[6] - ea[2] * ea[7]);
         const e6 = detInv * (e6a - e6b + e6c);
 
-        const e7a = e[11] * (e[0] * e[6] - e[2] * e[4]);
-        const e7b = e[10] * (e[0] * e[7] - e[3] * e[4]);
-        const e7c = e[8] * (e[2] * e[7] - e[3] * e[6]);
+        const e7a = ea[11] * (ea[0] * ea[6] - ea[2] * ea[4]);
+        const e7b = ea[10] * (ea[0] * ea[7] - ea[3] * ea[4]);
+        const e7c = ea[8] * (ea[2] * ea[7] - ea[3] * ea[6]);
         const e7 = detInv * (e7a - e7b + e7c);
 
-        const e8a = e[15] * (e[4] * e[9] - e[5] * e[8]);
-        const e8b = e[13] * (e[4] * e[11] - e[7] * e[8]);
-        const e8c = e[12] * (e[5] * e[11] - e[7] * e[9]);
+        const e8a = ea[15] * (ea[4] * ea[9] - ea[5] * ea[8]);
+        const e8b = ea[13] * (ea[4] * ea[11] - ea[7] * ea[8]);
+        const e8c = ea[12] * (ea[5] * ea[11] - ea[7] * ea[9]);
         const e8 = detInv * (e8a - e8b + e8c);
 
-        const e9a = e[15] * (e[1] * e[8] - e[0] * e[9]);
-        const e9b = e[13] * (e[3] * e[8] - e[0] * e[11]);
-        const e9c = e[12] * (e[3] * e[9] - e[1] * e[11]);
+        const e9a = ea[15] * (ea[1] * ea[8] - ea[0] * ea[9]);
+        const e9b = ea[13] * (ea[3] * ea[8] - ea[0] * ea[11]);
+        const e9c = ea[12] * (ea[3] * ea[9] - ea[1] * ea[11]);
         const e9 = detInv * (e9a - e9b + e9c);
 
-        const e10a = e[15] * (e[0] * e[5] - e[1] * e[4]);
-        const e10b = e[13] * (e[0] * e[7] - e[3] * e[4]);
-        const e10c = e[12] * (e[1] * e[7] - e[3] * e[5]);
+        const e10a = ea[15] * (ea[0] * ea[5] - ea[1] * ea[4]);
+        const e10b = ea[13] * (ea[0] * ea[7] - ea[3] * ea[4]);
+        const e10c = ea[12] * (ea[1] * ea[7] - ea[3] * ea[5]);
         const e10 = detInv * (e10a - e10b + e10c);
 
-        const e11a = e[11] * (e[1] * e[4] - e[0] * e[5]);
-        const e11b = e[9] * (e[3] * e[4] - e[0] * e[7]);
-        const e11c = e[8] * (e[3] * e[5] - e[1] * e[7]);
+        const e11a = ea[11] * (ea[1] * ea[4] - ea[0] * ea[5]);
+        const e11b = ea[9] * (ea[3] * ea[4] - ea[0] * ea[7]);
+        const e11c = ea[8] * (ea[3] * ea[5] - ea[1] * ea[7]);
         const e11 = detInv * (e11a - e11b + e11c);
 
-        const e12a = e[14] * (e[5] * e[8] - e[4] * e[9]);
-        const e12b = e[13] * (e[6] * e[8] - e[4] * e[10]);
-        const e12c = e[12] * (e[6] * e[9] - e[5] * e[10]);
+        const e12a = ea[14] * (ea[5] * ea[8] - ea[4] * ea[9]);
+        const e12b = ea[13] * (ea[6] * ea[8] - ea[4] * ea[10]);
+        const e12c = ea[12] * (ea[6] * ea[9] - ea[5] * ea[10]);
         const e12 = detInv * (e12a - e12b + e12c);
 
-        const e13a = e[14] * (e[0] * e[9] - e[1] * e[8]);
-        const e13b = e[13] * (e[0] * e[10] - e[2] * e[8]);
-        const e13c = e[12] * (e[1] * e[10] - e[2] * e[9]);
+        const e13a = ea[14] * (ea[0] * ea[9] - ea[1] * ea[8]);
+        const e13b = ea[13] * (ea[0] * ea[10] - ea[2] * ea[8]);
+        const e13c = ea[12] * (ea[1] * ea[10] - ea[2] * ea[9]);
         const e13 = detInv * (e13a - e13b + e13c);
 
-        const e14a = e[14] * (e[1] * e[4] - e[0] * e[5]);
-        const e14b = e[13] * (e[2] * e[4] - e[0] * e[6]);
-        const e14c = e[12] * (e[2] * e[5] - e[1] * e[6]);
+        const e14a = ea[14] * (ea[1] * ea[4] - ea[0] * ea[5]);
+        const e14b = ea[13] * (ea[2] * ea[4] - ea[0] * ea[6]);
+        const e14c = ea[12] * (ea[2] * ea[5] - ea[1] * ea[6]);
         const e14 = detInv * (e14a - e14b + e14c);
 
-        const e15a = e[10] * (e[0] * e[5] - e[1] * e[4]);
-        const e15b = e[9] * (e[0] * e[6] - e[2] * e[4]);
-        const e15c = e[8] * (e[1] * e[6] - e[2] * e[5]);
+        const e15a = ea[10] * (ea[0] * ea[5] - ea[1] * ea[4]);
+        const e15b = ea[9] * (ea[0] * ea[6] - ea[2] * ea[4]);
+        const e15c = ea[8] * (ea[1] * ea[6] - ea[2] * ea[5]);
         const e15 = detInv * (e15a - e15b + e15c);
+
+        this.set(e0, e1, e2, e3, e4, e5, e6, e7, e8, e9, e10, e11, e12, e13, e14, e15);
+    }
+
+    /**
+     * ```
+     * | ea0  ea4   ea8  ea12 |   | eb0  eb4   eb8  eb12 |
+     * | ea1  ea5   ea9  ea13 | * | eb1  eb5   eb9  eb13 |
+     * | ea2  ea6  ea10  ea14 |   | eb2  eb6  eb10  eb14 |
+     * | ea3  ea7  ea11  ea15 |   | eb3  eb7  eb11  eb15 |
+     * ```
+     */
+    public setMul(mat1: ReadonlyMatrix4, mat2: ReadonlyMatrix4): void {
+        const ea = mat1.elements;
+        const eb = mat2.elements;
+
+        const e0 = ea[0] * eb[0] + ea[4] * eb[1] + ea[8] * eb[2] + ea[12] * eb[3];
+        const e1 = ea[1] * eb[0] + ea[5] * eb[1] + ea[9] * eb[2] + ea[13] * eb[3];
+        const e2 = ea[2] * eb[0] + ea[6] * eb[1] + ea[10] * eb[2] + ea[14] * eb[3];
+        const e3 = ea[3] * eb[0] + ea[7] * eb[1] + ea[11] * eb[2] + ea[15] * eb[3];
+
+        const e4 = ea[0] * eb[4] + ea[4] * eb[5] + ea[8] * eb[6] + ea[12] * eb[7];
+        const e5 = ea[1] * eb[4] + ea[5] * eb[5] + ea[9] * eb[6] + ea[13] * eb[7];
+        const e6 = ea[2] * eb[4] + ea[6] * eb[5] + ea[10] * eb[6] + ea[14] * eb[7];
+        const e7 = ea[3] * eb[4] + ea[7] * eb[5] + ea[11] * eb[6] + ea[15] * eb[7];
+
+        const e8 = ea[0] * eb[8] + ea[4] * eb[9] + ea[8] * eb[10] + ea[12] * eb[11];
+        const e9 = ea[1] * eb[8] + ea[5] * eb[9] + ea[9] * eb[10] + ea[13] * eb[11];
+        const e10 = ea[2] * eb[8] + ea[6] * eb[9] + ea[10] * eb[10] + ea[14] * eb[11];
+        const e11 = ea[3] * eb[8] + ea[7] * eb[9] + ea[11] * eb[10] + ea[15] * eb[11];
+
+        const e12 = ea[0] * eb[12] + ea[4] * eb[13] + ea[8] * eb[14] + ea[12] * eb[15];
+        const e13 = ea[1] * eb[12] + ea[5] * eb[13] + ea[9] * eb[14] + ea[13] * eb[15];
+        const e14 = ea[2] * eb[12] + ea[6] * eb[13] + ea[10] * eb[14] + ea[14] * eb[15];
+        const e15 = ea[3] * eb[12] + ea[7] * eb[13] + ea[11] * eb[14] + ea[15] * eb[15];
 
         this.set(e0, e1, e2, e3, e4, e5, e6, e7, e8, e9, e10, e11, e12, e13, e14, e15);
     }
@@ -3347,6 +3237,277 @@ export class Matrix4 implements ReadonlyMatrix4 {
         this.set(e0, 0, 0, 0, 0, e5, 0, 0, 0, 0, e10, -1, 0, 0, e14, 0);
     }
 
+    /**
+     * ```
+     * | q0  q3  q6  0 |   | ea0  ea4   ea8  ea12 |
+     * | q1  q4  q7  0 | * | ea1  ea5   ea9  ea13 |
+     * | q2  q5  q8  0 |   | ea2  ea6  ea10  ea14 |
+     * |  0   0   0  1 |   | ea3  ea7  ea11  ea15 |
+     * ```
+     */
+    public setRotate(mat: ReadonlyMatrix4, qa: number, qb: number, qc: number, qd: number): void {
+        const qaa = qa * qa;
+        const qbb = qb * qb;
+        const qcc = qc * qc;
+        const qdd = qd * qd;
+        const q0 = qaa + qbb - qcc - qdd;
+        const q4 = qaa - qbb + qcc - qdd;
+        const q8 = qaa - qbb - qcc + qdd;
+
+        const qbc = qb * qc;
+        const qad = qa * qd;
+        const q1 = qbc + qbc + qad + qad;
+        const q3 = qbc + qbc - qad - qad;
+
+        const qbd = qb * qd;
+        const qac = qa * qc;
+        const q2 = qbd + qbd - qac - qac;
+        const q6 = qbd + qbd + qac + qac;
+
+        const qcd = qc * qd;
+        const qab = qa * qb;
+        const q5 = qcd + qcd + qab + qab;
+        const q7 = qcd + qcd - qab - qab;
+
+        const ea = mat.elements;
+        const e = this.elements;
+
+        const e0 = q0 * ea[0] + q3 * ea[1] + q6 * ea[2];
+        const e1 = q1 * ea[0] + q4 * ea[1] + q7 * ea[2];
+        const e2 = q2 * ea[0] + q5 * ea[1] + q8 * ea[2];
+        e[0] = e0;
+        e[1] = e1;
+        e[2] = e2;
+
+        const e4 = q0 * ea[4] + q3 * ea[5] + q6 * ea[6];
+        const e5 = q1 * ea[4] + q4 * ea[5] + q7 * ea[6];
+        const e6 = q2 * ea[4] + q5 * ea[5] + q8 * ea[6];
+        e[4] = e4;
+        e[5] = e5;
+        e[6] = e6;
+
+        const e8 = q0 * ea[8] + q3 * ea[9] + q6 * ea[10];
+        const e9 = q1 * ea[8] + q4 * ea[9] + q7 * ea[10];
+        const e10 = q2 * ea[8] + q5 * ea[9] + q8 * ea[10];
+        e[8] = e8;
+        e[9] = e9;
+        e[10] = e10;
+
+        const e12 = q0 * ea[12] + q3 * ea[13] + q6 * ea[14];
+        const e13 = q1 * ea[12] + q4 * ea[13] + q7 * ea[14];
+        const e14 = q2 * ea[12] + q5 * ea[13] + q8 * ea[14];
+        e[12] = e12;
+        e[13] = e13;
+        e[14] = e14;
+    }
+
+    /**
+     * ```
+     * | ea0  ea4   ea8  ea12 |   | q0  q3  q6  0 |
+     * | ea1  ea5   ea9  ea13 | * | q1  q4  q7  0 |
+     * | ea2  ea6  ea10  ea14 |   | q2  q5  q8  0 |
+     * | ea3  ea7  ea11  ea15 |   |  0   0   0  1 |
+     * ```
+     */
+    public setRotatePre(mat: ReadonlyMatrix4, qa: number, qb: number, qc: number, qd: number): void {
+        const qaa = qa * qa;
+        const qbb = qb * qb;
+        const qcc = qc * qc;
+        const qdd = qd * qd;
+        const q0 = qaa + qbb - qcc - qdd;
+        const q4 = qaa - qbb + qcc - qdd;
+        const q8 = qaa - qbb - qcc + qdd;
+
+        const qbc = qb * qc;
+        const qad = qa * qd;
+        const q1 = qbc + qbc + qad + qad;
+        const q3 = qbc + qbc - qad - qad;
+
+        const qbd = qb * qd;
+        const qac = qa * qc;
+        const q2 = qbd + qbd - qac - qac;
+        const q6 = qbd + qbd + qac + qac;
+
+        const qcd = qc * qd;
+        const qab = qa * qb;
+        const q5 = qcd + qcd + qab + qab;
+        const q7 = qcd + qcd - qab - qab;
+
+        const ea = mat.elements;
+        const e = this.elements;
+
+        const e0 = ea[0] * q0 + ea[4] * q1 + ea[8] * q2;
+        const e4 = ea[0] * q3 + ea[4] * q4 + ea[8] * q5;
+        const e8 = ea[0] * q6 + ea[4] * q7 + ea[8] * q8;
+        e[0] = e0;
+        e[4] = e4;
+        e[8] = e8;
+
+        const e1 = ea[1] * q0 + ea[5] * q1 + ea[9] * q2;
+        const e5 = ea[1] * q3 + ea[5] * q4 + ea[9] * q5;
+        const e9 = ea[1] * q6 + ea[5] * q7 + ea[9] * q8;
+        e[1] = e1;
+        e[5] = e5;
+        e[9] = e9;
+
+        const e2 = ea[2] * q0 + ea[6] * q1 + ea[10] * q2;
+        const e6 = ea[2] * q1 + ea[6] * q4 + ea[10] * q5;
+        const e10 = ea[2] * q2 + ea[6] * q7 + ea[10] * q8;
+        e[2] = e2;
+        e[6] = e6;
+        e[10] = e10;
+
+        const e3 = ea[3] * q0 + ea[7] * q1 + ea[11] * q2;
+        const e7 = ea[3] * q1 + ea[7] * q4 + ea[11] * q5;
+        const e11 = ea[3] * q2 + ea[7] * q7 + ea[11] * q8;
+        e[3] = e3;
+        e[7] = e7;
+        e[11] = e11;
+    }
+
+    /**
+     * ```
+     * | sx   0   0  0 |   | ea0  ea4   ea8  ea12 |
+     * |  0  sy   0  0 | * | ea1  ea5   ea9  ea13 |
+     * |  0   0  sz  0 |   | ea2  ea6  ea10  ea14 |
+     * |  0   0   0  1 |   | ea3  ea7  ea11  ea15 |
+     * ```
+     */
+    public setScale(mat: ReadonlyMatrix4, sx: number, sy: number, sz: number): void {
+        const ea = mat.elements;
+        const e = this.elements;
+
+        e[0] = sx * ea[0];
+        e[1] = sy * ea[1];
+        e[2] = sz * ea[2];
+
+        e[4] = sx * ea[4];
+        e[5] = sy * ea[5];
+        e[6] = sz * ea[6];
+
+        e[8] = sx * ea[8];
+        e[9] = sy * ea[9];
+        e[10] = sz * ea[10];
+
+        e[12] = sx * ea[12];
+        e[13] = sy * ea[13];
+        e[14] = sz * ea[14];
+    }
+
+    /**
+     * ```
+     * | ea0  ea4   ea8  ea12 |   | sx   0   0  0 |
+     * | ea1  ea5   ea9  ea13 | * |  0  sy   0  0 |
+     * | ea2  ea6  ea10  ea14 |   |  0   0  sz  0 |
+     * | ea3  ea7  ea11  ea15 |   |  0   0   0  1 |
+     * ```
+     */
+    public setScalePre(mat: ReadonlyMatrix4, sx: number, sy: number, sz: number): void {
+        const ea = mat.elements;
+        const e = this.elements;
+
+        e[0] = ea[0] * sx;
+        e[1] = ea[1] * sx;
+        e[2] = ea[2] * sx;
+        e[3] = ea[3] * sx;
+
+        e[4] = ea[4] * sy;
+        e[5] = ea[5] * sy;
+        e[6] = ea[6] * sy;
+        e[7] = ea[7] * sy;
+
+        e[8] = ea[8] * sz;
+        e[9] = ea[9] * sz;
+        e[10] = ea[10] * sz;
+        e[11] = ea[11] * sz;
+    }
+
+    /**
+     * ```
+     * | ea0  ea4   ea8  ea12 |   | eb0  eb4   eb8  eb12 |
+     * | ea1  ea5   ea9  ea13 | - | eb1  eb5   eb9  eb13 |
+     * | ea2  ea6  ea10  ea14 |   | eb2  eb6  eb10  eb14 |
+     * | ea3  ea7  ea11  ea15 |   | eb3  eb7  eb11  eb15 |
+     * ```
+     */
+    public setSub(mat1: ReadonlyMatrix4, mat2: ReadonlyMatrix4): void {
+        const ea = mat1.elements;
+        const eb = mat2.elements;
+        const e = this.elements;
+
+        e[0] = ea[0] - eb[0];
+        e[1] = ea[1] - eb[1];
+        e[2] = ea[2] - eb[2];
+        e[3] = ea[3] - eb[3];
+        e[4] = ea[4] - eb[4];
+        e[5] = ea[5] - eb[5];
+        e[6] = ea[6] - eb[6];
+        e[7] = ea[7] - eb[7];
+        e[8] = ea[8] - eb[8];
+        e[9] = ea[9] - eb[9];
+        e[10] = ea[10] - eb[10];
+        e[11] = ea[11] - eb[11];
+        e[12] = ea[12] - eb[12];
+        e[13] = ea[13] - eb[13];
+        e[14] = ea[14] - eb[14];
+        e[15] = ea[15] - eb[15];
+    }
+
+    /**
+     * ```
+     * | 1  0  0  tx |   | ea0  ea4   ea8  ea12 |
+     * | 0  1  0  ty | * | ea1  ea5   ea9  ea13 |
+     * | 0  0  1  tz |   | ea2  ea6  e1a0  ea14 |
+     * | 0  0  0   1 |   | ea3  ea7  e1a1  ea15 |
+     * ```
+     */
+    public setTranslate(mat: ReadonlyMatrix4, tx: number, ty: number, tz: number): void {
+        const ea = mat.elements;
+        const e = this.elements;
+
+        e[0] = ea[0] + tx * ea[3];
+        e[1] = ea[1] + ty * ea[3];
+        e[2] = ea[2] + tz * ea[3];
+
+        e[4] = ea[4] + tx * ea[7];
+        e[5] = ea[5] + ty * ea[7];
+        e[6] = ea[6] + tz * ea[7];
+
+        e[8] = ea[8] + tx * ea[11];
+        e[9] = ea[9] + ty * ea[11];
+        e[10] = ea[10] + tz * ea[11];
+
+        e[12] = ea[12] + tx * ea[15];
+        e[13] = ea[13] + ty * ea[15];
+        e[14] = ea[14] + tz * ea[15];
+    }
+
+    /**
+     * ```
+     * | ea0  ea4   ea8  ea12 |   | 1  0  0  tx |
+     * | ea1  ea5   ea9  ea13 | * | 0  1  0  ty |
+     * | ea2  ea6  ea10  ea14 |   | 0  0  1  tz |
+     * | ea3  ea7  ea11  ea15 |   | 0  0  0   1 |
+     * ```
+     */
+    public setTranslatePre(mat: ReadonlyMatrix4, tx: number, ty: number, tz: number): void {
+        const ea = mat.elements;
+        const e = this.elements;
+
+        e[12] = ea[0] * tx + ea[4] * ty + ea[8] * tz + ea[12];
+        e[13] = ea[1] * tx + ea[5] * ty + ea[9] * tz + ea[13];
+        e[14] = ea[2] * tx + ea[6] * ty + ea[10] * tz + ea[14];
+        e[15] = ea[3] * tx + ea[7] * ty + ea[11] * tz + ea[15];
+    }
+
+    /**
+     * ```
+     * | ea0  ea4   ea8  ea12 |   | eb0  eb4   eb8  eb12 |
+     * | ea1  ea5   ea9  ea13 | - | eb1  eb5   eb9  eb13 |
+     * | ea2  ea6  ea10  ea14 |   | eb2  eb6  eb10  eb14 |
+     * | ea3  ea7  ea11  ea15 |   | eb3  eb7  eb11  eb15 |
+     * ```
+     */
     public sub(mat: ReadonlyMatrix4): Matrix4 {
         const ea = this.elements;
         const eb = mat.elements;
@@ -3369,30 +3530,6 @@ export class Matrix4 implements ReadonlyMatrix4 {
         const e15 = ea[15] - eb[15];
 
         return new Matrix4([e0, e1, e2, e3, e4, e5, e6, e7, e8, e9, e10, e11, e12, e13, e14, e15]);
-    }
-
-    public subSet(mat1: ReadonlyMatrix4, mat2: ReadonlyMatrix4): void {
-        const ea = mat1.elements;
-        const eb = mat2.elements;
-
-        const e0 = ea[0] - eb[0];
-        const e1 = ea[1] - eb[1];
-        const e2 = ea[2] - eb[2];
-        const e3 = ea[3] - eb[3];
-        const e4 = ea[4] - eb[4];
-        const e5 = ea[5] - eb[5];
-        const e6 = ea[6] - eb[6];
-        const e7 = ea[7] - eb[7];
-        const e8 = ea[8] - eb[8];
-        const e9 = ea[9] - eb[9];
-        const e10 = ea[10] - eb[10];
-        const e11 = ea[11] - eb[11];
-        const e12 = ea[12] - eb[12];
-        const e13 = ea[13] - eb[13];
-        const e14 = ea[14] - eb[14];
-        const e15 = ea[15] - eb[15];
-
-        this.set(e0, e1, e2, e3, e4, e5, e6, e7, e8, e9, e10, e11, e12, e13, e14, e15);
     }
 
     public toArray(): MatrixElements4 {
@@ -3447,63 +3584,6 @@ export class Matrix4 implements ReadonlyMatrix4 {
         const w = e[3] * v.x + e[7] * v.y + e[11] * v.z;
 
         return Vector3.fromXYZW(x, y, z, w);
-    }
-
-    /**
-     * ```
-     * | 1  0  0  tx |   | e0  e4   e8  e12 |
-     * | 0  1  0  ty | * | e1  e5   e9  e13 |
-     * | 0  0  1  tz |   | e2  e6  e10  e14 |
-     * | 0  0  0   1 |   | e3  e7  e11  e15 |
-     * ```
-     */
-    public translate(tx: number, ty: number, tz: number): void {
-        const e = this.elements;
-
-        e[0] += tx * e[3];
-        e[1] += ty * e[3];
-        e[2] += tz * e[3];
-
-        e[4] += tx * e[7];
-        e[5] += ty * e[7];
-        e[6] += tz * e[7];
-
-        e[8] += tx * e[11];
-        e[9] += ty * e[11];
-        e[10] += tz * e[11];
-
-        e[12] += tx * e[15];
-        e[13] += ty * e[15];
-        e[14] += tz * e[15];
-    }
-
-    /**
-     * ```
-     * | e0  e4   e8  e12 |   | 1  0  0  tx |
-     * | e1  e5   e9  e13 | * | 0  1  0  ty |
-     * | e2  e6  e10  e14 |   | 0  0  1  tz |
-     * | e3  e7  e11  e15 |   | 0  0  0   1 |
-     * ```
-     */
-    public translatePre(tx: number, ty: number, tz: number): void {
-        const e = this.elements;
-
-        e[12] += e[0] * tx + e[4] * ty + e[8] * tz;
-        e[13] += e[1] * tx + e[5] * ty + e[9] * tz;
-        e[14] += e[2] * tx + e[6] * ty + e[10] * tz;
-        e[15] += e[3] * tx + e[7] * ty + e[11] * tz;
-    }
-
-    /**
-     * ```
-     * |  1   0   0  0 |
-     * |  0   1   0  0 |
-     * |  0   0   1  0 |
-     * | tx  ty  tz  1 |
-     * ```
-     */
-    public translateSet(tx: number, ty: number, tz: number): void {
-        this.set(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, tx, ty, tz, 1);
     }
 
     /**

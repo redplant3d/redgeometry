@@ -12,13 +12,13 @@ import { Interval } from "../utility/interval.js";
 import { lerp } from "../utility/scalar.js";
 import { RootType, solveCubic, solveQuadratic } from "../utility/solve.js";
 
-export function encloseCurveAt(c: ReadonlyBezierCurve2, box: Box2, t: number): void {
+export function setEncloseCurveAt(c: ReadonlyBezierCurve2, box: Box2, t: number): void {
     if (!isInParameterRange(t)) {
         return;
     }
 
     const p = c.getValueAt(t);
-    box.enclose(p);
+    box.setEnclose(box, p);
 }
 
 export function minimizeCurveDistanceAt(

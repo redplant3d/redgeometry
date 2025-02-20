@@ -69,63 +69,63 @@ test("Quaternion - fromRotationEuler", () => {
 
     const qa1 = Quaternion.fromRotationEuler(ax, ay, az, RotationOrder.XYZ);
     const qa2 = Quaternion.createIdentity();
-    qa2.rotateXPre(ax);
-    qa2.rotateYPre(ay);
-    qa2.rotateZPre(az);
+    qa2.setRotateXPre(qa2, ax);
+    qa2.setRotateYPre(qa2, ay);
+    qa2.setRotateZPre(qa2, az);
     const qa3 = Quaternion.createIdentity();
-    qa3.rotateZ(az);
-    qa3.rotateY(ay);
-    qa3.rotateX(ax);
+    qa3.setRotateZ(qa3, az);
+    qa3.setRotateY(qa3, ay);
+    qa3.setRotateX(qa3, ax);
 
     const qb1 = Quaternion.fromRotationEuler(ax, ay, az, RotationOrder.XZY);
     const qb2 = Quaternion.createIdentity();
-    qb2.rotateXPre(ax);
-    qb2.rotateZPre(az);
-    qb2.rotateYPre(ay);
+    qb2.setRotateXPre(qb2, ax);
+    qb2.setRotateZPre(qb2, az);
+    qb2.setRotateYPre(qb2, ay);
     const qb3 = Quaternion.createIdentity();
-    qb3.rotateY(ay);
-    qb3.rotateZ(az);
-    qb3.rotateX(ax);
+    qb3.setRotateY(qb3, ay);
+    qb3.setRotateZ(qb3, az);
+    qb3.setRotateX(qb3, ax);
 
     const qc1 = Quaternion.fromRotationEuler(ax, ay, az, RotationOrder.YXZ);
     const qc2 = Quaternion.createIdentity();
-    qc2.rotateYPre(ay);
-    qc2.rotateXPre(ax);
-    qc2.rotateZPre(az);
+    qc2.setRotateYPre(qc2, ay);
+    qc2.setRotateXPre(qc2, ax);
+    qc2.setRotateZPre(qc2, az);
     const qc3 = Quaternion.createIdentity();
-    qc3.rotateZ(az);
-    qc3.rotateX(ax);
-    qc3.rotateY(ay);
+    qc3.setRotateZ(qc3, az);
+    qc3.setRotateX(qc3, ax);
+    qc3.setRotateY(qc3, ay);
 
     const qd1 = Quaternion.fromRotationEuler(ax, ay, az, RotationOrder.YZX);
     const qd2 = Quaternion.createIdentity();
-    qd2.rotateYPre(ay);
-    qd2.rotateZPre(az);
-    qd2.rotateXPre(ax);
+    qd2.setRotateYPre(qd2, ay);
+    qd2.setRotateZPre(qd2, az);
+    qd2.setRotateXPre(qd2, ax);
     const qd3 = Quaternion.createIdentity();
-    qd3.rotateX(ax);
-    qd3.rotateZ(az);
-    qd3.rotateY(ay);
+    qd3.setRotateX(qd3, ax);
+    qd3.setRotateZ(qd3, az);
+    qd3.setRotateY(qd3, ay);
 
     const qe1 = Quaternion.fromRotationEuler(ax, ay, az, RotationOrder.ZXY);
     const qe2 = Quaternion.createIdentity();
-    qe2.rotateZPre(az);
-    qe2.rotateXPre(ax);
-    qe2.rotateYPre(ay);
+    qe2.setRotateZPre(qe2, az);
+    qe2.setRotateXPre(qe2, ax);
+    qe2.setRotateYPre(qe2, ay);
     const qe3 = Quaternion.createIdentity();
-    qe3.rotateY(ay);
-    qe3.rotateX(ax);
-    qe3.rotateZ(az);
+    qe3.setRotateY(qe3, ay);
+    qe3.setRotateX(qe3, ax);
+    qe3.setRotateZ(qe3, az);
 
     const qf1 = Quaternion.fromRotationEuler(ax, ay, az, RotationOrder.ZYX);
     const qf2 = Quaternion.createIdentity();
-    qf2.rotateZPre(az);
-    qf2.rotateYPre(ay);
-    qf2.rotateXPre(ax);
+    qf2.setRotateZPre(qf2, az);
+    qf2.setRotateYPre(qf2, ay);
+    qf2.setRotateXPre(qf2, ax);
     const qf3 = Quaternion.createIdentity();
-    qf3.rotateX(ax);
-    qf3.rotateY(ay);
-    qf3.rotateZ(az);
+    qf3.setRotateX(qf3, ax);
+    qf3.setRotateY(qf3, ay);
+    qf3.setRotateZ(qf3, az);
 
     expectToBeCloseQuaternion(qa1, qa2);
     expectToBeCloseQuaternion(qa1, qa3);
@@ -192,13 +192,13 @@ test("Quaternion - mulV", () => {
     const mat3 = Matrix4A.fromRotation(q3.a, q3.b, q3.c, q3.d);
     const qa = Quaternion.fromRotationEuler(ax, ay, az, RotationOrder.ZYX);
     const qb = Quaternion.createIdentity();
-    qb.rotateX(ax);
-    qb.rotateY(ay);
-    qb.rotateZ(az);
+    qb.setRotateX(qb, ax);
+    qb.setRotateY(qb, ay);
+    qb.setRotateZ(qb, az);
     const qc = Quaternion.createIdentity();
-    qc.rotateZPre(az);
-    qc.rotateYPre(ay);
-    qc.rotateXPre(ax);
+    qc.setRotateZPre(qc, az);
+    qc.setRotateYPre(qc, ay);
+    qc.setRotateXPre(qc, ax);
 
     const v = new Vector3(1, 2, 3);
 
@@ -214,37 +214,37 @@ test("Quaternion - mulV", () => {
     expectToBeCloseVector3(v1, v5);
 });
 
-test("Quaternion - rotateX", () => {
+test("Quaternion - setRotateX", () => {
     const a = 1;
     const q1 = Quaternion.fromRotationAngleX(a);
     const q2 = Quaternion.fromRotationAngleX(a);
 
-    q1.rotateX(-a);
-    q2.rotateXPre(-a);
+    q1.setRotateX(q1, -a);
+    q2.setRotateXPre(q2, -a);
 
     expectToBeCloseQuaternion(q1, Quaternion.IDENTITY);
     expectToBeCloseQuaternion(q2, Quaternion.IDENTITY);
 });
 
-test("Quaternion - rotateY", () => {
+test("Quaternion - setRotateY", () => {
     const a = 1;
     const q1 = Quaternion.fromRotationAngleY(a);
     const q2 = Quaternion.fromRotationAngleY(a);
 
-    q1.rotateY(-a);
-    q2.rotateYPre(-a);
+    q1.setRotateY(q1, -a);
+    q2.setRotateYPre(q2, -a);
 
     expectToBeCloseQuaternion(q1, Quaternion.IDENTITY);
     expectToBeCloseQuaternion(q2, Quaternion.IDENTITY);
 });
 
-test("Quaternion - rotateZ", () => {
+test("Quaternion - setRotateZ", () => {
     const a = 1;
     const q1 = Quaternion.fromRotationAngleZ(a);
     const q2 = Quaternion.fromRotationAngleZ(a);
 
-    q1.rotateZ(-a);
-    q2.rotateZPre(-a);
+    q1.setRotateZ(q1, -a);
+    q2.setRotateZPre(q2, -a);
 
     expectToBeCloseQuaternion(q1, Quaternion.IDENTITY);
     expectToBeCloseQuaternion(q2, Quaternion.IDENTITY);

@@ -78,6 +78,7 @@ export function transformSystem(world: World): void {
         hiearchySelector.select(entry.entityId);
 
         const parent = hiearchySelector.getParent();
+        const { global } = computed;
 
         if (parent !== undefined) {
             const parentComputed = world.getComponent<ComputedTransformComponent>(parent, "computed-transform");
@@ -86,7 +87,7 @@ export function transformSystem(world: World): void {
                 continue;
             }
 
-            computed.global.copyFromMat4A(parentComputed.global);
+            global.setFromMat4A(parentComputed.global);
 
             if (transform.visible === Visibility.Inherit) {
                 computed.visible = parentComputed.visible;
@@ -94,23 +95,23 @@ export function transformSystem(world: World): void {
                 computed.visible = transform.visible;
             }
         } else {
-            computed.global.set(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0);
+            global.set(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0);
             computed.visible = transform.visible;
         }
 
         const t = transform.translation;
         if (!t.isZero()) {
-            computed.global.translatePre(t.x, t.y, t.z);
+            global.setTranslatePre(global, t.x, t.y, t.z);
         }
 
         const r = transform.rotation;
         if (!r.isIdentity()) {
-            computed.global.rotatePre(r.a, r.b, r.c, r.d);
+            global.setRotatePre(global, r.a, r.b, r.c, r.d);
         }
 
         const s = transform.scale;
         if (!s.isOne()) {
-            computed.global.scalePre(s.x, s.y, s.z);
+            global.setScalePre(global, s.x, s.y, s.z);
         }
 
         world.updateComponent<ComputedTransformComponent>(entry.entityId, "computed-transform");

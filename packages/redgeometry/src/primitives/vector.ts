@@ -399,33 +399,28 @@ export class Vector2 implements ReadonlyVector2 {
     }
 
     public setAdd(v1: ReadonlyVector2, v2: ReadonlyVector2): void {
-        const vx = v1.x + v2.x;
-        const vy = v1.y + v2.y;
-        this.set(vx, vy);
+        this.x = v1.x + v2.x;
+        this.y = v1.y + v2.y;
     }
 
     public setAddMulS(v1: ReadonlyVector2, s: number, v2: ReadonlyVector2): void {
-        const vx = v1.x + s * v2.x;
-        const vy = v1.y + s * v2.y;
-        this.set(vx, vy);
+        this.x = v1.x + s * v2.x;
+        this.y = v1.y + s * v2.y;
     }
 
     public setDivS(v: ReadonlyVector2, s: number): void {
-        const vx = v.x / s;
-        const vy = v.y / s;
-        this.set(vx, vy);
+        this.x = v.x / s;
+        this.y = v.y / s;
     }
 
     public setMulS(s: number, v: ReadonlyVector2): void {
-        const vx = s * v.x;
-        const vy = s * v.y;
-        this.set(vx, vy);
+        this.x = s * v.x;
+        this.y = s * v.y;
     }
 
     public setSub(v1: ReadonlyVector2, v2: ReadonlyVector2): void {
-        const vx = v1.x - v2.x;
-        const vy = v1.y - v2.y;
-        this.set(vx, vy);
+        this.x = v1.x - v2.x;
+        this.y = v1.y - v2.y;
     }
 
     /**
@@ -781,45 +776,41 @@ export class Vector3 implements ReadonlyVector3 {
     }
 
     public setAdd(v1: ReadonlyVector3, v2: ReadonlyVector3): void {
-        const vx = v1.x + v2.x;
-        const vy = v1.y + v2.y;
-        const vz = v1.z + v2.z;
-        this.set(vx, vy, vz);
+        this.x = v1.x + v2.x;
+        this.y = v1.y + v2.y;
+        this.z = v1.z + v2.z;
     }
 
     public setAddMulS(v1: ReadonlyVector3, s: number, v2: ReadonlyVector3): void {
-        const vx = v1.x + s * v2.x;
-        const vy = v1.y + s * v2.y;
-        const vz = v1.z + s * v2.z;
-        this.set(vx, vy, vz);
+        this.x = v1.x + s * v2.x;
+        this.y = v1.y + s * v2.y;
+        this.z = v1.z + s * v2.z;
     }
 
     public setCross(v1: ReadonlyVector3, v2: ReadonlyVector3): void {
         const vx = v1.y * v2.z - v1.z * v2.y;
         const vy = v1.z * v2.x - v1.x * v2.z;
         const vz = v1.x * v2.y - v1.y * v2.x;
+
         this.set(vx, vy, vz);
     }
 
     public setDivS(v: ReadonlyVector3, s: number): void {
-        const vx = v.x / s;
-        const vy = v.y / s;
-        const vz = v.z / s;
-        this.set(vx, vy, vz);
+        this.x = v.x / s;
+        this.y = v.y / s;
+        this.z = v.z / s;
     }
 
     public setMulS(s: number, v: ReadonlyVector3): void {
-        const vx = s * v.x;
-        const vy = s * v.y;
-        const vz = s * v.z;
-        this.set(vx, vy, vz);
+        this.x = s * v.x;
+        this.y = s * v.y;
+        this.z = s * v.z;
     }
 
     public setSub(v1: ReadonlyVector3, v2: ReadonlyVector3): void {
-        const vx = v1.x - v2.x;
-        const vy = v1.y - v2.y;
-        const vz = v1.z - v2.z;
-        this.set(vx, vy, vz);
+        this.x = v1.x - v2.x;
+        this.y = v1.y - v2.y;
+        this.z = v1.z - v2.z;
     }
 
     /**
@@ -1083,43 +1074,38 @@ export class Vector4 implements ReadonlyVector4 {
     }
 
     public setAdd(v1: ReadonlyVector4, v2: ReadonlyVector4): void {
-        const vx = v1.x + v2.x;
-        const vy = v1.y + v2.y;
-        const vz = v1.z + v2.z;
-        const vw = v1.w + v2.w;
-        this.set(vx, vy, vz, vw);
+        this.x = v1.x + v2.x;
+        this.y = v1.y + v2.y;
+        this.z = v1.z + v2.z;
+        this.w = v1.w + v2.w;
     }
 
     public setAddMulS(v1: ReadonlyVector4, s: number, v2: ReadonlyVector4): void {
-        const vx = v1.x + s * v2.x;
-        const vy = v1.y + s * v2.y;
-        const vz = v1.z + s * v2.z;
-        const vw = v1.w + s * v2.w;
-        this.set(vx, vy, vz, vw);
+        this.x = v1.x + s * v2.x;
+        this.y = v1.y + s * v2.y;
+        this.z = v1.z + s * v2.z;
+        this.w = v1.w + s * v2.w;
     }
 
     public setDivS(v: ReadonlyVector4, s: number): void {
-        const vx = v.x / s;
-        const vy = v.y / s;
-        const vz = v.z / s;
-        const vw = v.w / s;
-        this.set(vx, vy, vz, vw);
+        this.x = v.x / s;
+        this.y = v.y / s;
+        this.z = v.z / s;
+        this.w = v.w / s;
     }
 
     public setMulS(s: number, v: ReadonlyVector4): void {
-        const vx = s * v.x;
-        const vy = s * v.y;
-        const vz = s * v.z;
-        const vw = s * v.w;
-        this.set(vx, vy, vz, vw);
+        this.x = s * v.x;
+        this.y = s * v.y;
+        this.z = s * v.z;
+        this.w = s * v.w;
     }
 
     public setSub(v1: ReadonlyVector4, v2: ReadonlyVector4): void {
-        const vx = v1.x - v2.x;
-        const vy = v1.y - v2.y;
-        const vz = v1.z - v2.z;
-        const vw = v1.w - v2.w;
-        this.set(vx, vy, vz, vw);
+        this.x = v1.x - v2.x;
+        this.y = v1.y - v2.y;
+        this.z = v1.z - v2.z;
+        this.w = v1.w - v2.w;
     }
 
     public sub(v: ReadonlyVector4): Vector4 {

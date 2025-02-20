@@ -160,18 +160,6 @@ export class Box2 implements ReadonlyBox2 {
         return this.y1 - this.y0;
     }
 
-    public enclose(p: ReadonlyVector2): void {
-        this.x0 = Math.min(this.x0, p.x);
-        this.y0 = Math.min(this.y0, p.y);
-        this.x1 = Math.max(this.x1, p.x);
-        this.y1 = Math.max(this.y1, p.y);
-    }
-
-    public encloseWithTransform(p: ReadonlyVector2, mat: ReadonlyMatrix3 | ReadonlyMatrix3A): void {
-        const pp = mat.transformPoint(p);
-        this.enclose(pp);
-    }
-
     public getCenter(): Vector2 {
         return new Vector2(0.5 * (this.x0 + this.x1), 0.5 * (this.y0 + this.y1));
     }
@@ -231,6 +219,29 @@ export class Box2 implements ReadonlyBox2 {
         this.y1 = y1;
     }
 
+    public setEnclose(box: ReadonlyBox2, p: ReadonlyVector2): void {
+        this.x0 = Math.min(box.x0, p.x);
+        this.y0 = Math.min(box.y0, p.y);
+        this.x1 = Math.max(box.x1, p.x);
+        this.y1 = Math.max(box.y1, p.y);
+    }
+
+    public setEncloseWithTransform(
+        box: ReadonlyBox2,
+        p: ReadonlyVector2,
+        mat: ReadonlyMatrix3 | ReadonlyMatrix3A,
+    ): void {
+        const pp = mat.transformPoint(p);
+        this.setEnclose(box, pp);
+    }
+
+    public setUnion(box1: ReadonlyBox2, box2: ReadonlyBox2): void {
+        this.x0 = Math.min(box1.x0, box2.x0);
+        this.y0 = Math.min(box1.y0, box2.y0);
+        this.x1 = Math.max(box1.x1, box2.x1);
+        this.y1 = Math.max(box1.y1, box2.y1);
+    }
+
     /**
      * Returns the Minkowski difference of the boxes.
      */
@@ -253,20 +264,12 @@ export class Box2 implements ReadonlyBox2 {
 
     public transform(mat: ReadonlyMatrix3 | ReadonlyMatrix3A): Box2 {
         const box = Box2.createEmpty();
-
-        box.encloseWithTransform(new Vector2(this.x0, this.y0), mat);
-        box.encloseWithTransform(new Vector2(this.x0, this.y1), mat);
-        box.encloseWithTransform(new Vector2(this.x1, this.y0), mat);
-        box.encloseWithTransform(new Vector2(this.x1, this.y1), mat);
+        box.setEncloseWithTransform(box, new Vector2(this.x0, this.y0), mat);
+        box.setEncloseWithTransform(box, new Vector2(this.x0, this.y1), mat);
+        box.setEncloseWithTransform(box, new Vector2(this.x1, this.y0), mat);
+        box.setEncloseWithTransform(box, new Vector2(this.x1, this.y1), mat);
 
         return box;
-    }
-
-    public union(b: ReadonlyBox2): void {
-        this.x0 = Math.min(this.x0, b.x0);
-        this.y0 = Math.min(this.y0, b.y0);
-        this.x1 = Math.max(this.x1, b.x1);
-        this.y1 = Math.max(this.y1, b.y1);
     }
 }
 
@@ -380,20 +383,6 @@ export class Box3 implements ReadonlyBox3 {
         return this.z1 - this.z0;
     }
 
-    public enclose(p: ReadonlyVector3): void {
-        this.x0 = Math.min(this.x0, p.x);
-        this.y0 = Math.min(this.y0, p.y);
-        this.z0 = Math.min(this.z0, p.z);
-        this.x1 = Math.max(this.x1, p.x);
-        this.y1 = Math.max(this.y1, p.y);
-        this.z1 = Math.max(this.z1, p.z);
-    }
-
-    public encloseWithTransform(p: ReadonlyVector3, mat: ReadonlyMatrix4 | ReadonlyMatrix4A): void {
-        const pp = mat.transformPoint(p);
-        this.enclose(pp);
-    }
-
     public getCenter(): Vector3 {
         return new Vector3(0.5 * (this.x0 + this.x1), 0.5 * (this.y0 + this.y1), 0.5 * (this.z0 + this.z1));
     }
@@ -470,6 +459,33 @@ export class Box3 implements ReadonlyBox3 {
         this.z1 = z1;
     }
 
+    public setEnclose(box: ReadonlyBox3, p: ReadonlyVector3): void {
+        this.x0 = Math.min(box.x0, p.x);
+        this.y0 = Math.min(box.y0, p.y);
+        this.z0 = Math.min(box.z0, p.z);
+        this.x1 = Math.max(box.x1, p.x);
+        this.y1 = Math.max(box.y1, p.y);
+        this.z1 = Math.max(box.z1, p.z);
+    }
+
+    public setEncloseWithTransform(
+        box: ReadonlyBox3,
+        p: ReadonlyVector3,
+        mat: ReadonlyMatrix4 | ReadonlyMatrix4A,
+    ): void {
+        const pp = mat.transformPoint(p);
+        this.setEnclose(box, pp);
+    }
+
+    public setUnion(box1: ReadonlyBox3, box2: ReadonlyBox3): void {
+        this.x0 = Math.min(box1.x0, box2.x0);
+        this.y0 = Math.min(box1.y0, box2.y0);
+        this.z0 = Math.min(box1.z0, box2.z0);
+        this.x1 = Math.max(box1.x1, box2.x1);
+        this.y1 = Math.max(box1.y1, box2.y1);
+        this.z1 = Math.max(box1.z1, box2.z1);
+    }
+
     /**
      * Returns the Minkowski difference of the boxes.
      */
@@ -495,24 +511,15 @@ export class Box3 implements ReadonlyBox3 {
     public transform(mat: ReadonlyMatrix4 | ReadonlyMatrix4A): Box3 {
         const box = Box3.createEmpty();
 
-        box.encloseWithTransform(new Vector3(this.x0, this.y0, this.z0), mat);
-        box.encloseWithTransform(new Vector3(this.x0, this.y0, this.z1), mat);
-        box.encloseWithTransform(new Vector3(this.x0, this.y1, this.z0), mat);
-        box.encloseWithTransform(new Vector3(this.x0, this.y1, this.z1), mat);
-        box.encloseWithTransform(new Vector3(this.x1, this.y0, this.z0), mat);
-        box.encloseWithTransform(new Vector3(this.x1, this.y0, this.z1), mat);
-        box.encloseWithTransform(new Vector3(this.x1, this.y1, this.z0), mat);
-        box.encloseWithTransform(new Vector3(this.x1, this.y1, this.z1), mat);
+        box.setEncloseWithTransform(box, new Vector3(this.x0, this.y0, this.z0), mat);
+        box.setEncloseWithTransform(box, new Vector3(this.x0, this.y0, this.z1), mat);
+        box.setEncloseWithTransform(box, new Vector3(this.x0, this.y1, this.z0), mat);
+        box.setEncloseWithTransform(box, new Vector3(this.x0, this.y1, this.z1), mat);
+        box.setEncloseWithTransform(box, new Vector3(this.x1, this.y0, this.z0), mat);
+        box.setEncloseWithTransform(box, new Vector3(this.x1, this.y0, this.z1), mat);
+        box.setEncloseWithTransform(box, new Vector3(this.x1, this.y1, this.z0), mat);
+        box.setEncloseWithTransform(box, new Vector3(this.x1, this.y1, this.z1), mat);
 
         return box;
-    }
-
-    public union(b: ReadonlyBox3): void {
-        this.x0 = Math.min(this.x0, b.x0);
-        this.y0 = Math.min(this.y0, b.y0);
-        this.z0 = Math.min(this.z0, b.z0);
-        this.x1 = Math.max(this.x1, b.x1);
-        this.y1 = Math.max(this.y1, b.y1);
-        this.z1 = Math.max(this.z1, b.z1);
     }
 }

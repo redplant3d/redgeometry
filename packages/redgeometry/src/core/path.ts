@@ -211,12 +211,12 @@ export class Path2 implements PathSink2 {
 
         const mat = Matrix3A.fromRotation(cos, sin);
 
-        mat.scale(rx, ry);
-        mat.translate(pc.x, pc.y);
+        mat.setScale(mat, rx, ry);
+        mat.setTranslate(mat, pc.x, pc.y);
 
         if (a < 0) {
             // Flip Y
-            mat.scalePre(1, -1);
+            mat.setScalePre(mat, 1, -1);
         }
 
         a = Math.abs(a);
@@ -359,7 +359,7 @@ export class Path2 implements PathSink2 {
         const bounds = Box2.createEmpty();
 
         for (const c of this.getCurveIterator()) {
-            bounds.union(c.getBounds());
+            bounds.setUnion(bounds, c.getBounds());
         }
 
         return bounds;
@@ -614,7 +614,7 @@ export class Path2 implements PathSink2 {
         }
 
         // Prepend scale
-        mat.scale(1 / sx, 1 / sy);
+        mat.setScale(mat, 1 / sx, 1 / sy);
 
         // Calculate unit coordinates
         let pp0: ReadonlyVector2 = mat.transformPoint(p0);
@@ -646,10 +646,10 @@ export class Path2 implements PathSink2 {
         let v2 = pp1.sub(pc);
 
         // Set up the final transformation matrix
-        mat.rotateSet(v1.x, v1.y);
-        mat.translate(pc.x, pc.y);
-        mat.scale(sx, sy);
-        mat.rotate(cos, sin);
+        mat.setFromRotation(v1.x, v1.y);
+        mat.setTranslate(mat, pc.x, pc.y);
+        mat.setScale(mat, sx, sy);
+        mat.setRotate(mat, cos, sin);
 
         // We have `sin = v1.cross(v2) / (v1.length * v2.length)`
         // with the length of `v1` and `v2` both 1 (unit vectors)
@@ -679,7 +679,7 @@ export class Path2 implements PathSink2 {
             }
 
             // Flip Y
-            mat.scalePre(1, -1);
+            mat.setScalePre(mat, 1, -1);
 
             v2 = new Vector2(cos, -sin);
 

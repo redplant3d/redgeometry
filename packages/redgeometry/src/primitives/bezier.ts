@@ -1,11 +1,11 @@
 import {
-    encloseCurveAt,
     getIntersectionQuadQuad,
     getWindingAtParameterConic,
     getWindingAtParameterCubic,
     getWindingAtParameterLinear,
     getWindingAtParameterQuadratic,
     minimizeCurveDistanceAt,
+    setEncloseCurveAt,
 } from "../internal/bezier.js";
 import { Interval } from "../utility/interval.js";
 import { RootType, solveCubic, solveLinear, solveQuadratic } from "../utility/solve.js";
@@ -93,8 +93,8 @@ export interface ReadonlyBezier2Curve2 {
     getVertexParameter(): number;
     getWindingAt(p: ReadonlyVector2): number;
     getWindingFracAt(p: ReadonlyVector2, step: number): number;
-    intersectLine(c: ReadonlyBezier1Curve2, output: number[]): void;
-    intersectQuad(c: ReadonlyBezier2Curve2, output: Vector2[]): void;
+    intersectLine(c: ReadonlyBezier1Curve2, outParameters: number[]): void;
+    intersectQuad(c: ReadonlyBezier2Curve2, outParameters: Vector2[]): void;
     isCollinear(): boolean;
     isFinite(): boolean;
     isPoint(): boolean;
@@ -426,8 +426,8 @@ export class Bezier2Curve2 implements ReadonlyBezier2Curve2 {
         const tx = solveLinear(qqa.x, qqb.x);
         const ty = solveLinear(qqa.y, qqb.y);
 
-        encloseCurveAt(this, box, tx);
-        encloseCurveAt(this, box, ty);
+        setEncloseCurveAt(this, box, tx);
+        setEncloseCurveAt(this, box, ty);
 
         return box;
     }
@@ -482,7 +482,7 @@ export class Bezier2Curve2 implements ReadonlyBezier2Curve2 {
 
     public getControlBounds(): Box2 {
         const box = Box2.fromPoints(this.p0, this.p2);
-        box.enclose(this.p1);
+        box.setEnclose(box, this.p1);
 
         return box;
     }
@@ -636,7 +636,7 @@ export class Bezier2Curve2 implements ReadonlyBezier2Curve2 {
         return step * sum;
     }
 
-    public intersectLine(c: ReadonlyBezier1Curve2, output: number[]): void {
+    public intersectLine(c: ReadonlyBezier1Curve2, outParameters: number[]): void {
         const a0 = Vector2.signedArea(c.p0, c.p1, this.p0);
         const a1 = Vector2.signedArea(c.p0, c.p1, this.p1);
         const a2 = Vector2.signedArea(c.p0, c.p1, this.p2);
@@ -648,20 +648,20 @@ export class Bezier2Curve2 implements ReadonlyBezier2Curve2 {
 
         if (r.type === RootType.Two) {
             if (r.x1 >= 0 && r.x1 <= 1) {
-                output.push(r.x1);
+                outParameters.push(r.x1);
             }
 
             if (r.x2 >= 0 && r.x2 <= 1) {
-                output.push(r.x2);
+                outParameters.push(r.x2);
             }
         }
     }
 
-    public intersectQuad(c: ReadonlyBezier2Curve2, output: Vector2[]): void {
+    public intersectQuad(c: ReadonlyBezier2Curve2, outParameters: Vector2[]): void {
         const i1 = new Interval(0, 1);
         const i2 = new Interval(0, 1);
 
-        getIntersectionQuadQuad(this, i1, c, i2, output);
+        getIntersectionQuadQuad(this, i1, c, i2, outParameters);
     }
 
     public isCollinear(): boolean {
@@ -834,13 +834,13 @@ export class Bezier3Curve2 implements ReadonlyBezier3Curve2 {
         const r2 = solveQuadratic(qqa.y, 0.5 * qqb.y, qqc.y);
 
         if (r1.type === RootType.Two) {
-            encloseCurveAt(this, box, r1.x1);
-            encloseCurveAt(this, box, r1.x2);
+            setEncloseCurveAt(this, box, r1.x1);
+            setEncloseCurveAt(this, box, r1.x2);
         }
 
         if (r2.type === RootType.Two) {
-            encloseCurveAt(this, box, r2.x1);
-            encloseCurveAt(this, box, r2.x2);
+            setEncloseCurveAt(this, box, r2.x1);
+            setEncloseCurveAt(this, box, r2.x2);
         }
 
         return box;
@@ -864,8 +864,8 @@ export class Bezier3Curve2 implements ReadonlyBezier3Curve2 {
 
     public getControlBounds(): Box2 {
         const box = Box2.fromPoints(this.p0, this.p3);
-        box.enclose(this.p1);
-        box.enclose(this.p2);
+        box.setEnclose(box, this.p1);
+        box.setEnclose(box, this.p2);
 
         return box;
     }
@@ -1263,13 +1263,13 @@ export class BezierRCurve2 implements ReadonlyBezierRCurve2 {
         const r2 = solveQuadratic(qqa.y, 0.5 * qqb.y, qqc.y);
 
         if (r1.type === RootType.Two) {
-            encloseCurveAt(this, box, r1.x1);
-            encloseCurveAt(this, box, r1.x2);
+            setEncloseCurveAt(this, box, r1.x1);
+            setEncloseCurveAt(this, box, r1.x2);
         }
 
         if (r2.type === RootType.Two) {
-            encloseCurveAt(this, box, r2.x1);
-            encloseCurveAt(this, box, r2.x2);
+            setEncloseCurveAt(this, box, r2.x1);
+            setEncloseCurveAt(this, box, r2.x2);
         }
 
         return box;
@@ -1277,7 +1277,7 @@ export class BezierRCurve2 implements ReadonlyBezierRCurve2 {
 
     public getControlBounds(): Box2 {
         const box = Box2.fromPoints(this.p0, this.p2);
-        box.enclose(this.p1);
+        box.setEnclose(box, this.p1);
 
         return box;
     }

@@ -462,132 +462,6 @@ export class Quaternion implements ReadonlyQuaternion {
         return new Quaternion(rcos, rsin * va.x, rsin * va.y, rsin * va.z);
     }
 
-    /**
-     * Returns the current quaternion rotated by an extrinsic rotation around the x-axis.
-     */
-    public rotateX(angle: number): void {
-        const sin = Math.sin(0.5 * angle);
-        const cos = Math.cos(0.5 * angle);
-        const qa = this.a;
-        const qb = this.b;
-        const qc = this.c;
-        const qd = this.d;
-
-        // | cos |   | a |
-        // | sin | * | b |
-        // |   0 |   | c |
-        // |   0 |   | d |
-        this.a = cos * qa - sin * qb;
-        this.b = cos * qb + sin * qa;
-        this.c = cos * qc - sin * qd;
-        this.d = cos * qd + sin * qc;
-    }
-
-    /**
-     * Returns the current quaternion rotated by an instrinsic rotation around the x-axis.
-     */
-    public rotateXPre(angle: number): void {
-        const sin = Math.sin(0.5 * angle);
-        const cos = Math.cos(0.5 * angle);
-        const qa = this.a;
-        const qb = this.b;
-        const qc = this.c;
-        const qd = this.d;
-
-        // | a |   | cos |
-        // | b | * | sin |
-        // | c |   |   0 |
-        // | d |   |   0 |
-        this.a = qa * cos - qb * sin;
-        this.b = qb * cos + qa * sin;
-        this.c = qc * cos + qd * sin;
-        this.d = qd * cos - qc * sin;
-    }
-
-    /**
-     * Returns the current quaternion rotated by an extrinsic rotation around the y-axis.
-     */
-    public rotateY(angle: number): void {
-        const sin = Math.sin(0.5 * angle);
-        const cos = Math.cos(0.5 * angle);
-        const qa = this.a;
-        const qb = this.b;
-        const qc = this.c;
-        const qd = this.d;
-
-        // | cos |   | a |
-        // |   0 | * | b |
-        // | sin |   | c |
-        // |   0 |   | d |
-        this.a = cos * qa - sin * qc;
-        this.b = cos * qb + sin * qd;
-        this.c = cos * qc + sin * qa;
-        this.d = cos * qd - sin * qb;
-    }
-
-    /**
-     * Returns the current quaternion rotated by an instrinsic rotation around the y-axis.
-     */
-    public rotateYPre(angle: number): void {
-        const sin = Math.sin(0.5 * angle);
-        const cos = Math.cos(0.5 * angle);
-        const qa = this.a;
-        const qb = this.b;
-        const qc = this.c;
-        const qd = this.d;
-
-        // | a |   | cos |
-        // | b | * |   0 |
-        // | c |   | sin |
-        // | d |   |   0 |
-        this.a = qa * cos - qc * sin;
-        this.b = qb * cos - qd * sin;
-        this.c = qc * cos + qa * sin;
-        this.d = qd * cos + qb * sin;
-    }
-
-    /**
-     * Returns the current quaternion rotated by an extrinsic rotation around the z-axis.
-     */
-    public rotateZ(angle: number): void {
-        const sin = Math.sin(0.5 * angle);
-        const cos = Math.cos(0.5 * angle);
-        const qa = this.a;
-        const qb = this.b;
-        const qc = this.c;
-        const qd = this.d;
-
-        // | cos |   | a |
-        // |   0 | * | b |
-        // |   0 |   | c |
-        // | sin |   | d |
-        this.a = cos * qa - sin * qd;
-        this.b = cos * qb - sin * qc;
-        this.c = cos * qc + sin * qb;
-        this.d = cos * qd + sin * qa;
-    }
-
-    /**
-     * Returns the current quaternion rotated by an instrinsic rotation around the z-axis.
-     */
-    public rotateZPre(angle: number): void {
-        const sin = Math.sin(0.5 * angle);
-        const cos = Math.cos(0.5 * angle);
-        const qa = this.a;
-        const qb = this.b;
-        const qc = this.c;
-        const qd = this.d;
-
-        // | a |   | cos |
-        // | b | * |   0 |
-        // | c |   |   0 |
-        // | d |   | sin |
-        this.a = qa * cos - qd * sin;
-        this.b = qb * cos + qc * sin;
-        this.c = qc * cos - qb * sin;
-        this.d = qd * cos + qa * sin;
-    }
-
     public set(a: number, b: number, c: number, d: number): void {
         this.a = a;
         this.b = b;
@@ -596,11 +470,31 @@ export class Quaternion implements ReadonlyQuaternion {
     }
 
     public setAdd(q1: ReadonlyQuaternion, q2: ReadonlyQuaternion): void {
-        const qa = q1.a + q2.a;
-        const qb = q1.b + q2.b;
-        const qc = q1.c + q2.c;
-        const qd = q1.d + q2.d;
-        this.set(qa, qb, qc, qd);
+        this.a = q1.a + q2.a;
+        this.b = q1.b + q2.b;
+        this.c = q1.c + q2.c;
+        this.d = q1.d + q2.d;
+    }
+
+    public setFromRotationX(angle: number): void {
+        const sin = Math.sin(0.5 * angle);
+        const cos = Math.cos(0.5 * angle);
+
+        this.set(cos, sin, 0, 0);
+    }
+
+    public setFromRotationY(angle: number): void {
+        const sin = Math.sin(0.5 * angle);
+        const cos = Math.cos(0.5 * angle);
+
+        this.set(cos, 0, sin, 0);
+    }
+
+    public setFromRotationZ(angle: number): void {
+        const sin = Math.sin(0.5 * angle);
+        const cos = Math.cos(0.5 * angle);
+
+        this.set(cos, 0, 0, sin);
     }
 
     public setMul(q1: ReadonlyQuaternion, q2: ReadonlyQuaternion): void {
@@ -608,15 +502,111 @@ export class Quaternion implements ReadonlyQuaternion {
         const qb = q1.a * q2.b + q1.b * q2.a + q1.c * q2.d - q1.d * q2.c;
         const qc = q1.a * q2.c - q1.b * q2.d + q1.c * q2.a + q1.d * q2.b;
         const qd = q1.a * q2.d + q1.b * q2.c - q1.c * q2.b + q1.d * q2.a;
+
+        this.set(qa, qb, qc, qd);
+    }
+
+    public setRotateX(q: ReadonlyQuaternion, angle: number): void {
+        const sin = Math.sin(0.5 * angle);
+        const cos = Math.cos(0.5 * angle);
+
+        // | cos |   | a |
+        // | sin | * | b |
+        // |   0 |   | c |
+        // |   0 |   | d |
+        const qa = cos * q.a - sin * q.b;
+        const qb = cos * q.b + sin * q.a;
+        const qc = cos * q.c - sin * q.d;
+        const qd = cos * q.d + sin * q.c;
+
+        this.set(qa, qb, qc, qd);
+    }
+
+    public setRotateXPre(q: ReadonlyQuaternion, angle: number): void {
+        const sin = Math.sin(0.5 * angle);
+        const cos = Math.cos(0.5 * angle);
+
+        // | a |   | cos |
+        // | b | * | sin |
+        // | c |   |   0 |
+        // | d |   |   0 |
+        const qa = q.a * cos - q.b * sin;
+        const qb = q.b * cos + q.a * sin;
+        const qc = q.c * cos + q.d * sin;
+        const qd = q.d * cos - q.c * sin;
+
+        this.set(qa, qb, qc, qd);
+    }
+
+    public setRotateY(q: ReadonlyQuaternion, angle: number): void {
+        const sin = Math.sin(0.5 * angle);
+        const cos = Math.cos(0.5 * angle);
+
+        // | cos |   | a |
+        // |   0 | * | b |
+        // | sin |   | c |
+        // |   0 |   | d |
+        const qa = cos * q.a - sin * q.c;
+        const qb = cos * q.b + sin * q.d;
+        const qc = cos * q.c + sin * q.a;
+        const qd = cos * q.d - sin * q.b;
+
+        this.set(qa, qb, qc, qd);
+    }
+
+    public setRotateYPre(q: ReadonlyQuaternion, angle: number): void {
+        const sin = Math.sin(0.5 * angle);
+        const cos = Math.cos(0.5 * angle);
+
+        // | a |   | cos |
+        // | b | * |   0 |
+        // | c |   | sin |
+        // | d |   |   0 |
+        const qa = q.a * cos - q.c * sin;
+        const qb = q.b * cos - q.d * sin;
+        const qc = q.c * cos + q.a * sin;
+        const qd = q.d * cos + q.b * sin;
+
+        this.set(qa, qb, qc, qd);
+    }
+
+    public setRotateZ(q: ReadonlyQuaternion, angle: number): void {
+        const sin = Math.sin(0.5 * angle);
+        const cos = Math.cos(0.5 * angle);
+
+        // | cos |   | a |
+        // |   0 | * | b |
+        // |   0 |   | c |
+        // | sin |   | d |
+        const qa = cos * q.a - sin * q.d;
+        const qb = cos * q.b - sin * q.c;
+        const qc = cos * q.c + sin * q.b;
+        const qd = cos * q.d + sin * q.a;
+
+        this.set(qa, qb, qc, qd);
+    }
+
+    public setRotateZPre(q: ReadonlyQuaternion, angle: number): void {
+        const sin = Math.sin(0.5 * angle);
+        const cos = Math.cos(0.5 * angle);
+
+        // | a |   | cos |
+        // | b | * |   0 |
+        // | c |   |   0 |
+        // | d |   | sin |
+        const qa = q.a * cos - q.d * sin;
+        const qb = q.b * cos + q.c * sin;
+        const qc = q.c * cos - q.b * sin;
+        const qd = q.d * cos + q.a * sin;
+
         this.set(qa, qb, qc, qd);
     }
 
     public setSub(q1: ReadonlyQuaternion, q2: ReadonlyQuaternion): void {
-        const qa = q1.a - q2.a;
-        const qb = q1.b - q2.b;
-        const qc = q1.c - q2.c;
-        const qd = q1.d - q2.d;
-        this.set(qa, qb, qc, qd);
+        this.a = q1.a - q2.a;
+        this.b = q1.b - q2.b;
+        this.c = q1.c - q2.c;
+        this.d = q1.d - q2.d;
     }
 
     /**

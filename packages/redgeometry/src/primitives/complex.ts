@@ -145,37 +145,43 @@ export class Complex implements ReadonlyComplex {
         return new Vector2(this.a * v.x - this.b * v.y, this.a * v.y + this.b * v.x);
     }
 
-    public rotate(angle: number): void {
-        const sin = Math.sin(angle);
-        const cos = Math.cos(angle);
-        const za = this.a;
-        const zb = this.b;
-
-        this.a = cos * za - sin * zb;
-        this.b = cos * zb + sin * za;
-    }
-
     public set(a: number, b: number): void {
         this.a = a;
         this.b = b;
     }
 
     public setAdd(z1: ReadonlyComplex, z2: ReadonlyComplex): void {
-        const za = z1.a + z2.a;
-        const zb = z1.b + z2.b;
-        this.set(za, zb);
+        this.a = z1.a + z2.a;
+        this.b = z1.b + z2.b;
+    }
+
+    public setFromRotationAngle(angle: number): void {
+        const sin = Math.sin(angle);
+        const cos = Math.cos(angle);
+
+        this.set(cos, sin);
     }
 
     public setMul(z1: ReadonlyComplex, z2: ReadonlyComplex): void {
         const za = z1.a * z2.a - z1.b * z2.b;
         const zb = z1.a * z2.b + z1.b * z2.a;
+
+        this.set(za, zb);
+    }
+
+    public setRotate(z: ReadonlyComplex, angle: number): void {
+        const sin = Math.sin(angle);
+        const cos = Math.cos(angle);
+
+        const za = cos * z.a - sin * z.b;
+        const zb = cos * z.b + sin * z.a;
+
         this.set(za, zb);
     }
 
     public setSub(z1: ReadonlyComplex, z2: ReadonlyComplex): void {
-        const za = z1.a - z2.a;
-        const zb = z1.b - z2.b;
-        this.set(za, zb);
+        this.a = z1.a - z2.a;
+        this.b = z1.b - z2.b;
     }
 
     public sub(z: ReadonlyComplex): Complex {

@@ -99,19 +99,19 @@ function updateSystem(world: World): void {
     const h = 0.5 * canvasHeight;
     const s = 0.5 * Math.min(canvasWidth, canvasHeight);
 
-    matProj.scale(s, s, s);
-    matProj.translate(w, h, 0);
+    matProj.setScale(matProj, s, s, s);
+    matProj.setTranslate(matProj, w, h, 0);
 
     // Model view
     const d = (rotation * Math.PI) / 180;
     const q = Quaternion.fromRotationEuler(1.1 * d, 1.3 * d, 1.7 * d, RotationOrder.XYZ);
 
     const matView = Matrix4.createIdentity();
-    matView.rotate(q.a, q.b, q.c, q.d);
-    matView.translate(0, 0, -5);
+    matView.setRotate(matView, q.a, q.b, q.c, q.d);
+    matView.setTranslate(matView, 0, 0, -5);
 
     // View to screen coordinates
-    matView.mulSet(matProj, matView);
+    matView.setMul(matProj, matView);
 
     world.writeData<AppPartRemoteData>({
         dataId: "app-part-remote",

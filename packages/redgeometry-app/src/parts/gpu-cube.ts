@@ -313,8 +313,8 @@ function cameraMoveSystem(world: World): void {
 
         const sens = 1 / 250;
 
-        camRot.rotateXPre(sens * dy);
-        camRot.rotateY(sens * dx);
+        camRot.setRotateXPre(camRot, sens * dy);
+        camRot.setRotateY(camRot, sens * dx);
 
         camRot = camRot.unit();
     }

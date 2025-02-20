@@ -15,11 +15,11 @@ test("Complex - inverse", () => {
     expectToBeCloseComplex(z2, Complex.IDENTITY);
 });
 
-test("Complex - rotate", () => {
+test("Complex - setRotate", () => {
     const a = 1;
     const z = Complex.fromRotationAngle(a);
 
-    z.rotate(-a);
+    z.setRotate(z, -a);
 
     expectToBeCloseComplex(z, Complex.IDENTITY);
 });
