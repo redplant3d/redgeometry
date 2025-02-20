@@ -32,7 +32,7 @@ export type Matrix4Like = {
 };
 
 export interface ReadonlyMatrix3A {
-    readonly elements: MatrixElements3A;
+    readonly elements: Readonly<MatrixElements3A>;
     readonly type: MatrixType.Affine;
 
     clone(): Matrix3A;
@@ -50,7 +50,7 @@ export interface ReadonlyMatrix3A {
 }
 
 export interface ReadonlyMatrix3 {
-    readonly elements: MatrixElements3;
+    readonly elements: Readonly<MatrixElements3>;
     readonly type: MatrixType.Projective;
 
     add(mat: ReadonlyMatrix3): Matrix3;
@@ -69,7 +69,7 @@ export interface ReadonlyMatrix3 {
 }
 
 export interface ReadonlyMatrix4A {
-    readonly elements: MatrixElements4A;
+    readonly elements: Readonly<MatrixElements4A>;
     readonly type: MatrixType.Affine;
 
     clone(): Matrix4A;
@@ -87,7 +87,7 @@ export interface ReadonlyMatrix4A {
 }
 
 export interface ReadonlyMatrix4 {
-    readonly elements: MatrixElements4;
+    readonly elements: Readonly<MatrixElements4>;
     readonly type: MatrixType.Projective;
 
     add(mat: ReadonlyMatrix4): Matrix4;
