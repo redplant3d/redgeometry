@@ -86,12 +86,12 @@ function updateSystem(world: World): void {
     const edges = createCube();
 
     // Projection
-    let matProj: Matrix4 | undefined;
+    const matProj = Matrix4.createIdentity();
 
     if (projection === "orthographic") {
-        matProj = Matrix4.fromOrthographicFrustum(-2.5, 2.5, -2.5, 2.5, 1, 10);
+        matProj.setFromOrthographicFrustum(-2.5, 2.5, -2.5, 2.5, 1, 10);
     } else {
-        matProj = Matrix4.fromPerspectiveFrustum(-0.5, 0.5, -0.5, 0.5, 1, 10);
+        matProj.setFromPerspectiveFrustum(-0.5, 0.5, -0.5, 0.5, 1, 10);
     }
 
     // NDC to screen

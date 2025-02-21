@@ -244,23 +244,10 @@ export class Matrix3A implements ReadonlyMatrix3A {
      * Returns the inverse of the matrix.
      */
     public inverse(): Matrix3A {
-        const det = this.determinant();
+        const mat = new Matrix3A([0, 0, 0, 0, 0, 0]);
+        mat.setInverse(this);
 
-        if (det === 0) {
-            return Matrix3A.createIdentity();
-        }
-
-        const detInv = 1 / det;
-        const ea = this.elements;
-
-        const e0 = detInv * ea[3];
-        const e1 = detInv * -ea[1];
-        const e2 = detInv * -ea[2];
-        const e3 = detInv * ea[0];
-        const e4 = -(ea[4] * e0 + ea[5] * e2);
-        const e5 = -(ea[4] * e1 + ea[5] * e3);
-
-        return new Matrix3A([e0, e1, e2, e3, e4, e5]);
+        return mat;
     }
 
     /**
@@ -320,8 +307,12 @@ export class Matrix3A implements ReadonlyMatrix3A {
         e[5] = e5;
     }
 
+    public setFromIdentity(): void {
+        this.set(1, 0, 0, 1, 0, 0);
+    }
+
     /**
-     * Copies values from `mat` into this matrix.
+     * Sets values from `mat` to this matrix.
      */
     public setFromMat3(mat: ReadonlyMatrix3): void {
         const ea = mat.elements;
@@ -336,7 +327,7 @@ export class Matrix3A implements ReadonlyMatrix3A {
     }
 
     /**
-     * Copies values from `mat` into this matrix.
+     * Sets values from `mat` to this matrix.
      */
     public setFromMat3A(mat: ReadonlyMatrix3A): void {
         const ea = mat.elements;
@@ -388,15 +379,11 @@ export class Matrix3A implements ReadonlyMatrix3A {
         this.set(1, 0, 0, 1, tx, ty);
     }
 
-    public setIdentity(): void {
-        this.set(1, 0, 0, 1, 0, 0);
-    }
-
     public setInverse(mat: ReadonlyMatrix3A): void {
         const det = mat.determinant();
 
         if (det === 0) {
-            this.setIdentity();
+            this.setFromIdentity();
             return;
         }
 
@@ -677,22 +664,6 @@ export class Matrix3 implements ReadonlyMatrix3 {
     }
 
     /**
-     * Creates a matrix from `mat` by omitting the projection and translation parts.
-     */
-    public static fromMat4(mat: ReadonlyMatrix4): Matrix3 {
-        const e = mat.elements;
-        return new Matrix3([e[0], e[1], e[2], e[4], e[5], e[6], e[8], e[9], e[10]]);
-    }
-
-    /**
-     * Creates a matrix from `mat` by omitting the translation part.
-     */
-    public static fromMat4A(mat: ReadonlyMatrix4A): Matrix3 {
-        const e = mat.elements;
-        return new Matrix3([e[0], e[1], e[2], e[3], e[4], e[5], e[6], e[7], e[8]]);
-    }
-
-    /**
      * ```
      * | z0  z2  0 |
      * | z1  z3  0 |
@@ -811,26 +782,10 @@ export class Matrix3 implements ReadonlyMatrix3 {
      * Returns the inverse of the matrix.
      */
     public inverse(): Matrix3 {
-        const det = this.determinant();
+        const mat = new Matrix3([0, 0, 0, 0, 0, 0, 0, 0, 0]);
+        mat.setInverse(this);
 
-        if (det === 0) {
-            return Matrix3.createIdentity();
-        }
-
-        const detInv = 1 / det;
-        const ea = this.elements;
-
-        const e0 = detInv * (ea[4] * ea[8] - ea[5] * ea[7]);
-        const e1 = detInv * (ea[2] * ea[7] - ea[1] * ea[8]);
-        const e2 = detInv * (ea[1] * ea[5] - ea[2] * ea[4]);
-        const e3 = detInv * (ea[5] * ea[6] - ea[3] * ea[8]);
-        const e4 = detInv * (ea[0] * ea[8] - ea[2] * ea[6]);
-        const e5 = detInv * (ea[2] * ea[3] - ea[0] * ea[5]);
-        const e6 = detInv * (ea[3] * ea[7] - ea[4] * ea[6]);
-        const e7 = detInv * (ea[1] * ea[6] - ea[0] * ea[7]);
-        const e8 = detInv * (ea[0] * ea[4] - ea[1] * ea[3]);
-
-        return new Matrix3([e0, e1, e2, e3, e4, e5, e6, e7, e8]);
+        return mat;
     }
 
     /**
@@ -930,8 +885,12 @@ export class Matrix3 implements ReadonlyMatrix3 {
         e[8] = ea[8] + eb[8];
     }
 
+    public setFromIdentity(): void {
+        this.set(1, 0, 0, 0, 1, 0, 0, 0, 1);
+    }
+
     /**
-     * Copies values from `mat` into this matrix.
+     * Sets values from `mat` to this matrix.
      */
     public setFromMat3(mat: ReadonlyMatrix3): void {
         const ea = mat.elements;
@@ -949,7 +908,7 @@ export class Matrix3 implements ReadonlyMatrix3 {
     }
 
     /**
-     * Copies values from `mat` into this matrix.
+     * Sets values from `mat` to this matrix.
      */
     public setFromMat3A(mat: ReadonlyMatrix3A): void {
         const ea = mat.elements;
@@ -1004,15 +963,11 @@ export class Matrix3 implements ReadonlyMatrix3 {
         this.set(1, 0, 0, 0, 1, 0, tx, ty, 1);
     }
 
-    public setIdentity(): void {
-        this.set(1, 0, 0, 0, 1, 0, 0, 0, 1);
-    }
-
     public setInverse(mat: ReadonlyMatrix3): void {
         const det = mat.determinant();
 
         if (det === 0) {
-            this.setIdentity();
+            this.setFromIdentity();
             return;
         }
 
@@ -1368,76 +1323,6 @@ export class Matrix4A implements ReadonlyMatrix4A {
     }
 
     /**
-     * Creates a matrix from `mat`.
-     */
-    public static fromMat3(mat: ReadonlyMatrix3): Matrix4A {
-        const e = mat.elements;
-        return new Matrix4A([e[0], e[1], e[2], e[3], e[4], e[5], e[6], e[7], e[8], 0, 0, 0]);
-    }
-
-    /**
-     * Creates a matrix from `mat`.
-     */
-    public static fromMat4(mat: ReadonlyMatrix4): Matrix4A {
-        const e = mat.elements;
-        return new Matrix4A([e[0], e[1], e[2], e[4], e[5], e[6], e[8], e[9], e[10], e[12], e[13], e[14]]);
-    }
-
-    /**
-     * Returns a right-handed orthographic projection matrix with a depth range of `[0, 1]`.
-     *
-     * Values equal to `glm::orthoRH_NO`.
-     */
-    public static fromOrthographicFrustum(
-        left: number,
-        right: number,
-        bottom: number,
-        top: number,
-        near: number,
-        far: number,
-    ): Matrix4A {
-        // | e0   0   0   e9 |
-        // |  0  e4   0  e10 |
-        // |  0   0  e8  e11 |
-        // |  0   0   0    1 |
-        const e0 = 2 / (right - left);
-        const e4 = 2 / (top - bottom);
-        const e8 = 1 / (near - far);
-        const e9 = (left + right) / (left - right);
-        const e10 = (bottom + top) / (bottom - top);
-        const e11 = near / (near - far);
-
-        return new Matrix4A([e0, 0, 0, 0, e4, 0, 0, 0, e8, e9, e10, e11]);
-    }
-
-    /**
-     * Returns a right-handed orthographic projection matrix with a depth range of `[-1, 1]`.
-     *
-     * Values equal to `glm::orthoRH_ZO`.
-     */
-    public static fromOrthographicFrustumGL(
-        left: number,
-        right: number,
-        bottom: number,
-        top: number,
-        near: number,
-        far: number,
-    ): Matrix4A {
-        // | e0   0   0   e9 |
-        // |  0  e4   0  e10 |
-        // |  0   0  e8  e11 |
-        // |  0   0   0    1 |
-        const e0 = 2 / (right - left);
-        const e4 = 2 / (top - bottom);
-        const e8 = 2 / (near - far);
-        const e9 = (left + right) / (left - right);
-        const e10 = (bottom + top) / (bottom - top);
-        const e11 = (near + far) / (near - far);
-
-        return new Matrix4A([e0, 0, 0, 0, e4, 0, 0, 0, e8, e9, e10, e11]);
-    }
-
-    /**
      * ```
      * | q0  q3  q6  0 |
      * | q1  q4  q7  0 |
@@ -1494,32 +1379,6 @@ export class Matrix4A implements ReadonlyMatrix4A {
      */
     public static fromTranslation(tx: number, ty: number, tz: number): Matrix4A {
         return new Matrix4A([1, 0, 0, 0, 1, 0, 0, 0, 1, tx, ty, tz]);
-    }
-
-    /**
-     * Returns a view matrix where `x` is right, `y` is up and `-z` is forward.
-     */
-    public static fromView(offset: ReadonlyVector3, direction: ReadonlyVector3, up: ReadonlyVector3): Matrix4A {
-        // Orthonormal basis
-        const v3 = direction.neg().unit();
-        const v1 = up.cross(v3).unit();
-        const v2 = v3.cross(v1);
-
-        // See the `Matrix4.fromView()` for derivation.
-        const e0 = v1.x;
-        const e1 = v2.x;
-        const e2 = v3.x;
-        const e3 = v1.y;
-        const e4 = v2.y;
-        const e5 = v3.y;
-        const e6 = v1.z;
-        const e7 = v2.z;
-        const e8 = v3.z;
-        const e9 = -offset.dot(v1);
-        const e10 = -offset.dot(v2);
-        const e11 = -offset.dot(v3);
-
-        return new Matrix4A([e0, e1, e2, e3, e4, e5, e6, e7, e8, e9, e10, e11]);
     }
 
     public clone(): Matrix4A {
@@ -1595,29 +1454,10 @@ export class Matrix4A implements ReadonlyMatrix4A {
      * Returns the inverse of the matrix.
      */
     public inverse(): Matrix4A {
-        const det = this.determinant();
+        const mat = new Matrix4A([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
+        mat.setInverse(this);
 
-        if (det === 0) {
-            return Matrix4A.createIdentity();
-        }
-
-        const detInv = 1 / det;
-        const ea = this.elements;
-
-        const e0 = detInv * (ea[4] * ea[8] - ea[5] * ea[7]);
-        const e1 = detInv * (ea[2] * ea[7] - ea[1] * ea[8]);
-        const e2 = detInv * (ea[1] * ea[5] - ea[2] * ea[4]);
-        const e3 = detInv * (ea[5] * ea[6] - ea[3] * ea[8]);
-        const e4 = detInv * (ea[0] * ea[8] - ea[2] * ea[6]);
-        const e5 = detInv * (ea[2] * ea[3] - ea[0] * ea[5]);
-        const e6 = detInv * (ea[3] * ea[7] - ea[4] * ea[6]);
-        const e7 = detInv * (ea[1] * ea[6] - ea[0] * ea[7]);
-        const e8 = detInv * (ea[0] * ea[4] - ea[1] * ea[3]);
-        const e9 = -(ea[9] * e0 + ea[10] * e3 + ea[11] * e6);
-        const e10 = -(ea[9] * e1 + ea[10] * e4 + ea[11] * e7);
-        const e11 = -(ea[9] * e2 + ea[10] * e5 + ea[11] * e8);
-
-        return new Matrix4A([e0, e1, e2, e3, e4, e5, e6, e7, e8, e9, e10, e11]);
+        return mat;
     }
 
     /**
@@ -1707,8 +1547,12 @@ export class Matrix4A implements ReadonlyMatrix4A {
         e[11] = e11;
     }
 
+    public setFromIdentity(): void {
+        this.set(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0);
+    }
+
     /**
-     * Copies values from `mat` into this matrix.
+     * Sets values from `mat` to this matrix.
      */
     public setFromMat4(mat: ReadonlyMatrix4): void {
         const e = this.elements;
@@ -1729,7 +1573,7 @@ export class Matrix4A implements ReadonlyMatrix4A {
     }
 
     /**
-     * Copies values from `mat` into this matrix.
+     * Sets values from `mat` to this matrix.
      */
     public setFromMat4A(mat: ReadonlyMatrix4A): void {
         const ea = mat.elements;
@@ -1747,6 +1591,60 @@ export class Matrix4A implements ReadonlyMatrix4A {
         e[9] = ea[9];
         e[10] = ea[10];
         e[11] = ea[11];
+    }
+
+    /**
+     * Sets a right-handed orthographic projection matrix with a depth range of `[0, 1]`.
+     *
+     * Values equal to `glm::orthoRH_ZO`.
+     */
+    public setFromOrthographicFrustum(
+        left: number,
+        right: number,
+        bottom: number,
+        top: number,
+        near: number,
+        far: number,
+    ): void {
+        // | e0   0   0   e9 |
+        // |  0  e4   0  e10 |
+        // |  0   0  e8  e11 |
+        // |  0   0   0    1 |
+        const e0 = 2 / (right - left);
+        const e4 = 2 / (top - bottom);
+        const e8 = 1 / (near - far);
+        const e9 = (left + right) / (left - right);
+        const e10 = (bottom + top) / (bottom - top);
+        const e11 = near / (near - far);
+
+        this.set(e0, 0, 0, 0, e4, 0, 0, 0, e8, e9, e10, e11);
+    }
+
+    /**
+     * Sets a right-handed orthographic projection matrix with a depth range of `[-1, 1]`.
+     *
+     * Values equal to `glm::orthoRH_NO`.
+     */
+    public setFromOrthographicFrustumGL(
+        left: number,
+        right: number,
+        bottom: number,
+        top: number,
+        near: number,
+        far: number,
+    ): void {
+        // | e0   0   0   e9 |
+        // |  0  e4   0  e10 |
+        // |  0   0  e8  e11 |
+        // |  0   0   0    1 |
+        const e0 = 2 / (right - left);
+        const e4 = 2 / (top - bottom);
+        const e8 = 2 / (near - far);
+        const e9 = (left + right) / (left - right);
+        const e10 = (bottom + top) / (bottom - top);
+        const e11 = (near + far) / (near - far);
+
+        this.set(e0, 0, 0, 0, e4, 0, 0, 0, e8, e9, e10, e11);
     }
 
     /**
@@ -1808,15 +1706,37 @@ export class Matrix4A implements ReadonlyMatrix4A {
         this.set(1, 0, 0, 0, 1, 0, 0, 0, 1, tx, ty, tz);
     }
 
-    public setIdentity(): void {
-        this.set(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0);
+    /**
+     * Sets a view matrix where `x` is right, `y` is up and `-z` is forward.
+     */
+    public setFromView(offset: ReadonlyVector3, direction: ReadonlyVector3, up: ReadonlyVector3): void {
+        // Orthonormal basis
+        const v3 = direction.neg().unit();
+        const v1 = up.cross(v3).unit();
+        const v2 = v3.cross(v1);
+
+        // See the `Matrix4.setFromView()` for derivation.
+        const e0 = v1.x;
+        const e1 = v2.x;
+        const e2 = v3.x;
+        const e3 = v1.y;
+        const e4 = v2.y;
+        const e5 = v3.y;
+        const e6 = v1.z;
+        const e7 = v2.z;
+        const e8 = v3.z;
+        const e9 = -offset.dot(v1);
+        const e10 = -offset.dot(v2);
+        const e11 = -offset.dot(v3);
+
+        this.set(e0, e1, e2, e3, e4, e5, e6, e7, e8, e9, e10, e11);
     }
 
     public setInverse(mat: ReadonlyMatrix4A): void {
         const det = mat.determinant();
 
         if (det === 0) {
-            this.setIdentity();
+            this.setFromIdentity();
             return;
         }
 
@@ -1868,55 +1788,6 @@ export class Matrix4A implements ReadonlyMatrix4A {
         const e11 = ea[2] * eb[9] + ea[5] * eb[10] + ea[8] * eb[11] + ea[11];
 
         this.set(e0, e1, e2, e3, e4, e5, e6, e7, e8, e9, e10, e11);
-    }
-
-    public setOrthographicFrustum(
-        left: number,
-        right: number,
-        bottom: number,
-        top: number,
-        near: number,
-        far: number,
-    ): void {
-        // | e0   0   0   e9 |
-        // |  0  e4   0  e10 |
-        // |  0   0  e8  e11 |
-        // |  0   0   0    1 |
-        const e0 = 2 / (right - left);
-        const e4 = 2 / (top - bottom);
-        const e8 = 1 / (near - far);
-        const e9 = (left + right) / (left - right);
-        const e10 = (bottom + top) / (bottom - top);
-        const e11 = near / (near - far);
-
-        this.set(e0, 0, 0, 0, e4, 0, 0, 0, e8, e9, e10, e11);
-    }
-
-    /**
-     * Returns a right-handed orthographic projection matrix with a depth range of `[-1, 1]`.
-     *
-     * Values equal to `glm::orthoRH_ZO`.
-     */
-    public setOrthographicFrustumGL(
-        left: number,
-        right: number,
-        bottom: number,
-        top: number,
-        near: number,
-        far: number,
-    ): void {
-        // | e0   0   0   e9 |
-        // |  0  e4   0  e10 |
-        // |  0   0  e8  e11 |
-        // |  0   0   0    1 |
-        const e0 = 2 / (right - left);
-        const e4 = 2 / (top - bottom);
-        const e8 = 2 / (near - far);
-        const e9 = (left + right) / (left - right);
-        const e10 = (bottom + top) / (bottom - top);
-        const e11 = (near + far) / (near - far);
-
-        this.set(e0, 0, 0, 0, e4, 0, 0, 0, e8, e9, e10, e11);
     }
 
     /**
@@ -2267,170 +2138,6 @@ export class Matrix4 implements ReadonlyMatrix4 {
     }
 
     /**
-     * Creates a matrix from `mat`.
-     */
-    public static fromMat3(mat: ReadonlyMatrix3): Matrix4 {
-        const e = mat.elements;
-        return new Matrix4([e[0], e[1], e[2], 0, e[3], e[4], e[5], 0, e[6], e[7], e[8], 0, 0, 0, 0, 1]);
-    }
-
-    /**
-     * Creates a matrix from `mat`.
-     */
-    public static fromMat4A(mat: ReadonlyMatrix4A): Matrix4 {
-        const e = mat.elements;
-        return new Matrix4([e[0], e[1], e[2], 0, e[3], e[4], e[5], 0, e[6], e[7], e[8], 0, e[9], e[10], e[11], 1]);
-    }
-
-    /**
-     * Returns a right-handed orthographic projection matrix with a depth range of `[0, 1]`.
-     *
-     * Values equal to `glm::orthoRH_NO`.
-     */
-    public static fromOrthographicFrustum(
-        left: number,
-        right: number,
-        bottom: number,
-        top: number,
-        near: number,
-        far: number,
-    ): Matrix4 {
-        // | e0   0    0  e12 |
-        // |  0  e5    0  e13 |
-        // |  0   0  e10  e14 |
-        // |  0   0    0    1 |
-        const e0 = 2 / (right - left);
-        const e5 = 2 / (top - bottom);
-        const e10 = 1 / (near - far);
-        const e12 = (left + right) / (left - right);
-        const e13 = (bottom + top) / (bottom - top);
-        const e14 = near / (near - far);
-
-        return new Matrix4([e0, 0, 0, 0, 0, e5, 0, 0, 0, 0, e10, 0, e12, e13, e14, 1]);
-    }
-
-    /**
-     * Returns a right-handed orthographic projection matrix with a depth range of `[-1, 1]`.
-     *
-     * Values equal to `glm::orthoRH_ZO`.
-     */
-    public static fromOrthographicFrustumGL(
-        left: number,
-        right: number,
-        bottom: number,
-        top: number,
-        near: number,
-        far: number,
-    ): Matrix4 {
-        // | e0   0    0  e12 |
-        // |  0  e5    0  e13 |
-        // |  0   0  e10  e14 |
-        // |  0   0    0    1 |
-        const e0 = 2 / (right - left);
-        const e5 = 2 / (top - bottom);
-        const e10 = 2 / (near - far);
-        const e12 = (left + right) / (left - right);
-        const e13 = (bottom + top) / (bottom - top);
-        const e14 = (near + far) / (near - far);
-
-        return new Matrix4([e0, 0, 0, 0, 0, e5, 0, 0, 0, 0, e10, 0, e12, e13, e14, 1]);
-    }
-
-    /**
-     * Returns a right-handed perspective projection matrix with a depth range of `[0, 1]`.
-     *
-     * Values equal to `glm::perspectiveRH_ZO`.
-     */
-    public static fromPerspective(fovY: number, aspectRatio: number, near: number, far: number): Matrix4 {
-        const cot = 1 / Math.tan(0.5 * fovY);
-
-        // | e0   0    0    0 |
-        // |  0  e5    0    0 |
-        // |  0   0  e10  e14 |
-        // |  0   0   -1    0 |
-        const e0 = cot / aspectRatio;
-        const e5 = cot;
-        const e10 = far / (near - far);
-        const e14 = (near * far) / (near - far);
-
-        return new Matrix4([e0, 0, 0, 0, 0, e5, 0, 0, 0, 0, e10, -1, 0, 0, e14, 0]);
-    }
-
-    /**
-     * Returns a right-handed perspective projection matrix with a depth range of `[0, 1]`.
-     *
-     * Values equal to `glm::frustumRH_ZO`.
-     */
-    public static fromPerspectiveFrustum(
-        left: number,
-        right: number,
-        bottom: number,
-        top: number,
-        near: number,
-        far: number,
-    ): Matrix4 {
-        // | e0   0   e8    0 |
-        // |  0  e5   e9    0 |
-        // |  0   0  e10  e14 |
-        // |  0   0   -1    0 |
-        const e0 = (2 * near) / (right - left);
-        const e5 = (2 * near) / (top - bottom);
-        const e8 = (left + right) / (right - left);
-        const e9 = (bottom + top) / (top - bottom);
-        const e10 = far / (near - far);
-        const e14 = (near * far) / (near - far);
-
-        return new Matrix4([e0, 0, 0, 0, 0, e5, 0, 0, e8, e9, e10, -1, 0, 0, e14, 0]);
-    }
-
-    /**
-     * Returns a right-handed perspective projection matrix with a depth range of `[-1, 1]`.
-     *
-     * Values equal to `glm::frustumRH_NO`.
-     */
-    public static fromPerspectiveFrustumGL(
-        left: number,
-        right: number,
-        bottom: number,
-        top: number,
-        near: number,
-        far: number,
-    ): Matrix4 {
-        // | e0   0   e8    0 |
-        // |  0  e5   e9    0 |
-        // |  0   0  e10  e14 |
-        // |  0   0   -1    0 |
-        const e0 = (2 * near) / (right - left);
-        const e5 = (2 * near) / (top - bottom);
-        const e8 = (left + right) / (right - left);
-        const e9 = (bottom + top) / (top - bottom);
-        const e10 = (near + far) / (near - far);
-        const e14 = (2 * near * far) / (near - far);
-
-        return new Matrix4([e0, 0, 0, 0, 0, e5, 0, 0, e8, e9, e10, -1, 0, 0, e14, 0]);
-    }
-
-    /**
-     * Returns a right-handed perspective projection matrix with a depth range of `[-1, 1]`.
-     *
-     * Values equal to `glm::perspectiveRH_NO`.
-     */
-    public static fromPerspectiveGL(fovY: number, aspectRatio: number, near: number, far: number): Matrix4 {
-        const cot = 1 / Math.tan(0.5 * fovY);
-
-        // | e0   0    0    0 |
-        // |  0  e5    0    0 |
-        // |  0   0  e10  e14 |
-        // |  0   0   -1    0 |
-        const e0 = cot / aspectRatio;
-        const e5 = cot;
-        const e10 = (near + far) / (near - far);
-        const e14 = (2 * far * near) / (near - far);
-
-        return new Matrix4([e0, 0, 0, 0, 0, e5, 0, 0, 0, 0, e10, -1, 0, 0, e14, 0]);
-    }
-
-    /**
      * ```
      * | q0  q3  q6  0 |
      * | q1  q4  q7  0 |
@@ -2487,46 +2194,6 @@ export class Matrix4 implements ReadonlyMatrix4 {
      */
     public static fromTranslation(tx: number, ty: number, tz: number): Matrix4 {
         return new Matrix4([1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, tx, ty, tz, 1]);
-    }
-
-    /**
-     * Returns a view matrix where `x` is right, `y` is up and `-z` is forward.
-     */
-    public static fromView(offset: ReadonlyVector3, direction: ReadonlyVector3, up: ReadonlyVector3): Matrix4 {
-        // Orthonormal basis
-        const v3 = direction.neg().unit();
-        const v1 = up.cross(v3).unit();
-        const v2 = v3.cross(v1);
-
-        // The inverse of the view matrix is the camera transform:
-        // ```
-        // | 1  0  0  x |   | v1x  v2x  v3x  0 |
-        // | 0  1  0  y | * | v1y  v2y  v3y  0 |
-        // | 0  0  1  z |   | v1z  v2z  v3z  0 |
-        // | 0  0  0  1 |   |   0    0    0  1 |
-        // ```
-        // Because the inverse of an orthogonal matrix is just its transpose
-        // and `(A * B)^-1 = B^-1 * A^-1`, the view matrix is:
-        // ```
-        // | v1x  v2y  v3z  0 |   | 1  0  0  -x |
-        // | v2x  v2y  v2z  0 | * | 0  1  0  -y |
-        // | v3x  v3y  v3z  0 |   | 0  0  1  -z |
-        // |   0    0    0  1 |   | 0  0  0   1 |
-        // ```
-        const e0 = v1.x;
-        const e1 = v2.x;
-        const e2 = v3.x;
-        const e4 = v1.y;
-        const e5 = v2.y;
-        const e6 = v3.y;
-        const e8 = v1.z;
-        const e9 = v2.z;
-        const e10 = v3.z;
-        const e12 = -offset.dot(v1);
-        const e13 = -offset.dot(v2);
-        const e14 = -offset.dot(v3);
-
-        return new Matrix4([e0, e1, e2, 0, e4, e5, e6, 0, e8, e9, e10, 0, e12, e13, e14, 1]);
     }
 
     /**
@@ -2654,96 +2321,10 @@ export class Matrix4 implements ReadonlyMatrix4 {
      * Returns the inverse of the matrix.
      */
     public inverse(): Matrix4 {
-        const det = this.determinant();
+        const mat = new Matrix4([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
+        mat.setInverse(this);
 
-        if (det === 0) {
-            return Matrix4.createIdentity();
-        }
-
-        const detInv = 1 / det;
-        const ea = this.elements;
-
-        const e0a = ea[15] * (ea[5] * ea[10] - ea[6] * ea[9]);
-        const e0b = ea[14] * (ea[5] * ea[11] - ea[7] * ea[9]);
-        const e0c = ea[13] * (ea[6] * ea[11] - ea[7] * ea[10]);
-        const e0 = detInv * (e0a - e0b + e0c);
-
-        const e1a = ea[15] * (ea[2] * ea[9] - ea[1] * ea[10]);
-        const e1b = ea[14] * (ea[3] * ea[9] - ea[1] * ea[11]);
-        const e1c = ea[13] * (ea[3] * ea[10] - ea[2] * ea[11]);
-        const e1 = detInv * (e1a - e1b + e1c);
-
-        const e2a = ea[15] * (ea[1] * ea[6] - ea[2] * ea[5]);
-        const e2b = ea[14] * (ea[1] * ea[7] - ea[3] * ea[5]);
-        const e2c = ea[13] * (ea[2] * ea[7] - ea[3] * ea[6]);
-        const e2 = detInv * (e2a - e2b + e2c);
-
-        const e3a = ea[11] * (ea[2] * ea[5] - ea[1] * ea[6]);
-        const e3b = ea[10] * (ea[3] * ea[5] - ea[1] * ea[7]);
-        const e3c = ea[9] * (ea[3] * ea[6] - ea[2] * ea[7]);
-        const e3 = detInv * (e3a - e3b + e3c);
-
-        const e4a = ea[15] * (ea[6] * ea[8] - ea[4] * ea[10]);
-        const e4b = ea[14] * (ea[7] * ea[8] - ea[4] * ea[11]);
-        const e4c = ea[12] * (ea[7] * ea[10] - ea[6] * ea[11]);
-        const e4 = detInv * (e4a - e4b + e4c);
-
-        const e5a = ea[15] * (ea[0] * ea[10] - ea[2] * ea[8]);
-        const e5b = ea[14] * (ea[0] * ea[11] - ea[3] * ea[8]);
-        const e5c = ea[12] * (ea[2] * ea[11] - ea[3] * ea[10]);
-        const e5 = detInv * (e5a - e5b + e5c);
-
-        const e6a = ea[15] * (ea[2] * ea[4] - ea[0] * ea[6]);
-        const e6b = ea[14] * (ea[3] * ea[4] - ea[0] * ea[7]);
-        const e6c = ea[12] * (ea[3] * ea[6] - ea[2] * ea[7]);
-        const e6 = detInv * (e6a - e6b + e6c);
-
-        const e7a = ea[11] * (ea[0] * ea[6] - ea[2] * ea[4]);
-        const e7b = ea[10] * (ea[0] * ea[7] - ea[3] * ea[4]);
-        const e7c = ea[8] * (ea[2] * ea[7] - ea[3] * ea[6]);
-        const e7 = detInv * (e7a - e7b + e7c);
-
-        const e8a = ea[15] * (ea[4] * ea[9] - ea[5] * ea[8]);
-        const e8b = ea[13] * (ea[4] * ea[11] - ea[7] * ea[8]);
-        const e8c = ea[12] * (ea[5] * ea[11] - ea[7] * ea[9]);
-        const e8 = detInv * (e8a - e8b + e8c);
-
-        const e9a = ea[15] * (ea[1] * ea[8] - ea[0] * ea[9]);
-        const e9b = ea[13] * (ea[3] * ea[8] - ea[0] * ea[11]);
-        const e9c = ea[12] * (ea[3] * ea[9] - ea[1] * ea[11]);
-        const e9 = detInv * (e9a - e9b + e9c);
-
-        const e10a = ea[15] * (ea[0] * ea[5] - ea[1] * ea[4]);
-        const e10b = ea[13] * (ea[0] * ea[7] - ea[3] * ea[4]);
-        const e10c = ea[12] * (ea[1] * ea[7] - ea[3] * ea[5]);
-        const e10 = detInv * (e10a - e10b + e10c);
-
-        const e11a = ea[11] * (ea[1] * ea[4] - ea[0] * ea[5]);
-        const e11b = ea[9] * (ea[3] * ea[4] - ea[0] * ea[7]);
-        const e11c = ea[8] * (ea[3] * ea[5] - ea[1] * ea[7]);
-        const e11 = detInv * (e11a - e11b + e11c);
-
-        const e12a = ea[14] * (ea[5] * ea[8] - ea[4] * ea[9]);
-        const e12b = ea[13] * (ea[6] * ea[8] - ea[4] * ea[10]);
-        const e12c = ea[12] * (ea[6] * ea[9] - ea[5] * ea[10]);
-        const e12 = detInv * (e12a - e12b + e12c);
-
-        const e13a = ea[14] * (ea[0] * ea[9] - ea[1] * ea[8]);
-        const e13b = ea[13] * (ea[0] * ea[10] - ea[2] * ea[8]);
-        const e13c = ea[12] * (ea[1] * ea[10] - ea[2] * ea[9]);
-        const e13 = detInv * (e13a - e13b + e13c);
-
-        const e14a = ea[14] * (ea[1] * ea[4] - ea[0] * ea[5]);
-        const e14b = ea[13] * (ea[2] * ea[4] - ea[0] * ea[6]);
-        const e14c = ea[12] * (ea[2] * ea[5] - ea[1] * ea[6]);
-        const e14 = detInv * (e14a - e14b + e14c);
-
-        const e15a = ea[10] * (ea[0] * ea[5] - ea[1] * ea[4]);
-        const e15b = ea[9] * (ea[0] * ea[6] - ea[2] * ea[4]);
-        const e15c = ea[8] * (ea[1] * ea[6] - ea[2] * ea[5]);
-        const e15 = detInv * (e15a - e15b + e15c);
-
-        return new Matrix4([e0, e1, e2, e3, e4, e5, e6, e7, e8, e9, e10, e11, e12, e13, e14, e15]);
+        return mat;
     }
 
     /**
@@ -2877,8 +2458,12 @@ export class Matrix4 implements ReadonlyMatrix4 {
         e[15] = ea[15] + eb[15];
     }
 
+    public setFromIdentity(): void {
+        this.set(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
+    }
+
     /**
-     * Copies values from `mat` into this matrix.
+     * Sets values from `mat` to this matrix.
      */
     public setFromMat4(mat: ReadonlyMatrix4): void {
         const e = this.elements;
@@ -2903,7 +2488,7 @@ export class Matrix4 implements ReadonlyMatrix4 {
     }
 
     /**
-     * Copies values from `mat` into this matrix.
+     * Sets values from `mat` to this matrix.
      */
     public setFromMat4A(mat: ReadonlyMatrix4A): void {
         const ea = mat.elements;
@@ -2925,6 +2510,154 @@ export class Matrix4 implements ReadonlyMatrix4 {
         e[13] = ea[10];
         e[14] = ea[11];
         e[15] = 1;
+    }
+
+    /**
+     * Sets a right-handed orthographic projection matrix with a depth range of `[0, 1]`.
+     *
+     * Values equal to `glm::orthoRH_ZO`.
+     */
+    public setFromOrthographicFrustum(
+        left: number,
+        right: number,
+        bottom: number,
+        top: number,
+        near: number,
+        far: number,
+    ): void {
+        // | e0   0    0  e12 |
+        // |  0  e5    0  e13 |
+        // |  0   0  e10  e14 |
+        // |  0   0    0    1 |
+        const e0 = 2 / (right - left);
+        const e5 = 2 / (top - bottom);
+        const e10 = 1 / (near - far);
+        const e12 = (left + right) / (left - right);
+        const e13 = (bottom + top) / (bottom - top);
+        const e14 = near / (near - far);
+
+        this.set(e0, 0, 0, 0, 0, e5, 0, 0, 0, 0, e10, 0, e12, e13, e14, 1);
+    }
+
+    /**
+     * Sets a right-handed orthographic projection matrix with a depth range of `[-1, 1]`.
+     *
+     * Values equal to `glm::orthoRH_NO`.
+     */
+    public setFromOrthographicFrustumGL(
+        left: number,
+        right: number,
+        bottom: number,
+        top: number,
+        near: number,
+        far: number,
+    ): void {
+        // | e0   0    0  e12 |
+        // |  0  e5    0  e13 |
+        // |  0   0  e10  e14 |
+        // |  0   0    0    1 |
+        const e0 = 2 / (right - left);
+        const e5 = 2 / (top - bottom);
+        const e10 = 2 / (near - far);
+        const e12 = (left + right) / (left - right);
+        const e13 = (bottom + top) / (bottom - top);
+        const e14 = (near + far) / (near - far);
+
+        this.set(e0, 0, 0, 0, 0, e5, 0, 0, 0, 0, e10, 0, e12, e13, e14, 1);
+    }
+
+    /**
+     * Sets a right-handed perspective projection matrix with a depth range of `[0, 1]`.
+     *
+     * Values equal to `glm::perspectiveRH_ZO`.
+     */
+    public setFromPerspective(fovY: number, aspectRatio: number, near: number, far: number): void {
+        const cot = 1 / Math.tan(0.5 * fovY);
+
+        // | e0   0    0    0 |
+        // |  0  e5    0    0 |
+        // |  0   0  e10  e14 |
+        // |  0   0   -1    0 |
+        const e0 = cot / aspectRatio;
+        const e5 = cot;
+        const e10 = far / (near - far);
+        const e14 = (near * far) / (near - far);
+
+        this.set(e0, 0, 0, 0, 0, e5, 0, 0, 0, 0, e10, -1, 0, 0, e14, 0);
+    }
+
+    /**
+     * Sets a right-handed perspective projection matrix with a depth range of `[0, 1]`.
+     *
+     * Values equal to `glm::frustumRH_ZO`.
+     */
+    public setFromPerspectiveFrustum(
+        left: number,
+        right: number,
+        bottom: number,
+        top: number,
+        near: number,
+        far: number,
+    ): void {
+        // | e0   0   e8    0 |
+        // |  0  e5   e9    0 |
+        // |  0   0  e10  e14 |
+        // |  0   0   -1    0 |
+        const e0 = (2 * near) / (right - left);
+        const e5 = (2 * near) / (top - bottom);
+        const e8 = (left + right) / (right - left);
+        const e9 = (bottom + top) / (top - bottom);
+        const e10 = far / (near - far);
+        const e14 = (near * far) / (near - far);
+
+        this.set(e0, 0, 0, 0, 0, e5, 0, 0, e8, e9, e10, -1, 0, 0, e14, 0);
+    }
+
+    /**
+     * Sets a right-handed perspective projection matrix with a depth range of `[-1, 1]`.
+     *
+     * Values equal to `glm::frustumRH_NO`.
+     */
+    public setFromPerspectiveFrustumGL(
+        left: number,
+        right: number,
+        bottom: number,
+        top: number,
+        near: number,
+        far: number,
+    ): void {
+        // | e0   0   e8    0 |
+        // |  0  e5   e9    0 |
+        // |  0   0  e10  e14 |
+        // |  0   0   -1    0 |
+        const e0 = (2 * near) / (right - left);
+        const e5 = (2 * near) / (top - bottom);
+        const e8 = (left + right) / (right - left);
+        const e9 = (bottom + top) / (top - bottom);
+        const e10 = (near + far) / (near - far);
+        const e14 = (2 * near * far) / (near - far);
+
+        this.set(e0, 0, 0, 0, 0, e5, 0, 0, e8, e9, e10, -1, 0, 0, e14, 0);
+    }
+
+    /**
+     * Sets a right-handed perspective projection matrix with a depth range of `[-1, 1]`.
+     *
+     * Values equal to `glm::perspectiveRH_NO`.
+     */
+    public setFromPerspectiveGL(fovY: number, aspectRatio: number, near: number, far: number): void {
+        const cot = 1 / Math.tan(0.5 * fovY);
+
+        // | e0   0    0    0 |
+        // |  0  e5    0    0 |
+        // |  0   0  e10  e14 |
+        // |  0   0   -1    0 |
+        const e0 = cot / aspectRatio;
+        const e5 = cot;
+        const e10 = (near + far) / (near - far);
+        const e14 = (2 * far * near) / (near - far);
+
+        this.set(e0, 0, 0, 0, 0, e5, 0, 0, 0, 0, e10, -1, 0, 0, e14, 0);
     }
 
     /**
@@ -2986,15 +2719,51 @@ export class Matrix4 implements ReadonlyMatrix4 {
         this.set(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, tx, ty, tz, 1);
     }
 
-    public setIdentity(): void {
-        this.set(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
+    /**
+     * Sets a view matrix where `x` is right, `y` is up and `-z` is forward.
+     */
+    public setFromView(offset: ReadonlyVector3, direction: ReadonlyVector3, up: ReadonlyVector3): void {
+        // Orthonormal basis
+        const v3 = direction.neg().unit();
+        const v1 = up.cross(v3).unit();
+        const v2 = v3.cross(v1);
+
+        // The inverse of the view matrix is the camera transform:
+        // ```
+        // | 1  0  0  x |   | v1x  v2x  v3x  0 |
+        // | 0  1  0  y | * | v1y  v2y  v3y  0 |
+        // | 0  0  1  z |   | v1z  v2z  v3z  0 |
+        // | 0  0  0  1 |   |   0    0    0  1 |
+        // ```
+        // Because the inverse of an orthogonal matrix is just its transpose
+        // and `(A * B)^-1 = B^-1 * A^-1`, the view matrix is:
+        // ```
+        // | v1x  v2y  v3z  0 |   | 1  0  0  -x |
+        // | v2x  v2y  v2z  0 | * | 0  1  0  -y |
+        // | v3x  v3y  v3z  0 |   | 0  0  1  -z |
+        // |   0    0    0  1 |   | 0  0  0   1 |
+        // ```
+        const e0 = v1.x;
+        const e1 = v2.x;
+        const e2 = v3.x;
+        const e4 = v1.y;
+        const e5 = v2.y;
+        const e6 = v3.y;
+        const e8 = v1.z;
+        const e9 = v2.z;
+        const e10 = v3.z;
+        const e12 = -offset.dot(v1);
+        const e13 = -offset.dot(v2);
+        const e14 = -offset.dot(v3);
+
+        this.set(e0, e1, e2, 0, e4, e5, e6, 0, e8, e9, e10, 0, e12, e13, e14, 1);
     }
 
     public setInverse(mat: ReadonlyMatrix4): void {
         const det = mat.determinant();
 
         if (det === 0) {
-            this.setIdentity();
+            this.setFromIdentity();
             return;
         }
 
@@ -3117,124 +2886,6 @@ export class Matrix4 implements ReadonlyMatrix4 {
         const e15 = ea[3] * eb[12] + ea[7] * eb[13] + ea[11] * eb[14] + ea[15] * eb[15];
 
         this.set(e0, e1, e2, e3, e4, e5, e6, e7, e8, e9, e10, e11, e12, e13, e14, e15);
-    }
-
-    public setOrthographicFrustum(
-        left: number,
-        right: number,
-        bottom: number,
-        top: number,
-        near: number,
-        far: number,
-    ): void {
-        // | e0   0    0  e12 |
-        // |  0  e5    0  e13 |
-        // |  0   0  e10  e14 |
-        // |  0   0    0    1 |
-        const e0 = 2 / (right - left);
-        const e5 = 2 / (top - bottom);
-        const e10 = 1 / (near - far);
-        const e12 = (left + right) / (left - right);
-        const e13 = (bottom + top) / (bottom - top);
-        const e14 = near / (near - far);
-
-        this.set(e0, 0, 0, 0, 0, e5, 0, 0, 0, 0, e10, 0, e12, e13, e14, 1);
-    }
-
-    public setOrthographicFrustumGL(
-        left: number,
-        right: number,
-        bottom: number,
-        top: number,
-        near: number,
-        far: number,
-    ): void {
-        // | e0   0    0  e12 |
-        // |  0  e5    0  e13 |
-        // |  0   0  e10  e14 |
-        // |  0   0    0    1 |
-        const e0 = 2 / (right - left);
-        const e5 = 2 / (top - bottom);
-        const e10 = 2 / (near - far);
-        const e12 = (left + right) / (left - right);
-        const e13 = (bottom + top) / (bottom - top);
-        const e14 = (near + far) / (near - far);
-
-        this.set(e0, 0, 0, 0, 0, e5, 0, 0, 0, 0, e10, 0, e12, e13, e14, 1);
-    }
-
-    public setPerspective(fovY: number, aspectRatio: number, near: number, far: number): void {
-        const cot = 1 / Math.tan(0.5 * fovY);
-
-        // | e0   0    0    0 |
-        // |  0  e5    0    0 |
-        // |  0   0  e10  e14 |
-        // |  0   0   -1    0 |
-        const e0 = cot / aspectRatio;
-        const e5 = cot;
-        const e10 = far / (near - far);
-        const e14 = (near * far) / (near - far);
-
-        this.set(e0, 0, 0, 0, 0, e5, 0, 0, 0, 0, e10, -1, 0, 0, e14, 0);
-    }
-
-    public setPerspectiveFrustum(
-        left: number,
-        right: number,
-        bottom: number,
-        top: number,
-        near: number,
-        far: number,
-    ): void {
-        // | e0   0   e8    0 |
-        // |  0  e5   e9    0 |
-        // |  0   0  e10  e14 |
-        // |  0   0   -1    0 |
-        const e0 = (2 * near) / (right - left);
-        const e5 = (2 * near) / (top - bottom);
-        const e8 = (left + right) / (right - left);
-        const e9 = (bottom + top) / (top - bottom);
-        const e10 = far / (near - far);
-        const e14 = (near * far) / (near - far);
-
-        this.set(e0, 0, 0, 0, 0, e5, 0, 0, e8, e9, e10, -1, 0, 0, e14, 0);
-    }
-
-    public setPerspectiveFrustumGL(
-        left: number,
-        right: number,
-        bottom: number,
-        top: number,
-        near: number,
-        far: number,
-    ): void {
-        // | e0   0   e8    0 |
-        // |  0  e5   e9    0 |
-        // |  0   0  e10  e14 |
-        // |  0   0   -1    0 |
-        const e0 = (2 * near) / (right - left);
-        const e5 = (2 * near) / (top - bottom);
-        const e8 = (left + right) / (right - left);
-        const e9 = (bottom + top) / (top - bottom);
-        const e10 = (near + far) / (near - far);
-        const e14 = (2 * near * far) / (near - far);
-
-        this.set(e0, 0, 0, 0, 0, e5, 0, 0, e8, e9, e10, -1, 0, 0, e14, 0);
-    }
-
-    public setPerspectiveGL(fovY: number, aspectRatio: number, near: number, far: number): void {
-        const cot = 1 / Math.tan(0.5 * fovY);
-
-        // | e0   0    0    0 |
-        // |  0  e5    0    0 |
-        // |  0   0  e10  e14 |
-        // |  0   0   -1    0 |
-        const e0 = cot / aspectRatio;
-        const e5 = cot;
-        const e10 = (near + far) / (near - far);
-        const e14 = (2 * far * near) / (near - far);
-
-        this.set(e0, 0, 0, 0, 0, e5, 0, 0, 0, 0, e10, -1, 0, 0, e14, 0);
     }
 
     /**

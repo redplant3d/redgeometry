@@ -348,7 +348,8 @@ function cameraMoveSystem(world: World): void {
 
     const fovRad = fov * (Math.PI / 180);
     const aspect = context.canvas.width / context.canvas.height;
-    const camProj = Matrix4.fromPerspective(fovRad, aspect, 0.1, 100);
+    const camProj = Matrix4.createIdentity();
+    camProj.setFromPerspective(fovRad, aspect, 0.1, 100);
 
     camera.projection = camProj;
 }
