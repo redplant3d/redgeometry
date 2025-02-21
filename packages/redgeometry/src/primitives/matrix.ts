@@ -15,24 +15,29 @@ export type MatrixElements3 = FixedSizeArray<number, 9>;
 export type MatrixElements4A = FixedSizeArray<number, 12>;
 export type MatrixElements4 = FixedSizeArray<number, 16>;
 
+export type ReadonlyMatrixElements3A = Readonly<MatrixElements3A>;
+export type ReadonlyMatrixElements3 = Readonly<MatrixElements3>;
+export type ReadonlyMatrixElements4A = Readonly<MatrixElements4A>;
+export type ReadonlyMatrixElements4 = Readonly<MatrixElements4>;
+
 export type Matrix3ALike = {
-    readonly elements: MatrixElements3A;
+    readonly elements: ReadonlyMatrixElements3A;
 };
 
 export type Matrix3Like = {
-    readonly elements: MatrixElements3;
+    readonly elements: ReadonlyMatrixElements3;
 };
 
 export type Matrix4ALike = {
-    readonly elements: MatrixElements4A;
+    readonly elements: ReadonlyMatrixElements4A;
 };
 
 export type Matrix4Like = {
-    readonly elements: MatrixElements4;
+    readonly elements: ReadonlyMatrixElements4;
 };
 
 export interface ReadonlyMatrix3A {
-    readonly elements: Readonly<MatrixElements3A>;
+    readonly elements: ReadonlyMatrixElements3A;
     readonly type: MatrixType.Affine;
 
     clone(): Matrix3A;
@@ -50,7 +55,7 @@ export interface ReadonlyMatrix3A {
 }
 
 export interface ReadonlyMatrix3 {
-    readonly elements: Readonly<MatrixElements3>;
+    readonly elements: ReadonlyMatrixElements3;
     readonly type: MatrixType.Projective;
 
     add(mat: ReadonlyMatrix3): Matrix3;
@@ -69,7 +74,7 @@ export interface ReadonlyMatrix3 {
 }
 
 export interface ReadonlyMatrix4A {
-    readonly elements: Readonly<MatrixElements4A>;
+    readonly elements: ReadonlyMatrixElements4A;
     readonly type: MatrixType.Affine;
 
     clone(): Matrix4A;
@@ -87,7 +92,7 @@ export interface ReadonlyMatrix4A {
 }
 
 export interface ReadonlyMatrix4 {
-    readonly elements: Readonly<MatrixElements4>;
+    readonly elements: ReadonlyMatrixElements4;
     readonly type: MatrixType.Projective;
 
     add(mat: ReadonlyMatrix4): Matrix4;
