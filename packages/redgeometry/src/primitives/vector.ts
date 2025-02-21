@@ -423,6 +423,22 @@ export class Vector2 implements ReadonlyVector2 {
         this.y = v1.y - v2.y;
     }
 
+    public setToOne(): void {
+        this.set(1, 1);
+    }
+
+    public setToUnitX(): void {
+        this.set(1, 0);
+    }
+
+    public setToUnitY(): void {
+        this.set(0, 1);
+    }
+
+    public setToZero(): void {
+        this.set(0, 0);
+    }
+
     /**
      * Returns the spherical linear interpolation of the current vector and `v`.
      */
@@ -813,6 +829,26 @@ export class Vector3 implements ReadonlyVector3 {
         this.z = v1.z - v2.z;
     }
 
+    public setToOne(): void {
+        this.set(1, 1, 1);
+    }
+
+    public setToUnitX(): void {
+        this.set(1, 0, 0);
+    }
+
+    public setToUnitY(): void {
+        this.set(0, 1, 0);
+    }
+
+    public setToUnitZ(): void {
+        this.set(0, 0, 1);
+    }
+
+    public setToZero(): void {
+        this.set(0, 0, 0);
+    }
+
     /**
      * Returns the spherical linear interpolation of the current vector and `v`.
      */
@@ -1106,6 +1142,30 @@ export class Vector4 implements ReadonlyVector4 {
         this.y = v1.y - v2.y;
         this.z = v1.z - v2.z;
         this.w = v1.w - v2.w;
+    }
+
+    public setToOne(): void {
+        this.set(1, 1, 1, 1);
+    }
+
+    public setToUnitW(): void {
+        this.set(0, 0, 0, 1);
+    }
+
+    public setToUnitX(): void {
+        this.set(1, 0, 0, 0);
+    }
+
+    public setToUnitY(): void {
+        this.set(0, 1, 0, 0);
+    }
+
+    public setToUnitZ(): void {
+        this.set(0, 0, 1, 0);
+    }
+
+    public setToZero(): void {
+        this.set(0, 0, 0, 0);
     }
 
     public sub(v: ReadonlyVector4): Vector4 {

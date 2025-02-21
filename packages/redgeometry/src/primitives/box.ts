@@ -235,6 +235,15 @@ export class Box2 implements ReadonlyBox2 {
         this.setEnclose(box, pp);
     }
 
+    public setToEmpty(): void {
+        this.set(
+            Number.POSITIVE_INFINITY,
+            Number.POSITIVE_INFINITY,
+            Number.NEGATIVE_INFINITY,
+            Number.NEGATIVE_INFINITY,
+        );
+    }
+
     public setUnion(box1: ReadonlyBox2, box2: ReadonlyBox2): void {
         this.x0 = Math.min(box1.x0, box2.x0);
         this.y0 = Math.min(box1.y0, box2.y0);
@@ -475,6 +484,17 @@ export class Box3 implements ReadonlyBox3 {
     ): void {
         const pp = mat.transformPoint(p);
         this.setEnclose(box, pp);
+    }
+
+    public setToEmpty(): void {
+        this.set(
+            Number.POSITIVE_INFINITY,
+            Number.POSITIVE_INFINITY,
+            Number.POSITIVE_INFINITY,
+            Number.NEGATIVE_INFINITY,
+            Number.NEGATIVE_INFINITY,
+            Number.NEGATIVE_INFINITY,
+        );
     }
 
     public setUnion(box1: ReadonlyBox3, box2: ReadonlyBox3): void {

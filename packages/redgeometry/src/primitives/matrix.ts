@@ -312,10 +312,6 @@ export class Matrix3A implements ReadonlyMatrix3A {
         e[5] = e5;
     }
 
-    public setFromIdentity(): void {
-        this.set(1, 0, 0, 1, 0, 0);
-    }
-
     /**
      * Sets values from `mat` to this matrix.
      */
@@ -388,7 +384,7 @@ export class Matrix3A implements ReadonlyMatrix3A {
         const det = mat.determinant();
 
         if (det === 0) {
-            this.setFromIdentity();
+            this.setToIdentity();
             return;
         }
 
@@ -524,6 +520,17 @@ export class Matrix3A implements ReadonlyMatrix3A {
 
         e[2] = ea[2] * sy;
         e[3] = ea[3] * sy;
+    }
+
+    /**
+     * ```
+     * | 1  0  0 |
+     * | 0  1  0 |
+     * | 0  0  1 |
+     * ```
+     */
+    public setToIdentity(): void {
+        this.set(1, 0, 0, 1, 0, 0);
     }
 
     /**
@@ -891,10 +898,6 @@ export class Matrix3 implements ReadonlyMatrix3 {
         e[8] = ea[8] + eb[8];
     }
 
-    public setFromIdentity(): void {
-        this.set(1, 0, 0, 0, 1, 0, 0, 0, 1);
-    }
-
     /**
      * Sets values from `mat` to this matrix.
      */
@@ -973,7 +976,7 @@ export class Matrix3 implements ReadonlyMatrix3 {
         const det = mat.determinant();
 
         if (det === 0) {
-            this.setFromIdentity();
+            this.setToIdentity();
             return;
         }
 
@@ -1145,6 +1148,28 @@ export class Matrix3 implements ReadonlyMatrix3 {
         e[6] = ea[6] - eb[6];
         e[7] = ea[7] - eb[7];
         e[8] = ea[8] - eb[8];
+    }
+
+    /**
+     * ```
+     * | 1  0  0 |
+     * | 0  1  0 |
+     * | 0  0  1 |
+     * ```
+     */
+    public setToIdentity(): void {
+        this.set(1, 0, 0, 0, 1, 0, 0, 0, 1);
+    }
+
+    /**
+     * ```
+     * | 0  0  0 |
+     * | 0  0  0 |
+     * | 0  0  0 |
+     * ```
+     */
+    public setToZero(): void {
+        this.set(0, 0, 0, 0, 0, 0, 0, 0, 0);
     }
 
     /**
@@ -1553,10 +1578,6 @@ export class Matrix4A implements ReadonlyMatrix4A {
         e[11] = e11;
     }
 
-    public setFromIdentity(): void {
-        this.set(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0);
-    }
-
     /**
      * Sets values from `mat` to this matrix.
      */
@@ -1742,7 +1763,7 @@ export class Matrix4A implements ReadonlyMatrix4A {
         const det = mat.determinant();
 
         if (det === 0) {
-            this.setFromIdentity();
+            this.setToIdentity();
             return;
         }
 
@@ -1969,6 +1990,18 @@ export class Matrix4A implements ReadonlyMatrix4A {
         e[6] = ea[6] * sz;
         e[7] = ea[7] * sz;
         e[8] = ea[8] * sz;
+    }
+
+    /**
+     * ```
+     * | 1  0  0  0 |
+     * | 0  1  0  0 |
+     * | 0  0  1  0 |
+     * | 0  0  0  1 |
+     * ```
+     */
+    public setToIdentity(): void {
+        this.set(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0);
     }
 
     /**
@@ -2465,10 +2498,6 @@ export class Matrix4 implements ReadonlyMatrix4 {
         e[15] = ea[15] + eb[15];
     }
 
-    public setFromIdentity(): void {
-        this.set(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
-    }
-
     /**
      * Sets values from `mat` to this matrix.
      */
@@ -2770,7 +2799,7 @@ export class Matrix4 implements ReadonlyMatrix4 {
         const det = mat.determinant();
 
         if (det === 0) {
-            this.setFromIdentity();
+            this.setToIdentity();
             return;
         }
 
@@ -3109,6 +3138,30 @@ export class Matrix4 implements ReadonlyMatrix4 {
         e[13] = ea[13] - eb[13];
         e[14] = ea[14] - eb[14];
         e[15] = ea[15] - eb[15];
+    }
+
+    /**
+     * ```
+     * | 1  0  0  0 |
+     * | 0  1  0  0 |
+     * | 0  0  1  0 |
+     * | 0  0  0  1 |
+     * ```
+     */
+    public setToIdentity(): void {
+        this.set(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
+    }
+
+    /**
+     * ```
+     * | 0  0  0  0 |
+     * | 0  0  0  0 |
+     * | 0  0  0  0 |
+     * | 0  0  0  0 |
+     * ```
+     */
+    public setToZero(): void {
+        this.set(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
     }
 
     /**
