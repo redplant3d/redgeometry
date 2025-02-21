@@ -621,6 +621,7 @@ export class Matrix3A implements ReadonlyMatrix3A {
  */
 export class Matrix3 implements ReadonlyMatrix3 {
     public static readonly IDENTITY: ReadonlyMatrix3 = Matrix3.createIdentity();
+    public static readonly ZERO: ReadonlyMatrix3 = Matrix3.createZero();
 
     public readonly elements: MatrixElements3;
 
@@ -2075,6 +2076,7 @@ export class Matrix4A implements ReadonlyMatrix4A {
  */
 export class Matrix4 implements ReadonlyMatrix4 {
     public static readonly IDENTITY: ReadonlyMatrix4 = Matrix4.createIdentity();
+    public static readonly ZERO: ReadonlyMatrix4 = Matrix4.createZero();
 
     public readonly elements: MatrixElements4;
 
