@@ -360,6 +360,11 @@ export class Edge2 implements ReadonlyEdge2 {
         return Box2.fromPoints(this.p0, this.p1);
     }
 
+    public getClosestParameter(p: ReadonlyVector2): number {
+        const t = this.getParameterFromPoint(p);
+        return clamp(t, 0, 1);
+    }
+
     public getClosestPoint(p: ReadonlyVector2): Vector2 {
         const t = this.getParameterFromPoint(p);
 
@@ -528,6 +533,11 @@ export class Edge3 implements ReadonlyEdge3 {
 
     public getBounds(): Box3 {
         return Box3.fromPoints(this.p0, this.p1);
+    }
+
+    public getClosestParameter(p: ReadonlyVector3): number {
+        const t = this.getParameterFromPoint(p);
+        return clamp(t, 0, 1);
     }
 
     public getClosestPoint(p: ReadonlyVector3): Vector3 {
