@@ -1,4 +1,4 @@
-import { assertDebug } from "../utility/debug.js";
+import { assertDebug } from "redgeometry/src/utility/debug";
 import type { SoftwareCompositor } from "./compositor.js";
 import { FillRule } from "./context.js";
 

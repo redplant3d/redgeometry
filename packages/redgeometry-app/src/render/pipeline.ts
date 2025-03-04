@@ -1,10 +1,10 @@
-import type { PathFlatten2 } from "../core/path-flatten.js";
-import { DEFAULT_PATH_QUALITY_OPTIONS, createPathFlatten, createPathStroke } from "../core/path-options.js";
-import type { PathStroke2 } from "../core/path-stroke.js";
-import { Path2 } from "../core/path.js";
-import type { ReadonlyMatrix3A } from "../primitives/matrix.js";
-import { Vector2, type ReadonlyVector2 } from "../primitives/vector.js";
-import { clamp } from "../utility/scalar.js";
+import { Path2 } from "redgeometry/src/core/path";
+import type { PathFlatten2 } from "redgeometry/src/core/path-flatten";
+import { createPathFlatten, createPathStroke, DEFAULT_PATH_QUALITY_OPTIONS } from "redgeometry/src/core/path-options";
+import type { PathStroke2 } from "redgeometry/src/core/path-stroke";
+import type { ReadonlyMatrix3A } from "redgeometry/src/primitives/matrix";
+import { Vector2, type ReadonlyVector2 } from "redgeometry/src/primitives/vector";
+import { clamp } from "redgeometry/src/utility/scalar";
 import { SoftwareCompositor } from "./compositor.js";
 import { FillRule, StrokeTransformOrder, type ContextFillOptions, type ContextStrokeOptions } from "./context.js";
 import type { Image2 } from "./image.js";

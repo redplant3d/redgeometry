@@ -1,5 +1,4 @@
 import { Box2, type ReadonlyBox2 } from "redgeometry/src/primitives/box";
-import { Image2 } from "redgeometry/src/render/image";
 import { assertUnreachable } from "redgeometry/src/utility/debug";
 import { RandomXSR128, type Random } from "redgeometry/src/utility/random";
 import { clamp } from "redgeometry/src/utility/scalar";
@@ -11,6 +10,7 @@ import { AppMainModule, AppRemoteModule, type AppStateData } from "../ecs-module
 import type { WorldOptions } from "../ecs/app.js";
 import type { DefaultSystemStage, WorldModule } from "../ecs/types.js";
 import { DEFAULT_WORLD_SCHEDULES, type World } from "../ecs/world.js";
+import { Image2 } from "../render/image.js";
 
 const SOBOL_XOR_1 = [
     0x00000000, 0x00000001, 0x00000001, 0x00000007, 0x00000001, 0x00000013, 0x00000015, 0x0000007f, 0x00000001,

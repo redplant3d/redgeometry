@@ -1,4 +1,4 @@
-import { clamp } from "../utility/scalar.js";
+import { clamp } from "redgeometry/src/utility/scalar";
 
 export type ColorRgbaLike = {
     readonly a: number;

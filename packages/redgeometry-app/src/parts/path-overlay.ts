@@ -3,7 +3,6 @@ import { Path2 } from "redgeometry/src/core/path";
 import { DEFAULT_PATH_QUALITY_OPTIONS } from "redgeometry/src/core/path-options";
 import { PathOverlay2 } from "redgeometry/src/core/path-overlay";
 import { Polygon2 } from "redgeometry/src/core/polygon";
-import { ColorRgba } from "redgeometry/src/primitives/color";
 import { Edge2 } from "redgeometry/src/primitives/edge";
 import { arrayEquals } from "redgeometry/src/utility/array";
 import { assertDebug } from "redgeometry/src/utility/debug";
@@ -16,6 +15,7 @@ import { AppMainModule, AppRemoteModule, type AppStateData } from "../ecs-module
 import type { WorldOptions } from "../ecs/app.js";
 import type { DefaultSystemStage, WorldModule } from "../ecs/types.js";
 import { DEFAULT_WORLD_SCHEDULES, type World } from "../ecs/world.js";
+import { ColorRgba } from "../render/color.js";
 import { createRandomPolygonPair, getWindingOperator } from "../utility/helper.js";
 type PathOverlayTagEntry = { tag: number[]; faces: MeshFace2[] };
 

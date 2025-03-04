@@ -10,10 +10,10 @@ import {
 } from "redgeometry/src/core/path-options";
 import { Polygon2 } from "redgeometry/src/core/polygon";
 import type { ReadonlyBox2 } from "redgeometry/src/primitives/box";
-import { ColorRgba } from "redgeometry/src/primitives/color";
 import { Edge2 } from "redgeometry/src/primitives/edge";
 import { Vector2 } from "redgeometry/src/primitives/vector";
 import type { Random } from "redgeometry/src/utility/random";
+import { ColorRgba } from "../render/color.js";
 
 export function createRandomColor(random: Random, s: number, v: number, a: number): ColorRgba {
     return ColorRgba.fromHSV(random.nextFloat(), s, v, a);

@@ -6,11 +6,11 @@ import type { Edge2, ReadonlyEdge2 } from "redgeometry/src/primitives/edge";
 import type { ReadonlyMatrix3A } from "redgeometry/src/primitives/matrix";
 import type { ReadonlyRay2 } from "redgeometry/src/primitives/ray";
 import { Vector2, type ReadonlyVector2 } from "redgeometry/src/primitives/vector";
-import type { Image2 } from "redgeometry/src/render/image";
 import { assertUnreachable, throwError } from "redgeometry/src/utility/debug";
 import type { Random } from "redgeometry/src/utility/random";
 import type { DefaultSystemStage, WorldModule, WorldPlugin } from "../ecs/types.js";
 import type { World } from "../ecs/world.js";
+import type { Image2 } from "../render/image.js";
 import { createRandomColor } from "../utility/helper.js";
 import type { AppCanvasData } from "./app.js";
 

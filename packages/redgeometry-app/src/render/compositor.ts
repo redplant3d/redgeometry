@@ -1,4 +1,4 @@
-import type { ReadonlyColorRgba } from "../primitives/color.js";
+import type { ReadonlyColorRgba } from "./color.js";
 import { CompositeOperation } from "./context.js";
 import type { Image2 } from "./image.js";
 

@@ -1,6 +1,3 @@
-import { ColorRgba } from "redgeometry/src/primitives/color";
-import { FillRule, SoftwareRenderContext2 } from "redgeometry/src/render/context";
-import { Image2 } from "redgeometry/src/render/image";
 import { RandomXSR128 } from "redgeometry/src/utility/random";
 import type { AppContextPlugin } from "../ecs-modules/app-context.js";
 import { AppContextModule } from "../ecs-modules/app-context.js";
@@ -10,6 +7,9 @@ import { AppMainModule, AppRemoteModule, type AppStateData } from "../ecs-module
 import type { WorldOptions } from "../ecs/app.js";
 import type { DefaultSystemStage, WorldModule } from "../ecs/types.js";
 import { DEFAULT_WORLD_SCHEDULES, type World } from "../ecs/world.js";
+import { ColorRgba } from "../render/color.js";
+import { FillRule, SoftwareRenderContext2 } from "../render/context.js";
+import { Image2 } from "../render/image.js";
 import { createRandomPath } from "../utility/helper.js";
 
 type AppPartMainData = {

@@ -12,7 +12,6 @@ export * from "./core/polygon.js";
 export * from "./core/snapround.js";
 export * from "./primitives/bezier.js";
 export * from "./primitives/box.js";
-export * from "./primitives/color.js";
 export * from "./primitives/complex.js";
 export * from "./primitives/edge.js";
 export * from "./primitives/matrix.js";

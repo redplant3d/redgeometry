@@ -1,7 +1,7 @@
-import { BUTT_CAPS, JoinType, type StrokeCaps } from "../core/path-options.js";
-import type { Path2 } from "../core/path.js";
-import { ColorRgba, type ReadonlyColorRgba } from "../primitives/color.js";
-import { Matrix3A } from "../primitives/matrix.js";
+import type { Path2 } from "redgeometry/src/core/path";
+import { BUTT_CAPS, JoinType, type StrokeCaps } from "redgeometry/src/core/path-options";
+import { Matrix3A } from "redgeometry/src/primitives/matrix";
+import { ColorRgba, type ReadonlyColorRgba } from "./color.js";
 import type { Image2 } from "./image.js";
 import { SoftwareRenderPipeline, type RenderPipeline } from "./pipeline.js";
 

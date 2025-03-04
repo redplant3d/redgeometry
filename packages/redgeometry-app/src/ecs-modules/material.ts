@@ -1,4 +1,4 @@
-import type { ReadonlyColorRgba } from "redgeometry/src/primitives/color";
+import type { ReadonlyColorRgba } from "../render/color.js";
 import type { AssetId } from "./asset.js";
 
 export type Material = {
