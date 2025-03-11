@@ -474,21 +474,6 @@ export class MeshFace2 {
     }
 
     /**
-     * Returns the signed area of the face.
-     */
-    public getSignedArea(): number {
-        let area = 0;
-
-        for (const e of this.getEdgeIterator()) {
-            // If segment does not exist, use origin points as fallback
-            const seg = e.seg ?? Bezier1Curve2.fromReadonly(e.p0, e.p1);
-            area += seg.getSignedArea();
-        }
-
-        return area;
-    }
-
-    /**
      * Returns `true` if a point `p` is inside the face.
      */
     public hasPointInside(p: ReadonlyVector2): boolean {
@@ -533,6 +518,21 @@ export class MeshFace2 {
         message += "}";
 
         log.infoDebug("{}", message);
+    }
+
+    /**
+     * Returns the signed area of the face.
+     */
+    public signedArea(): number {
+        let area = 0;
+
+        for (const e of this.getEdgeIterator()) {
+            // If segment does not exist, use origin points as fallback
+            const seg = e.seg ?? Bezier1Curve2.fromReadonly(e.p0, e.p1);
+            area += seg.signedArea();
+        }
+
+        return area;
     }
 
     public writeToPath(path: Path2): void {

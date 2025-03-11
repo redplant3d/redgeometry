@@ -50,7 +50,6 @@ export interface ReadonlyBezier1Curve2 {
     getBounds(): Box2;
     getControlBounds(): Box2;
     getDerivative(): Vector2;
-    getSignedArea(): number;
     getTangentEnd(): Vector2;
     getTangentStart(): Vector2;
     getValueAt(t: number): Vector2;
@@ -59,6 +58,7 @@ export interface ReadonlyBezier1Curve2 {
     isFinite(): boolean;
     isPoint(): boolean;
     reverse(): Bezier1Curve2;
+    signedArea(): number;
     splitAfter(t: number): Bezier1Curve2;
     splitAt(t: number): [Bezier1Curve2, Bezier1Curve2];
     splitBefore(t: number): Bezier1Curve2;
@@ -86,7 +86,6 @@ export interface ReadonlyBezier2Curve2 {
     getDerivativeCoefficients(): [Vector2, Vector2];
     getEvoluteAt(t: number): Vector2;
     getOffsetCuspParameter(rad: number): [number, number];
-    getSignedArea(): number;
     getTangentEnd(): Vector2;
     getTangentStart(): Vector2;
     getValueAt(t: number): Vector2;
@@ -99,6 +98,7 @@ export interface ReadonlyBezier2Curve2 {
     isFinite(): boolean;
     isPoint(): boolean;
     reverse(): Bezier2Curve2;
+    signedArea(): number;
     splitAfter(t: number): Bezier2Curve2;
     splitAt(t: number): [Bezier2Curve2, Bezier2Curve2];
     splitBefore(t: number): Bezier2Curve2;
@@ -125,7 +125,6 @@ export interface ReadonlyBezier3Curve2 {
     getDerivativeCoefficients(): [Vector2, Vector2, Vector2];
     getEvoluteAt(t: number): Vector2;
     getInflectionParameter(): [number, number];
-    getSignedArea(): number;
     getTangentEnd(): Vector2;
     getTangentStart(): Vector2;
     getValueAt(t: number): Vector2;
@@ -135,6 +134,7 @@ export interface ReadonlyBezier3Curve2 {
     isFinite(): boolean;
     isPoint(): boolean;
     reverse(): Bezier3Curve2;
+    signedArea(): number;
     splitAfter(t: number): Bezier3Curve2;
     splitAt(t: number): [Bezier3Curve2, Bezier3Curve2];
     splitBefore(t: number): Bezier3Curve2;
@@ -157,7 +157,6 @@ export interface ReadonlyBezierRCurve2 {
     getDerivativeAt(t: number): Vector2;
     getDerivativeCoefficients(): [Vector3, Vector3, Vector3];
     getProjectivePoints(): [Vector3, Vector3, Vector3];
-    getSignedArea(): number;
     getTangentEnd(): Vector2;
     getTangentStart(): Vector2;
     getValueAt(t: number): Vector2;
@@ -166,6 +165,7 @@ export interface ReadonlyBezierRCurve2 {
     isFinite(): boolean;
     isPoint(): boolean;
     reverse(): BezierRCurve2;
+    signedArea(): number;
     splitAfter(t: number): BezierRCurve2;
     splitAt(t: number): [BezierRCurve2, BezierRCurve2];
     splitBefore(t: number): BezierRCurve2;
@@ -252,15 +252,6 @@ export class Bezier1Curve2 implements ReadonlyBezier1Curve2 {
         return this.p1.sub(this.p0);
     }
 
-    public getSignedArea(): number {
-        const v0 = this.p0;
-        const v1 = this.p1;
-
-        const a01 = v0.cross(v1);
-
-        return a01 / 2;
-    }
-
     public getTangentEnd(): Vector2 {
         return this.getDerivative();
     }
@@ -316,6 +307,15 @@ export class Bezier1Curve2 implements ReadonlyBezier1Curve2 {
     public setXY(x0: number, y0: number, x1: number, y1: number): void {
         this.p0 = new Vector2(x0, y0);
         this.p1 = new Vector2(x1, y1);
+    }
+
+    public signedArea(): number {
+        const v0 = this.p0;
+        const v1 = this.p1;
+
+        const a01 = v0.cross(v1);
+
+        return a01 / 2;
     }
 
     public splitAfter(t: number): Bezier1Curve2 {
@@ -564,18 +564,6 @@ export class Bezier2Curve2 implements ReadonlyBezier2Curve2 {
         return [tc, td];
     }
 
-    public getSignedArea(): number {
-        const v0 = this.p0;
-        const v1 = this.p1;
-        const v2 = this.p2;
-
-        const a01 = 2 * v0.cross(v1);
-        const a12 = 2 * v1.cross(v2);
-        const a02 = v0.cross(v2);
-
-        return (a01 + a02 + a12) / 6;
-    }
-
     public getTangentEnd(): Vector2 {
         if (!this.p2.eq(this.p1)) {
             return this.p2.sub(this.p1);
@@ -690,6 +678,18 @@ export class Bezier2Curve2 implements ReadonlyBezier2Curve2 {
         this.p0 = new Vector2(x0, y0);
         this.p1 = new Vector2(x1, y1);
         this.p2 = new Vector2(x2, y2);
+    }
+
+    public signedArea(): number {
+        const v0 = this.p0;
+        const v1 = this.p1;
+        const v2 = this.p2;
+
+        const a01 = 2 * v0.cross(v1);
+        const a12 = 2 * v1.cross(v2);
+        const a02 = v0.cross(v2);
+
+        return (a01 + a02 + a12) / 6;
     }
 
     public splitAfter(t: number): Bezier2Curve2 {
@@ -965,22 +965,6 @@ export class Bezier3Curve2 implements ReadonlyBezier3Curve2 {
         return [tc, td];
     }
 
-    public getSignedArea(): number {
-        const v0 = this.p0;
-        const v1 = this.p1;
-        const v2 = this.p2;
-        const v3 = this.p3;
-
-        const a01 = 6 * v0.cross(v1);
-        const a23 = 6 * v2.cross(v3);
-        const a02 = 3 * v0.cross(v2);
-        const a12 = 3 * v1.cross(v2);
-        const a13 = 3 * v1.cross(v3);
-        const a03 = v0.cross(v3);
-
-        return (a01 + a02 + a03 + a12 + a13 + a23) / 20;
-    }
-
     public getTangentEnd(): Vector2 {
         if (!this.p3.eq(this.p2)) {
             return this.p3.sub(this.p2);
@@ -1074,6 +1058,22 @@ export class Bezier3Curve2 implements ReadonlyBezier3Curve2 {
         this.p1 = new Vector2(x1, y1);
         this.p2 = new Vector2(x2, y2);
         this.p3 = new Vector2(x3, y3);
+    }
+
+    public signedArea(): number {
+        const v0 = this.p0;
+        const v1 = this.p1;
+        const v2 = this.p2;
+        const v3 = this.p3;
+
+        const a01 = 6 * v0.cross(v1);
+        const a23 = 6 * v2.cross(v3);
+        const a02 = 3 * v0.cross(v2);
+        const a12 = 3 * v1.cross(v2);
+        const a13 = 3 * v1.cross(v3);
+        const a03 = v0.cross(v3);
+
+        return (a01 + a02 + a03 + a12 + a13 + a23) / 20;
     }
 
     public splitAfter(t: number): Bezier3Curve2 {
@@ -1347,56 +1347,6 @@ export class BezierRCurve2 implements ReadonlyBezierRCurve2 {
         return [p0, p1, p2];
     }
 
-    public getSignedArea(): number {
-        // Inspired from: http://ich.deanmcnamee.com/graphics/2016/03/30/CurveArea.html
-        const v0 = this.p0;
-        const v1 = this.p1;
-        const v2 = this.p2;
-        const w = this.w;
-
-        const a01 = v0.cross(v1);
-        const a02 = v0.cross(v2);
-        const a12 = v1.cross(v2);
-
-        // We need to be careful around `w = -1` and `w = 1`
-        // Single float mantissa size seems to be wide enough for sufficient precision
-        const eps = 2 ** -23;
-
-        if (w < 1 - eps) {
-            if (w <= -1 + eps) {
-                // `-Inf < w <= -1` -> Divergent case (just assume linear)
-                return a02 / 2;
-            } else {
-                // `-1 < w < 1` -> Elliptic case
-                const w1 = 1 - w * w;
-                const w2 = (1 - w) / (1 + w);
-                const sqrtw1 = Math.sqrt(w1);
-                const sqrtw2 = Math.sqrt(w2);
-                const a = w * w * (a01 + a12) - a02;
-                const b = 2 * w * (a01 + a12 - a02);
-                const d = 2 * sqrtw1 * w1;
-                return (b * Math.atan(sqrtw2) - a * sqrtw1) / d;
-            }
-        } else {
-            if (w <= 1 + eps) {
-                // `w == 1` -> Parabolic case (series expansion about `w = 1` because of singularity)
-                const s0 = (2 * a01 + a02 + 2 * a12) / 6;
-                const s1 = (2 / 15) * (a02 - a01 - a12) * (w - 1);
-                return s0 - s1;
-            } else {
-                // `1 < w < Inf` -> Hyperbolic case
-                const w1 = w * w - 1;
-                const w2 = (w - 1) / (w + 1);
-                const sqrtw1 = Math.sqrt(w1);
-                const sqrtw2 = Math.sqrt(w2);
-                const a = w * w * (a01 + a12) - a02;
-                const b = 2 * w * (a01 + a12 - a02);
-                const d = 2 * sqrtw1 * w1;
-                return (a * sqrtw1 - b * Math.atanh(sqrtw2)) / d;
-            }
-        }
-    }
-
     public getTangentEnd(): Vector2 {
         if (!this.p2.eq(this.p1)) {
             return this.p2.sub(this.p1);
@@ -1480,6 +1430,56 @@ export class BezierRCurve2 implements ReadonlyBezierRCurve2 {
         this.p1 = new Vector2(x1, y1);
         this.p2 = new Vector2(x2, y2);
         this.w = w;
+    }
+
+    public signedArea(): number {
+        // Inspired from: http://ich.deanmcnamee.com/graphics/2016/03/30/CurveArea.html
+        const v0 = this.p0;
+        const v1 = this.p1;
+        const v2 = this.p2;
+        const w = this.w;
+
+        const a01 = v0.cross(v1);
+        const a02 = v0.cross(v2);
+        const a12 = v1.cross(v2);
+
+        // We need to be careful around `w = -1` and `w = 1`
+        // Single float mantissa size seems to be wide enough for sufficient precision
+        const eps = 2 ** -23;
+
+        if (w < 1 - eps) {
+            if (w <= -1 + eps) {
+                // `-Inf < w <= -1` -> Divergent case (just assume linear)
+                return a02 / 2;
+            } else {
+                // `-1 < w < 1` -> Elliptic case
+                const w1 = 1 - w * w;
+                const w2 = (1 - w) / (1 + w);
+                const sqrtw1 = Math.sqrt(w1);
+                const sqrtw2 = Math.sqrt(w2);
+                const a = w * w * (a01 + a12) - a02;
+                const b = 2 * w * (a01 + a12 - a02);
+                const d = 2 * sqrtw1 * w1;
+                return (b * Math.atan(sqrtw2) - a * sqrtw1) / d;
+            }
+        } else {
+            if (w <= 1 + eps) {
+                // `w == 1` -> Parabolic case (series expansion about `w = 1` because of singularity)
+                const s0 = (2 * a01 + a02 + 2 * a12) / 6;
+                const s1 = (2 / 15) * (a02 - a01 - a12) * (w - 1);
+                return s0 - s1;
+            } else {
+                // `1 < w < Inf` -> Hyperbolic case
+                const w1 = w * w - 1;
+                const w2 = (w - 1) / (w + 1);
+                const sqrtw1 = Math.sqrt(w1);
+                const sqrtw2 = Math.sqrt(w2);
+                const a = w * w * (a01 + a12) - a02;
+                const b = 2 * w * (a01 + a12 - a02);
+                const d = 2 * sqrtw1 * w1;
+                return (a * sqrtw1 - b * Math.atanh(sqrtw2)) / d;
+            }
+        }
     }
 
     public splitAfter(t: number): BezierRCurve2 {

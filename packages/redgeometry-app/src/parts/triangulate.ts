@@ -153,7 +153,7 @@ function updateSystem(world: World): void {
     const error = Path2.createEmpty();
 
     for (const face of mesh.getFaces()) {
-        const orientation = face.getSignedArea();
+        const orientation = face.signedArea();
 
         if (orientation <= 0) {
             log.warn("Negative path area: {}", orientation);

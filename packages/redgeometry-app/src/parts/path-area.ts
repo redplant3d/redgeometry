@@ -89,7 +89,7 @@ function updateSystem(world: World): void {
         isInside: path.hasPointInside(p, WindingOperator.EvenOdd),
     });
 
-    // log.info("Path area = {}", path.getSignedArea());
+    // log.info("Path area = {}", path.signedArea());
 }
 
 function renderSystem(world: World): void {

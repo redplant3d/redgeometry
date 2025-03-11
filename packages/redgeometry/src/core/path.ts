@@ -261,6 +261,22 @@ export class Path2 implements PathSink2 {
         this.close();
     }
 
+    public addPolygon(polygon: Polygon2): void {
+        const points = polygon.points;
+
+        if (points.length === 0) {
+            return;
+        }
+
+        this.moveTo(points[0]);
+
+        for (let i = 1; i < points.length; i++) {
+            this.lineTo(points[i]);
+        }
+
+        this.close();
+    }
+
     public addQuad(p0: ReadonlyVector2, p1: ReadonlyVector2, p2: ReadonlyVector2): void {
         this.moveTo(p0);
         this.quadTo(p1, p2);
@@ -286,6 +302,23 @@ export class Path2 implements PathSink2 {
         const p1 = new Vector2(x1, y1);
         const p2 = new Vector2(x2, y2);
         this.arcTo(p1, p2);
+    }
+
+    public centroid(): Vector2 {
+        let x = 0;
+        let y = 0;
+        let area = 0;
+
+        for (const c of this.getCurveIterator()) {
+            const a = c.signedArea();
+            x += a * (c.p0.x + c.pn.x);
+            y += a * (c.p0.y + c.pn.y);
+            area += a;
+        }
+
+        area *= 3;
+
+        return new Vector2(x / area, y / area);
     }
 
     public clear(): void {
@@ -391,16 +424,6 @@ export class Path2 implements PathSink2 {
 
     public getPoints(): readonly ReadonlyVector2[] {
         return this.points;
-    }
-
-    public getSignedArea(): number {
-        let area = 0;
-
-        for (const c of this.getCurveIterator()) {
-            area += c.getSignedArea();
-        }
-
-        return area;
     }
 
     public getSvgData(): string {
@@ -554,6 +577,16 @@ export class Path2 implements PathSink2 {
         const p1 = new Vector2(x1, y1);
         const p2 = new Vector2(x2, y2);
         this.quadTo(p1, p2);
+    }
+
+    public signedArea(): number {
+        let area = 0;
+
+        for (const c of this.getCurveIterator()) {
+            area += c.signedArea();
+        }
+
+        return area;
     }
 
     public simplify(qualityOptions?: Partial<PathQualityOptions>): Path2 {
