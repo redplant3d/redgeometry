@@ -1,8 +1,8 @@
 import type { Mesh2, MeshFace2 } from "redgeometry/src/core/mesh";
-import { PathCommandType, type Path2 } from "redgeometry/src/core/path";
-import type { Polygon2 } from "redgeometry/src/core/polygon";
+import { Path2, PathCommandType } from "redgeometry/src/core/path";
+import { Polygon2 } from "redgeometry/src/core/polygon";
 import type { ReadonlyBox2 } from "redgeometry/src/primitives/box";
-import type { Edge2, ReadonlyEdge2 } from "redgeometry/src/primitives/edge";
+import { Edge2, type ReadonlyEdge2 } from "redgeometry/src/primitives/edge";
 import type { ReadonlyMatrix3A } from "redgeometry/src/primitives/matrix";
 import type { ReadonlyRay2 } from "redgeometry/src/primitives/ray";
 import { Vector2, type ReadonlyVector2 } from "redgeometry/src/primitives/vector";
@@ -174,6 +174,23 @@ export class AppContextPlugin implements WorldPlugin {
         ctx.restore();
     }
 
+    public drawPaths(paths: Path2[], style: CanvasStyle = "#000000", width = 1): void {
+        const ctx = this.context;
+        ctx.beginPath();
+
+        for (const path of paths) {
+            this.addPath(ctx, path);
+        }
+
+        ctx.save();
+        ctx.lineJoin = "round";
+        ctx.lineCap = "round";
+        ctx.lineWidth = width;
+        ctx.strokeStyle = style;
+        ctx.stroke();
+        ctx.restore();
+    }
+
     public drawPolygon(poly: Polygon2, style: CanvasStyle = "#000000", width = 1): void {
         const ctx = this.context;
         ctx.beginPath();
@@ -274,6 +291,24 @@ export class AppContextPlugin implements WorldPlugin {
         ctx.beginPath();
 
         this.addPath(ctx, path);
+
+        ctx.save();
+        ctx.fillStyle = style;
+        ctx.fill(fillRule);
+        ctx.restore();
+    }
+
+    public fillPaths(
+        paths: Path2[],
+        style: CanvasStyle = "#000000",
+        fillRule?: "evenodd" | "nonzero" | undefined,
+    ): void {
+        const ctx = this.context;
+        ctx.beginPath();
+
+        for (const path of paths) {
+            this.addPath(ctx, path);
+        }
 
         ctx.save();
         ctx.fillStyle = style;
