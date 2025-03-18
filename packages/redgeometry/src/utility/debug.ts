@@ -8,6 +8,32 @@ export const log: Log = new Log({
     infoFn: console.info,
 });
 
+export class ValidationHelper {
+    public errors: string[];
+
+    public constructor() {
+        this.errors = [];
+    }
+
+    public clear(): void {
+        this.errors = [];
+    }
+
+    public equal<T>(valueA: T, valueB: T, fmt: string, ...params: FormatParameters): void {
+        if (valueA !== valueB) {
+            const message = `${formatString(fmt, ...params)}: ${valueA} expected to be EQUAL to ${valueB}`;
+            this.errors.push(message);
+        }
+    }
+
+    public notEqual<T>(valueA: T, valueB: T, fmt: string, ...params: FormatParameters): void {
+        if (valueA === valueB) {
+            const message = `${formatString(fmt, ...params)}: ${valueA} expected to be NOT EQUAL to ${valueB}`;
+            this.errors.push(message);
+        }
+    }
+}
+
 export function assert(value: boolean, fmt?: string, ...params: FormatParameters): asserts value {
     if (!value) {
         const message = formatString(fmt ?? "Assertion failed", ...params);
