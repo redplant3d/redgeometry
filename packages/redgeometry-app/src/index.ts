@@ -11,6 +11,7 @@ import { PATH_INTERSECTION_MAIN_WORLD, PATH_INTERSECTION_REMOTE_WORLD } from "./
 import { PATH_OPERATIONS_MAIN_WORLD, PATH_OPERATIONS_REMOTE_WORLD } from "./parts/path-operations.js";
 import { PATH_OVERLAY_MAIN_WORLD, PATH_OVERLAY_REMOTE_WORLD } from "./parts/path-overlay.js";
 import { PLAYGROUND_MAIN_WORLD, PLAYGROUND_REMOTE_WORLD } from "./parts/playground.js";
+import { POLYGON_MINKOWSKI_MAIN_WORLD, POLYGON_MINKOWSKI_REMOTE_WORLD } from "./parts/polygon-minkowski.js";
 import { SAMPLING_MAIN_WORLD, SAMPLING_REMOTE_WORLD } from "./parts/sampling.js";
 import { SNAP_ROUNDING_MAIN_WORLD, SNAP_ROUNDING_REMOTE_WORLD } from "./parts/snap-rounding.js";
 import { STRAIGHT_SKELETON_MAIN_WORLD, STRAIGHT_SKELETON_REMOTE_WORLD } from "./parts/straight-skeleton.js";
@@ -75,6 +76,11 @@ launcher.addPart(
     { id: "path-overlay", runWorldId: "main", runScheduleId: "start" },
     { id: "path-overlay-main", parent: undefined, worlds: [PATH_OVERLAY_MAIN_WORLD] },
     { id: "path-overlay-remote", parent: "path-overlay-main", worlds: [PATH_OVERLAY_REMOTE_WORLD] },
+);
+launcher.addPart(
+    { id: "polygon-minkowski", runWorldId: "main", runScheduleId: "start" },
+    { id: "polygon-minkowski-main", parent: undefined, worlds: [POLYGON_MINKOWSKI_MAIN_WORLD] },
+    { id: "polygon-minkowski-remote", parent: "polygon-minkowski-main", worlds: [POLYGON_MINKOWSKI_REMOTE_WORLD] },
 );
 launcher.addPart(
     { id: "playground", runWorldId: "main", runScheduleId: "start" },
