@@ -50,7 +50,9 @@ export interface ReadonlyMatrix3A {
     toArray(): MatrixElements3A;
     toString(): string;
     transformPoint(p: ReadonlyVector2): Vector2;
+    transformPointXY(px: number, py: number): Vector2;
     transformVector(v: ReadonlyVector2): Vector2;
+    transformVectorXY(vx: number, vy: number): Vector2;
     transpose(): Matrix3;
 }
 
@@ -69,7 +71,9 @@ export interface ReadonlyMatrix3 {
     toArray(): MatrixElements3;
     toString(): string;
     transformPoint(p: ReadonlyVector2): Vector2;
+    transformPointXY(px: number, py: number): Vector2;
     transformVector(v: ReadonlyVector2): Vector2;
+    transformVectorXY(vx: number, vy: number): Vector2;
     transpose(): Matrix3;
 }
 
@@ -87,7 +91,9 @@ export interface ReadonlyMatrix4A {
     toArray(): MatrixElements4A;
     toString(): string;
     transformPoint(p: ReadonlyVector3): Vector3;
+    transformPointXYZ(px: number, py: number, pz: number): Vector3;
     transformVector(v: ReadonlyVector3): Vector3;
+    transformVectorXYZ(vx: number, vy: number, vz: number): Vector3;
     transpose(): Matrix4;
 }
 
@@ -107,7 +113,9 @@ export interface ReadonlyMatrix4 {
     toArray(): MatrixElements4;
     toString(): string;
     transformPoint(p: ReadonlyVector3): Vector3;
+    transformPointXYZ(px: number, py: number, pz: number): Vector3;
     transformVector(v: ReadonlyVector3): Vector3;
+    transformVectorXYZ(vx: number, vy: number, vz: number): Vector3;
     transpose(): Matrix4;
 }
 
@@ -597,6 +605,22 @@ export class Matrix3A implements ReadonlyMatrix3A {
      * ```
      * | e0  e2  e4 |   | x |
      * | e1  e3  e5 | * | y |
+     * |  0   0   1 |   | 1 |
+     * ```
+     */
+    public transformPointXY(px: number, py: number): Vector2 {
+        const e = this.elements;
+
+        const x = e[0] * px + e[2] * py + e[4];
+        const y = e[1] * px + e[3] * py + e[5];
+
+        return new Vector2(x, y);
+    }
+
+    /**
+     * ```
+     * | e0  e2  e4 |   | x |
+     * | e1  e3  e5 | * | y |
      * |  0   0   1 |   | 0 |
      * ```
      */
@@ -605,6 +629,22 @@ export class Matrix3A implements ReadonlyMatrix3A {
 
         const x = e[0] * v.x + e[2] * v.y;
         const y = e[1] * v.x + e[3] * v.y;
+
+        return new Vector2(x, y);
+    }
+
+    /**
+     * ```
+     * | e0  e2  e4 |   | x |
+     * | e1  e3  e5 | * | y |
+     * |  0   0   1 |   | 0 |
+     * ```
+     */
+    public transformVectorXY(vx: number, vy: number): Vector2 {
+        const e = this.elements;
+
+        const x = e[0] * vx + e[2] * vy;
+        const y = e[1] * vx + e[3] * vy;
 
         return new Vector2(x, y);
     }
@@ -1269,6 +1309,23 @@ export class Matrix3 implements ReadonlyMatrix3 {
      * ```
      * | e0  e3  e6 |   | x |
      * | e1  e4  e7 | * | y |
+     * | e2  e5  e8 |   | 1 |
+     * ```
+     */
+    public transformPointXY(px: number, py: number): Vector2 {
+        const e = this.elements;
+
+        const x = e[0] * px + e[3] * py + e[6];
+        const y = e[1] * px + e[4] * py + e[7];
+        const w = e[2] * px + e[5] * py + e[8];
+
+        return Vector2.fromXYW(x, y, w);
+    }
+
+    /**
+     * ```
+     * | e0  e3  e6 |   | x |
+     * | e1  e4  e7 | * | y |
      * | e2  e5  e8 |   | 0 |
      * ```
      */
@@ -1278,6 +1335,23 @@ export class Matrix3 implements ReadonlyMatrix3 {
         const x = e[0] * v.x + e[3] * v.y;
         const y = e[1] * v.x + e[4] * v.y;
         const w = e[2] * v.x + e[5] * v.y;
+
+        return Vector2.fromXYW(x, y, w);
+    }
+
+    /**
+     * ```
+     * | e0  e3  e6 |   | x |
+     * | e1  e4  e7 | * | y |
+     * | e2  e5  e8 |   | 0 |
+     * ```
+     */
+    public transformVectorXY(vx: number, vy: number): Vector2 {
+        const e = this.elements;
+
+        const x = e[0] * vx + e[3] * vy;
+        const y = e[1] * vx + e[4] * vy;
+        const w = e[2] * vx + e[5] * vy;
 
         return Vector2.fromXYW(x, y, w);
     }
@@ -2076,6 +2150,24 @@ export class Matrix4A implements ReadonlyMatrix4A {
      * | e0  e3  e6   e9 |   | x |
      * | e1  e4  e7  e10 | * | y |
      * | e2  e5  e8  e11 |   | z |
+     * |  0   0   0    1 |   | 1 |
+     * ```
+     */
+    public transformPointXYZ(px: number, py: number, pz: number): Vector3 {
+        const e = this.elements;
+
+        const x = e[0] * px + e[3] * py + e[6] * pz + e[9];
+        const y = e[1] * px + e[4] * py + e[7] * pz + e[10];
+        const z = e[2] * px + e[5] * py + e[8] * pz + e[11];
+
+        return new Vector3(x, y, z);
+    }
+
+    /**
+     * ```
+     * | e0  e3  e6   e9 |   | x |
+     * | e1  e4  e7  e10 | * | y |
+     * | e2  e5  e8  e11 |   | z |
      * |  0   0   0    1 |   | 0 |
      * ```
      */
@@ -2085,6 +2177,24 @@ export class Matrix4A implements ReadonlyMatrix4A {
         const x = e[0] * v.x + e[3] * v.y + e[6] * v.z;
         const y = e[1] * v.x + e[4] * v.y + e[7] * v.z;
         const z = e[2] * v.x + e[5] * v.y + e[8] * v.z;
+
+        return new Vector3(x, y, z);
+    }
+
+    /**
+     * ```
+     * | e0  e3  e6   e9 |   | x |
+     * | e1  e4  e7  e10 | * | y |
+     * | e2  e5  e8  e11 |   | z |
+     * |  0   0   0    1 |   | 0 |
+     * ```
+     */
+    public transformVectorXYZ(vx: number, vy: number, vz: number): Vector3 {
+        const e = this.elements;
+
+        const x = e[0] * vx + e[3] * vy + e[6] * vz;
+        const y = e[1] * vx + e[4] * vy + e[7] * vz;
+        const z = e[2] * vx + e[5] * vy + e[8] * vz;
 
         return new Vector3(x, y, z);
     }
@@ -3283,6 +3393,25 @@ export class Matrix4 implements ReadonlyMatrix4 {
      * | e0  e4   e8  e12 |   | x |
      * | e1  e5   e9  e13 | * | y |
      * | e2  e6  e10  e14 |   | z |
+     * | e3  e7  e11  e15 |   | 1 |
+     * ```
+     */
+    public transformPointXYZ(px: number, py: number, pz: number): Vector3 {
+        const e = this.elements;
+
+        const x = e[0] * px + e[4] * py + e[8] * pz + e[12];
+        const y = e[1] * px + e[5] * py + e[9] * pz + e[13];
+        const z = e[2] * px + e[6] * py + e[10] * pz + e[14];
+        const w = e[3] * px + e[7] * py + e[11] * pz + e[15];
+
+        return Vector3.fromXYZW(x, y, z, w);
+    }
+
+    /**
+     * ```
+     * | e0  e4   e8  e12 |   | x |
+     * | e1  e5   e9  e13 | * | y |
+     * | e2  e6  e10  e14 |   | z |
      * | e3  e7  e11  e15 |   | 0 |
      * ```
      */
@@ -3293,6 +3422,25 @@ export class Matrix4 implements ReadonlyMatrix4 {
         const y = e[1] * v.x + e[5] * v.y + e[9] * v.z;
         const z = e[2] * v.x + e[6] * v.y + e[10] * v.z;
         const w = e[3] * v.x + e[7] * v.y + e[11] * v.z;
+
+        return Vector3.fromXYZW(x, y, z, w);
+    }
+
+    /**
+     * ```
+     * | e0  e4   e8  e12 |   | x |
+     * | e1  e5   e9  e13 | * | y |
+     * | e2  e6  e10  e14 |   | z |
+     * | e3  e7  e11  e15 |   | 0 |
+     * ```
+     */
+    public transformVectorXYZ(vx: number, vy: number, vz: number): Vector3 {
+        const e = this.elements;
+
+        const x = e[0] * vx + e[4] * vy + e[8] * vz;
+        const y = e[1] * vx + e[5] * vy + e[9] * vz;
+        const z = e[2] * vx + e[6] * vy + e[10] * vz;
+        const w = e[3] * vx + e[7] * vy + e[11] * vz;
 
         return Vector3.fromXYZW(x, y, z, w);
     }
