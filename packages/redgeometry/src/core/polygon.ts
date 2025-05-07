@@ -16,6 +16,49 @@ export class Polygon2 {
         this.points = points;
     }
 
+    public static createConvexHull(points: ReadonlyVector2[]): Polygon2 {
+        // Find lowest/leftmost point
+        let p0 = points[0];
+
+        for (let i = 1; i < points.length; i++) {
+            const p1 = points[i];
+
+            if (p1.y === p0.y ? p1.x < p0.x : p1.y < p0.y) {
+                p0 = p1;
+            }
+        }
+
+        // Sort points by polar angle around p0
+        const sorted = points.slice();
+        sorted.sort((pa, pb) => pa.sub(p0).angle() - pb.sub(p0).angle());
+
+        // Compute the convex hull (graham scan)
+        const stack: ReadonlyVector2[] = [];
+
+        for (const p0 of sorted) {
+            let len = stack.length;
+
+            while (len > 1) {
+                const p2 = stack[len - 2];
+                const p1 = stack[len - 1];
+
+                const v1 = p0.sub(p1);
+                const v2 = p1.sub(p2);
+
+                if (v1.cross(v2) <= 0) {
+                    break;
+                }
+
+                stack.pop();
+                len -= 1;
+            }
+
+            stack.push(p0);
+        }
+
+        return new Polygon2(stack);
+    }
+
     public static createEmpty(): Polygon2 {
         return new Polygon2([]);
     }
@@ -155,45 +198,6 @@ export class Polygon2 {
         return new Box2(x0, y0, x1, y1);
     }
 
-    public getConvexHull(): Polygon2 {
-        // Find lowest/leftmost point
-        let p0 = this.points[0];
-
-        for (let i = 1; i < this.points.length; i++) {
-            const p1 = this.points[i];
-
-            if (p1.y === p0.y ? p1.x < p0.x : p1.y < p0.y) {
-                p0 = p1;
-            }
-        }
-
-        // Sort points by polar angle around p0
-        const points = this.points.slice();
-
-        points.sort((pa, pb) => pa.sub(p0).angle() - pb.sub(p0).angle());
-
-        // Compute the convex hull (graham scan)
-        let idx = 2;
-
-        while (idx < points.length) {
-            const pp0 = points[idx - 2];
-            const pp1 = points[idx - 1];
-            const pp2 = points[idx - 0];
-
-            const v1 = pp0.sub(pp1);
-            const v2 = pp0.sub(pp2);
-
-            if (v1.cross(v2) > 0) {
-                idx++;
-            } else {
-                idx--;
-                points.splice(idx, 1);
-            }
-        }
-
-        return new Polygon2(points);
-    }
-
     /**
      * Returns an iterator which traverses all edges of the polygon.
      */
@@ -216,7 +220,7 @@ export class Polygon2 {
         let minArea = Number.POSITIVE_INFINITY;
 
         const points = [Vector2.ZERO, Vector2.ZERO, Vector2.ZERO, Vector2.ZERO];
-        const convexHull = this.getConvexHull();
+        const convexHull = Polygon2.createConvexHull(this.points);
 
         // Iterate all edges
         for (const edge of convexHull.getEdgeIterator()) {
