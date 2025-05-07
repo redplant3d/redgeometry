@@ -42,9 +42,11 @@ export interface ReadonlyVector2 {
     len(): number;
     lenSq(): number;
     lerp(v: ReadonlyVector2, t: number): Vector2;
+    mul(v: ReadonlyVector2): Vector2;
     mulS(s: number): Vector2;
     neg(): Vector2;
     normal(): Vector2;
+    setMul(v1: ReadonlyVector2, v2: ReadonlyVector2): void;
     slerp(v: ReadonlyVector2, t: number): Vector2;
     sub(v: ReadonlyVector2): Vector2;
     toArray(): [number, number];
@@ -77,6 +79,7 @@ export interface ReadonlyVector3 {
     len(): number;
     lenSq(): number;
     lerp(v: ReadonlyVector3, t: number): Vector3;
+    mul(v: ReadonlyVector3): Vector3;
     mulS(s: number): Vector3;
     neg(): Vector3;
     normalAround(v: ReadonlyVector3): Vector3;
@@ -85,6 +88,7 @@ export interface ReadonlyVector3 {
     normalAroundY(): Vector3;
     normalAroundZ(): Vector3;
     orthonormalBasis(): { n1: Vector3; n2: Vector3 };
+    setMul(v1: ReadonlyVector3, v2: ReadonlyVector3): void;
     slerp(v: ReadonlyVector3, t: number): Vector3;
     sub(v: ReadonlyVector3): Vector3;
     toArray(): [number, number, number];
@@ -115,8 +119,10 @@ export interface ReadonlyVector4 {
     len(): number;
     lenSq(): number;
     lerp(v: ReadonlyVector4, t: number): Vector4;
+    mul(v: ReadonlyVector4): Vector4;
     mulS(s: number): Vector4;
     neg(): Vector4;
+    setMul(v1: ReadonlyVector4, v2: ReadonlyVector4): void;
     sub(v: ReadonlyVector4): Vector4;
     toArray(): [number, number, number, number];
     toString(): string;
@@ -373,6 +379,13 @@ export class Vector2 implements ReadonlyVector2 {
     }
 
     /**
+     * Returns the product of the current vector and a vector `v`.
+     */
+    public mul(v: ReadonlyVector2): Vector2 {
+        return new Vector2(this.x * v.x, this.y * v.y);
+    }
+
+    /**
      * Returns the product of the current vector and a scalar `s`.
      */
     public mulS(s: number): Vector2 {
@@ -411,6 +424,11 @@ export class Vector2 implements ReadonlyVector2 {
     public setDivS(v: ReadonlyVector2, s: number): void {
         this.x = v.x / s;
         this.y = v.y / s;
+    }
+
+    public setMul(v1: ReadonlyVector2, v2: ReadonlyVector2): void {
+        this.x = v1.x * v2.x;
+        this.y = v1.y * v2.y;
     }
 
     public setMulS(s: number, v: ReadonlyVector2): void {
@@ -698,6 +716,13 @@ export class Vector3 implements ReadonlyVector3 {
     }
 
     /**
+     * Returns the product of the current vector and a vector `v`.
+     */
+    public mul(v: ReadonlyVector3): Vector3 {
+        return new Vector3(this.x * v.x, this.y * v.y, this.z * v.z);
+    }
+
+    /**
      * Returns the product of the current vector and a scalar `s`.
      */
     public mulS(s: number): Vector3 {
@@ -815,6 +840,12 @@ export class Vector3 implements ReadonlyVector3 {
         this.x = v.x / s;
         this.y = v.y / s;
         this.z = v.z / s;
+    }
+
+    public setMul(v1: ReadonlyVector3, v2: ReadonlyVector3): void {
+        this.x = v1.x * v2.x;
+        this.y = v1.y * v2.y;
+        this.z = v1.z * v2.z;
     }
 
     public setMulS(s: number, v: ReadonlyVector3): void {
@@ -1092,6 +1123,13 @@ export class Vector4 implements ReadonlyVector4 {
     }
 
     /**
+     * Returns the product of the current vector and a vector `v`.
+     */
+    public mul(v: ReadonlyVector4): Vector4 {
+        return new Vector4(this.x * v.x, this.y * v.y, this.z * v.z, this.w * v.w);
+    }
+
+    /**
      * Returns the product of the current vector and a scalar `s`.
      */
     public mulS(s: number): Vector4 {
@@ -1128,6 +1166,13 @@ export class Vector4 implements ReadonlyVector4 {
         this.y = v.y / s;
         this.z = v.z / s;
         this.w = v.w / s;
+    }
+
+    public setMul(v1: ReadonlyVector4, v2: ReadonlyVector4): void {
+        this.x = v1.x * v2.x;
+        this.y = v1.y * v2.y;
+        this.z = v1.z * v2.z;
+        this.w = v1.w * v2.w;
     }
 
     public setMulS(s: number, v: ReadonlyVector4): void {
