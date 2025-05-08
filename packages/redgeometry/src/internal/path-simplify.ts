@@ -74,7 +74,7 @@ export function simplifyCubicMidpoint(c: ReadonlyBezier3Curve2): ReadonlyBezier2
     const pc2 = c.p3.lerp(c.p2, 1.5);
     const pc = pc1.lerp(pc2, 0.5);
 
-    return Bezier2Curve2.fromReadonly(c.p0, pc, c.p3);
+    return new Bezier2Curve2(c.p0, pc, c.p3);
 }
 
 export function simplifyCubicContinious(c: ReadonlyBezier3Curve2): [ReadonlyBezier2Curve2, ReadonlyBezier2Curve2] {
@@ -83,14 +83,14 @@ export function simplifyCubicContinious(c: ReadonlyBezier3Curve2): [ReadonlyBezi
     const pc2 = c.p3.lerp(c.p2, 0.75);
     const pm = pc1.lerp(pc2, 0.5);
 
-    const c1 = Bezier2Curve2.fromReadonly(c.p0, pc1, pm);
-    const c2 = Bezier2Curve2.fromReadonly(pm, pc2, c.p3);
+    const c1 = new Bezier2Curve2(c.p0, pc1, pm);
+    const c2 = new Bezier2Curve2(pm, pc2, c.p3);
 
     return [c1, c2];
 }
 
 export function simplifyConic(c: ReadonlyBezierRCurve2): ReadonlyBezier2Curve2 {
-    return Bezier2Curve2.fromReadonly(c.p0, c.p1, c.p2);
+    return new Bezier2Curve2(c.p0, c.p1, c.p2);
 }
 
 export function isDegenerateQuad(c0: ReadonlyBezier2Curve2): boolean {

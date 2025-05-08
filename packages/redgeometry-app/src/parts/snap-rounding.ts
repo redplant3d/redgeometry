@@ -139,7 +139,7 @@ function renderSystem(world: World): void {
 }
 
 function addEdge(snapRound: SnapRound2, p0: ReadonlyVector2, p1: ReadonlyVector2, snap = false): void {
-    const c = Bezier1Curve2.fromReadonly(p0, p1);
+    const c = new Bezier1Curve2(p0, p1);
     snapRound.addSegment(c, 0, 1, snap, undefined);
 }
 

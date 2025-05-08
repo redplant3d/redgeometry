@@ -35,8 +35,8 @@ export class DashState {
     }
 
     public dashDegenerateQuad(p0: ReadonlyVector2, p1: ReadonlyVector2, p2: ReadonlyVector2): void {
-        const c1 = Bezier2Curve2.fromReadonly(p0, p1, p1);
-        const c2 = Bezier2Curve2.fromReadonly(p1, p1, p2);
+        const c1 = new Bezier2Curve2(p0, p1, p1);
+        const c2 = new Bezier2Curve2(p1, p1, p2);
 
         this.dashQuadraticSimple(c1);
         this.dashQuadraticSimple(c2);

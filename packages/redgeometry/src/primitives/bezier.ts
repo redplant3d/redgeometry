@@ -188,15 +188,15 @@ export enum CurveType {
 }
 
 export class Bezier1Curve2 implements ReadonlyBezier1Curve2 {
-    public p0: Vector2;
-    public p1: Vector2;
+    public p0: ReadonlyVector2;
+    public p1: ReadonlyVector2;
 
-    public constructor(p0: Vector2, p1: Vector2) {
+    public constructor(p0: ReadonlyVector2, p1: ReadonlyVector2) {
         this.p0 = p0;
         this.p1 = p1;
     }
 
-    public get pn(): Vector2 {
+    public get pn(): ReadonlyVector2 {
         return this.p1;
     }
 
@@ -217,12 +217,6 @@ export class Bezier1Curve2 implements ReadonlyBezier1Curve2 {
         return new Bezier1Curve2(p0, p1);
     }
 
-    public static fromReadonly(p0: ReadonlyVector2, p1: ReadonlyVector2): ReadonlyBezier1Curve2 {
-        const pp0 = p0 as Vector2;
-        const pp1 = p1 as Vector2;
-        return new Bezier1Curve2(pp0, pp1) as ReadonlyBezier1Curve2;
-    }
-
     public static fromXY(x0: number, y0: number, x1: number, y1: number): Bezier1Curve2 {
         const p0 = new Vector2(x0, y0);
         const p1 = new Vector2(x1, y1);
@@ -237,7 +231,7 @@ export class Bezier1Curve2 implements ReadonlyBezier1Curve2 {
     }
 
     public clone(): Bezier1Curve2 {
-        return new Bezier1Curve2(this.p0.clone(), this.p1.clone());
+        return new Bezier1Curve2(this.p0, this.p1);
     }
 
     public getBounds(): Box2 {
@@ -360,17 +354,17 @@ export class Bezier1Curve2 implements ReadonlyBezier1Curve2 {
 }
 
 export class Bezier2Curve2 implements ReadonlyBezier2Curve2 {
-    public p0: Vector2;
-    public p1: Vector2;
-    public p2: Vector2;
+    public p0: ReadonlyVector2;
+    public p1: ReadonlyVector2;
+    public p2: ReadonlyVector2;
 
-    public constructor(p0: Vector2, p1: Vector2, p2: Vector2) {
+    public constructor(p0: ReadonlyVector2, p1: ReadonlyVector2, p2: ReadonlyVector2) {
         this.p0 = p0;
         this.p1 = p1;
         this.p2 = p2;
     }
 
-    public get pn(): Vector2 {
+    public get pn(): ReadonlyVector2 {
         return this.p2;
     }
 
@@ -393,13 +387,6 @@ export class Bezier2Curve2 implements ReadonlyBezier2Curve2 {
         return new Bezier2Curve2(p0, p1, p2);
     }
 
-    public static fromReadonly(p0: ReadonlyVector2, p1: ReadonlyVector2, p2: ReadonlyVector2): ReadonlyBezier2Curve2 {
-        const pp0 = p0 as Vector2;
-        const pp1 = p1 as Vector2;
-        const pp2 = p2 as Vector2;
-        return new Bezier2Curve2(pp0, pp1, pp2) as ReadonlyBezier2Curve2;
-    }
-
     public static fromXY(x0: number, y0: number, x1: number, y1: number, x2: number, y2: number): Bezier2Curve2 {
         const p0 = new Vector2(x0, y0);
         const p1 = new Vector2(x1, y1);
@@ -416,7 +403,7 @@ export class Bezier2Curve2 implements ReadonlyBezier2Curve2 {
     }
 
     public clone(): Bezier2Curve2 {
-        return new Bezier2Curve2(this.p0.clone(), this.p1.clone(), this.p2.clone());
+        return new Bezier2Curve2(this.p0, this.p1, this.p2);
     }
 
     public getBounds(): Box2 {
@@ -475,7 +462,7 @@ export class Bezier2Curve2 implements ReadonlyBezier2Curve2 {
         // qb = v1 + v1
         const qa = v2.sub(v1);
         const qb = v1.add(v1);
-        const qc = this.p0;
+        const qc = this.p0.clone();
 
         return [qa, qb, qc];
     }
@@ -746,19 +733,19 @@ export class Bezier2Curve2 implements ReadonlyBezier2Curve2 {
 }
 
 export class Bezier3Curve2 implements ReadonlyBezier3Curve2 {
-    public p0: Vector2;
-    public p1: Vector2;
-    public p2: Vector2;
-    public p3: Vector2;
+    public p0: ReadonlyVector2;
+    public p1: ReadonlyVector2;
+    public p2: ReadonlyVector2;
+    public p3: ReadonlyVector2;
 
-    public constructor(p0: Vector2, p1: Vector2, p2: Vector2, p3: Vector2) {
+    public constructor(p0: ReadonlyVector2, p1: ReadonlyVector2, p2: ReadonlyVector2, p3: ReadonlyVector2) {
         this.p0 = p0;
         this.p1 = p1;
         this.p2 = p2;
         this.p3 = p3;
     }
 
-    public get pn(): Vector2 {
+    public get pn(): ReadonlyVector2 {
         return this.p3;
     }
 
@@ -781,19 +768,6 @@ export class Bezier3Curve2 implements ReadonlyBezier3Curve2 {
         const p2 = Vector2.fromObject(obj.p2);
         const p3 = Vector2.fromObject(obj.p3);
         return new Bezier3Curve2(p0, p1, p2, p3);
-    }
-
-    public static fromReadonly(
-        p0: ReadonlyVector2,
-        p1: ReadonlyVector2,
-        p2: ReadonlyVector2,
-        p3: ReadonlyVector2,
-    ): ReadonlyBezier3Curve2 {
-        const pp0 = p0 as Vector2;
-        const pp1 = p1 as Vector2;
-        const pp2 = p2 as Vector2;
-        const pp3 = p3 as Vector2;
-        return new Bezier3Curve2(pp0, pp1, pp2, pp3) as ReadonlyBezier3Curve2;
     }
 
     public static fromXY(
@@ -823,7 +797,7 @@ export class Bezier3Curve2 implements ReadonlyBezier3Curve2 {
     }
 
     public clone(): Bezier3Curve2 {
-        return new Bezier3Curve2(this.p0.clone(), this.p1.clone(), this.p2.clone(), this.p3.clone());
+        return new Bezier3Curve2(this.p0, this.p1, this.p2, this.p3);
     }
 
     public getBounds(): Box2 {
@@ -857,7 +831,7 @@ export class Bezier3Curve2 implements ReadonlyBezier3Curve2 {
         const qa = v3.sub(v2).sub(v2).add(v1);
         const qb = v2.sub(v1).mulS(3);
         const qc = v1.mulS(3);
-        const qd = this.p0;
+        const qd = this.p0.clone();
 
         return [qa, qb, qc, qd];
     }
@@ -1152,19 +1126,19 @@ export class Bezier3Curve2 implements ReadonlyBezier3Curve2 {
 }
 
 export class BezierRCurve2 implements ReadonlyBezierRCurve2 {
-    public p0: Vector2;
-    public p1: Vector2;
-    public p2: Vector2;
+    public p0: ReadonlyVector2;
+    public p1: ReadonlyVector2;
+    public p2: ReadonlyVector2;
     public w: number;
 
-    public constructor(p0: Vector2, p1: Vector2, p2: Vector2, w: number) {
+    public constructor(p0: ReadonlyVector2, p1: ReadonlyVector2, p2: ReadonlyVector2, w: number) {
         this.p0 = p0;
         this.p1 = p1;
         this.p2 = p2;
         this.w = w;
     }
 
-    public get pn(): Vector2 {
+    public get pn(): ReadonlyVector2 {
         return this.p2;
     }
 
@@ -1205,18 +1179,6 @@ export class BezierRCurve2 implements ReadonlyBezierRCurve2 {
         return new BezierRCurve2(pp0, pp1, pp2, w);
     }
 
-    public static fromReadonly(
-        p0: ReadonlyVector2,
-        p1: ReadonlyVector2,
-        p2: ReadonlyVector2,
-        w: number,
-    ): ReadonlyBezierRCurve2 {
-        const pp0 = p0 as Vector2;
-        const pp1 = p1 as Vector2;
-        const pp2 = p2 as Vector2;
-        return new BezierRCurve2(pp0, pp1, pp2, w) as ReadonlyBezierRCurve2;
-    }
-
     public static fromXY(
         x0: number,
         y0: number,
@@ -1252,7 +1214,7 @@ export class BezierRCurve2 implements ReadonlyBezierRCurve2 {
     }
 
     public clone(): BezierRCurve2 {
-        return new BezierRCurve2(this.p0.clone(), this.p1.clone(), this.p2.clone(), this.w);
+        return new BezierRCurve2(this.p0, this.p1, this.p2, this.w);
     }
 
     public getBounds(): Box2 {

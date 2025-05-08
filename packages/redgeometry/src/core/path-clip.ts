@@ -101,10 +101,10 @@ export class PathClip2 {
                 const [inc, out] = this.isIncOut(left);
 
                 if (inc) {
-                    const c = Bezier1Curve2.fromReadonly(left.p0, left.p1);
+                    const c = new Bezier1Curve2(left.p0, left.p1);
                     output.addChainSegment(c, left.seg.ref.data);
                 } else if (out) {
-                    const c = Bezier1Curve2.fromReadonly(left.p1, left.p0);
+                    const c = new Bezier1Curve2(left.p1, left.p0);
                     output.addChainSegment(c, left.seg.ref.data);
                 }
 

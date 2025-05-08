@@ -102,36 +102,31 @@ export class Path2CurveIterator implements IterableIterator<ReadonlyBezierCurve2
                     break;
                 }
                 case PathCommandType.Linear: {
-                    const c = Bezier1Curve2.fromReadonly(this.p0, points[this.pIdx++]);
+                    const c = new Bezier1Curve2(this.p0, points[this.pIdx++]);
                     this.p0 = c.p1;
 
                     return { done: false, value: c };
                 }
                 case PathCommandType.Quadratic: {
-                    const c = Bezier2Curve2.fromReadonly(this.p0, points[this.pIdx++], points[this.pIdx++]);
+                    const c = new Bezier2Curve2(this.p0, points[this.pIdx++], points[this.pIdx++]);
                     this.p0 = c.p2;
 
                     return { done: false, value: c };
                 }
                 case PathCommandType.Cubic: {
-                    const c = Bezier3Curve2.fromReadonly(
-                        this.p0,
-                        points[this.pIdx++],
-                        points[this.pIdx++],
-                        points[this.pIdx++],
-                    );
+                    const c = new Bezier3Curve2(this.p0, points[this.pIdx++], points[this.pIdx++], points[this.pIdx++]);
                     this.p0 = c.p3;
 
                     return { done: false, value: c };
                 }
                 case PathCommandType.Conic: {
-                    const c = BezierRCurve2.fromReadonly(this.p0, points[this.pIdx++], points[this.pIdx++], command.w);
+                    const c = new BezierRCurve2(this.p0, points[this.pIdx++], points[this.pIdx++], command.w);
                     this.p0 = c.p2;
 
                     return { done: false, value: c };
                 }
                 case PathCommandType.Close: {
-                    const c = Bezier1Curve2.fromReadonly(this.p0, this.ps);
+                    const c = new Bezier1Curve2(this.p0, this.ps);
                     this.p0 = c.p1;
 
                     if (!c.isPoint()) {
@@ -168,11 +163,11 @@ export class Polygon2EdgeIterator implements IterableIterator<ReadonlyEdge2> {
         const idx = this.idx;
 
         if (idx < points.length) {
-            const e = Edge2.fromReadonly(points[idx - 1], points[idx]);
+            const e = new Edge2(points[idx - 1], points[idx]);
             this.idx += 1;
             return { done: false, value: e };
         } else if (idx === points.length) {
-            const e = Edge2.fromReadonly(points[idx - 1], points[0]);
+            const e = new Edge2(points[idx - 1], points[0]);
             this.idx += 1;
             return { done: false, value: e };
         } else {

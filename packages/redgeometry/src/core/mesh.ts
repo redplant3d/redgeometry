@@ -242,7 +242,7 @@ export class MeshEdge2 {
         MeshEdge2.splice(e.sym, b.lnext);
 
         // Update segment
-        const seg = Bezier1Curve2.fromReadonly(a.p1, b.p1);
+        const seg = new Bezier1Curve2(a.p1, b.p1);
 
         e.p0 = seg.p0;
         e.seg = seg;
@@ -481,7 +481,7 @@ export class MeshFace2 {
 
         for (const e of this.getEdgeIterator()) {
             // If segment does not exist, use origin points as fallback
-            const seg = e.seg ?? Bezier1Curve2.fromReadonly(e.p0, e.p1);
+            const seg = e.seg ?? new Bezier1Curve2(e.p0, e.p1);
             wind += seg.getWindingAt(p);
         }
 
@@ -528,7 +528,7 @@ export class MeshFace2 {
 
         for (const e of this.getEdgeIterator()) {
             // If segment does not exist, use origin points as fallback
-            const seg = e.seg ?? Bezier1Curve2.fromReadonly(e.p0, e.p1);
+            const seg = e.seg ?? new Bezier1Curve2(e.p0, e.p1);
             area += seg.signedArea();
         }
 
@@ -783,7 +783,7 @@ export class Mesh2 {
             MeshEdge2.splice(e1, e2);
         } else {
             // We need to insert a new edge
-            const c = Bezier1Curve2.fromReadonly(e1.p0, e2.p0);
+            const c = new Bezier1Curve2(e1.p0, e2.p0);
             const e = this.createEdge(c, c.reverse());
 
             MeshEdge2.splice(e1, e);
@@ -1051,9 +1051,9 @@ export class Mesh2 {
                 const e2 = e1.lnext;
                 const e3 = e2.lnext;
 
-                const c1 = Bezier1Curve2.fromReadonly(p, e1.p0);
-                const c2 = Bezier1Curve2.fromReadonly(p, e2.p0);
-                const c3 = Bezier1Curve2.fromReadonly(p, e3.p0);
+                const c1 = new Bezier1Curve2(p, e1.p0);
+                const c2 = new Bezier1Curve2(p, e2.p0);
+                const c3 = new Bezier1Curve2(p, e3.p0);
 
                 const ee1 = this.createEdge(c1, c1.reverse());
                 const ee2 = this.createEdge(c2, c2.reverse());

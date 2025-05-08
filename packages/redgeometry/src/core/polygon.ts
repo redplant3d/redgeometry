@@ -161,7 +161,7 @@ export class Polygon2 {
     }
 
     public clone(): Polygon2 {
-        const points = this.points.map((p) => p.clone());
+        const points = this.points.slice();
         return new Polygon2(points);
     }
 

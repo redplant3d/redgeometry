@@ -74,7 +74,7 @@ export class PathDashIncremental2 implements PathDash2 {
                     break;
                 }
                 case PathCommandType.Linear: {
-                    const c = Bezier1Curve2.fromReadonly(p0, points[pIdx++]);
+                    const c = new Bezier1Curve2(p0, points[pIdx++]);
                     const m = c.getDerivative();
 
                     if (!m.isZero()) {
@@ -88,7 +88,7 @@ export class PathDashIncremental2 implements PathDash2 {
                     break;
                 }
                 case PathCommandType.Quadratic: {
-                    const c = Bezier2Curve2.fromReadonly(p0, points[pIdx++], points[pIdx++]);
+                    const c = new Bezier2Curve2(p0, points[pIdx++], points[pIdx++]);
                     const m = c.getTangentStart();
 
                     if (!m.isZero()) {
@@ -102,7 +102,7 @@ export class PathDashIncremental2 implements PathDash2 {
                     break;
                 }
                 case PathCommandType.Cubic: {
-                    const c = Bezier3Curve2.fromReadonly(p0, points[pIdx++], points[pIdx++], points[pIdx++]);
+                    const c = new Bezier3Curve2(p0, points[pIdx++], points[pIdx++], points[pIdx++]);
                     const m = c.getTangentStart();
 
                     if (!m.isZero()) {
@@ -116,7 +116,7 @@ export class PathDashIncremental2 implements PathDash2 {
                     break;
                 }
                 case PathCommandType.Conic: {
-                    const c = BezierRCurve2.fromReadonly(p0, points[pIdx++], points[pIdx++], command.w);
+                    const c = new BezierRCurve2(p0, points[pIdx++], points[pIdx++], command.w);
                     const m = c.getTangentStart();
 
                     if (!m.isZero()) {
@@ -130,7 +130,7 @@ export class PathDashIncremental2 implements PathDash2 {
                     break;
                 }
                 case PathCommandType.Close: {
-                    const c = Bezier1Curve2.fromReadonly(p0, ps);
+                    const c = new Bezier1Curve2(p0, ps);
                     const m = c.getDerivative();
 
                     if (!m.isZero()) {
@@ -280,7 +280,7 @@ export class PathDashRecursive2 implements PathDash2 {
                     break;
                 }
                 case PathCommandType.Linear: {
-                    const c = Bezier1Curve2.fromReadonly(p0, points[pIdx++]);
+                    const c = new Bezier1Curve2(p0, points[pIdx++]);
                     const m = c.getDerivative();
 
                     if (!m.isZero()) {
@@ -294,7 +294,7 @@ export class PathDashRecursive2 implements PathDash2 {
                     break;
                 }
                 case PathCommandType.Quadratic: {
-                    const c = Bezier2Curve2.fromReadonly(p0, points[pIdx++], points[pIdx++]);
+                    const c = new Bezier2Curve2(p0, points[pIdx++], points[pIdx++]);
                     const m = c.getTangentStart();
 
                     if (!m.isZero()) {
@@ -308,7 +308,7 @@ export class PathDashRecursive2 implements PathDash2 {
                     break;
                 }
                 case PathCommandType.Cubic: {
-                    const c = Bezier3Curve2.fromReadonly(p0, points[pIdx++], points[pIdx++], points[pIdx++]);
+                    const c = new Bezier3Curve2(p0, points[pIdx++], points[pIdx++], points[pIdx++]);
                     const m = c.getTangentStart();
 
                     if (!m.isZero()) {
@@ -322,7 +322,7 @@ export class PathDashRecursive2 implements PathDash2 {
                     break;
                 }
                 case PathCommandType.Conic: {
-                    const c = BezierRCurve2.fromReadonly(p0, points[pIdx++], points[pIdx++], command.w);
+                    const c = new BezierRCurve2(p0, points[pIdx++], points[pIdx++], command.w);
                     const m = c.getTangentStart();
 
                     if (!m.isZero()) {
@@ -336,7 +336,7 @@ export class PathDashRecursive2 implements PathDash2 {
                     break;
                 }
                 case PathCommandType.Close: {
-                    const c = Bezier1Curve2.fromReadonly(p0, ps);
+                    const c = new Bezier1Curve2(p0, ps);
                     const m = c.getDerivative();
 
                     if (!m.isZero()) {

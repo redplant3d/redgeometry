@@ -29,8 +29,8 @@ export function offsetQuadraticDegenerate(
     p2: ReadonlyVector2,
     d: number,
 ): void {
-    const c1 = Bezier2Curve2.fromReadonly(p0, p1, p1);
-    const c2 = Bezier2Curve2.fromReadonly(p1, p1, p2);
+    const c1 = new Bezier2Curve2(p0, p1, p1);
+    const c2 = new Bezier2Curve2(p1, p1, p2);
 
     const n0 = p1.sub(p0).unit().normal();
     const n1 = p2.sub(p1).unit().normal();

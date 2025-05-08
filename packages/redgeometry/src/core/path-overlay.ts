@@ -88,8 +88,8 @@ export class PathOverlay2 {
 
                 // Quickly reject unnecessary edges (same tags)
                 if (!arrayEquals(data1.tag, data2.tag)) {
-                    const seg1 = Bezier1Curve2.fromReadonly(left.p1, left.p0);
-                    const seg2 = Bezier1Curve2.fromReadonly(left.p0, left.p1);
+                    const seg1 = new Bezier1Curve2(left.p1, left.p0);
+                    const seg2 = new Bezier1Curve2(left.p0, left.p1);
 
                     this.addSegmentPair(output, seg1, seg2, data1, data2);
                 }

@@ -49,10 +49,10 @@ export interface ReadonlyRay3 {
 }
 
 export class Ray2 implements ReadonlyRay2 {
-    public p: Vector2;
-    public v: Vector2;
+    public p: ReadonlyVector2;
+    public v: ReadonlyVector2;
 
-    public constructor(p: Vector2, v: Vector2) {
+    public constructor(p: ReadonlyVector2, v: ReadonlyVector2) {
         this.p = p;
         this.v = v;
     }
@@ -73,12 +73,6 @@ export class Ray2 implements ReadonlyRay2 {
     public static fromPoints(p0: Vector2, p1: Vector2): Ray2 {
         const v = p1.sub(p0);
         return new Ray2(p0, v);
-    }
-
-    public static fromReadonly(v: ReadonlyVector2, p: ReadonlyVector2): ReadonlyRay2 {
-        const pp = p as Vector2;
-        const vv = v as Vector2;
-        return new Ray2(pp, vv) as ReadonlyRay2;
     }
 
     public static fromXY(px: number, py: number, vx: number, vy: number): Ray2 {
@@ -130,7 +124,7 @@ export class Ray2 implements ReadonlyRay2 {
     }
 
     public clone(): Ray2 {
-        return new Ray2(this.p.clone(), this.v.clone());
+        return new Ray2(this.p, this.v);
     }
 
     /**
@@ -191,10 +185,10 @@ export class Ray2 implements ReadonlyRay2 {
 }
 
 export class Ray3 implements ReadonlyRay3 {
-    public p: Vector3;
-    public v: Vector3;
+    public p: ReadonlyVector3;
+    public v: ReadonlyVector3;
 
-    public constructor(p: Vector3, v: Vector3) {
+    public constructor(p: ReadonlyVector3, v: ReadonlyVector3) {
         this.p = p;
         this.v = v;
     }
@@ -215,12 +209,6 @@ export class Ray3 implements ReadonlyRay3 {
     public static fromPoints(p0: Vector3, p1: Vector3): Ray3 {
         const v = p1.sub(p0);
         return new Ray3(p0, v);
-    }
-
-    public static fromReadonly(v: ReadonlyVector3, p: ReadonlyVector3): ReadonlyRay3 {
-        const pp = p as Vector3;
-        const vv = v as Vector3;
-        return new Ray3(pp, vv) as ReadonlyRay3;
     }
 
     public static fromXYZ(px: number, py: number, pz: number, vx: number, vy: number, vz: number): Ray3 {
@@ -278,7 +266,7 @@ export class Ray3 implements ReadonlyRay3 {
     }
 
     public clone(): Ray3 {
-        return new Ray3(this.p.clone(), this.v.clone());
+        return new Ray3(this.p, this.v);
     }
 
     /**
