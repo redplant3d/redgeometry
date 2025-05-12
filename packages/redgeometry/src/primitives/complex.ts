@@ -71,21 +71,25 @@ export class Complex implements ReadonlyComplex {
     /**
      * Returns the angle between the current complex and `z` in radians.
      *
-     * Note: The returned value is unsigned and less than `PI`.
+     * Note: The returned value is unsigned and less than or equal to `PI`.
      */
     public angleTo(z: ReadonlyComplex): number {
         // Formula adapted from `Quaternion`
         const dot = this.a * z.a + this.b * z.b;
         const lenSq2 = this.lenSq() * z.lenSq();
+        const sqrt = Math.sqrt(lenSq2);
 
-        if (dot * dot >= lenSq2) {
+        if (sqrt <= dot) {
             // Angle either undefined, very close or equal to zero
             return 0;
         }
 
-        const cos = dot / Math.sqrt(lenSq2);
+        if (sqrt <= -dot) {
+            // Angle very close or equal to Pi
+            return Math.PI;
+        }
 
-        return Math.acos(cos);
+        return Math.acos(dot / sqrt);
     }
 
     public clone(): Complex {

@@ -277,20 +277,24 @@ export class Vector2 implements ReadonlyVector2 {
     /**
      * Returns the angle between the current vector and `v` in radians.
      *
-     * Note: The returned value is unsigned and less than `PI`.
+     * Note: The returned value is unsigned and less than or equal to `PI`.
      */
     public angleTo(v: ReadonlyVector2): number {
         const dot = this.dot(v);
         const lenSq2 = this.lenSq() * v.lenSq();
+        const sqrt = Math.sqrt(lenSq2);
 
-        if (dot * dot >= lenSq2) {
+        if (sqrt <= dot) {
             // Angle either undefined, very close or equal to zero
             return 0;
         }
 
-        const cos = dot / Math.sqrt(lenSq2);
+        if (sqrt <= -dot) {
+            // Angle very close or equal to Pi
+            return Math.PI;
+        }
 
-        return Math.acos(cos);
+        return Math.acos(dot / sqrt);
     }
 
     public clamp(vmin: ReadonlyVector2, vmax: ReadonlyVector2): Vector2 {
@@ -622,20 +626,24 @@ export class Vector3 implements ReadonlyVector3 {
     /**
      * Returns the angle between the current vector and `v` in radians.
      *
-     * Note: The returned value is unsigned and less than `PI`.
+     * Note: The returned value is unsigned and less than or equal to `PI`.
      */
     public angleTo(v: ReadonlyVector3): number {
         const dot = this.dot(v);
         const lenSq2 = this.lenSq() * v.lenSq();
+        const sqrt = Math.sqrt(lenSq2);
 
-        if (dot * dot >= lenSq2) {
+        if (sqrt <= dot) {
             // Angle either undefined, very close or equal to zero
             return 0;
         }
 
-        const cos = dot / Math.sqrt(lenSq2);
+        if (sqrt <= -dot) {
+            // Angle very close or equal to Pi
+            return Math.PI;
+        }
 
-        return Math.acos(cos);
+        return Math.acos(dot / sqrt);
     }
 
     public clamp(vmin: ReadonlyVector3, vmax: ReadonlyVector3): Vector3 {

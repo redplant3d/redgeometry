@@ -244,21 +244,25 @@ export class Quaternion implements ReadonlyQuaternion {
     /**
      * Returns the angle between the current quaternion and `q` in radians.
      *
-     * Note: The returned value is unsigned and less than `2 * PI`.
+     * Note: The returned value is unsigned and less than or equal to `2 * PI`.
      */
     public angleTo(q: ReadonlyQuaternion): number {
         // Glenn Davis formula (referenced by Ken Shoemake)
         const dot = this.a * q.a + this.b * q.b + this.c * q.c + this.d * q.d;
         const lenSq2 = this.lenSq() * q.lenSq();
+        const sqrt = Math.sqrt(lenSq2);
 
-        if (dot * dot >= lenSq2) {
+        if (sqrt <= dot) {
             // Angle either undefined, very close or equal to zero
             return 0;
         }
 
-        const cos = dot / Math.sqrt(lenSq2);
+        if (sqrt <= -dot) {
+            // Angle very close or equal to Pi
+            return 2 * Math.PI;
+        }
 
-        return 2 * Math.acos(cos);
+        return 2 * Math.acos(dot / sqrt);
     }
 
     /**
