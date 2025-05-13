@@ -95,6 +95,8 @@ export interface ReadonlyVector3 {
     toString(): string;
     unit(): Vector3;
     unitOrZero(): Vector3;
+    xy(): Vector2;
+    xz(): Vector2;
 }
 
 export interface ReadonlyVector4 {
@@ -128,6 +130,9 @@ export interface ReadonlyVector4 {
     toString(): string;
     unit(): Vector4;
     unitOrZero(): Vector4;
+    xy(): Vector2;
+    xyz(): Vector3;
+    xz(): Vector2;
 }
 
 export class Vector2 implements ReadonlyVector2 {
@@ -945,6 +950,14 @@ export class Vector3 implements ReadonlyVector3 {
 
         return this.divS(s);
     }
+
+    public xy(): Vector2 {
+        return new Vector2(this.x, this.y);
+    }
+
+    public xz(): Vector2 {
+        return new Vector2(this.x, this.z);
+    }
 }
 
 export class Vector4 implements ReadonlyVector4 {
@@ -1246,5 +1259,17 @@ export class Vector4 implements ReadonlyVector4 {
         }
 
         return this.divS(s);
+    }
+
+    public xy(): Vector2 {
+        return new Vector2(this.x, this.y);
+    }
+
+    public xyz(): Vector3 {
+        return new Vector3(this.x, this.y, this.z);
+    }
+
+    public xz(): Vector2 {
+        return new Vector2(this.x, this.z);
     }
 }
