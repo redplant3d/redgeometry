@@ -1,3 +1,4 @@
+import { lerp } from "../utility/scalar.js";
 import type { FixedSizeArray } from "../utility/types.js";
 import { Complex, type ComplexLike, type ReadonlyComplex } from "./complex.js";
 import type { ReadonlyMatrix3, ReadonlyMatrix3A, ReadonlyMatrix4, ReadonlyMatrix4A } from "./matrix.js";
@@ -57,21 +58,17 @@ export interface ReadonlyBox2 {
     readonly y0: number;
     readonly y1: number;
 
-    addMinkowski(box: ReadonlyBox2): Box2;
+    center(): Vector2;
     clone(): Box2;
-    contains(p: ReadonlyVector2): boolean;
-    containsInclusive(p: ReadonlyVector2): boolean;
-    dx(): number;
-    dy(): number;
-    getCenter(): Vector2;
-    intersects(b: ReadonlyBox2): boolean;
-    intersectsInclusive(b: ReadonlyBox2): boolean;
+    containsPoint(p: ReadonlyVector2, eps: number): boolean;
+    deltaX(): number;
+    deltaY(): number;
+    intersects(b: ReadonlyBox2, eps: number): boolean;
     intersectsRay(ray: ReadonlyRay2): boolean;
     isEmpty(): boolean;
     isPoint(): boolean;
-    scale(fx: number, fy: number): Box2;
-    scaleAbsolute(dx: number, dy: number): Box2;
-    subMinkowski(box: ReadonlyBox2): Box2;
+    scaleAbs(dx: number, dy: number): Box2;
+    scaleRel(fx: number, fy: number): Box2;
     toArray(): [number, number, number, number];
     toString(): string;
     transform(mat: ReadonlyMatrix3 | ReadonlyMatrix3A): Box2;
@@ -85,22 +82,18 @@ export interface ReadonlyBox3 {
     readonly z0: number;
     readonly z1: number;
 
-    addMinkowski(box: ReadonlyBox3): Box3;
+    center(): Vector3;
     clone(): Box3;
-    contains(p: ReadonlyVector3): boolean;
-    containsInclusive(p: ReadonlyVector3): boolean;
-    dx(): number;
-    dy(): number;
-    dz(): number;
-    getCenter(): Vector3;
-    intersects(b: ReadonlyBox3): boolean;
-    intersectsInclusive(b: ReadonlyBox3): boolean;
+    containsPoint(p: ReadonlyVector3, eps: number): boolean;
+    deltaX(): number;
+    deltaY(): number;
+    deltaZ(): number;
+    intersects(b: ReadonlyBox3, eps: number): boolean;
     intersectsRay(ray: ReadonlyRay3): boolean;
     isEmpty(): boolean;
     isPoint(): boolean;
-    scale(fx: number, fy: number, fz: number): Box3;
-    scaleAbsolute(dx: number, dy: number, dz: number): Box3;
-    subMinkowski(box: ReadonlyBox3): Box3;
+    scaleAbs(dx: number, dy: number, dz: number): Box3;
+    scaleRel(fx: number, fy: number, fz: number): Box3;
     toArray(): [number, number, number, number, number, number];
     toString(): string;
     transform(mat: ReadonlyMatrix4 | ReadonlyMatrix4A): Box3;
@@ -114,8 +107,8 @@ export interface ReadonlyAABox2 {
     axisY(): Vector2;
     clone(): AABox2;
     containsPoint(p: ReadonlyVector2, eps: number): boolean;
-    dx(): number;
-    dy(): number;
+    deltaX(): number;
+    deltaY(): number;
     getCorner(index: number): Vector2;
     getPoints(): FixedSizeArray<Vector2, 4>;
     getTransform(): Matrix3A;
@@ -143,9 +136,9 @@ export interface ReadonlyAABox3 {
     axisZ(): Vector3;
     clone(): AABox3;
     containsPoint(p: ReadonlyVector3, eps: number): boolean;
-    dx(): number;
-    dy(): number;
-    dz(): number;
+    deltaX(): number;
+    deltaY(): number;
+    deltaZ(): number;
     getCorner(index: number): Vector3;
     getPoints(): FixedSizeArray<Vector3, 8>;
     getTransform(): Matrix4A;
@@ -175,8 +168,8 @@ export interface ReadonlyOBox2 {
     axisY(): Vector2;
     clone(): OBox2;
     containsPoint(p: ReadonlyVector2, eps: number): boolean;
-    dx(): number;
-    dy(): number;
+    deltaX(): number;
+    deltaX(): number;
     getCorner(index: number): Vector2;
     getPoints(): FixedSizeArray<Vector2, 4>;
     getTransform(): Matrix3A;
@@ -200,9 +193,9 @@ export interface ReadonlyOBox3 {
     axisZ(): Vector3;
     clone(): OBox3;
     containsPoint(p: ReadonlyVector3, eps: number): boolean;
-    dx(): number;
-    dy(): number;
-    dz(): number;
+    deltaX(): number;
+    deltaY(): number;
+    deltaZ(): number;
     getCorner(index: number): Vector3;
     getPoints(): FixedSizeArray<Vector3, 8>;
     getTransform(): Matrix4A;
@@ -271,48 +264,41 @@ export class Box2 implements ReadonlyBox2 {
         return { x0: box.x0, y0: box.y0, x1: box.x1, y1: box.y1 };
     }
 
-    /**
-     * Returns the Minkowski sum of the boxes.
-     */
-    public addMinkowski(box: ReadonlyBox2): Box2 {
-        const x0 = this.x0 - box.x1;
-        const y0 = this.y0 - box.y1;
-        const x1 = this.x1 - box.x0;
-        const y1 = this.y1 - box.y0;
+    public center(): Vector2 {
+        const x = lerp(0.5, this.x0, this.x1);
+        const y = lerp(0.5, this.y0, this.y1);
 
-        return new Box2(x0, y0, x1, y1);
+        return new Vector2(x, y);
     }
 
     public clone(): Box2 {
         return new Box2(this.x0, this.y0, this.x1, this.y1);
     }
 
-    public contains(p: ReadonlyVector2): boolean {
-        return this.x0 < p.x && this.y0 < p.y && this.x1 > p.x && this.y1 > p.y;
+    public containsPoint(p: ReadonlyVector2, eps: number): boolean {
+        const x0 = this.x0 - p.x;
+        const y0 = this.y0 - p.y;
+        const x1 = p.x - this.x1;
+        const y1 = p.y - this.y1;
+
+        return x0 <= eps && x1 <= eps && y0 <= eps && y1 <= eps;
     }
 
-    public containsInclusive(p: ReadonlyVector2): boolean {
-        return this.x0 <= p.x && this.y0 <= p.y && this.x1 >= p.x && this.y1 >= p.y;
-    }
-
-    public dx(): number {
+    public deltaX(): number {
         return this.x1 - this.x0;
     }
 
-    public dy(): number {
+    public deltaY(): number {
         return this.y1 - this.y0;
     }
 
-    public getCenter(): Vector2 {
-        return new Vector2(0.5 * (this.x0 + this.x1), 0.5 * (this.y0 + this.y1));
-    }
+    public intersects(b: ReadonlyBox2, eps: number): boolean {
+        const x0 = this.x0 - b.x1;
+        const y0 = this.y0 - b.y1;
+        const x1 = b.x0 - this.x1;
+        const y1 = b.y0 - this.y1;
 
-    public intersects(b: ReadonlyBox2): boolean {
-        return this.x0 < b.x1 && this.x1 > b.x0 && this.y0 < b.y1 && this.y1 > b.y0;
-    }
-
-    public intersectsInclusive(b: ReadonlyBox2): boolean {
-        return this.x0 <= b.x1 && this.x1 >= b.x0 && this.y0 <= b.y1 && this.y1 >= b.y0;
+        return x0 <= eps && x1 <= eps && y0 <= eps && y1 <= eps;
     }
 
     public intersectsRay(ray: ReadonlyRay2): boolean {
@@ -344,15 +330,15 @@ export class Box2 implements ReadonlyBox2 {
         return this.x0 === this.x1 && this.y0 === this.y1;
     }
 
-    public scale(fx: number, fy: number): Box2 {
-        const dx = 0.5 * (fx - 1) * this.dx();
-        const dy = 0.5 * (fy - 1) * this.dy();
-
-        return this.scaleAbsolute(dx, dy);
+    public scaleAbs(sx: number, sy: number): Box2 {
+        return new Box2(this.x0 - sx, this.y0 - sy, this.x1 + sx, this.y1 + sy);
     }
 
-    public scaleAbsolute(dx: number, dy: number): Box2 {
-        return new Box2(this.x0 - dx, this.y0 - dy, this.x1 + dx, this.y1 + dy);
+    public scaleRel(sx: number, sy: number): Box2 {
+        const ssx = 0.5 * (sx - 1) * this.deltaX();
+        const ssy = 0.5 * (sy - 1) * this.deltaY();
+
+        return this.scaleAbs(ssx, ssy);
     }
 
     public set(x0: number, y0: number, x1: number, y1: number): void {
@@ -362,20 +348,20 @@ export class Box2 implements ReadonlyBox2 {
         this.y1 = y1;
     }
 
-    public setEnclose(box: ReadonlyBox2, p: ReadonlyVector2): void {
+    public setEnclosePoint(box: ReadonlyBox2, p: ReadonlyVector2): void {
         this.x0 = Math.min(box.x0, p.x);
         this.y0 = Math.min(box.y0, p.y);
         this.x1 = Math.max(box.x1, p.x);
         this.y1 = Math.max(box.y1, p.y);
     }
 
-    public setEncloseWithTransform(
+    public setEnclosePointTransform(
         box: ReadonlyBox2,
         p: ReadonlyVector2,
         mat: ReadonlyMatrix3 | ReadonlyMatrix3A,
     ): void {
         const pp = mat.transformPoint(p);
-        this.setEnclose(box, pp);
+        this.setEnclosePoint(box, pp);
     }
 
     public setToEmpty(): void {
@@ -394,18 +380,6 @@ export class Box2 implements ReadonlyBox2 {
         this.y1 = Math.max(box1.y1, box2.y1);
     }
 
-    /**
-     * Returns the Minkowski difference of the boxes.
-     */
-    public subMinkowski(box: ReadonlyBox2): Box2 {
-        const x0 = this.x0 + box.x1;
-        const y0 = this.y0 + box.y1;
-        const x1 = this.x1 + box.x0;
-        const y1 = this.y1 + box.y0;
-
-        return new Box2(x0, y0, x1, y1);
-    }
-
     public toArray(): [number, number, number, number] {
         return [this.x0, this.y0, this.x1, this.y1];
     }
@@ -416,10 +390,10 @@ export class Box2 implements ReadonlyBox2 {
 
     public transform(mat: ReadonlyMatrix3 | ReadonlyMatrix3A): Box2 {
         const box = Box2.createEmpty();
-        box.setEncloseWithTransform(box, new Vector2(this.x0, this.y0), mat);
-        box.setEncloseWithTransform(box, new Vector2(this.x0, this.y1), mat);
-        box.setEncloseWithTransform(box, new Vector2(this.x1, this.y0), mat);
-        box.setEncloseWithTransform(box, new Vector2(this.x1, this.y1), mat);
+        box.setEnclosePointTransform(box, new Vector2(this.x0, this.y0), mat);
+        box.setEnclosePointTransform(box, new Vector2(this.x0, this.y1), mat);
+        box.setEnclosePointTransform(box, new Vector2(this.x1, this.y0), mat);
+        box.setEnclosePointTransform(box, new Vector2(this.x1, this.y1), mat);
 
         return box;
     }
@@ -497,61 +471,50 @@ export class Box3 implements ReadonlyBox3 {
         return { x0: box.x0, y0: box.y0, z0: box.z0, x1: box.x1, y1: box.y1, z1: box.z1 };
     }
 
-    /**
-     * Returns the Minkowski sum of the boxes.
-     */
-    public addMinkowski(box: ReadonlyBox3): Box3 {
-        const x0 = this.x0 - box.x1;
-        const y0 = this.y0 - box.y1;
-        const z0 = this.z0 - box.z1;
-        const x1 = this.x1 - box.x0;
-        const y1 = this.y1 - box.y0;
-        const z1 = this.z1 - box.z0;
+    public center(): Vector3 {
+        const x = lerp(0.5, this.x0, this.x1);
+        const y = lerp(0.5, this.y0, this.y1);
+        const z = lerp(0.5, this.z0, this.z1);
 
-        return new Box3(x0, y0, z0, x1, y1, z1);
+        return new Vector3(x, y, z);
     }
 
     public clone(): Box3 {
         return new Box3(this.x0, this.y0, this.z0, this.x1, this.y1, this.z1);
     }
 
-    public contains(p: ReadonlyVector3): boolean {
-        return this.x0 < p.x && this.y0 < p.y && this.z0 < p.z && this.x1 > p.x && this.y1 > p.y && this.z1 > p.z;
+    public containsPoint(p: ReadonlyVector3, eps: number): boolean {
+        const x0 = this.x0 - p.x;
+        const y0 = this.y0 - p.y;
+        const z0 = this.z0 - p.z;
+        const x1 = p.x - this.x1;
+        const y1 = p.y - this.y1;
+        const z1 = p.z - this.z1;
+
+        return x0 <= eps && x1 <= eps && y0 <= eps && y1 <= eps && z0 <= eps && z1 <= eps;
     }
 
-    public containsInclusive(p: ReadonlyVector3): boolean {
-        return this.x0 <= p.x && this.y0 <= p.y && this.z0 <= p.z && this.x1 >= p.x && this.y1 >= p.y && this.z1 >= p.z;
-    }
-
-    public dx(): number {
+    public deltaX(): number {
         return this.x1 - this.x0;
     }
 
-    public dy(): number {
+    public deltaY(): number {
         return this.y1 - this.y0;
     }
 
-    public dz(): number {
+    public deltaZ(): number {
         return this.z1 - this.z0;
     }
 
-    public getCenter(): Vector3 {
-        return new Vector3(0.5 * (this.x0 + this.x1), 0.5 * (this.y0 + this.y1), 0.5 * (this.z0 + this.z1));
-    }
+    public intersects(b: ReadonlyBox3, eps: number): boolean {
+        const x0 = this.x0 - b.x1;
+        const y0 = this.y0 - b.y1;
+        const z0 = this.z0 - b.z1;
+        const x1 = b.x0 - this.x1;
+        const y1 = b.y0 - this.y1;
+        const z1 = b.z0 - this.z1;
 
-    public intersects(b: ReadonlyBox3): boolean {
-        return this.x0 < b.x1 && this.x1 > b.x0 && this.y0 < b.y1 && this.y1 > b.y0 && this.z0 < b.z1 && this.z1 > b.z0;
-    }
-
-    public intersectsInclusive(b: ReadonlyBox3): boolean {
-        return (
-            this.x0 <= b.x1 &&
-            this.x1 >= b.x0 &&
-            this.y0 <= b.y1 &&
-            this.y1 >= b.y0 &&
-            this.z0 <= b.z1 &&
-            this.z1 >= b.z0
-        );
+        return x0 <= eps && x1 <= eps && y0 <= eps && y1 <= eps && z0 <= eps && z1 <= eps;
     }
 
     public intersectsRay(ray: ReadonlyRay3): boolean {
@@ -590,16 +553,16 @@ export class Box3 implements ReadonlyBox3 {
         return this.x0 === this.x1 && this.y0 === this.y1 && this.z0 === this.z1;
     }
 
-    public scale(fx: number, fy: number, fz: number): Box3 {
-        const dx = 0.5 * (fx - 1) * this.dx();
-        const dy = 0.5 * (fy - 1) * this.dy();
-        const dz = 0.5 * (fz - 1) * this.dz();
-
-        return this.scaleAbsolute(dx, dy, dz);
+    public scaleAbs(sx: number, sy: number, sz: number): Box3 {
+        return new Box3(this.x0 - sx, this.y0 - sy, this.z0 - sz, this.x1 + sx, this.y1 + sy, this.z1 + sz);
     }
 
-    public scaleAbsolute(dx: number, dy: number, dz: number): Box3 {
-        return new Box3(this.x0 - dx, this.y0 - dy, this.z0 - dz, this.x1 + dx, this.y1 + dy, this.z1 + dz);
+    public scaleRel(sx: number, sy: number, sz: number): Box3 {
+        const ssx = 0.5 * (sx - 1) * this.deltaX();
+        const ssy = 0.5 * (sy - 1) * this.deltaY();
+        const ssz = 0.5 * (sz - 1) * this.deltaZ();
+
+        return this.scaleAbs(ssx, ssy, ssz);
     }
 
     public set(x0: number, y0: number, z0: number, x1: number, y1: number, z1: number): void {
@@ -611,7 +574,7 @@ export class Box3 implements ReadonlyBox3 {
         this.z1 = z1;
     }
 
-    public setEnclose(box: ReadonlyBox3, p: ReadonlyVector3): void {
+    public setEnclosePoint(box: ReadonlyBox3, p: ReadonlyVector3): void {
         this.x0 = Math.min(box.x0, p.x);
         this.y0 = Math.min(box.y0, p.y);
         this.z0 = Math.min(box.z0, p.z);
@@ -620,13 +583,13 @@ export class Box3 implements ReadonlyBox3 {
         this.z1 = Math.max(box.z1, p.z);
     }
 
-    public setEncloseWithTransform(
+    public setEnclosePointTransform(
         box: ReadonlyBox3,
         p: ReadonlyVector3,
         mat: ReadonlyMatrix4 | ReadonlyMatrix4A,
     ): void {
         const pp = mat.transformPoint(p);
-        this.setEnclose(box, pp);
+        this.setEnclosePoint(box, pp);
     }
 
     public setToEmpty(): void {
@@ -649,20 +612,6 @@ export class Box3 implements ReadonlyBox3 {
         this.z1 = Math.max(box1.z1, box2.z1);
     }
 
-    /**
-     * Returns the Minkowski difference of the boxes.
-     */
-    public subMinkowski(box: ReadonlyBox3): Box3 {
-        const x0 = this.x0 + box.x1;
-        const y0 = this.y0 + box.y1;
-        const z0 = this.z0 + box.z1;
-        const x1 = this.x1 + box.x0;
-        const y1 = this.y1 + box.y0;
-        const z1 = this.z1 + box.z0;
-
-        return new Box3(x0, y0, z0, x1, y1, z1);
-    }
-
     public toArray(): [number, number, number, number, number, number] {
         return [this.x0, this.y0, this.z0, this.x1, this.y1, this.z1];
     }
@@ -674,14 +623,14 @@ export class Box3 implements ReadonlyBox3 {
     public transform(mat: ReadonlyMatrix4 | ReadonlyMatrix4A): Box3 {
         const box = Box3.createEmpty();
 
-        box.setEncloseWithTransform(box, new Vector3(this.x0, this.y0, this.z0), mat);
-        box.setEncloseWithTransform(box, new Vector3(this.x0, this.y0, this.z1), mat);
-        box.setEncloseWithTransform(box, new Vector3(this.x0, this.y1, this.z0), mat);
-        box.setEncloseWithTransform(box, new Vector3(this.x0, this.y1, this.z1), mat);
-        box.setEncloseWithTransform(box, new Vector3(this.x1, this.y0, this.z0), mat);
-        box.setEncloseWithTransform(box, new Vector3(this.x1, this.y0, this.z1), mat);
-        box.setEncloseWithTransform(box, new Vector3(this.x1, this.y1, this.z0), mat);
-        box.setEncloseWithTransform(box, new Vector3(this.x1, this.y1, this.z1), mat);
+        box.setEnclosePointTransform(box, new Vector3(this.x0, this.y0, this.z0), mat);
+        box.setEnclosePointTransform(box, new Vector3(this.x0, this.y0, this.z1), mat);
+        box.setEnclosePointTransform(box, new Vector3(this.x0, this.y1, this.z0), mat);
+        box.setEnclosePointTransform(box, new Vector3(this.x0, this.y1, this.z1), mat);
+        box.setEnclosePointTransform(box, new Vector3(this.x1, this.y0, this.z0), mat);
+        box.setEnclosePointTransform(box, new Vector3(this.x1, this.y0, this.z1), mat);
+        box.setEnclosePointTransform(box, new Vector3(this.x1, this.y1, this.z0), mat);
+        box.setEnclosePointTransform(box, new Vector3(this.x1, this.y1, this.z1), mat);
 
         return box;
     }
@@ -762,11 +711,11 @@ export class AABox2 implements ReadonlyAABox2 {
         return cx <= ex && cx >= -ex && cy <= ey && cy >= -ey;
     }
 
-    public dx(): number {
+    public deltaX(): number {
         return 2 * this.extents.x;
     }
 
-    public dy(): number {
+    public deltaY(): number {
         return 2 * this.extents.y;
     }
 
@@ -845,6 +794,11 @@ export class AABox2 implements ReadonlyAABox2 {
         return new AABox2(this.center, extents);
     }
 
+    public set(center: ReadonlyVector2, extents: ReadonlyVector2): void {
+        this.center = center;
+        this.extents = extents;
+    }
+
     public setEnclosePoint(box: ReadonlyAABox2, p: ReadonlyVector2): void {
         const pc = box.center;
         const ve = box.extents;
@@ -868,6 +822,11 @@ export class AABox2 implements ReadonlyAABox2 {
     public setFromXYWH(x: number, y: number, w: number, h: number): void {
         this.center = new Vector2(x, y);
         this.extents = new Vector2(0.5 * w, 0.5 * h);
+    }
+
+    public setToEmpty(): void {
+        this.center = Vector2.createZero();
+        this.extents = new Vector2(Number.NEGATIVE_INFINITY, Number.NEGATIVE_INFINITY);
     }
 
     public setUnion(box1: ReadonlyAABox2, box2: ReadonlyAABox2): void {
@@ -982,15 +941,15 @@ export class AABox3 implements ReadonlyAABox3 {
         return cx <= ex && cx >= -ex && cy <= ey && cy >= -ey && cz <= ez && cz >= -ez;
     }
 
-    public dx(): number {
+    public deltaX(): number {
         return 2 * this.extents.x;
     }
 
-    public dy(): number {
+    public deltaY(): number {
         return 2 * this.extents.y;
     }
 
-    public dz(): number {
+    public deltaZ(): number {
         return 2 * this.extents.z;
     }
 
@@ -1088,6 +1047,11 @@ export class AABox3 implements ReadonlyAABox3 {
         return new AABox3(this.center, extents);
     }
 
+    public set(center: ReadonlyVector3, extents: ReadonlyVector3): void {
+        this.center = center;
+        this.extents = extents;
+    }
+
     public setEnclosePoint(box: ReadonlyAABox3, p: ReadonlyVector3): void {
         const pc = box.center;
         const ve = box.extents;
@@ -1114,6 +1078,11 @@ export class AABox3 implements ReadonlyAABox3 {
     public setFromXYZWHD(x: number, y: number, z: number, w: number, h: number, d: number): void {
         this.center = new Vector3(x, y, z);
         this.extents = new Vector3(0.5 * w, 0.5 * h, 0.5 * d);
+    }
+
+    public setToEmpty(): void {
+        this.center = Vector3.createZero();
+        this.extents = new Vector3(Number.NEGATIVE_INFINITY, Number.NEGATIVE_INFINITY, Number.NEGATIVE_INFINITY);
     }
 
     public setUnion(box1: ReadonlyAABox3, box2: ReadonlyAABox3): void {
@@ -1230,11 +1199,11 @@ export class OBox2 implements ReadonlyOBox2 {
         return vc.x <= ex && vc.x >= -ex && vc.y <= ey && vc.y >= -ey;
     }
 
-    public dx(): number {
+    public deltaX(): number {
         return 2 * this.extents.x;
     }
 
-    public dy(): number {
+    public deltaY(): number {
         return 2 * this.extents.y;
     }
 
@@ -1319,6 +1288,18 @@ export class OBox2 implements ReadonlyOBox2 {
     public scaleRel(sx: number, sy: number): OBox2 {
         const extents = new Vector2(this.extents.x * sx, this.extents.y * sy);
         return new OBox2(this.center, extents, this.rotation);
+    }
+
+    public set(center: ReadonlyVector2, extents: ReadonlyVector2, rotation: ReadonlyComplex): void {
+        this.center = center;
+        this.extents = extents;
+        this.rotation = rotation;
+    }
+
+    public setToEmpty(): void {
+        this.center = Vector2.createZero();
+        this.extents = new Vector2(Number.NEGATIVE_INFINITY, Number.NEGATIVE_INFINITY);
+        this.rotation = Complex.createIdentity();
     }
 
     public toAABox(): AABox2 {
@@ -1456,15 +1437,15 @@ export class OBox3 implements ReadonlyOBox3 {
         return vc.x <= ex && vc.x >= -ex && vc.y <= ey && vc.y >= -ey && vc.z <= ez && vc.z >= -ez;
     }
 
-    public dx(): number {
+    public deltaX(): number {
         return 2 * this.extents.x;
     }
 
-    public dy(): number {
+    public deltaY(): number {
         return 2 * this.extents.y;
     }
 
-    public dz(): number {
+    public deltaZ(): number {
         return 2 * this.extents.z;
     }
 
@@ -1554,6 +1535,18 @@ export class OBox3 implements ReadonlyOBox3 {
     public scaleRel(sx: number, sy: number, sz: number): OBox3 {
         const extents = new Vector3(this.extents.x * sx, this.extents.y * sy, this.extents.z * sz);
         return new OBox3(this.center, extents, this.rotation);
+    }
+
+    public set(center: ReadonlyVector3, extents: ReadonlyVector3, rotation: ReadonlyQuaternion): void {
+        this.center = center;
+        this.extents = extents;
+        this.rotation = rotation;
+    }
+
+    public setToEmpty(): void {
+        this.center = Vector3.createZero();
+        this.extents = new Vector3(Number.NEGATIVE_INFINITY, Number.NEGATIVE_INFINITY, Number.NEGATIVE_INFINITY);
+        this.rotation = Quaternion.createIdentity();
     }
 
     public toAABox(): AABox3 {

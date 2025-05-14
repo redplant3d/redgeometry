@@ -18,7 +18,7 @@ export function setEncloseCurveAt(c: ReadonlyBezierCurve2, box: Box2, t: number)
     }
 
     const p = c.getValueAt(t);
-    box.setEnclose(box, p);
+    box.setEnclosePoint(box, p);
 }
 
 export function minimizeCurveDistanceAt(

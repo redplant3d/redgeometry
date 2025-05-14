@@ -469,7 +469,7 @@ export class Bezier2Curve2 implements ReadonlyBezier2Curve2 {
 
     public getControlBounds(): Box2 {
         const box = Box2.fromPoints(this.p0, this.p2);
-        box.setEnclose(box, this.p1);
+        box.setEnclosePoint(box, this.p1);
 
         return box;
     }
@@ -838,8 +838,8 @@ export class Bezier3Curve2 implements ReadonlyBezier3Curve2 {
 
     public getControlBounds(): Box2 {
         const box = Box2.fromPoints(this.p0, this.p3);
-        box.setEnclose(box, this.p1);
-        box.setEnclose(box, this.p2);
+        box.setEnclosePoint(box, this.p1);
+        box.setEnclosePoint(box, this.p2);
 
         return box;
     }
@@ -1239,7 +1239,7 @@ export class BezierRCurve2 implements ReadonlyBezierRCurve2 {
 
     public getControlBounds(): Box2 {
         const box = Box2.fromPoints(this.p0, this.p2);
-        box.setEnclose(box, this.p1);
+        box.setEnclosePoint(box, this.p1);
 
         return box;
     }

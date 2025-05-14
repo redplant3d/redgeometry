@@ -142,7 +142,7 @@ function renderSystem(world: World): void {
             const yCoord = boxOffset + y * (boxHeight + boxPadding);
             const box = Box2.fromXYWH(xCoord, yCoord, boxWidth, boxHeight);
             ctx.fillBox(box, color);
-            ctx.fillText(value.toFixed(3), box.getCenter(), "#FFFFFF");
+            ctx.fillText(value.toFixed(3), box.center(), "#FFFFFF");
             xNext++;
         }
     }

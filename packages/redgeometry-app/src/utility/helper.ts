@@ -226,11 +226,11 @@ export function createRandomPolygonSimple(
 ): Polygon2 {
     const result = Polygon2.createEmpty();
 
-    const center = box.getCenter();
+    const center = box.center();
     const angleStep = (2 * Math.PI) / count;
 
-    const w = 0.5 * box.dx();
-    const h = 0.5 * box.dy();
+    const w = 0.5 * box.deltaX();
+    const h = 0.5 * box.deltaY();
 
     for (let i = 0; i < count; i++) {
         const a = i * angleStep + angleStep * random.nextFloatBetween(0, irregularity);
