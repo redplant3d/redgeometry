@@ -1,8 +1,10 @@
 import { Polygon2EdgeIterator } from "../internal/iterator.js";
+import { isWindingInside } from "../internal/path.js";
 import { Box2 } from "../primitives/box.js";
 import { Edge2, type ReadonlyEdge2 } from "../primitives/edge.js";
 import type { ReadonlyMatrix3, ReadonlyMatrix3A } from "../primitives/matrix.js";
 import { Vector2, type ReadonlyVector2, type Vector2Like } from "../primitives/vector.js";
+import type { CustomWindingOperator, WindingOperator } from "./path-options.js";
 import { Path2 } from "./path.js";
 
 export type Polygon2Like = {
@@ -81,18 +83,22 @@ export class Polygon2 {
         return new Polygon2(points);
     }
 
-    public static isAreaIntersection(poly1: Polygon2, poly2: Polygon2, isNonZero: boolean): boolean {
+    public static isAreaIntersection(
+        poly1: Polygon2,
+        poly2: Polygon2,
+        windingOperator: WindingOperator | CustomWindingOperator,
+    ): boolean {
         if (Polygon2.isEdgeIntersection(poly1, poly2)) {
             // Polygons intersect
             return true;
         }
 
-        if (Polygon2.isPointInside(poly1, poly2.points[0], isNonZero)) {
+        if (Polygon2.isPointInside(poly1, poly2.points[0], windingOperator)) {
             // `poly2` is inside `poly1`
             return true;
         }
 
-        if (Polygon2.isPointInside(poly2, poly1.points[0], isNonZero)) {
+        if (Polygon2.isPointInside(poly2, poly1.points[0], windingOperator)) {
             // `poly1` is inside `poly2`
             return true;
         }
@@ -113,23 +119,27 @@ export class Polygon2 {
         return false;
     }
 
-    public static isPointInside(poly: Polygon2, p: ReadonlyVector2, isNonZero: boolean): boolean {
+    public static isPointInside(
+        poly: Polygon2,
+        p: ReadonlyVector2,
+        windingOperator: WindingOperator | CustomWindingOperator,
+    ): boolean {
         let wind = 0;
 
         for (const e of poly.getEdgeIterator()) {
             wind += e.toBezier().getWindingAt(p);
         }
 
-        if (!isNonZero) {
-            wind = wind & 1;
-        }
-
-        return wind !== 0;
+        return isWindingInside(wind, windingOperator);
     }
 
-    public static isPolygonInside(poly1: Polygon2, poly2: Polygon2, isNonZero = false): boolean {
+    public static isPolygonInside(
+        poly1: Polygon2,
+        poly2: Polygon2,
+        windingOperator: WindingOperator | CustomWindingOperator,
+    ): boolean {
         for (const p of poly2.points) {
-            if (!Polygon2.isPointInside(poly1, p, isNonZero)) {
+            if (!Polygon2.isPointInside(poly1, p, windingOperator)) {
                 return false;
             }
         }
