@@ -42,6 +42,8 @@ export interface ReadonlyVector2 {
     len(): number;
     lenSq(): number;
     lerp(v: ReadonlyVector2, t: number): Vector2;
+    max(v: ReadonlyVector2): Vector2;
+    min(v: ReadonlyVector2): Vector2;
     mul(v: ReadonlyVector2): Vector2;
     mulS(s: number): Vector2;
     neg(): Vector2;
@@ -79,6 +81,8 @@ export interface ReadonlyVector3 {
     len(): number;
     lenSq(): number;
     lerp(v: ReadonlyVector3, t: number): Vector3;
+    max(v: ReadonlyVector3): Vector3;
+    min(v: ReadonlyVector3): Vector3;
     mul(v: ReadonlyVector3): Vector3;
     mulS(s: number): Vector3;
     neg(): Vector3;
@@ -121,6 +125,8 @@ export interface ReadonlyVector4 {
     len(): number;
     lenSq(): number;
     lerp(v: ReadonlyVector4, t: number): Vector4;
+    max(v: ReadonlyVector4): Vector4;
+    min(v: ReadonlyVector4): Vector4;
     mul(v: ReadonlyVector4): Vector4;
     mulS(s: number): Vector4;
     neg(): Vector4;
@@ -384,6 +390,20 @@ export class Vector2 implements ReadonlyVector2 {
     public lerp(v: ReadonlyVector2, t: number): Vector2 {
         const x = lerp(this.x, v.x, t);
         const y = lerp(this.y, v.y, t);
+        return new Vector2(x, y);
+    }
+
+    public max(v: ReadonlyVector2): Vector2 {
+        const x = Math.max(this.x, v.x);
+        const y = Math.max(this.y, v.y);
+
+        return new Vector2(x, y);
+    }
+
+    public min(v: ReadonlyVector2): Vector2 {
+        const x = Math.min(this.x, v.x);
+        const y = Math.min(this.y, v.y);
+
         return new Vector2(x, y);
     }
 
@@ -725,6 +745,22 @@ export class Vector3 implements ReadonlyVector3 {
         const x = lerp(this.x, v.x, t);
         const y = lerp(this.y, v.y, t);
         const z = lerp(this.z, v.z, t);
+        return new Vector3(x, y, z);
+    }
+
+    public max(v: ReadonlyVector3): Vector3 {
+        const x = Math.max(this.x, v.x);
+        const y = Math.max(this.y, v.y);
+        const z = Math.max(this.z, v.z);
+
+        return new Vector3(x, y, z);
+    }
+
+    public min(v: ReadonlyVector3): Vector3 {
+        const x = Math.min(this.x, v.x);
+        const y = Math.min(this.y, v.y);
+        const z = Math.min(this.z, v.z);
+
         return new Vector3(x, y, z);
     }
 
@@ -1140,6 +1176,24 @@ export class Vector4 implements ReadonlyVector4 {
         const y = lerp(this.y, v.y, t);
         const z = lerp(this.z, v.z, t);
         const w = lerp(this.w, v.w, t);
+        return new Vector4(x, y, z, w);
+    }
+
+    public max(v: ReadonlyVector4): Vector4 {
+        const x = Math.max(this.x, v.x);
+        const y = Math.max(this.y, v.y);
+        const z = Math.max(this.z, v.z);
+        const w = Math.max(this.w, v.w);
+
+        return new Vector4(x, y, z, w);
+    }
+
+    public min(v: ReadonlyVector4): Vector4 {
+        const x = Math.min(this.x, v.x);
+        const y = Math.min(this.y, v.y);
+        const z = Math.min(this.z, v.z);
+        const w = Math.min(this.w, v.w);
+
         return new Vector4(x, y, z, w);
     }
 
