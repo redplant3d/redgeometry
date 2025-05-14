@@ -208,8 +208,8 @@ export class AppContextPlugin implements WorldPlugin {
     public drawRay(edge: ReadonlyRay2, style: CanvasStyle = "#000000", width = 1): void {
         const ctx = this.context;
         ctx.beginPath();
-        ctx.moveTo(edge.p.x, edge.p.y);
-        ctx.lineTo(edge.p.x + edge.v.x, edge.p.y + edge.v.y);
+        ctx.moveTo(edge.origin.x, edge.origin.y);
+        ctx.lineTo(edge.origin.x + edge.direction.x, edge.origin.y + edge.direction.y);
 
         ctx.save();
         ctx.lineJoin = "round";

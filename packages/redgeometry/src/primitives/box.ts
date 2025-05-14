@@ -305,16 +305,16 @@ export class Box2 implements ReadonlyBox2 {
         let tmin = Number.NEGATIVE_INFINITY;
         let tmax = Number.POSITIVE_INFINITY;
 
-        let d = 1 / ray.v.x;
-        let t0 = (this.x0 - ray.p.x) * d;
-        let t1 = (this.x1 - ray.p.x) * d;
+        let d = 1 / ray.direction.x;
+        let t0 = (this.x0 - ray.origin.x) * d;
+        let t1 = (this.x1 - ray.origin.x) * d;
 
         tmin = Math.max(Math.min(t0, t1), tmin);
         tmax = Math.min(Math.max(t0, t1), tmax);
 
-        d = 1 / ray.v.y;
-        t0 = (this.y0 - ray.p.y) * d;
-        t1 = (this.y1 - ray.p.y) * d;
+        d = 1 / ray.direction.y;
+        t0 = (this.y0 - ray.origin.y) * d;
+        t1 = (this.y1 - ray.origin.y) * d;
 
         tmin = Math.max(Math.min(t0, t1), tmin);
         tmax = Math.min(Math.max(t0, t1), tmax);
@@ -521,23 +521,23 @@ export class Box3 implements ReadonlyBox3 {
         let tmin = Number.NEGATIVE_INFINITY;
         let tmax = Number.POSITIVE_INFINITY;
 
-        let d = 1 / ray.v.x;
-        let t0 = (this.x0 - ray.p.x) * d;
-        let t1 = (this.x1 - ray.p.x) * d;
+        let d = 1 / ray.direction.x;
+        let t0 = (this.x0 - ray.origin.x) * d;
+        let t1 = (this.x1 - ray.origin.x) * d;
 
         tmin = Math.max(Math.min(t0, t1), tmin);
         tmax = Math.min(Math.max(t0, t1), tmax);
 
-        d = 1 / ray.v.y;
-        t0 = (this.y0 - ray.p.y) * d;
-        t1 = (this.y1 - ray.p.y) * d;
+        d = 1 / ray.direction.y;
+        t0 = (this.y0 - ray.origin.y) * d;
+        t1 = (this.y1 - ray.origin.y) * d;
 
         tmin = Math.max(Math.min(t0, t1), tmin);
         tmax = Math.min(Math.max(t0, t1), tmax);
 
-        d = 1 / ray.v.z;
-        t0 = (this.z0 - ray.p.z) * d;
-        t1 = (this.z1 - ray.p.z) * d;
+        d = 1 / ray.direction.z;
+        t0 = (this.z0 - ray.origin.z) * d;
+        t1 = (this.z1 - ray.origin.z) * d;
 
         tmin = Math.max(Math.min(t0, t1), tmin);
         tmax = Math.min(Math.max(t0, t1), tmax);

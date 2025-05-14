@@ -8,18 +8,18 @@ import {
 } from "./vector.js";
 
 export type Ray2Like = {
-    readonly p: Vector2Like;
-    readonly v: Vector2Like;
+    readonly origin: Vector2Like;
+    readonly direction: Vector2Like;
 };
 
 export type Ray3Like = {
-    readonly p: Vector3Like;
-    readonly v: Vector3Like;
+    readonly origin: Vector3Like;
+    readonly direction: Vector3Like;
 };
 
 export interface ReadonlyRay2 {
-    readonly p: ReadonlyVector2;
-    readonly v: ReadonlyVector2;
+    readonly direction: ReadonlyVector2;
+    readonly origin: ReadonlyVector2;
 
     clone(): Ray2;
     getParameterFromPoint(p: ReadonlyVector2): number;
@@ -33,8 +33,8 @@ export interface ReadonlyRay2 {
 }
 
 export interface ReadonlyRay3 {
-    readonly p: ReadonlyVector3;
-    readonly v: ReadonlyVector3;
+    readonly direction: ReadonlyVector3;
+    readonly origin: ReadonlyVector3;
 
     clone(): Ray3;
     getDistanceFromPoint(p: ReadonlyVector3): number;
@@ -49,25 +49,25 @@ export interface ReadonlyRay3 {
 }
 
 export class Ray2 implements ReadonlyRay2 {
-    public p: ReadonlyVector2;
-    public v: ReadonlyVector2;
+    public direction: ReadonlyVector2;
+    public origin: ReadonlyVector2;
 
-    public constructor(p: ReadonlyVector2, v: ReadonlyVector2) {
-        this.p = p;
-        this.v = v;
+    public constructor(origin: ReadonlyVector2, direction: ReadonlyVector2) {
+        this.origin = origin;
+        this.direction = direction;
     }
 
     public static fromArray(data: ArrayLike<number>, offset = 0): Ray2 {
-        const p = Vector2.fromArray(data, offset);
-        const v = Vector2.fromArray(data, offset + 2);
+        const origin = Vector2.fromArray(data, offset);
+        const direction = Vector2.fromArray(data, offset + 2);
 
-        return new Ray2(p, v);
+        return new Ray2(origin, direction);
     }
 
     public static fromObject(obj: Ray2Like): Ray2 {
-        const p = Vector2.fromObject(obj.p);
-        const v = Vector2.fromObject(obj.v);
-        return new Ray2(p, v);
+        const origin = Vector2.fromObject(obj.origin);
+        const direction = Vector2.fromObject(obj.direction);
+        return new Ray2(origin, direction);
     }
 
     public static fromPoints(p0: Vector2, p1: Vector2): Ray2 {
@@ -76,14 +76,14 @@ export class Ray2 implements ReadonlyRay2 {
     }
 
     public static fromXY(px: number, py: number, vx: number, vy: number): Ray2 {
-        const p = new Vector2(px, py);
-        const v = new Vector2(vx, vy);
-        return new Ray2(p, v);
+        const origin = new Vector2(px, py);
+        const direction = new Vector2(vx, vy);
+        return new Ray2(origin, direction);
     }
 
     public static getIntersection(ray1: ReadonlyRay2, ray2: ReadonlyRay2): Vector2 | undefined {
-        const v1 = ray1.v;
-        const v2 = ray2.v;
+        const v1 = ray1.direction;
+        const v2 = ray2.direction;
         const den = v1.cross(v2);
 
         if (den === 0) {
@@ -92,15 +92,15 @@ export class Ray2 implements ReadonlyRay2 {
         }
 
         // `t = (p2 − p1) cross v2 / (v1 cross v2)`
-        const v = ray2.p.sub(ray1.p);
-        const t = v.cross(ray2.v) / den;
+        const v = ray2.origin.sub(ray1.origin);
+        const t = v.cross(ray2.direction) / den;
 
         return ray1.getValueAt(t);
     }
 
     public static getIntersectionParameter(ray1: ReadonlyRay2, ray2: ReadonlyRay2): [number, number] {
-        const v1 = ray1.v;
-        const v2 = ray2.v;
+        const v1 = ray1.direction;
+        const v2 = ray2.direction;
         const den = v1.cross(v2);
 
         if (den === 0) {
@@ -110,7 +110,7 @@ export class Ray2 implements ReadonlyRay2 {
 
         // `t = (p2 − p1) cross v2 / (v1 cross v2)`
         // `u = (p2 − p1) cross v1 / (v1 cross v2)`
-        const v = ray2.p.sub(ray1.p);
+        const v = ray2.origin.sub(ray1.origin);
         const t = v.cross(v2) / den;
         const u = v.cross(v1) / den;
 
@@ -118,21 +118,21 @@ export class Ray2 implements ReadonlyRay2 {
     }
 
     public static toObject(ray: ReadonlyRay2): Ray2Like {
-        const p = Vector2.toObject(ray.p);
-        const v = Vector2.toObject(ray.v);
-        return { p, v };
+        const origin = Vector2.toObject(ray.origin);
+        const direction = Vector2.toObject(ray.direction);
+        return { origin, direction };
     }
 
     public clone(): Ray2 {
-        return new Ray2(this.p, this.v);
+        return new Ray2(this.origin, this.direction);
     }
 
     /**
      * Returns the parameterized value where a point `p` is orthogonal on the ray.
      */
     public getParameterFromPoint(p: ReadonlyVector2): number {
-        const v1 = this.v;
-        const v2 = p.sub(this.p);
+        const v1 = this.direction;
+        const v2 = p.sub(this.origin);
         return v1.dot(v2) / v1.lenSq();
     }
 
@@ -140,8 +140,8 @@ export class Ray2 implements ReadonlyRay2 {
      * Returns the signed distance to where a point `p` is orthogonal to the ray.
      */
     public getSignedDistanceFromPoint(p: ReadonlyVector2): number {
-        const v1 = this.v;
-        const v2 = this.p.sub(p);
+        const v1 = this.direction;
+        const v2 = this.origin.sub(p);
         return v1.cross(v2) / v1.len();
     }
 
@@ -149,72 +149,72 @@ export class Ray2 implements ReadonlyRay2 {
      * Returns the parameterized point on the ray along its direction.
      */
     public getValueAt(t: number): Vector2 {
-        return this.p.addMulS(this.v, t);
+        return this.origin.addMulS(this.direction, t);
     }
 
     public normal(): Ray2 {
-        return new Ray2(this.p, this.v.normal());
+        return new Ray2(this.origin, this.direction.normal());
     }
 
     public reverse(): Ray2 {
-        return new Ray2(this.p, this.v.neg());
+        return new Ray2(this.origin, this.direction.neg());
     }
 
-    public set(p: Vector2, v: Vector2): void {
-        this.p = p;
-        this.v = v;
+    public set(origin: Vector2, direction: Vector2): void {
+        this.origin = origin;
+        this.direction = direction;
     }
 
     public setXY(px: number, py: number, vx: number, vy: number): void {
-        this.p = new Vector2(px, py);
-        this.v = new Vector2(vx, vy);
+        this.origin = new Vector2(px, py);
+        this.direction = new Vector2(vx, vy);
     }
 
     public toArray(): [number, number, number, number] {
-        return [this.p.x, this.p.y, this.v.x, this.v.y];
+        return [this.origin.x, this.origin.y, this.direction.x, this.direction.y];
     }
 
     public toString(): string {
-        return `{p: ${this.p}, p: ${this.p}}`;
+        return `{p: ${this.origin}, p: ${this.origin}}`;
     }
 
     public translate(v: ReadonlyVector2): Ray2 {
-        const p = this.p.add(v);
-        return new Ray2(p, this.v);
+        const origin = this.origin.add(v);
+        return new Ray2(origin, this.direction);
     }
 }
 
 export class Ray3 implements ReadonlyRay3 {
-    public p: ReadonlyVector3;
-    public v: ReadonlyVector3;
+    public direction: ReadonlyVector3;
+    public origin: ReadonlyVector3;
 
-    public constructor(p: ReadonlyVector3, v: ReadonlyVector3) {
-        this.p = p;
-        this.v = v;
+    public constructor(origin: ReadonlyVector3, direction: ReadonlyVector3) {
+        this.origin = origin;
+        this.direction = direction;
     }
 
     public static fromArray(data: ArrayLike<number>, offset = 0): Ray3 {
-        const p = Vector3.fromArray(data, offset);
-        const v = Vector3.fromArray(data, offset + 3);
+        const origin = Vector3.fromArray(data, offset);
+        const direction = Vector3.fromArray(data, offset + 3);
 
-        return new Ray3(p, v);
+        return new Ray3(origin, direction);
     }
 
     public static fromObject(obj: Ray3Like): Ray3 {
-        const p = Vector3.fromObject(obj.p);
-        const v = Vector3.fromObject(obj.v);
-        return new Ray3(p, v);
+        const origin = Vector3.fromObject(obj.origin);
+        const direction = Vector3.fromObject(obj.direction);
+        return new Ray3(origin, direction);
     }
 
     public static fromPoints(p0: Vector3, p1: Vector3): Ray3 {
-        const v = p1.sub(p0);
-        return new Ray3(p0, v);
+        const direction = p1.sub(p0);
+        return new Ray3(p0, direction);
     }
 
     public static fromXYZ(px: number, py: number, pz: number, vx: number, vy: number, vz: number): Ray3 {
-        const p = new Vector3(px, py, pz);
-        const v = new Vector3(vx, vy, vz);
-        return new Ray3(p, v);
+        const origin = new Vector3(px, py, pz);
+        const direction = new Vector3(vx, vy, vz);
+        return new Ray3(origin, direction);
     }
 
     /**
@@ -227,7 +227,7 @@ export class Ray3 implements ReadonlyRay3 {
         // p1 + t1 * v1 = p2 + t2 * v2
         // t1 * v1 - t2 * v2 = p2 - p1
         // ```
-        const vc = ray1.v.cross(ray2.v);
+        const vc = ray1.direction.cross(ray2.direction);
         const den = vc.lenSq();
 
         if (den === 0) {
@@ -236,7 +236,7 @@ export class Ray3 implements ReadonlyRay3 {
         }
 
         // `v = p2 - p1`
-        const v = ray2.p.sub(ray1.p);
+        const v = ray2.origin.sub(ray1.origin);
 
         // We can elimate `t2` by applying the cross product with `v2` so that `v2 cross v2` vanishes:
         // ```
@@ -245,7 +245,7 @@ export class Ray3 implements ReadonlyRay3 {
         // t1 * (v1 cross v2) dot (v1 cross v2) = (v cross v2) dot (v1 cross v2)
         // t1 = ((v cross v2) dot (v1 cross v2)) / ((v1 cross v2) dot (v1 cross v2))
         // ```
-        const t1 = v.cross(ray2.v).dot(vc) / den;
+        const t1 = v.cross(ray2.direction).dot(vc) / den;
 
         // Similarly, we eliminate `t1` and use the anticommutativity property of the cross product:
         // ```
@@ -254,40 +254,40 @@ export class Ray3 implements ReadonlyRay3 {
         // t2 * (v1 cross v2) dot (v1 cross v2) = (v cross v1) dot (v1 cross v2)
         // t2 = ((v cross v1) dot (v1 cross v2)) / ((v1 cross v2) dot (v1 cross v2))
         // ```
-        const t2 = v.cross(ray1.v).dot(vc) / den;
+        const t2 = v.cross(ray1.direction).dot(vc) / den;
 
         return [t1, t2];
     }
 
     public static toObject(ray: ReadonlyRay3): Ray3Like {
-        const p = Vector3.toObject(ray.p);
-        const v = Vector3.toObject(ray.v);
-        return { p, v };
+        const origin = Vector3.toObject(ray.origin);
+        const direction = Vector3.toObject(ray.direction);
+        return { origin, direction };
     }
 
     public clone(): Ray3 {
-        return new Ray3(this.p, this.v);
+        return new Ray3(this.origin, this.direction);
     }
 
     /**
      * Returns the distance to where a point `p` is orthogonal to the ray.
      */
     public getDistanceFromPoint(p: ReadonlyVector3): number {
-        const v1 = this.v;
-        const v2 = this.p.sub(p);
+        const v1 = this.direction;
+        const v2 = this.origin.sub(p);
         return v1.cross(v2).len() / v1.len();
     }
 
     public getNormalAround(v: ReadonlyVector3): Ray3 {
-        return new Ray3(this.p, this.v.cross(v));
+        return new Ray3(this.origin, this.direction.cross(v));
     }
 
     /**
      * Returns the parameterized value where a point `p` is orthogonal on the ray.
      */
     public getParameterFromPoint(p: ReadonlyVector3): number {
-        const v1 = this.v;
-        const v2 = p.sub(this.p);
+        const v1 = this.direction;
+        const v2 = p.sub(this.origin);
         return v1.dot(v2) / v1.lenSq();
     }
 
@@ -295,37 +295,37 @@ export class Ray3 implements ReadonlyRay3 {
      * Returns the parameterized point on the ray along its direction.
      */
     public getValueAt(t: number): Vector3 {
-        return this.p.addMulS(this.v, t);
+        return this.origin.addMulS(this.direction, t);
     }
 
     public isFinite(): boolean {
-        return this.p.isFinite() && this.v.isFinite();
+        return this.origin.isFinite() && this.direction.isFinite();
     }
 
     public reverse(): Ray3 {
-        return new Ray3(this.p, this.v.neg());
+        return new Ray3(this.origin, this.direction.neg());
     }
 
-    public set(p: Vector3, v: Vector3): void {
-        this.p = p;
-        this.v = v;
+    public set(origin: Vector3, direction: Vector3): void {
+        this.origin = origin;
+        this.direction = direction;
     }
 
     public setXYZ(px: number, py: number, pz: number, vx: number, vy: number, vz: number): void {
-        this.p = new Vector3(px, py, pz);
-        this.v = new Vector3(vx, vy, vz);
+        this.origin = new Vector3(px, py, pz);
+        this.direction = new Vector3(vx, vy, vz);
     }
 
     public toArray(): [number, number, number, number, number, number] {
-        return [this.p.x, this.p.y, this.p.z, this.v.x, this.v.y, this.v.z];
+        return [this.origin.x, this.origin.y, this.origin.z, this.direction.x, this.direction.y, this.direction.z];
     }
 
     public toString(): string {
-        return `{p: ${this.p}, p: ${this.p}}`;
+        return `{p: ${this.origin}, p: ${this.origin}}`;
     }
 
     public translate(v: ReadonlyVector3): Ray3 {
-        const p = this.p.add(v);
-        return new Ray3(p, this.v);
+        const origin = this.origin.add(v);
+        return new Ray3(origin, this.direction);
     }
 }
