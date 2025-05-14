@@ -28,9 +28,22 @@ export class Polygon2 {
             }
         }
 
-        // Sort points by polar angle around p0
         const sorted = points.slice();
-        sorted.sort((pa, pb) => pa.sub(p0).angle() - pb.sub(p0).angle());
+        sorted.sort((pa, pb) => {
+            const v1 = pa.sub(p0);
+            const v2 = pb.sub(p0);
+
+            const a1 = v1.angle();
+            const a2 = v2.angle();
+
+            if (a1 !== a2) {
+                // Sort by polar angle around p0
+                return a1 - a2;
+            }
+
+            // Sort by distance
+            return v1.lenSq() - v2.lenSq();
+        });
 
         // Compute the convex hull (graham scan)
         const stack: ReadonlyVector2[] = [];
