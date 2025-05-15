@@ -11,6 +11,6 @@
         "typescript": ">=5.8"
     },
     "devDependencies": {
-        "@types/node": "^22.15.14"
+        "@types/node": "^22.15.18"
     }
 }
