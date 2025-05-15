@@ -2,7 +2,6 @@ import { lerp } from "../utility/scalar.js";
 import type { FixedSizeArray } from "../utility/types.js";
 import { Complex, type ComplexLike, type ReadonlyComplex } from "./complex.js";
 import type { ReadonlyMatrix3, ReadonlyMatrix3A, ReadonlyMatrix4, ReadonlyMatrix4A } from "./matrix.js";
-import { Matrix3A, Matrix4A } from "./matrix.js";
 import { Quaternion, type QuaternionLike, type ReadonlyQuaternion } from "./quaternion.js";
 import type { ReadonlyRay2, ReadonlyRay3 } from "./ray.js";
 import {
@@ -58,10 +57,13 @@ export interface ReadonlyMinMaxBox2 {
     readonly minX: number;
     readonly minY: number;
 
+    axisX(): Vector2;
+    axisY(): Vector2;
     center(): Vector2;
     clone(): MinMaxBox2;
     containsPoint(p: ReadonlyVector2, eps: number): boolean;
     extents(): Vector2;
+    getCorner(index: number): Vector2;
     intersects(b: ReadonlyMinMaxBox2, eps: number): boolean;
     intersectsRay(ray: ReadonlyRay2): boolean;
     isEmpty(): boolean;
@@ -85,10 +87,14 @@ export interface ReadonlyMinMaxBox3 {
     readonly minY: number;
     readonly minZ: number;
 
+    axisX(): Vector3;
+    axisY(): Vector3;
+    axisZ(): Vector3;
     center(): Vector3;
     clone(): MinMaxBox3;
     containsPoint(p: ReadonlyVector3, eps: number): boolean;
     extents(): Vector3;
+    getCorner(index: number): Vector3;
     intersects(b: ReadonlyMinMaxBox3, eps: number): boolean;
     intersectsRay(ray: ReadonlyRay3): boolean;
     isEmpty(): boolean;
@@ -114,8 +120,6 @@ export interface ReadonlyAxisAlignedBox2 {
     clone(): AxisAlignedBox2;
     containsPoint(p: ReadonlyVector2, eps: number): boolean;
     getCorner(index: number): Vector2;
-    getPoints(): FixedSizeArray<Vector2, 4>;
-    getTransform(): Matrix3A;
     intersects(box: AxisAlignedBox2, eps: number): boolean;
     isEmpty(): boolean;
     isPoint(): boolean;
@@ -125,7 +129,6 @@ export interface ReadonlyAxisAlignedBox2 {
     minY(): number;
     scaleAbs(sx: number, sy: number): AxisAlignedBox2;
     scaleRel(sx: number, sy: number): AxisAlignedBox2;
-    setEnclosePoint(box: ReadonlyAxisAlignedBox2, p: ReadonlyVector2): void;
     sizeX(): number;
     sizeY(): number;
     toArray(): FixedSizeArray<number, 4>;
@@ -144,8 +147,6 @@ export interface ReadonlyAxisAlignedBox3 {
     clone(): AxisAlignedBox3;
     containsPoint(p: ReadonlyVector3, eps: number): boolean;
     getCorner(index: number): Vector3;
-    getPoints(): FixedSizeArray<Vector3, 8>;
-    getTransform(): Matrix4A;
     intersects(box: AxisAlignedBox3, eps: number): boolean;
     isEmpty(): boolean;
     isPoint(): boolean;
@@ -157,7 +158,6 @@ export interface ReadonlyAxisAlignedBox3 {
     minZ(): number;
     scaleAbs(sx: number, sy: number, sz: number): AxisAlignedBox3;
     scaleRel(sx: number, sy: number, sz: number): AxisAlignedBox3;
-    setEnclosePoint(box: ReadonlyAxisAlignedBox3, p: ReadonlyVector3): void;
     sizeX(): number;
     sizeY(): number;
     sizeZ(): number;
@@ -177,8 +177,6 @@ export interface ReadonlyOrientedBox2 {
     clone(): OrientedBox2;
     containsPoint(p: ReadonlyVector2, eps: number): boolean;
     getCorner(index: number): Vector2;
-    getPoints(): FixedSizeArray<Vector2, 4>;
-    getTransform(): Matrix3A;
     intersects(box: OrientedBox2, eps: number): boolean;
     isEmpty(): boolean;
     isPoint(): boolean;
@@ -202,8 +200,6 @@ export interface ReadonlyOrientedBox3 {
     clone(): OrientedBox3;
     containsPoint(p: ReadonlyVector3, eps: number): boolean;
     getCorner(index: number): Vector3;
-    getPoints(): FixedSizeArray<Vector3, 8>;
-    getTransform(): Matrix4A;
     intersects(box: OrientedBox3, eps: number): boolean;
     isEmpty(): boolean;
     isPoint(): boolean;
@@ -277,6 +273,14 @@ export class MinMaxBox2 implements ReadonlyMinMaxBox2 {
         };
     }
 
+    public axisX(): Vector2 {
+        return Vector2.createUnitX();
+    }
+
+    public axisY(): Vector2 {
+        return Vector2.createUnitY();
+    }
+
     public center(): Vector2 {
         const x = lerp(0.5, this.minX, this.maxX);
         const y = lerp(0.5, this.minY, this.maxY);
@@ -302,6 +306,21 @@ export class MinMaxBox2 implements ReadonlyMinMaxBox2 {
         const y = 0.5 * (this.maxY - this.minY);
 
         return new Vector2(x, y);
+    }
+
+    public getCorner(index: number): Vector2 {
+        switch (index & 4) {
+            case 0:
+                return new Vector2(this.minX, this.minY);
+            case 1:
+                return new Vector2(this.maxX, this.minY);
+            case 2:
+                return new Vector2(this.minX, this.maxY);
+            case 3:
+                return new Vector2(this.maxX, this.maxY);
+        }
+
+        return Vector2.createZero();
     }
 
     public intersects(b: ReadonlyMinMaxBox2, eps: number): boolean {
@@ -510,6 +529,18 @@ export class MinMaxBox3 implements ReadonlyMinMaxBox3 {
         };
     }
 
+    public axisX(): Vector3 {
+        return Vector3.createUnitX();
+    }
+
+    public axisY(): Vector3 {
+        return Vector3.createUnitY();
+    }
+
+    public axisZ(): Vector3 {
+        return Vector3.createUnitY();
+    }
+
     public center(): Vector3 {
         const x = lerp(0.5, this.minX, this.maxX);
         const y = lerp(0.5, this.minY, this.maxY);
@@ -539,6 +570,29 @@ export class MinMaxBox3 implements ReadonlyMinMaxBox3 {
         const z = 0.5 * (this.maxZ - this.minZ);
 
         return new Vector3(x, y, z);
+    }
+
+    public getCorner(index: number): Vector3 {
+        switch (index & 8) {
+            case 0:
+                return new Vector3(this.minX, this.minY, this.minZ);
+            case 1:
+                return new Vector3(this.maxX, this.minY, this.minZ);
+            case 2:
+                return new Vector3(this.minX, this.maxY, this.minZ);
+            case 3:
+                return new Vector3(this.maxX, this.maxY, this.minZ);
+            case 4:
+                return new Vector3(this.minX, this.minY, this.maxZ);
+            case 5:
+                return new Vector3(this.maxX, this.minY, this.maxZ);
+            case 6:
+                return new Vector3(this.minX, this.maxY, this.maxZ);
+            case 7:
+                return new Vector3(this.maxX, this.maxY, this.maxZ);
+        }
+
+        return Vector3.createZero();
     }
 
     public intersects(b: ReadonlyMinMaxBox3, eps: number): boolean {
@@ -788,24 +842,6 @@ export class AxisAlignedBox2 implements ReadonlyAxisAlignedBox2 {
         return p;
     }
 
-    public getPoints(): FixedSizeArray<Vector2, 4> {
-        const points: Vector2[] = [];
-
-        for (let i = 0; i < 4; i++) {
-            const p = this.getCorner(i);
-            points.push(p);
-        }
-
-        return points as FixedSizeArray<Vector2, 4>;
-    }
-
-    public getTransform(): Matrix3A {
-        const mat = Matrix3A.fromScale(this.extents.x, this.extents.y);
-        mat.setTranslate(mat, this.center.x, this.center.y);
-
-        return mat;
-    }
-
     public intersects(box: ReadonlyAxisAlignedBox2, eps: number): boolean {
         const cx = box.center.x - this.center.x;
         const cy = box.center.y - this.center.y;
@@ -1021,24 +1057,6 @@ export class AxisAlignedBox3 implements ReadonlyAxisAlignedBox3 {
         p = this.center.add(p);
 
         return p;
-    }
-
-    public getPoints(): FixedSizeArray<Vector3, 8> {
-        const points: Vector3[] = [];
-
-        for (let i = 0; i < 8; i++) {
-            const p = this.getCorner(i);
-            points.push(p);
-        }
-
-        return points as FixedSizeArray<Vector3, 8>;
-    }
-
-    public getTransform(): Matrix4A {
-        const mat = Matrix4A.fromScale(this.extents.x, this.extents.y, this.extents.z);
-        mat.setTranslate(mat, this.center.x, this.center.y, this.center.z);
-
-        return mat;
     }
 
     public intersects(box: ReadonlyAxisAlignedBox3, eps: number): boolean {
@@ -1277,25 +1295,6 @@ export class OrientedBox2 implements ReadonlyOrientedBox2 {
         return p;
     }
 
-    public getPoints(): FixedSizeArray<Vector2, 4> {
-        const points: Vector2[] = [];
-
-        for (let i = 0; i < 4; i++) {
-            const p = this.getCorner(i);
-            points.push(p);
-        }
-
-        return points as FixedSizeArray<Vector2, 4>;
-    }
-
-    public getTransform(): Matrix3A {
-        const mat = Matrix3A.fromScale(this.extents.x, this.extents.y);
-        mat.setRotate(mat, this.rotation.a, this.rotation.b);
-        mat.setTranslate(mat, this.center.x, this.center.y);
-
-        return mat;
-    }
-
     public intersects(box: OrientedBox2, eps: number): boolean {
         const va1 = this.axisX();
         const va2 = box.axisX();
@@ -1514,25 +1513,6 @@ export class OrientedBox3 implements ReadonlyOrientedBox3 {
         p = this.center.add(p);
 
         return p;
-    }
-
-    public getPoints(): FixedSizeArray<Vector3, 8> {
-        const points: Vector3[] = [];
-
-        for (let i = 0; i < 8; i++) {
-            const p = this.getCorner(i);
-            points.push(p);
-        }
-
-        return points as FixedSizeArray<Vector3, 8>;
-    }
-
-    public getTransform(): Matrix4A {
-        const mat = Matrix4A.fromScale(this.extents.x, this.extents.y, this.extents.z);
-        mat.setRotate(mat, this.rotation.a, this.rotation.b, this.rotation.c, this.rotation.d);
-        mat.setTranslate(mat, this.center.x, this.center.y, this.center.z);
-
-        return mat;
     }
 
     public intersects(box: OrientedBox3, eps: number): boolean {
