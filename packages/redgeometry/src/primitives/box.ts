@@ -282,8 +282,8 @@ export class MinMaxBox2 implements ReadonlyMinMaxBox2 {
     }
 
     public center(): Vector2 {
-        const x = lerp(0.5, this.minX, this.maxX);
-        const y = lerp(0.5, this.minY, this.maxY);
+        const x = lerp(this.minX, this.maxX, 0.5);
+        const y = lerp(this.minY, this.maxY, 0.5);
 
         return new Vector2(x, y);
     }
@@ -302,8 +302,8 @@ export class MinMaxBox2 implements ReadonlyMinMaxBox2 {
     }
 
     public extents(): Vector2 {
-        const x = 0.5 * (this.maxX - this.minX);
-        const y = 0.5 * (this.maxY - this.minY);
+        const x = 0.5 * this.sizeX();
+        const y = 0.5 * this.sizeY();
 
         return new Vector2(x, y);
     }
@@ -542,9 +542,9 @@ export class MinMaxBox3 implements ReadonlyMinMaxBox3 {
     }
 
     public center(): Vector3 {
-        const x = lerp(0.5, this.minX, this.maxX);
-        const y = lerp(0.5, this.minY, this.maxY);
-        const z = lerp(0.5, this.minZ, this.maxZ);
+        const x = lerp(this.minX, this.maxX, 0.5);
+        const y = lerp(this.minY, this.maxY, 0.5);
+        const z = lerp(this.minZ, this.maxZ, 0.5);
 
         return new Vector3(x, y, z);
     }
@@ -565,9 +565,9 @@ export class MinMaxBox3 implements ReadonlyMinMaxBox3 {
     }
 
     public extents(): Vector3 {
-        const x = 0.5 * (this.maxX - this.minX);
-        const y = 0.5 * (this.maxY - this.minY);
-        const z = 0.5 * (this.maxZ - this.minZ);
+        const x = 0.5 * this.sizeX();
+        const y = 0.5 * this.sizeY();
+        const z = 0.5 * this.sizeZ();
 
         return new Vector3(x, y, z);
     }
