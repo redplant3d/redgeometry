@@ -1,4 +1,4 @@
-import { Box2 } from "redgeometry/src/primitives/box";
+import { MinMaxBox2 } from "redgeometry/src/primitives/box";
 import { log } from "redgeometry/src/utility/debug";
 import { RandomXSR128 } from "redgeometry/src/utility/random";
 import type { Immutable } from "redgeometry/src/utility/types";
@@ -140,7 +140,7 @@ function renderSystem(world: World): void {
         for (const value of values) {
             const xCoord = boxOffset + xNext * (boxWidth + boxPadding);
             const yCoord = boxOffset + y * (boxHeight + boxPadding);
-            const box = Box2.fromXYWH(xCoord, yCoord, boxWidth, boxHeight);
+            const box = MinMaxBox2.fromXYWH(xCoord, yCoord, boxWidth, boxHeight);
             ctx.fillBox(box, color);
             ctx.fillText(value.toFixed(3), box.center(), "#FFFFFF");
             xNext++;

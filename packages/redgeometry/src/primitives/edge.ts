@@ -1,7 +1,7 @@
 import { clamp } from "../utility/scalar.js";
 import { RootType, solveQuadratic } from "../utility/solve.js";
 import { Bezier1Curve2 } from "./bezier.js";
-import { Box2, Box3 } from "./box.js";
+import { MinMaxBox2, MinMaxBox3 } from "./box.js";
 import { Ray2, Ray3 } from "./ray.js";
 import {
     type ReadonlyVector2,
@@ -28,7 +28,7 @@ export interface ReadonlyEdge2 {
 
     clone(): Edge2;
     eq(e: ReadonlyEdge2): boolean;
-    getBounds(): Box2;
+    getBounds(): MinMaxBox2;
     getClosestPoint(p: ReadonlyVector2): Vector2;
     getClosestPointDistance(p: ReadonlyVector2): number;
     getParameterFromPoint(p: ReadonlyVector2): number;
@@ -53,7 +53,7 @@ export interface ReadonlyEdge3 {
 
     clone(): Edge3;
     eq(e: ReadonlyEdge3): boolean;
-    getBounds(): Box3;
+    getBounds(): MinMaxBox3;
     getClosestPoint(p: ReadonlyVector3): Vector3;
     getClosestPointDistance(p: ReadonlyVector3): number;
     getDistanceFromPoint(p: ReadonlyVector3): number;
@@ -350,8 +350,8 @@ export class Edge2 implements ReadonlyEdge2 {
         return this.p0.eq(e.p0) && this.p1.eq(e.p1);
     }
 
-    public getBounds(): Box2 {
-        return Box2.fromPoints(this.p0, this.p1);
+    public getBounds(): MinMaxBox2 {
+        return MinMaxBox2.fromPoints(this.p0, this.p1);
     }
 
     public getClosestParameter(p: ReadonlyVector2): number {
@@ -519,8 +519,8 @@ export class Edge3 implements ReadonlyEdge3 {
         return this.p0.eq(e.p0) && this.p1.eq(e.p1);
     }
 
-    public getBounds(): Box3 {
-        return Box3.fromPoints(this.p0, this.p1);
+    public getBounds(): MinMaxBox3 {
+        return MinMaxBox3.fromPoints(this.p0, this.p1);
     }
 
     public getClosestParameter(p: ReadonlyVector3): number {

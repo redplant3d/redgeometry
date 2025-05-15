@@ -1,6 +1,6 @@
 import { Path2 } from "redgeometry/src/core/path";
 import { WindingOperator } from "redgeometry/src/core/path-options";
-import { Box2, type ReadonlyBox2 } from "redgeometry/src/primitives/box";
+import { MinMaxBox2, type ReadonlyMinMaxBox2 } from "redgeometry/src/primitives/box";
 import { Vector2 } from "redgeometry/src/primitives/vector";
 import { RandomXSR128 } from "redgeometry/src/utility/random";
 import type { AppContextPlugin } from "../ecs-modules/app-context.js";
@@ -21,7 +21,7 @@ type AppPartMainData = {
 
 type AppPartRemoteData = {
     dataId: "app-part-remote";
-    bounds: ReadonlyBox2;
+    bounds: ReadonlyMinMaxBox2;
     input: Path2;
     isInside: boolean;
 };
@@ -47,7 +47,7 @@ function initMainSystem(world: World): void {
 function initRemoteSystem(world: World): void {
     world.writeData<AppPartRemoteData>({
         dataId: "app-part-remote",
-        bounds: Box2.createEmpty(),
+        bounds: MinMaxBox2.createEmpty(),
         input: Path2.createEmpty(),
         isInside: false,
     });

@@ -1,6 +1,6 @@
 import { Mesh2 } from "redgeometry/src/core/mesh";
 import { WindingOperator } from "redgeometry/src/core/path-options";
-import { Box2 } from "redgeometry/src/primitives/box";
+import { MinMaxBox2 } from "redgeometry/src/primitives/box";
 import { RandomXSR128 } from "redgeometry/src/utility/random";
 import type { AppContextPlugin } from "../ecs-modules/app-context.js";
 import { AppContextModule } from "../ecs-modules/app-context.js";
@@ -74,7 +74,7 @@ function updateSystem(world: World): void {
 
     const random = RandomXSR128.fromSeedLcg(seed);
     const [canvasWidth, canvasHeight] = ctx.getSize(false);
-    const box = new Box2(0, 0, canvasWidth, canvasHeight);
+    const box = new MinMaxBox2(0, 0, canvasWidth, canvasHeight);
 
     const tmax = time;
 

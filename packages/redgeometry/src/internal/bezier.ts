@@ -5,14 +5,14 @@ import type {
     ReadonlyBezierCurve2,
     ReadonlyBezierRCurve2,
 } from "../primitives/bezier.js";
-import type { Box2 } from "../primitives/box.js";
+import type { MinMaxBox2 } from "../primitives/box.js";
 import { Vector2, type ReadonlyVector2, type ReadonlyVector3 } from "../primitives/vector.js";
 import { log } from "../utility/debug.js";
 import { Interval } from "../utility/interval.js";
 import { lerp } from "../utility/scalar.js";
 import { RootType, solveCubic, solveQuadratic } from "../utility/solve.js";
 
-export function setEncloseCurveAt(c: ReadonlyBezierCurve2, box: Box2, t: number): void {
+export function setEncloseCurveAt(c: ReadonlyBezierCurve2, box: MinMaxBox2, t: number): void {
     if (!isInParameterRange(t)) {
         return;
     }

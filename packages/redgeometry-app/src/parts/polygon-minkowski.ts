@@ -1,5 +1,5 @@
 import { Polygon2 } from "redgeometry/src/core/polygon";
-import { Box2 } from "redgeometry/src/primitives/box";
+import { MinMaxBox2 } from "redgeometry/src/primitives/box";
 import { Matrix3A } from "redgeometry/src/primitives/matrix";
 import type { Vector2 } from "redgeometry/src/primitives/vector";
 import { RandomXSR128 } from "redgeometry/src/utility/random";
@@ -80,8 +80,8 @@ function updateSystem(world: World): void {
 
     const random = RandomXSR128.fromSeedLcg(seed);
 
-    const boxA = new Box2(-50, -50, 50, 50);
-    const boxB = new Box2(-50, -50, 50, 50);
+    const boxA = new MinMaxBox2(-50, -50, 50, 50);
+    const boxB = new MinMaxBox2(-50, -50, 50, 50);
 
     const polygonA = createRandomPolygonSimple(random, boxA, parameterA, 0.5, 1);
     const polygonB = createRandomPolygonSimple(random, boxB, parameterB, 0.5, 1);

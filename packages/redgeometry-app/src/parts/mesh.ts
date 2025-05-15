@@ -2,7 +2,7 @@ import { Mesh2 } from "redgeometry/src/core/mesh";
 import { Path2 } from "redgeometry/src/core/path";
 import { PathClip2 } from "redgeometry/src/core/path-clip";
 import { DEFAULT_PATH_CLIP_OPTIONS, DEFAULT_PATH_QUALITY_OPTIONS } from "redgeometry/src/core/path-options";
-import { Box2 } from "redgeometry/src/primitives/box";
+import { MinMaxBox2 } from "redgeometry/src/primitives/box";
 import type { ReadonlyVector2 } from "redgeometry/src/primitives/vector";
 import { RandomXSR128 } from "redgeometry/src/utility/random";
 import type { AppContextPlugin } from "../ecs-modules/app-context.js";
@@ -74,7 +74,7 @@ function updateSystem(world: World): void {
 
     const random = RandomXSR128.fromSeedLcg(seed);
     const [canvasWidth, canvasHeight] = ctx.getSize(false);
-    const box = new Box2(0, 0, canvasWidth, canvasHeight);
+    const box = new MinMaxBox2(0, 0, canvasWidth, canvasHeight);
 
     const p0 = createRandomPoint(random, box);
     const p1 = createRandomPoint(random, box);

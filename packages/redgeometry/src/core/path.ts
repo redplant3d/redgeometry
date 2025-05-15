@@ -1,7 +1,7 @@
 import { Path2CurveIterator } from "../internal/iterator.js";
 import { copyCommandsReversed, isWindingInside } from "../internal/path.js";
 import { CurveType, type ReadonlyBezierCurve2 } from "../primitives/bezier.js";
-import { Box2 } from "../primitives/box.js";
+import { MinMaxBox2 } from "../primitives/box.js";
 import { Matrix3A, type ReadonlyMatrix3, type ReadonlyMatrix3A } from "../primitives/matrix.js";
 import { Vector2, type ReadonlyVector2, type Vector2Like } from "../primitives/vector.js";
 import { copyArray, copyArrayReversed } from "../utility/array.js";
@@ -388,8 +388,8 @@ export class Path2 implements PathSink2 {
         return output;
     }
 
-    public getBounds(): Box2 {
-        const bounds = Box2.createEmpty();
+    public getBounds(): MinMaxBox2 {
+        const bounds = MinMaxBox2.createEmpty();
 
         for (const c of this.getCurveIterator()) {
             bounds.setUnion(bounds, c.getBounds());

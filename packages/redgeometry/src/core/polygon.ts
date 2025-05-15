@@ -1,6 +1,6 @@
 import { Polygon2EdgeIterator } from "../internal/iterator.js";
 import { isWindingInside } from "../internal/path.js";
-import { Box2 } from "../primitives/box.js";
+import { MinMaxBox2 } from "../primitives/box.js";
 import { Edge2, type ReadonlyEdge2 } from "../primitives/edge.js";
 import type { ReadonlyMatrix3, ReadonlyMatrix3A } from "../primitives/matrix.js";
 import { Vector2, type ReadonlyVector2, type Vector2Like } from "../primitives/vector.js";
@@ -205,7 +205,7 @@ export class Polygon2 {
         return closestEdge;
     }
 
-    public getBounds(): Box2 {
+    public getBounds(): MinMaxBox2 {
         let x0 = Number.POSITIVE_INFINITY;
         let y0 = Number.POSITIVE_INFINITY;
         let x1 = Number.NEGATIVE_INFINITY;
@@ -218,7 +218,7 @@ export class Polygon2 {
             y1 = Math.max(y1, p.y);
         }
 
-        return new Box2(x0, y0, x1, y1);
+        return new MinMaxBox2(x0, y0, x1, y1);
     }
 
     /**

@@ -1,7 +1,7 @@
 import type { Mesh2, MeshFace2 } from "redgeometry/src/core/mesh";
 import { Path2, PathCommandType } from "redgeometry/src/core/path";
 import { Polygon2 } from "redgeometry/src/core/polygon";
-import type { ReadonlyBox2 } from "redgeometry/src/primitives/box";
+import type { ReadonlyMinMaxBox2 } from "redgeometry/src/primitives/box";
 import { Edge2, type ReadonlyEdge2 } from "redgeometry/src/primitives/edge";
 import type { ReadonlyMatrix3A } from "redgeometry/src/primitives/matrix";
 import type { ReadonlyRay2 } from "redgeometry/src/primitives/ray";
@@ -87,7 +87,7 @@ export class AppContextPlugin implements WorldPlugin {
         return this.context.createPattern(canvas, "repeat");
     }
 
-    public drawBox(box: ReadonlyBox2, style: CanvasStyle = "#000000", width = 1): void {
+    public drawBox(box: ReadonlyMinMaxBox2, style: CanvasStyle = "#000000", width = 1): void {
         const ctx = this.context;
         ctx.save();
         ctx.lineWidth = width;
@@ -96,7 +96,7 @@ export class AppContextPlugin implements WorldPlugin {
         ctx.restore();
     }
 
-    public drawBoxes(boxes: ReadonlyBox2[], style: CanvasStyle = "#000000", width = 1): void {
+    public drawBoxes(boxes: ReadonlyMinMaxBox2[], style: CanvasStyle = "#000000", width = 1): void {
         const ctx = this.context;
         ctx.beginPath();
 
@@ -219,7 +219,7 @@ export class AppContextPlugin implements WorldPlugin {
         ctx.restore();
     }
 
-    public fillBox(box: ReadonlyBox2, style: CanvasStyle = "#000000"): void {
+    public fillBox(box: ReadonlyMinMaxBox2, style: CanvasStyle = "#000000"): void {
         const ctx = this.context;
         ctx.save();
         ctx.fillStyle = style;
@@ -227,7 +227,7 @@ export class AppContextPlugin implements WorldPlugin {
         ctx.restore();
     }
 
-    public fillBoxes(boxes: ReadonlyBox2[], style: CanvasStyle = "#000000"): void {
+    public fillBoxes(boxes: ReadonlyMinMaxBox2[], style: CanvasStyle = "#000000"): void {
         const ctx = this.context;
         ctx.beginPath();
 

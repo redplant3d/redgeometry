@@ -1,4 +1,4 @@
-import { Box2, type ReadonlyBox2 } from "redgeometry/src/primitives/box";
+import { MinMaxBox2, type ReadonlyMinMaxBox2 } from "redgeometry/src/primitives/box";
 import { assertUnreachable } from "redgeometry/src/utility/debug";
 import { RandomXSR128, type Random } from "redgeometry/src/utility/random";
 import { clamp } from "redgeometry/src/utility/scalar";
@@ -28,7 +28,7 @@ type AppPartMainData = {
 
 type AppPartRemoteData = {
     dataId: "app-part-remote";
-    boxes: ReadonlyBox2[];
+    boxes: ReadonlyMinMaxBox2[];
     image: Image2;
 };
 
@@ -110,7 +110,7 @@ function updateSystem(world: World): void {
         }
     }
 
-    let boxes: Box2[] = [];
+    let boxes: MinMaxBox2[] = [];
     let image = new Image2(0, 0);
 
     switch (format) {
@@ -161,13 +161,13 @@ function renderSystem(world: World): void {
     ctx.fillBoxes(boxes, "#000000");
 }
 
-function createBoxes(samples: number[], size: number, d: number): Box2[] {
-    const boxes: Box2[] = [];
+function createBoxes(samples: number[], size: number, d: number): MinMaxBox2[] {
+    const boxes: MinMaxBox2[] = [];
 
     for (let i = 0; i < samples.length; i += 2) {
         const sx = size * samples[i + 0];
         const sy = size * samples[i + 1];
-        const b = new Box2(sx - d, sy - d, sx + d, sy + d);
+        const b = new MinMaxBox2(sx - d, sy - d, sx + d, sy + d);
         boxes.push(b);
     }
 

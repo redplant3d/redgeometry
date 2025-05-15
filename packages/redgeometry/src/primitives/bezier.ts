@@ -9,7 +9,7 @@ import {
 } from "../internal/bezier.js";
 import { Interval } from "../utility/interval.js";
 import { RootType, solveCubic, solveLinear, solveQuadratic } from "../utility/solve.js";
-import { Box2 } from "./box.js";
+import { MinMaxBox2 } from "./box.js";
 import { Edge2 } from "./edge.js";
 import { Vector2, Vector3, type ReadonlyVector2, type ReadonlyVector3, type Vector2Like } from "./vector.js";
 
@@ -47,8 +47,8 @@ export interface ReadonlyBezier1Curve2 {
     readonly type: CurveType.Bezier1;
 
     clone(): Bezier1Curve2;
-    getBounds(): Box2;
-    getControlBounds(): Box2;
+    getBounds(): MinMaxBox2;
+    getControlBounds(): MinMaxBox2;
     getDerivative(): Vector2;
     getTangentEnd(): Vector2;
     getTangentStart(): Vector2;
@@ -76,10 +76,10 @@ export interface ReadonlyBezier2Curve2 {
     readonly type: CurveType.Bezier2;
 
     clone(): Bezier2Curve2;
-    getBounds(): Box2;
+    getBounds(): MinMaxBox2;
     getClosestParameter(p: ReadonlyVector2): number;
     getCoefficients(): [Vector2, Vector2, Vector2];
-    getControlBounds(): Box2;
+    getControlBounds(): MinMaxBox2;
     getCurvatureAt(t: number): number;
     getCurvatureMetric(): number;
     getDerivativeAt(t: number): Vector2;
@@ -116,9 +116,9 @@ export interface ReadonlyBezier3Curve2 {
     readonly type: CurveType.Bezier3;
 
     clone(): Bezier3Curve2;
-    getBounds(): Box2;
+    getBounds(): MinMaxBox2;
     getCoefficients(): [Vector2, Vector2, Vector2, Vector2];
-    getControlBounds(): Box2;
+    getControlBounds(): MinMaxBox2;
     getCurvatureAt(t: number): number;
     getCurvatureMetric(): number;
     getDerivativeAt(t: number): Vector2;
@@ -152,8 +152,8 @@ export interface ReadonlyBezierRCurve2 {
     readonly w: number;
 
     clone(): BezierRCurve2;
-    getBounds(): Box2;
-    getControlBounds(): Box2;
+    getBounds(): MinMaxBox2;
+    getControlBounds(): MinMaxBox2;
     getDerivativeAt(t: number): Vector2;
     getDerivativeCoefficients(): [Vector3, Vector3, Vector3];
     getProjectivePoints(): [Vector3, Vector3, Vector3];
@@ -234,12 +234,12 @@ export class Bezier1Curve2 implements ReadonlyBezier1Curve2 {
         return new Bezier1Curve2(this.p0, this.p1);
     }
 
-    public getBounds(): Box2 {
-        return Box2.fromPoints(this.p0, this.p1);
+    public getBounds(): MinMaxBox2 {
+        return MinMaxBox2.fromPoints(this.p0, this.p1);
     }
 
-    public getControlBounds(): Box2 {
-        return Box2.fromPoints(this.p0, this.p1);
+    public getControlBounds(): MinMaxBox2 {
+        return MinMaxBox2.fromPoints(this.p0, this.p1);
     }
 
     public getDerivative(): Vector2 {
@@ -406,8 +406,8 @@ export class Bezier2Curve2 implements ReadonlyBezier2Curve2 {
         return new Bezier2Curve2(this.p0, this.p1, this.p2);
     }
 
-    public getBounds(): Box2 {
-        const box = Box2.fromPoints(this.p0, this.p2);
+    public getBounds(): MinMaxBox2 {
+        const box = MinMaxBox2.fromPoints(this.p0, this.p2);
         const [qqa, qqb] = this.getDerivativeCoefficients();
 
         const tx = solveLinear(qqa.x, qqb.x);
@@ -467,8 +467,8 @@ export class Bezier2Curve2 implements ReadonlyBezier2Curve2 {
         return [qa, qb, qc];
     }
 
-    public getControlBounds(): Box2 {
-        const box = Box2.fromPoints(this.p0, this.p2);
+    public getControlBounds(): MinMaxBox2 {
+        const box = MinMaxBox2.fromPoints(this.p0, this.p2);
         box.setEnclosePoint(box, this.p1);
 
         return box;
@@ -800,8 +800,8 @@ export class Bezier3Curve2 implements ReadonlyBezier3Curve2 {
         return new Bezier3Curve2(this.p0, this.p1, this.p2, this.p3);
     }
 
-    public getBounds(): Box2 {
-        const box = Box2.fromPoints(this.p0, this.p3);
+    public getBounds(): MinMaxBox2 {
+        const box = MinMaxBox2.fromPoints(this.p0, this.p3);
         const [qqa, qqb, qqc] = this.getDerivativeCoefficients();
 
         const r1 = solveQuadratic(qqa.x, 0.5 * qqb.x, qqc.x);
@@ -836,8 +836,8 @@ export class Bezier3Curve2 implements ReadonlyBezier3Curve2 {
         return [qa, qb, qc, qd];
     }
 
-    public getControlBounds(): Box2 {
-        const box = Box2.fromPoints(this.p0, this.p3);
+    public getControlBounds(): MinMaxBox2 {
+        const box = MinMaxBox2.fromPoints(this.p0, this.p3);
         box.setEnclosePoint(box, this.p1);
         box.setEnclosePoint(box, this.p2);
 
@@ -1217,8 +1217,8 @@ export class BezierRCurve2 implements ReadonlyBezierRCurve2 {
         return new BezierRCurve2(this.p0, this.p1, this.p2, this.w);
     }
 
-    public getBounds(): Box2 {
-        const box = Box2.fromPoints(this.p0, this.p2);
+    public getBounds(): MinMaxBox2 {
+        const box = MinMaxBox2.fromPoints(this.p0, this.p2);
         const [qqa, qqb, qqc] = this.getDerivativeCoefficients();
 
         const r1 = solveQuadratic(qqa.x, 0.5 * qqb.x, qqc.x);
@@ -1237,8 +1237,8 @@ export class BezierRCurve2 implements ReadonlyBezierRCurve2 {
         return box;
     }
 
-    public getControlBounds(): Box2 {
-        const box = Box2.fromPoints(this.p0, this.p2);
+    public getControlBounds(): MinMaxBox2 {
+        const box = MinMaxBox2.fromPoints(this.p0, this.p2);
         box.setEnclosePoint(box, this.p1);
 
         return box;

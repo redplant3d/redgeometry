@@ -1,6 +1,6 @@
 import { SnapRound2, type EdgeSegment2 } from "redgeometry/src/core/snapround";
 import { Bezier1Curve2 } from "redgeometry/src/primitives/bezier";
-import { Box2, type ReadonlyBox2 } from "redgeometry/src/primitives/box";
+import { MinMaxBox2, type ReadonlyMinMaxBox2 } from "redgeometry/src/primitives/box";
 import { Edge2 } from "redgeometry/src/primitives/edge";
 import { Vector2, type ReadonlyVector2 } from "redgeometry/src/primitives/vector";
 import { log } from "redgeometry/src/utility/debug";
@@ -21,10 +21,10 @@ type AppPartMainData = {
 
 type AppPartRemoteData = {
     dataId: "app-part-remote";
-    errors: ReadonlyBox2[];
+    errors: ReadonlyMinMaxBox2[];
     inputSegments: Edge2[];
     intersections: ReadonlyVector2[];
-    magnets: ReadonlyBox2[];
+    magnets: ReadonlyMinMaxBox2[];
     outputSegments: Edge2[];
     pins: ReadonlyVector2[];
 };
@@ -226,14 +226,14 @@ function fillEdges(
     }
 }
 
-function transformBox(points: ReadonlyVector2[], scale: number): Box2[] {
-    const result: Box2[] = [];
+function transformBox(points: ReadonlyVector2[], scale: number): MinMaxBox2[] {
+    const result: MinMaxBox2[] = [];
 
     for (const point of points) {
         const x = Math.round(scale * (point.x - 0.5));
         const y = Math.round(scale * (point.y - 0.5));
         const d = Math.round(scale);
-        result.push(new Box2(x, y, x + d, y + d));
+        result.push(new MinMaxBox2(x, y, x + d, y + d));
     }
 
     return result;
