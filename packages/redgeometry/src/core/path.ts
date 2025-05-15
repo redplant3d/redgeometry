@@ -498,7 +498,7 @@ export class Path2 implements PathSink2 {
             const bounds = c.getControlBounds();
 
             // Quickly reject curves by their control bounds
-            if (p.y < bounds.y0 || p.y > bounds.y1 || p.x < bounds.x0) {
+            if (p.y < bounds.minY || p.y > bounds.maxY || p.x < bounds.minX) {
                 continue;
             }
 

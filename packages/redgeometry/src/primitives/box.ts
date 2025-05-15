@@ -15,19 +15,19 @@ import {
 } from "./vector.js";
 
 export type Box2Like = {
-    readonly x0: number;
-    readonly x1: number;
-    readonly y0: number;
-    readonly y1: number;
+    readonly minX: number;
+    readonly minY: number;
+    readonly maxX: number;
+    readonly maxY: number;
 };
 
 export type Box3Like = {
-    readonly x0: number;
-    readonly x1: number;
-    readonly y0: number;
-    readonly y1: number;
-    readonly z0: number;
-    readonly z1: number;
+    readonly minX: number;
+    readonly minY: number;
+    readonly minZ: number;
+    readonly maxX: number;
+    readonly maxY: number;
+    readonly maxZ: number;
 };
 
 export type AABox2Like = {
@@ -53,48 +53,54 @@ export type OBox3Like = {
 };
 
 export interface ReadonlyBox2 {
-    readonly x0: number;
-    readonly x1: number;
-    readonly y0: number;
-    readonly y1: number;
+    readonly maxX: number;
+    readonly maxY: number;
+    readonly minX: number;
+    readonly minY: number;
 
     center(): Vector2;
     clone(): Box2;
     containsPoint(p: ReadonlyVector2, eps: number): boolean;
-    deltaX(): number;
-    deltaY(): number;
+    extents(): Vector2;
     intersects(b: ReadonlyBox2, eps: number): boolean;
     intersectsRay(ray: ReadonlyRay2): boolean;
     isEmpty(): boolean;
     isPoint(): boolean;
     scaleAbs(dx: number, dy: number): Box2;
     scaleRel(fx: number, fy: number): Box2;
+    sizeX(): number;
+    sizeY(): number;
+    toAABox(): AABox2;
     toArray(): [number, number, number, number];
+    toOBox(): OBox2;
     toString(): string;
     transform(mat: ReadonlyMatrix3 | ReadonlyMatrix3A): Box2;
 }
 
 export interface ReadonlyBox3 {
-    readonly x0: number;
-    readonly x1: number;
-    readonly y0: number;
-    readonly y1: number;
-    readonly z0: number;
-    readonly z1: number;
+    readonly maxX: number;
+    readonly maxY: number;
+    readonly maxZ: number;
+    readonly minX: number;
+    readonly minY: number;
+    readonly minZ: number;
 
     center(): Vector3;
     clone(): Box3;
     containsPoint(p: ReadonlyVector3, eps: number): boolean;
-    deltaX(): number;
-    deltaY(): number;
-    deltaZ(): number;
+    extents(): Vector3;
     intersects(b: ReadonlyBox3, eps: number): boolean;
     intersectsRay(ray: ReadonlyRay3): boolean;
     isEmpty(): boolean;
     isPoint(): boolean;
     scaleAbs(dx: number, dy: number, dz: number): Box3;
     scaleRel(fx: number, fy: number, fz: number): Box3;
+    sizeX(): number;
+    sizeY(): number;
+    sizeZ(): number;
+    toAABox(): AABox3;
     toArray(): [number, number, number, number, number, number];
+    toOBox(): OBox3;
     toString(): string;
     transform(mat: ReadonlyMatrix4 | ReadonlyMatrix4A): Box3;
 }
@@ -107,8 +113,6 @@ export interface ReadonlyAABox2 {
     axisY(): Vector2;
     clone(): AABox2;
     containsPoint(p: ReadonlyVector2, eps: number): boolean;
-    deltaX(): number;
-    deltaY(): number;
     getCorner(index: number): Vector2;
     getPoints(): FixedSizeArray<Vector2, 4>;
     getTransform(): Matrix3A;
@@ -122,7 +126,10 @@ export interface ReadonlyAABox2 {
     scaleAbs(sx: number, sy: number): AABox2;
     scaleRel(sx: number, sy: number): AABox2;
     setEnclosePoint(box: ReadonlyAABox2, p: ReadonlyVector2): void;
+    sizeX(): number;
+    sizeY(): number;
     toArray(): FixedSizeArray<number, 4>;
+    toBox(): Box2;
     toOBox(): OBox2;
     toString(): string;
 }
@@ -136,9 +143,6 @@ export interface ReadonlyAABox3 {
     axisZ(): Vector3;
     clone(): AABox3;
     containsPoint(p: ReadonlyVector3, eps: number): boolean;
-    deltaX(): number;
-    deltaY(): number;
-    deltaZ(): number;
     getCorner(index: number): Vector3;
     getPoints(): FixedSizeArray<Vector3, 8>;
     getTransform(): Matrix4A;
@@ -154,7 +158,11 @@ export interface ReadonlyAABox3 {
     scaleAbs(sx: number, sy: number, sz: number): AABox3;
     scaleRel(sx: number, sy: number, sz: number): AABox3;
     setEnclosePoint(box: ReadonlyAABox3, p: ReadonlyVector3): void;
+    sizeX(): number;
+    sizeY(): number;
+    sizeZ(): number;
     toArray(): FixedSizeArray<number, 6>;
+    toBox(): Box3;
     toOBox(): OBox3;
     toString(): string;
 }
@@ -168,8 +176,6 @@ export interface ReadonlyOBox2 {
     axisY(): Vector2;
     clone(): OBox2;
     containsPoint(p: ReadonlyVector2, eps: number): boolean;
-    deltaX(): number;
-    deltaX(): number;
     getCorner(index: number): Vector2;
     getPoints(): FixedSizeArray<Vector2, 4>;
     getTransform(): Matrix3A;
@@ -178,6 +184,8 @@ export interface ReadonlyOBox2 {
     isPoint(): boolean;
     scaleAbs(sx: number, sy: number): OBox2;
     scaleRel(sx: number, sy: number): OBox2;
+    sizeX(): number;
+    sizeX(): number;
     toAABox(): AABox2;
     toArray(): FixedSizeArray<number, 6>;
     toString(): string;
@@ -193,9 +201,6 @@ export interface ReadonlyOBox3 {
     axisZ(): Vector3;
     clone(): OBox3;
     containsPoint(p: ReadonlyVector3, eps: number): boolean;
-    deltaX(): number;
-    deltaY(): number;
-    deltaZ(): number;
     getCorner(index: number): Vector3;
     getPoints(): FixedSizeArray<Vector3, 8>;
     getTransform(): Matrix4A;
@@ -204,22 +209,25 @@ export interface ReadonlyOBox3 {
     isPoint(): boolean;
     scaleAbs(sx: number, sy: number, sz: number): OBox3;
     scaleRel(sx: number, sy: number, sz: number): OBox3;
+    sizeX(): number;
+    sizeY(): number;
+    sizeZ(): number;
     toAABox(): AABox3;
     toArray(): FixedSizeArray<number, 10>;
     toString(): string;
 }
 
 export class Box2 implements ReadonlyBox2 {
-    public x0: number;
-    public x1: number;
-    public y0: number;
-    public y1: number;
+    public maxX: number;
+    public maxY: number;
+    public minX: number;
+    public minY: number;
 
-    public constructor(x0: number, y0: number, x1: number, y1: number) {
-        this.x0 = x0;
-        this.y0 = y0;
-        this.x1 = x1;
-        this.y1 = y1;
+    public constructor(minX: number, minY: number, maxX: number, maxY: number) {
+        this.minX = minX;
+        this.minY = minY;
+        this.maxX = maxX;
+        this.maxY = maxY;
     }
 
     /**
@@ -239,64 +247,68 @@ export class Box2 implements ReadonlyBox2 {
     }
 
     public static fromObject(obj: Box2Like): Box2 {
-        return new Box2(obj.x0, obj.y0, obj.x1, obj.y1);
+        return new Box2(obj.minX, obj.minY, obj.maxX, obj.maxY);
     }
 
     public static fromPoints(p0: ReadonlyVector2, p1: ReadonlyVector2): Box2 {
-        const x0 = Math.min(p0.x, p1.x);
-        const y0 = Math.min(p0.y, p1.y);
-        const x1 = Math.max(p0.x, p1.x);
-        const y1 = Math.max(p0.y, p1.y);
+        const minX = Math.min(p0.x, p1.x);
+        const minY = Math.min(p0.y, p1.y);
+        const maxX = Math.max(p0.x, p1.x);
+        const maxY = Math.max(p0.y, p1.y);
 
-        return new Box2(x0, y0, x1, y1);
+        return new Box2(minX, minY, maxX, maxY);
     }
 
     public static fromXYWH(x: number, y: number, w: number, h: number): Box2 {
-        const x0 = Math.min(x, x + w);
-        const y0 = Math.min(y, y + h);
-        const x1 = Math.max(x, x + w);
-        const y1 = Math.max(y, y + h);
+        const minX = Math.min(x, x + w);
+        const minY = Math.min(y, y + h);
+        const maxX = Math.max(x, x + w);
+        const maxY = Math.max(y, y + h);
 
-        return new Box2(x0, y0, x1, y1);
+        return new Box2(minX, minY, maxX, maxY);
     }
 
     public static toObject(box: ReadonlyBox2): Box2Like {
-        return { x0: box.x0, y0: box.y0, x1: box.x1, y1: box.y1 };
+        return {
+            minX: box.minX,
+            minY: box.minY,
+            maxX: box.maxX,
+            maxY: box.maxY,
+        };
     }
 
     public center(): Vector2 {
-        const x = lerp(0.5, this.x0, this.x1);
-        const y = lerp(0.5, this.y0, this.y1);
+        const x = lerp(0.5, this.minX, this.maxX);
+        const y = lerp(0.5, this.minY, this.maxY);
 
         return new Vector2(x, y);
     }
 
     public clone(): Box2 {
-        return new Box2(this.x0, this.y0, this.x1, this.y1);
+        return new Box2(this.minX, this.minY, this.maxX, this.maxY);
     }
 
     public containsPoint(p: ReadonlyVector2, eps: number): boolean {
-        const x0 = this.x0 - p.x;
-        const y0 = this.y0 - p.y;
-        const x1 = p.x - this.x1;
-        const y1 = p.y - this.y1;
+        const x0 = this.minX - p.x;
+        const y0 = this.minY - p.y;
+        const x1 = p.x - this.maxX;
+        const y1 = p.y - this.maxY;
 
         return x0 <= eps && x1 <= eps && y0 <= eps && y1 <= eps;
     }
 
-    public deltaX(): number {
-        return this.x1 - this.x0;
-    }
+    public extents(): Vector2 {
+        const x = 0.5 * (this.maxX - this.minX);
+        const y = 0.5 * (this.maxY - this.minY);
 
-    public deltaY(): number {
-        return this.y1 - this.y0;
+        return new Vector2(x, y);
     }
 
     public intersects(b: ReadonlyBox2, eps: number): boolean {
-        const x0 = this.x0 - b.x1;
-        const y0 = this.y0 - b.y1;
-        const x1 = b.x0 - this.x1;
-        const y1 = b.y0 - this.y1;
+        const x0 = this.minX - b.maxX;
+        const y0 = this.minY - b.maxY;
+        const x1 = b.minX - this.maxX;
+        const y1 = b.minY - this.maxY;
 
         return x0 <= eps && x1 <= eps && y0 <= eps && y1 <= eps;
     }
@@ -306,15 +318,15 @@ export class Box2 implements ReadonlyBox2 {
         let tmax = Number.POSITIVE_INFINITY;
 
         let d = 1 / ray.direction.x;
-        let t0 = (this.x0 - ray.origin.x) * d;
-        let t1 = (this.x1 - ray.origin.x) * d;
+        let t0 = (this.minX - ray.origin.x) * d;
+        let t1 = (this.maxX - ray.origin.x) * d;
 
         tmin = Math.max(Math.min(t0, t1), tmin);
         tmax = Math.min(Math.max(t0, t1), tmax);
 
         d = 1 / ray.direction.y;
-        t0 = (this.y0 - ray.origin.y) * d;
-        t1 = (this.y1 - ray.origin.y) * d;
+        t0 = (this.minY - ray.origin.y) * d;
+        t1 = (this.maxY - ray.origin.y) * d;
 
         tmin = Math.max(Math.min(t0, t1), tmin);
         tmax = Math.min(Math.max(t0, t1), tmax);
@@ -323,36 +335,36 @@ export class Box2 implements ReadonlyBox2 {
     }
 
     public isEmpty(): boolean {
-        return this.x0 > this.x1 || this.y0 > this.y1;
+        return this.minX > this.maxX || this.minY > this.maxY;
     }
 
     public isPoint(): boolean {
-        return this.x0 === this.x1 && this.y0 === this.y1;
+        return this.minX === this.maxX && this.minY === this.maxY;
     }
 
     public scaleAbs(sx: number, sy: number): Box2 {
-        return new Box2(this.x0 - sx, this.y0 - sy, this.x1 + sx, this.y1 + sy);
+        return new Box2(this.minX - sx, this.minY - sy, this.maxX + sx, this.maxY + sy);
     }
 
     public scaleRel(sx: number, sy: number): Box2 {
-        const ssx = 0.5 * (sx - 1) * this.deltaX();
-        const ssy = 0.5 * (sy - 1) * this.deltaY();
+        const ssx = 0.5 * (sx - 1) * this.sizeX();
+        const ssy = 0.5 * (sy - 1) * this.sizeY();
 
         return this.scaleAbs(ssx, ssy);
     }
 
-    public set(x0: number, y0: number, x1: number, y1: number): void {
-        this.x0 = x0;
-        this.y0 = y0;
-        this.x1 = x1;
-        this.y1 = y1;
+    public set(minX: number, minY: number, maxX: number, maxY: number): void {
+        this.minX = minX;
+        this.minY = minY;
+        this.maxX = maxX;
+        this.maxY = maxY;
     }
 
     public setEnclosePoint(box: ReadonlyBox2, p: ReadonlyVector2): void {
-        this.x0 = Math.min(box.x0, p.x);
-        this.y0 = Math.min(box.y0, p.y);
-        this.x1 = Math.max(box.x1, p.x);
-        this.y1 = Math.max(box.y1, p.y);
+        this.minX = Math.min(box.minX, p.x);
+        this.minY = Math.min(box.minY, p.y);
+        this.maxX = Math.max(box.maxX, p.x);
+        this.maxY = Math.max(box.maxY, p.y);
     }
 
     public setEnclosePointTransform(
@@ -374,46 +386,66 @@ export class Box2 implements ReadonlyBox2 {
     }
 
     public setUnion(box1: ReadonlyBox2, box2: ReadonlyBox2): void {
-        this.x0 = Math.min(box1.x0, box2.x0);
-        this.y0 = Math.min(box1.y0, box2.y0);
-        this.x1 = Math.max(box1.x1, box2.x1);
-        this.y1 = Math.max(box1.y1, box2.y1);
+        this.minX = Math.min(box1.minX, box2.minX);
+        this.minY = Math.min(box1.minY, box2.minY);
+        this.maxX = Math.max(box1.maxX, box2.maxX);
+        this.maxY = Math.max(box1.maxY, box2.maxY);
+    }
+
+    public sizeX(): number {
+        return this.maxX - this.minX;
+    }
+
+    public sizeY(): number {
+        return this.maxY - this.minY;
+    }
+
+    public toAABox(): AABox2 {
+        return new AABox2(this.center(), this.extents());
     }
 
     public toArray(): [number, number, number, number] {
-        return [this.x0, this.y0, this.x1, this.y1];
+        return [this.minX, this.minY, this.maxX, this.maxY];
+    }
+
+    public toOBox(): OBox2 {
+        return new OBox2(this.center(), this.extents(), Complex.IDENTITY);
     }
 
     public toString(): string {
-        return `{x0: ${this.x0}, y0: ${this.y0}, x1: ${this.x1}, y1: ${this.y1}}`;
+        // prettier-ignore
+        return (
+            `{minX: ${this.minX}, minY: ${this.minY},\n` +
+            ` maxX: ${this.maxX}, maxY: ${this.maxY}}`
+        );
     }
 
     public transform(mat: ReadonlyMatrix3 | ReadonlyMatrix3A): Box2 {
         const box = Box2.createEmpty();
-        box.setEnclosePointTransform(box, new Vector2(this.x0, this.y0), mat);
-        box.setEnclosePointTransform(box, new Vector2(this.x0, this.y1), mat);
-        box.setEnclosePointTransform(box, new Vector2(this.x1, this.y0), mat);
-        box.setEnclosePointTransform(box, new Vector2(this.x1, this.y1), mat);
+        box.setEnclosePointTransform(box, new Vector2(this.minX, this.minY), mat);
+        box.setEnclosePointTransform(box, new Vector2(this.minX, this.maxY), mat);
+        box.setEnclosePointTransform(box, new Vector2(this.maxX, this.minY), mat);
+        box.setEnclosePointTransform(box, new Vector2(this.maxX, this.maxY), mat);
 
         return box;
     }
 }
 
 export class Box3 implements ReadonlyBox3 {
-    public x0: number;
-    public x1: number;
-    public y0: number;
-    public y1: number;
-    public z0: number;
-    public z1: number;
+    public maxX: number;
+    public maxY: number;
+    public maxZ: number;
+    public minX: number;
+    public minY: number;
+    public minZ: number;
 
-    public constructor(x0: number, y0: number, z0: number, x1: number, y1: number, z1: number) {
-        this.x0 = x0;
-        this.y0 = y0;
-        this.z0 = z0;
-        this.x1 = x1;
-        this.y1 = y1;
-        this.z1 = z1;
+    public constructor(minX: number, minY: number, minZ: number, maxX: number, maxY: number, maxZ: number) {
+        this.minX = minX;
+        this.minY = minY;
+        this.minZ = minZ;
+        this.maxX = maxX;
+        this.maxY = maxY;
+        this.maxZ = maxZ;
     }
 
     /**
@@ -442,77 +474,80 @@ export class Box3 implements ReadonlyBox3 {
     }
 
     public static fromObject(obj: Box3Like): Box3 {
-        return new Box3(obj.x0, obj.y0, obj.z0, obj.x1, obj.y1, obj.z1);
+        return new Box3(obj.minX, obj.minY, obj.minZ, obj.maxX, obj.maxY, obj.maxZ);
     }
 
     public static fromPoints(p0: ReadonlyVector3, p1: ReadonlyVector3): Box3 {
-        const x0 = Math.min(p0.x, p1.x);
-        const y0 = Math.min(p0.y, p1.y);
-        const z0 = Math.min(p0.z, p1.z);
-        const x1 = Math.max(p0.x, p1.x);
-        const y1 = Math.max(p0.y, p1.y);
-        const z1 = Math.max(p0.z, p1.z);
+        const minX = Math.min(p0.x, p1.x);
+        const minY = Math.min(p0.y, p1.y);
+        const minZ = Math.min(p0.z, p1.z);
+        const maxX = Math.max(p0.x, p1.x);
+        const maxY = Math.max(p0.y, p1.y);
+        const maxZ = Math.max(p0.z, p1.z);
 
-        return new Box3(x0, y0, z0, x1, y1, z1);
+        return new Box3(minX, minY, minZ, maxX, maxY, maxZ);
     }
 
     public static fromXYZWHD(x: number, y: number, z: number, w: number, h: number, d: number): Box3 {
-        const x0 = Math.min(x, x + w);
-        const y0 = Math.min(y, y + h);
-        const z0 = Math.min(z, z + d);
-        const x1 = Math.max(x, x + w);
-        const y1 = Math.max(y, y + h);
-        const z1 = Math.max(z, z + d);
+        const minX = Math.min(x, x + w);
+        const minY = Math.min(y, y + h);
+        const minZ = Math.min(z, z + d);
+        const maxX = Math.max(x, x + w);
+        const maxY = Math.max(y, y + h);
+        const maxZ = Math.max(z, z + d);
 
-        return new Box3(x0, y0, z0, x1, y1, z1);
+        return new Box3(minX, minY, minZ, maxX, maxY, maxZ);
     }
 
     public static toObject(box: ReadonlyBox3): Box3Like {
-        return { x0: box.x0, y0: box.y0, z0: box.z0, x1: box.x1, y1: box.y1, z1: box.z1 };
+        return {
+            minX: box.minX,
+            minY: box.minY,
+            minZ: box.minZ,
+            maxX: box.maxX,
+            maxY: box.maxY,
+            maxZ: box.maxZ,
+        };
     }
 
     public center(): Vector3 {
-        const x = lerp(0.5, this.x0, this.x1);
-        const y = lerp(0.5, this.y0, this.y1);
-        const z = lerp(0.5, this.z0, this.z1);
+        const x = lerp(0.5, this.minX, this.maxX);
+        const y = lerp(0.5, this.minY, this.maxY);
+        const z = lerp(0.5, this.minZ, this.maxZ);
 
         return new Vector3(x, y, z);
     }
 
     public clone(): Box3 {
-        return new Box3(this.x0, this.y0, this.z0, this.x1, this.y1, this.z1);
+        return new Box3(this.minX, this.minY, this.minZ, this.maxX, this.maxY, this.maxZ);
     }
 
     public containsPoint(p: ReadonlyVector3, eps: number): boolean {
-        const x0 = this.x0 - p.x;
-        const y0 = this.y0 - p.y;
-        const z0 = this.z0 - p.z;
-        const x1 = p.x - this.x1;
-        const y1 = p.y - this.y1;
-        const z1 = p.z - this.z1;
+        const x0 = this.minX - p.x;
+        const y0 = this.minY - p.y;
+        const z0 = this.minZ - p.z;
+        const x1 = p.x - this.maxX;
+        const y1 = p.y - this.maxY;
+        const z1 = p.z - this.maxZ;
 
         return x0 <= eps && x1 <= eps && y0 <= eps && y1 <= eps && z0 <= eps && z1 <= eps;
     }
 
-    public deltaX(): number {
-        return this.x1 - this.x0;
-    }
+    public extents(): Vector3 {
+        const x = 0.5 * (this.maxX - this.minX);
+        const y = 0.5 * (this.maxY - this.minY);
+        const z = 0.5 * (this.maxZ - this.minZ);
 
-    public deltaY(): number {
-        return this.y1 - this.y0;
-    }
-
-    public deltaZ(): number {
-        return this.z1 - this.z0;
+        return new Vector3(x, y, z);
     }
 
     public intersects(b: ReadonlyBox3, eps: number): boolean {
-        const x0 = this.x0 - b.x1;
-        const y0 = this.y0 - b.y1;
-        const z0 = this.z0 - b.z1;
-        const x1 = b.x0 - this.x1;
-        const y1 = b.y0 - this.y1;
-        const z1 = b.z0 - this.z1;
+        const x0 = this.minX - b.maxX;
+        const y0 = this.minY - b.maxY;
+        const z0 = this.minZ - b.maxZ;
+        const x1 = b.minX - this.maxX;
+        const y1 = b.minY - this.maxY;
+        const z1 = b.minZ - this.maxZ;
 
         return x0 <= eps && x1 <= eps && y0 <= eps && y1 <= eps && z0 <= eps && z1 <= eps;
     }
@@ -522,22 +557,22 @@ export class Box3 implements ReadonlyBox3 {
         let tmax = Number.POSITIVE_INFINITY;
 
         let d = 1 / ray.direction.x;
-        let t0 = (this.x0 - ray.origin.x) * d;
-        let t1 = (this.x1 - ray.origin.x) * d;
+        let t0 = (this.minX - ray.origin.x) * d;
+        let t1 = (this.maxX - ray.origin.x) * d;
 
         tmin = Math.max(Math.min(t0, t1), tmin);
         tmax = Math.min(Math.max(t0, t1), tmax);
 
         d = 1 / ray.direction.y;
-        t0 = (this.y0 - ray.origin.y) * d;
-        t1 = (this.y1 - ray.origin.y) * d;
+        t0 = (this.minY - ray.origin.y) * d;
+        t1 = (this.maxY - ray.origin.y) * d;
 
         tmin = Math.max(Math.min(t0, t1), tmin);
         tmax = Math.min(Math.max(t0, t1), tmax);
 
         d = 1 / ray.direction.z;
-        t0 = (this.z0 - ray.origin.z) * d;
-        t1 = (this.z1 - ray.origin.z) * d;
+        t0 = (this.minZ - ray.origin.z) * d;
+        t1 = (this.maxZ - ray.origin.z) * d;
 
         tmin = Math.max(Math.min(t0, t1), tmin);
         tmax = Math.min(Math.max(t0, t1), tmax);
@@ -546,41 +581,41 @@ export class Box3 implements ReadonlyBox3 {
     }
 
     public isEmpty(): boolean {
-        return this.x0 > this.x1 || this.y0 > this.y1 || this.z0 > this.z1;
+        return this.minX > this.maxX || this.minY > this.maxY || this.minZ > this.maxZ;
     }
 
     public isPoint(): boolean {
-        return this.x0 === this.x1 && this.y0 === this.y1 && this.z0 === this.z1;
+        return this.minX === this.maxX && this.minY === this.maxY && this.minZ === this.maxZ;
     }
 
     public scaleAbs(sx: number, sy: number, sz: number): Box3 {
-        return new Box3(this.x0 - sx, this.y0 - sy, this.z0 - sz, this.x1 + sx, this.y1 + sy, this.z1 + sz);
+        return new Box3(this.minX - sx, this.minY - sy, this.maxX + sx, this.maxY + sy, this.maxZ + sz, this.maxZ + sz);
     }
 
     public scaleRel(sx: number, sy: number, sz: number): Box3 {
-        const ssx = 0.5 * (sx - 1) * this.deltaX();
-        const ssy = 0.5 * (sy - 1) * this.deltaY();
-        const ssz = 0.5 * (sz - 1) * this.deltaZ();
+        const ssx = 0.5 * (sx - 1) * this.sizeX();
+        const ssy = 0.5 * (sy - 1) * this.sizeY();
+        const ssz = 0.5 * (sz - 1) * this.sizeZ();
 
         return this.scaleAbs(ssx, ssy, ssz);
     }
 
-    public set(x0: number, y0: number, z0: number, x1: number, y1: number, z1: number): void {
-        this.x0 = x0;
-        this.y0 = y0;
-        this.z0 = z0;
-        this.x1 = x1;
-        this.y1 = y1;
-        this.z1 = z1;
+    public set(minX: number, minY: number, minZ: number, maxX: number, maxY: number, maxZ: number): void {
+        this.minX = minX;
+        this.minY = minY;
+        this.minZ = minZ;
+        this.maxX = maxX;
+        this.maxY = maxY;
+        this.maxZ = maxZ;
     }
 
     public setEnclosePoint(box: ReadonlyBox3, p: ReadonlyVector3): void {
-        this.x0 = Math.min(box.x0, p.x);
-        this.y0 = Math.min(box.y0, p.y);
-        this.z0 = Math.min(box.z0, p.z);
-        this.x1 = Math.max(box.x1, p.x);
-        this.y1 = Math.max(box.y1, p.y);
-        this.z1 = Math.max(box.z1, p.z);
+        this.minX = Math.min(box.minX, p.x);
+        this.minY = Math.min(box.minY, p.y);
+        this.minZ = Math.min(box.minZ, p.z);
+        this.maxX = Math.max(box.maxX, p.x);
+        this.maxY = Math.max(box.maxY, p.y);
+        this.maxZ = Math.max(box.maxZ, p.z);
     }
 
     public setEnclosePointTransform(
@@ -604,33 +639,56 @@ export class Box3 implements ReadonlyBox3 {
     }
 
     public setUnion(box1: ReadonlyBox3, box2: ReadonlyBox3): void {
-        this.x0 = Math.min(box1.x0, box2.x0);
-        this.y0 = Math.min(box1.y0, box2.y0);
-        this.z0 = Math.min(box1.z0, box2.z0);
-        this.x1 = Math.max(box1.x1, box2.x1);
-        this.y1 = Math.max(box1.y1, box2.y1);
-        this.z1 = Math.max(box1.z1, box2.z1);
+        this.minX = Math.min(box1.minX, box2.minX);
+        this.minY = Math.min(box1.minY, box2.minY);
+        this.minZ = Math.min(box1.minZ, box2.minZ);
+        this.maxX = Math.max(box1.maxX, box2.maxX);
+        this.maxY = Math.max(box1.maxY, box2.maxY);
+        this.maxZ = Math.max(box1.maxZ, box2.maxZ);
+    }
+
+    public sizeX(): number {
+        return this.maxX - this.minX;
+    }
+
+    public sizeY(): number {
+        return this.maxY - this.minY;
+    }
+
+    public sizeZ(): number {
+        return this.maxZ - this.minZ;
+    }
+
+    public toAABox(): AABox3 {
+        return new AABox3(this.center(), this.extents());
     }
 
     public toArray(): [number, number, number, number, number, number] {
-        return [this.x0, this.y0, this.z0, this.x1, this.y1, this.z1];
+        return [this.minX, this.minY, this.minZ, this.maxX, this.maxY, this.maxZ];
+    }
+
+    public toOBox(): OBox3 {
+        return new OBox3(this.center(), this.extents(), Quaternion.IDENTITY);
     }
 
     public toString(): string {
-        return `{x0: ${this.x0}, y0: ${this.y0}, z0: ${this.z0}, x1: ${this.x1}, y1: ${this.y1}}, z1: ${this.z1}}`;
+        return (
+            `{minX: ${this.minX}, minY: ${this.minY}, minZ: ${this.minZ},\n` +
+            ` maxX: ${this.maxX}, maxY: ${this.maxY}, maxZ: ${this.maxZ}}`
+        );
     }
 
     public transform(mat: ReadonlyMatrix4 | ReadonlyMatrix4A): Box3 {
         const box = Box3.createEmpty();
 
-        box.setEnclosePointTransform(box, new Vector3(this.x0, this.y0, this.z0), mat);
-        box.setEnclosePointTransform(box, new Vector3(this.x0, this.y0, this.z1), mat);
-        box.setEnclosePointTransform(box, new Vector3(this.x0, this.y1, this.z0), mat);
-        box.setEnclosePointTransform(box, new Vector3(this.x0, this.y1, this.z1), mat);
-        box.setEnclosePointTransform(box, new Vector3(this.x1, this.y0, this.z0), mat);
-        box.setEnclosePointTransform(box, new Vector3(this.x1, this.y0, this.z1), mat);
-        box.setEnclosePointTransform(box, new Vector3(this.x1, this.y1, this.z0), mat);
-        box.setEnclosePointTransform(box, new Vector3(this.x1, this.y1, this.z1), mat);
+        box.setEnclosePointTransform(box, new Vector3(this.minX, this.minY, this.minZ), mat);
+        box.setEnclosePointTransform(box, new Vector3(this.minX, this.minY, this.maxZ), mat);
+        box.setEnclosePointTransform(box, new Vector3(this.minX, this.maxY, this.minZ), mat);
+        box.setEnclosePointTransform(box, new Vector3(this.minX, this.maxY, this.maxZ), mat);
+        box.setEnclosePointTransform(box, new Vector3(this.maxX, this.minY, this.minZ), mat);
+        box.setEnclosePointTransform(box, new Vector3(this.maxX, this.minY, this.maxZ), mat);
+        box.setEnclosePointTransform(box, new Vector3(this.maxX, this.maxY, this.minZ), mat);
+        box.setEnclosePointTransform(box, new Vector3(this.maxX, this.maxY, this.maxZ), mat);
 
         return box;
     }
@@ -709,14 +767,6 @@ export class AABox2 implements ReadonlyAABox2 {
         const ey = this.extents.y + eps;
 
         return cx <= ex && cx >= -ex && cy <= ey && cy >= -ey;
-    }
-
-    public deltaX(): number {
-        return 2 * this.extents.x;
-    }
-
-    public deltaY(): number {
-        return 2 * this.extents.y;
     }
 
     public getCorner(index: number): Vector2 {
@@ -843,11 +893,23 @@ export class AABox2 implements ReadonlyAABox2 {
         this.setFromXY(x0, y0, x1, y1);
     }
 
+    public sizeX(): number {
+        return 2 * this.extents.x;
+    }
+
+    public sizeY(): number {
+        return 2 * this.extents.y;
+    }
+
     public toArray(): FixedSizeArray<number, 4> {
         const pc = this.center;
         const ve = this.extents;
 
         return [pc.x, pc.y, ve.x, ve.y];
+    }
+
+    public toBox(): Box2 {
+        return new Box2(this.minX(), this.minY(), this.maxX(), this.maxY());
     }
 
     public toOBox(): OBox2 {
@@ -941,18 +1003,6 @@ export class AABox3 implements ReadonlyAABox3 {
         return cx <= ex && cx >= -ex && cy <= ey && cy >= -ey && cz <= ez && cz >= -ez;
     }
 
-    public deltaX(): number {
-        return 2 * this.extents.x;
-    }
-
-    public deltaY(): number {
-        return 2 * this.extents.y;
-    }
-
-    public deltaZ(): number {
-        return 2 * this.extents.z;
-    }
-
     public getCorner(index: number): Vector3 {
         const x = ((index & 1) << 1) - 1;
         const y = ((index & 2) >> 0) - 1;
@@ -1003,14 +1053,6 @@ export class AABox3 implements ReadonlyAABox3 {
     public isPoint(): boolean {
         const ve = this.extents;
         return ve.x === 0 && ve.y === 0 && ve.z === 0;
-    }
-
-    public max(): Vector3 {
-        return new Vector3(
-            this.center.x + this.extents.x,
-            this.center.y + this.extents.y,
-            this.center.z + this.extents.z,
-        );
     }
 
     public maxX(): number {
@@ -1101,11 +1143,27 @@ export class AABox3 implements ReadonlyAABox3 {
         this.setFromXYZ(x0, y0, z0, x1, y1, z1);
     }
 
+    public sizeX(): number {
+        return 2 * this.extents.x;
+    }
+
+    public sizeY(): number {
+        return 2 * this.extents.y;
+    }
+
+    public sizeZ(): number {
+        return 2 * this.extents.z;
+    }
+
     public toArray(): FixedSizeArray<number, 6> {
         const pc = this.center;
         const ve = this.extents;
 
         return [pc.x, pc.y, pc.z, ve.x, ve.y, ve.z];
+    }
+
+    public toBox(): Box3 {
+        return new Box3(this.minX(), this.minY(), this.minZ(), this.maxX(), this.maxY(), this.maxZ());
     }
 
     public toOBox(): OBox3 {
@@ -1197,14 +1255,6 @@ export class OBox2 implements ReadonlyOBox2 {
         const ey = this.extents.y + eps;
 
         return vc.x <= ex && vc.x >= -ex && vc.y <= ey && vc.y >= -ey;
-    }
-
-    public deltaX(): number {
-        return 2 * this.extents.x;
-    }
-
-    public deltaY(): number {
-        return 2 * this.extents.y;
     }
 
     public getCorner(index: number): Vector2 {
@@ -1300,6 +1350,14 @@ export class OBox2 implements ReadonlyOBox2 {
         this.center = Vector2.createZero();
         this.extents = new Vector2(Number.NEGATIVE_INFINITY, Number.NEGATIVE_INFINITY);
         this.rotation = Complex.createIdentity();
+    }
+
+    public sizeX(): number {
+        return 2 * this.extents.x;
+    }
+
+    public sizeY(): number {
+        return 2 * this.extents.y;
     }
 
     public toAABox(): AABox2 {
@@ -1437,18 +1495,6 @@ export class OBox3 implements ReadonlyOBox3 {
         return vc.x <= ex && vc.x >= -ex && vc.y <= ey && vc.y >= -ey && vc.z <= ez && vc.z >= -ez;
     }
 
-    public deltaX(): number {
-        return 2 * this.extents.x;
-    }
-
-    public deltaY(): number {
-        return 2 * this.extents.y;
-    }
-
-    public deltaZ(): number {
-        return 2 * this.extents.z;
-    }
-
     public getCorner(index: number): Vector3 {
         const x = ((index & 1) << 1) - 1;
         const y = ((index & 2) >> 0) - 1;
@@ -1547,6 +1593,18 @@ export class OBox3 implements ReadonlyOBox3 {
         this.center = Vector3.createZero();
         this.extents = new Vector3(Number.NEGATIVE_INFINITY, Number.NEGATIVE_INFINITY, Number.NEGATIVE_INFINITY);
         this.rotation = Quaternion.createIdentity();
+    }
+
+    public sizeX(): number {
+        return 2 * this.extents.x;
+    }
+
+    public sizeY(): number {
+        return 2 * this.extents.y;
+    }
+
+    public sizeZ(): number {
+        return 2 * this.extents.z;
     }
 
     public toAABox(): AABox3 {

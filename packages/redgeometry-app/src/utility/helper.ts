@@ -105,8 +105,8 @@ export function createRandomPath(
 }
 
 export function createRandomPoint(random: Random, box: ReadonlyBox2): Vector2 {
-    const x = random.nextFloatBetween(box.x0, box.x1);
-    const y = random.nextFloatBetween(box.y0, box.y1);
+    const x = random.nextFloatBetween(box.minX, box.maxX);
+    const y = random.nextFloatBetween(box.minY, box.maxY);
 
     return new Vector2(x, y);
 }
@@ -229,8 +229,8 @@ export function createRandomPolygonSimple(
     const center = box.center();
     const angleStep = (2 * Math.PI) / count;
 
-    const w = 0.5 * box.deltaX();
-    const h = 0.5 * box.deltaY();
+    const w = 0.5 * box.sizeX();
+    const h = 0.5 * box.sizeY();
 
     for (let i = 0; i < count; i++) {
         const a = i * angleStep + angleStep * random.nextFloatBetween(0, irregularity);

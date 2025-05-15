@@ -92,7 +92,7 @@ export class AppContextPlugin implements WorldPlugin {
         ctx.save();
         ctx.lineWidth = width;
         ctx.strokeStyle = style;
-        ctx.strokeRect(box.x0, box.y0, box.x1 - box.x0, box.y1 - box.y0);
+        ctx.strokeRect(box.minX, box.minY, box.sizeX(), box.sizeY());
         ctx.restore();
     }
 
@@ -101,7 +101,7 @@ export class AppContextPlugin implements WorldPlugin {
         ctx.beginPath();
 
         for (const box of boxes) {
-            ctx.rect(box.x0, box.y0, box.x1 - box.x0, box.y1 - box.y0);
+            ctx.rect(box.minX, box.minY, box.sizeX(), box.sizeY());
         }
 
         ctx.save();
@@ -223,7 +223,7 @@ export class AppContextPlugin implements WorldPlugin {
         const ctx = this.context;
         ctx.save();
         ctx.fillStyle = style;
-        ctx.fillRect(box.x0, box.y0, box.x1 - box.x0, box.y1 - box.y0);
+        ctx.fillRect(box.minX, box.minY, box.sizeX(), box.sizeY());
         ctx.restore();
     }
 
@@ -232,7 +232,7 @@ export class AppContextPlugin implements WorldPlugin {
         ctx.beginPath();
 
         for (const box of boxes) {
-            ctx.rect(box.x0, box.y0, box.x1 - box.x0, box.y1 - box.y0);
+            ctx.rect(box.minX, box.minY, box.sizeX(), box.sizeY());
         }
 
         ctx.save();
