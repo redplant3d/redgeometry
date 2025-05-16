@@ -1,4 +1,4 @@
-import { DEFAULT_SERIALIZATION_MAPPING, SerializationMap } from "redgeometry/src/internal/serialize";
+import { SERIALIZATION_MAPPINGS_DEFAULT, SerializationMap } from "redgeometry/src/internal/serialize";
 import { log, throwError } from "redgeometry/src/utility/debug";
 import {
     EntityComponentIterator,
@@ -70,7 +70,7 @@ export enum ChangeFlags {
     Deleted = 4,
 }
 
-export const DEFAULT_WORLD_SCHEDULES: WorldScheduleOptions<DefaultWorldScheduleId, DefaultSystemStage>[] = [
+export const WORLD_SCHEDULE_OPTIONS_DEFAULT: WorldScheduleOptions<DefaultWorldScheduleId, DefaultSystemStage>[] = [
     {
         id: "start",
         stages: [{ id: "start-pre" }, { id: "start" }, { id: "start-post" }],
@@ -100,7 +100,7 @@ export class World {
     private stages: Map<WorldScheduleId, SystemSchedule[]>;
 
     public constructor() {
-        this.serializationMap = new SerializationMap([...DEFAULT_SERIALIZATION_MAPPING]);
+        this.serializationMap = new SerializationMap([...SERIALIZATION_MAPPINGS_DEFAULT]);
         this.ecStorage = new EntityComponentStorage();
 
         this.channels = new Map();

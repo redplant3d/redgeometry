@@ -8,7 +8,7 @@ import { RangeInputElement } from "../ecs-modules/app-input.js";
 import { AppMainModule, AppRemoteModule } from "../ecs-modules/app.js";
 import type { WorldOptions } from "../ecs/app.js";
 import type { DefaultSystemStage, WorldModule } from "../ecs/types.js";
-import { DEFAULT_WORLD_SCHEDULES, type World } from "../ecs/world.js";
+import { WORLD_SCHEDULE_OPTIONS_DEFAULT, type World } from "../ecs/world.js";
 
 type AppPartMainData = {
     dataId: "app-part-main";
@@ -125,11 +125,11 @@ class AppPartRemoteModule implements WorldModule {
 export const PATH_INTERSECTION_MAIN_WORLD: WorldOptions = {
     id: "main",
     modules: [new AppMainModule(), new AppPartMainModule()],
-    schedules: DEFAULT_WORLD_SCHEDULES,
+    schedules: WORLD_SCHEDULE_OPTIONS_DEFAULT,
 };
 
 export const PATH_INTERSECTION_REMOTE_WORLD: WorldOptions = {
     id: "remote",
     modules: [new AppRemoteModule(), new AppPartRemoteModule()],
-    schedules: DEFAULT_WORLD_SCHEDULES,
+    schedules: WORLD_SCHEDULE_OPTIONS_DEFAULT,
 };

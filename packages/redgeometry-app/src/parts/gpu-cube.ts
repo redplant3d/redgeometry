@@ -29,7 +29,7 @@ import { type TimeData } from "../ecs-modules/time.js";
 import { Visibility, type TransformComponent } from "../ecs-modules/transform.js";
 import type { WorldOptions } from "../ecs/app.js";
 import type { DefaultSystemStage, EntityId, WorldModule } from "../ecs/types.js";
-import { DEFAULT_WORLD_SCHEDULES, type World } from "../ecs/world.js";
+import { WORLD_SCHEDULE_OPTIONS_DEFAULT, type World } from "../ecs/world.js";
 import { createRandomColor } from "../utility/helper.js";
 
 type AppPartMainData = {
@@ -403,11 +403,11 @@ class AppPartRemoteModule implements WorldModule {
 export const GPU_CUBE_MAIN_WORLD: WorldOptions = {
     id: "main",
     modules: [new AppMainModule(), new AppPartMainModule()],
-    schedules: DEFAULT_WORLD_SCHEDULES,
+    schedules: WORLD_SCHEDULE_OPTIONS_DEFAULT,
 };
 
 export const GPU_CUBE_REMOTE_WORLD: WorldOptions = {
     id: "remote",
     modules: [new AppRemoteModule(), new AppPartRemoteModule()],
-    schedules: DEFAULT_WORLD_SCHEDULES,
+    schedules: WORLD_SCHEDULE_OPTIONS_DEFAULT,
 };

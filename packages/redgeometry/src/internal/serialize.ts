@@ -7,7 +7,7 @@ export type SerializationMapping<T = unknown, U = unknown> = {
     deserialize(data: U): T;
 };
 
-export const DEFAULT_SERIALIZATION_MAPPING: ReadonlyArray<SerializationMapping> = [
+export const SERIALIZATION_MAPPINGS_DEFAULT: ReadonlyArray<SerializationMapping> = [
     {
         classType: Int8Array,
         serialize: (obj) => [...obj],

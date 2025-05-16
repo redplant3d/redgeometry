@@ -39,13 +39,13 @@ export type ContextStrokeOptions = {
     width: number;
 };
 
-export const DEFAULT_CONTEXT_FILL_OPTIONS: Readonly<ContextFillOptions> = {
+export const CONTEXT_FILL_OPTIONS_DEFAULT: Readonly<ContextFillOptions> = {
     color: new ColorRgba(0, 0, 0, 255),
     compOp: CompositeOperation.SourceOver,
     rule: FillRule.NonZero,
 };
 
-export const DEFAULT_CONTEXT_STROKE_OPTIONS: Readonly<ContextStrokeOptions> = {
+export const CONTEXT_STROKE_OPTIONS_DEFAULT: Readonly<ContextStrokeOptions> = {
     caps: BUTT_CAPS,
     color: new ColorRgba(0, 0, 0, 255),
     compOp: CompositeOperation.SourceOver,
@@ -94,8 +94,8 @@ export class SoftwareRenderContext2 implements RenderContext2 {
     private transform: Matrix3A;
 
     public constructor() {
-        this.fillOptions = { ...DEFAULT_CONTEXT_FILL_OPTIONS };
-        this.strokeOptions = { ...DEFAULT_CONTEXT_STROKE_OPTIONS };
+        this.fillOptions = { ...CONTEXT_FILL_OPTIONS_DEFAULT };
+        this.strokeOptions = { ...CONTEXT_STROKE_OPTIONS_DEFAULT };
         this.pipeline = new SoftwareRenderPipeline();
         this.transform = Matrix3A.createIdentity();
     }

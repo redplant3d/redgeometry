@@ -1,7 +1,7 @@
 import { Mesh2 } from "redgeometry/src/core/mesh";
 import { Path2 } from "redgeometry/src/core/path";
 import { PathClip2 } from "redgeometry/src/core/path-clip";
-import { DEFAULT_PATH_CLIP_OPTIONS, DEFAULT_PATH_QUALITY_OPTIONS } from "redgeometry/src/core/path-options";
+import { PATH_CLIP_OPTIONS_DEFAULT, PATH_QUALITY_OPTIONS_DEFAULT } from "redgeometry/src/core/path-options";
 import { MinMaxBox2 } from "redgeometry/src/primitives/box";
 import type { ReadonlyVector2 } from "redgeometry/src/primitives/vector";
 import { RandomXSR128 } from "redgeometry/src/utility/random";
@@ -12,7 +12,7 @@ import { RangeInputElement } from "../ecs-modules/app-input.js";
 import { AppMainModule, AppRemoteModule, type AppStateData } from "../ecs-modules/app.js";
 import type { WorldOptions } from "../ecs/app.js";
 import type { DefaultSystemStage, WorldModule } from "../ecs/types.js";
-import { DEFAULT_WORLD_SCHEDULES, type World } from "../ecs/world.js";
+import { WORLD_SCHEDULE_OPTIONS_DEFAULT, type World } from "../ecs/world.js";
 import { createRandomPoint } from "../utility/helper.js";
 
 type AppPartMainData = {
@@ -91,9 +91,9 @@ function updateSystem(world: World): void {
     path.close();
 
     const mesh = Mesh2.createEmpty();
-    const pathClip = new PathClip2(DEFAULT_PATH_QUALITY_OPTIONS);
+    const pathClip = new PathClip2(PATH_QUALITY_OPTIONS_DEFAULT);
     pathClip.addPath(path);
-    pathClip.process(mesh, DEFAULT_PATH_CLIP_OPTIONS);
+    pathClip.process(mesh, PATH_CLIP_OPTIONS_DEFAULT);
 
     for (let i = 0; i < count; i++) {
         const p01 = p0.lerp(p1, random.nextFloat());
@@ -160,11 +160,11 @@ class AppPartRemoteModule implements WorldModule {
 export const MESH_MAIN_WORLD: WorldOptions = {
     id: "main",
     modules: [new AppMainModule(), new AppPartMainModule()],
-    schedules: DEFAULT_WORLD_SCHEDULES,
+    schedules: WORLD_SCHEDULE_OPTIONS_DEFAULT,
 };
 
 export const MESH_REMOTE_WORLD: WorldOptions = {
     id: "remote",
     modules: [new AppRemoteModule(), new AppPartRemoteModule()],
-    schedules: DEFAULT_WORLD_SCHEDULES,
+    schedules: WORLD_SCHEDULE_OPTIONS_DEFAULT,
 };

@@ -90,7 +90,7 @@ export const BUTT_CAPS: Readonly<StrokeCaps> = { start: CapType.Butt, end: CapTy
 export const ROUND_CAPS: Readonly<StrokeCaps> = { start: CapType.Round, end: CapType.Round };
 export const SQUARE_CAPS: Readonly<StrokeCaps> = { start: CapType.Square, end: CapType.Square };
 
-export const DEFAULT_PATH_QUALITY_OPTIONS: Readonly<PathQualityOptions> = {
+export const PATH_QUALITY_OPTIONS_DEFAULT: Readonly<PathQualityOptions> = {
     clipPrecision: 65536,
     dashMode: ApproximationMode.Incremental,
     flattenMode: ApproximationMode.Incremental,
@@ -102,18 +102,18 @@ export const DEFAULT_PATH_QUALITY_OPTIONS: Readonly<PathQualityOptions> = {
     strokeMode: ApproximationMode.Incremental,
 };
 
-export const DEFAULT_PATH_DASH_OPTIONS: Readonly<PathDashOptions> = {
+export const PATH_DASH_OPTIONS_DEFAULT: Readonly<PathDashOptions> = {
     array: [],
     offset: 0,
 };
 
-export const DEFAULT_PATH_OFFSET_OPTIONS: Readonly<PathOffsetOptions> = {
+export const PATH_OFFSET_OPTIONS_DEFAULT: Readonly<PathOffsetOptions> = {
     join: JoinType.Miter,
     miterLimit: 4,
     distance: 1,
 };
 
-export const DEFAULT_PATH_STROKE_OPTIONS: Readonly<PathStrokeOptions> = {
+export const PATH_STROKE_OPTIONS_DEFAULT: Readonly<PathStrokeOptions> = {
     caps: BUTT_CAPS,
     dashArray: [],
     dashCaps: BUTT_CAPS,
@@ -123,7 +123,7 @@ export const DEFAULT_PATH_STROKE_OPTIONS: Readonly<PathStrokeOptions> = {
     width: 1,
 };
 
-export const DEFAULT_PATH_CLIP_OPTIONS: Readonly<PathClipOptions> = {
+export const PATH_CLIP_OPTIONS_DEFAULT: Readonly<PathClipOptions> = {
     booleanOperator: BooleanOperator.Union,
     windingOperatorA: WindingOperator.NonZero,
     windingOperatorB: WindingOperator.NonZero,

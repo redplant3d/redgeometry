@@ -9,11 +9,11 @@ import { assertUnreachable } from "../utility/debug.js";
 import { Mesh2 } from "./mesh.js";
 import { PathClip2 } from "./path-clip.js";
 import {
-    DEFAULT_PATH_CLIP_OPTIONS,
-    DEFAULT_PATH_DASH_OPTIONS,
-    DEFAULT_PATH_OFFSET_OPTIONS,
-    DEFAULT_PATH_QUALITY_OPTIONS,
-    DEFAULT_PATH_STROKE_OPTIONS,
+    PATH_CLIP_OPTIONS_DEFAULT,
+    PATH_DASH_OPTIONS_DEFAULT,
+    PATH_OFFSET_OPTIONS_DEFAULT,
+    PATH_QUALITY_OPTIONS_DEFAULT,
+    PATH_STROKE_OPTIONS_DEFAULT,
     createPathDash,
     createPathFlatten,
     createPathOffset,
@@ -332,10 +332,10 @@ export class Path2 implements PathSink2 {
         qualityOptions?: Partial<PathQualityOptions>,
     ): Path2 {
         const mesh = Mesh2.createEmpty();
-        const pathClip = new PathClip2({ ...DEFAULT_PATH_QUALITY_OPTIONS, ...qualityOptions });
+        const pathClip = new PathClip2({ ...PATH_QUALITY_OPTIONS_DEFAULT, ...qualityOptions });
         pathClip.addPath(this, 0);
         pathClip.addPath(path, 1);
-        pathClip.process(mesh, { ...DEFAULT_PATH_CLIP_OPTIONS, ...clipOptions });
+        pathClip.process(mesh, { ...PATH_CLIP_OPTIONS_DEFAULT, ...clipOptions });
         return mesh.getFacesPath();
     }
 
@@ -376,14 +376,14 @@ export class Path2 implements PathSink2 {
 
     public dash(dashOptions?: Partial<PathDashOptions>, qualityOptions?: Partial<PathQualityOptions>): Path2 {
         const output = Path2.createEmpty();
-        const pathDash = createPathDash({ ...DEFAULT_PATH_QUALITY_OPTIONS, ...qualityOptions });
-        pathDash.process(this, output, { ...DEFAULT_PATH_DASH_OPTIONS, ...dashOptions });
+        const pathDash = createPathDash({ ...PATH_QUALITY_OPTIONS_DEFAULT, ...qualityOptions });
+        pathDash.process(this, output, { ...PATH_DASH_OPTIONS_DEFAULT, ...dashOptions });
         return output;
     }
 
     public flatten(forceClose = false, qualityOptions?: Partial<PathQualityOptions>): Path2 {
         const output = Path2.createEmpty();
-        const pathFlatten = createPathFlatten({ ...DEFAULT_PATH_QUALITY_OPTIONS, ...qualityOptions });
+        const pathFlatten = createPathFlatten({ ...PATH_QUALITY_OPTIONS_DEFAULT, ...qualityOptions });
         pathFlatten.process(this, output, forceClose);
         return output;
     }
@@ -562,8 +562,8 @@ export class Path2 implements PathSink2 {
 
     public offset(offsetOptions?: Partial<PathOffsetOptions>, qualityOptions?: Partial<PathQualityOptions>): Path2 {
         const output = Path2.createEmpty();
-        const pathOffset = createPathOffset({ ...DEFAULT_PATH_QUALITY_OPTIONS, ...qualityOptions });
-        pathOffset.process(this, output, { ...DEFAULT_PATH_OFFSET_OPTIONS, ...offsetOptions });
+        const pathOffset = createPathOffset({ ...PATH_QUALITY_OPTIONS_DEFAULT, ...qualityOptions });
+        pathOffset.process(this, output, { ...PATH_OFFSET_OPTIONS_DEFAULT, ...offsetOptions });
         return output;
     }
 
@@ -591,15 +591,15 @@ export class Path2 implements PathSink2 {
 
     public simplify(qualityOptions?: Partial<PathQualityOptions>): Path2 {
         const output = Path2.createEmpty();
-        const pathSimplify = createPathSimplify({ ...DEFAULT_PATH_QUALITY_OPTIONS, ...qualityOptions });
+        const pathSimplify = createPathSimplify({ ...PATH_QUALITY_OPTIONS_DEFAULT, ...qualityOptions });
         pathSimplify.process(this, output);
         return output;
     }
 
     public stroke(strokeOptions?: Partial<PathStrokeOptions>, qualityOptions?: Partial<PathQualityOptions>): Path2 {
         const output = Path2.createEmpty();
-        const pathStroke = createPathStroke({ ...DEFAULT_PATH_QUALITY_OPTIONS, ...qualityOptions });
-        pathStroke.process(this, output, { ...DEFAULT_PATH_STROKE_OPTIONS, ...strokeOptions });
+        const pathStroke = createPathStroke({ ...PATH_QUALITY_OPTIONS_DEFAULT, ...qualityOptions });
+        pathStroke.process(this, output, { ...PATH_STROKE_OPTIONS_DEFAULT, ...strokeOptions });
         return output;
     }
 
@@ -759,9 +759,9 @@ export class Path2 implements PathSink2 {
         qualityOptions?: Partial<PathQualityOptions>,
     ): Mesh2 {
         const mesh = Mesh2.createEmpty();
-        const pathClip = new PathClip2({ ...DEFAULT_PATH_QUALITY_OPTIONS, ...qualityOptions });
+        const pathClip = new PathClip2({ ...PATH_QUALITY_OPTIONS_DEFAULT, ...qualityOptions });
         pathClip.addPath(this, 0);
-        pathClip.process(mesh, { ...DEFAULT_PATH_CLIP_OPTIONS, windingOperatorA: winding });
+        pathClip.process(mesh, { ...PATH_CLIP_OPTIONS_DEFAULT, windingOperatorA: winding });
         return mesh;
     }
 

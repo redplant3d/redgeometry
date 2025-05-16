@@ -11,7 +11,7 @@ import { AppMainModule, AppRemoteModule, type AppStateData } from "../ecs-module
 import type { MousePlugin } from "../ecs-modules/input.js";
 import type { WorldOptions } from "../ecs/app.js";
 import type { DefaultSystemStage, WorldModule } from "../ecs/types.js";
-import { DEFAULT_WORLD_SCHEDULES, type World } from "../ecs/world.js";
+import { WORLD_SCHEDULE_OPTIONS_DEFAULT, type World } from "../ecs/world.js";
 import { createRandomPath } from "../utility/helper.js";
 
 type AppPartMainData = {
@@ -137,11 +137,11 @@ class AppPartRemoteModule implements WorldModule {
 export const PATH_AREA_MAIN_WORLD: WorldOptions = {
     id: "main",
     modules: [new AppMainModule(), new AppPartMainModule()],
-    schedules: DEFAULT_WORLD_SCHEDULES,
+    schedules: WORLD_SCHEDULE_OPTIONS_DEFAULT,
 };
 
 export const PATH_AREA_REMOTE_WORLD: WorldOptions = {
     id: "remote",
     modules: [new AppRemoteModule(), new AppPartRemoteModule()],
-    schedules: DEFAULT_WORLD_SCHEDULES,
+    schedules: WORLD_SCHEDULE_OPTIONS_DEFAULT,
 };

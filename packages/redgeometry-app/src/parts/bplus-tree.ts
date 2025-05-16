@@ -9,7 +9,7 @@ import { RangeInputElement, TextBoxInputElement } from "../ecs-modules/app-input
 import { AppMainModule, AppRemoteModule, type AppStateData } from "../ecs-modules/app.js";
 import type { WorldOptions } from "../ecs/app.js";
 import type { DefaultSystemStage, WorldModule } from "../ecs/types.js";
-import { DEFAULT_WORLD_SCHEDULES, type World } from "../ecs/world.js";
+import { WORLD_SCHEDULE_OPTIONS_DEFAULT, type World } from "../ecs/world.js";
 import { BPlusTree, NodeType, type Node } from "../utility/bplus-tree.js";
 
 type AppPartMainData = {
@@ -181,11 +181,11 @@ class AppPartRemoteModule implements WorldModule {
 export const BPLUS_TREE_MAIN_WORLD: WorldOptions = {
     id: "main",
     modules: [new AppMainModule(), new AppPartMainModule()],
-    schedules: DEFAULT_WORLD_SCHEDULES,
+    schedules: WORLD_SCHEDULE_OPTIONS_DEFAULT,
 };
 
 export const BPLUS_TREE_REMOTE_WORLD: WorldOptions = {
     id: "remote",
     modules: [new AppRemoteModule(), new AppPartRemoteModule()],
-    schedules: DEFAULT_WORLD_SCHEDULES,
+    schedules: WORLD_SCHEDULE_OPTIONS_DEFAULT,
 };

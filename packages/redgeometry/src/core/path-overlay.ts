@@ -7,7 +7,7 @@ import { assertDebug, log } from "../utility/debug.js";
 import { MeshChain2, MeshEdge2, type Mesh2 } from "./mesh.js";
 import {
     ApproximationMode,
-    DEFAULT_PATH_CLIP_OPTIONS,
+    PATH_CLIP_OPTIONS_DEFAULT,
     type CustomWindingOperator,
     type PathQualityOptions,
     type WindingOperator,
@@ -33,7 +33,7 @@ export class PathOverlay2 {
         this.snapRound.precision = options.clipPrecision;
         this.flattenTolerance = options.flattenTolerance;
 
-        this.windingOperator = DEFAULT_PATH_CLIP_OPTIONS.windingOperatorA;
+        this.windingOperator = PATH_CLIP_OPTIONS_DEFAULT.windingOperatorA;
     }
 
     public addCurve(c: ReadonlyBezierCurve2, set = 0, weight = 1, snap = false, data?: unknown): void {

@@ -1,8 +1,8 @@
 import {
     COS_OBTUSE,
     CapType,
-    DEFAULT_PATH_STROKE_OPTIONS,
     JoinType,
+    PATH_STROKE_OPTIONS_DEFAULT,
     type CustomCap,
     type PathStrokeOptions,
     type StrokeCaps,
@@ -45,12 +45,12 @@ export class StrokeState {
     public startPhase: boolean;
 
     public constructor() {
-        this.caps = DEFAULT_PATH_STROKE_OPTIONS.caps;
-        this.dashArray = DEFAULT_PATH_STROKE_OPTIONS.dashArray;
-        this.dashCaps = DEFAULT_PATH_STROKE_OPTIONS.dashCaps;
-        this.distance = 0.5 * DEFAULT_PATH_STROKE_OPTIONS.width;
-        this.join = DEFAULT_PATH_STROKE_OPTIONS.join;
-        this.miterLimit = DEFAULT_PATH_STROKE_OPTIONS.miterLimit;
+        this.caps = PATH_STROKE_OPTIONS_DEFAULT.caps;
+        this.dashArray = PATH_STROKE_OPTIONS_DEFAULT.dashArray;
+        this.dashCaps = PATH_STROKE_OPTIONS_DEFAULT.dashCaps;
+        this.distance = 0.5 * PATH_STROKE_OPTIONS_DEFAULT.width;
+        this.join = PATH_STROKE_OPTIONS_DEFAULT.join;
+        this.miterLimit = PATH_STROKE_OPTIONS_DEFAULT.miterLimit;
 
         this.currentIndex = 0;
         this.currentLength = 0;

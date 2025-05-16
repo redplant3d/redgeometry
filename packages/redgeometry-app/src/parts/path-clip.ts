@@ -1,7 +1,7 @@
 import { Mesh2 } from "redgeometry/src/core/mesh";
 import { Path2 } from "redgeometry/src/core/path";
 import { PathClip2 } from "redgeometry/src/core/path-clip";
-import { DEFAULT_PATH_QUALITY_OPTIONS } from "redgeometry/src/core/path-options";
+import { PATH_QUALITY_OPTIONS_DEFAULT } from "redgeometry/src/core/path-options";
 import { Polygon2 } from "redgeometry/src/core/polygon";
 import { RandomXSR128 } from "redgeometry/src/utility/random";
 import type { AppContextPlugin } from "../ecs-modules/app-context.js";
@@ -11,7 +11,7 @@ import { ComboBoxInputElement, RangeInputElement } from "../ecs-modules/app-inpu
 import { AppMainModule, AppRemoteModule, type AppStateData } from "../ecs-modules/app.js";
 import type { WorldOptions } from "../ecs/app.js";
 import type { DefaultSystemStage, WorldModule } from "../ecs/types.js";
-import { DEFAULT_WORLD_SCHEDULES, type World } from "../ecs/world.js";
+import { WORLD_SCHEDULE_OPTIONS_DEFAULT, type World } from "../ecs/world.js";
 import { createRandomPolygonPair, getBooleanOperator, getWindingOperator } from "../utility/helper.js";
 
 type AppPartMainData = {
@@ -106,7 +106,7 @@ function updateSystem(world: World): void {
 
     const [polygonA, polygonB] = createRandomPolygonPair(random, generator, offset, width, height);
 
-    const clip = new PathClip2(DEFAULT_PATH_QUALITY_OPTIONS);
+    const clip = new PathClip2(PATH_QUALITY_OPTIONS_DEFAULT);
 
     for (const edge of polygonA.getEdges()) {
         clip.addEdge(edge, 0);
@@ -181,11 +181,11 @@ class AppPartRemoteModule implements WorldModule {
 export const PATH_CLIP_MAIN_WORLD: WorldOptions = {
     id: "main",
     modules: [new AppMainModule(), new AppPartMainModule()],
-    schedules: DEFAULT_WORLD_SCHEDULES,
+    schedules: WORLD_SCHEDULE_OPTIONS_DEFAULT,
 };
 
 export const PATH_CLIP_REMOTE_WORLD: WorldOptions = {
     id: "remote",
     modules: [new AppRemoteModule(), new AppPartRemoteModule()],
-    schedules: DEFAULT_WORLD_SCHEDULES,
+    schedules: WORLD_SCHEDULE_OPTIONS_DEFAULT,
 };

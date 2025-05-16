@@ -1,6 +1,6 @@
 import { Path2 } from "redgeometry/src/core/path";
 import type { PathFlatten2 } from "redgeometry/src/core/path-flatten";
-import { createPathFlatten, createPathStroke, DEFAULT_PATH_QUALITY_OPTIONS } from "redgeometry/src/core/path-options";
+import { createPathFlatten, createPathStroke, PATH_QUALITY_OPTIONS_DEFAULT } from "redgeometry/src/core/path-options";
 import type { PathStroke2 } from "redgeometry/src/core/path-stroke";
 import type { ReadonlyMatrix3A } from "redgeometry/src/primitives/matrix";
 import { Vector2, type ReadonlyVector2 } from "redgeometry/src/primitives/vector";
@@ -35,8 +35,8 @@ export class SoftwareRenderPipeline implements RenderPipeline {
 
         this.clipRect = new Rectangle2(0, 0, 0, 0);
 
-        this.pathFlatten = createPathFlatten(DEFAULT_PATH_QUALITY_OPTIONS);
-        this.pathStroke = createPathStroke(DEFAULT_PATH_QUALITY_OPTIONS);
+        this.pathFlatten = createPathFlatten(PATH_QUALITY_OPTIONS_DEFAULT);
+        this.pathStroke = createPathStroke(PATH_QUALITY_OPTIONS_DEFAULT);
     }
 
     public addFill(path: Path2, mat: ReadonlyMatrix3A): void {

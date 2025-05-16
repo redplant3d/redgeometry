@@ -6,7 +6,7 @@ import { log } from "../utility/debug.js";
 import type { Mesh2 } from "./mesh.js";
 import {
     ApproximationMode,
-    DEFAULT_PATH_CLIP_OPTIONS,
+    PATH_CLIP_OPTIONS_DEFAULT,
     type BooleanOperator,
     type CustomWindingOperator,
     type PathClipOptions,
@@ -31,9 +31,9 @@ export class PathClip2 {
         this.snapRound.precision = options.clipPrecision;
         this.flattenTolerance = options.flattenTolerance;
 
-        this.booleanOperator = DEFAULT_PATH_CLIP_OPTIONS.booleanOperator;
-        this.windingOperatorA = DEFAULT_PATH_CLIP_OPTIONS.windingOperatorA;
-        this.windingOperatorB = DEFAULT_PATH_CLIP_OPTIONS.windingOperatorB;
+        this.booleanOperator = PATH_CLIP_OPTIONS_DEFAULT.booleanOperator;
+        this.windingOperatorA = PATH_CLIP_OPTIONS_DEFAULT.windingOperatorA;
+        this.windingOperatorB = PATH_CLIP_OPTIONS_DEFAULT.windingOperatorB;
     }
 
     public addCurve(c: ReadonlyBezierCurve2, set = 0, weight = 1, snap = false, data?: unknown): void {

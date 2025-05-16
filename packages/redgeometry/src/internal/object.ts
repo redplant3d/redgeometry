@@ -28,7 +28,7 @@ export type ObjectMapping<T = unknown, U = unknown> =
     | PrimitiveCollectionObjectMapping<T, U>
     | RecursiveCollectionObjectMapping<T, U>;
 
-export const DEFAULT_BUILTIN_OBJECT_MAPPING: ReadonlyArray<ObjectMapping> = [
+export const OBJECT_MAPPINGS_DEFAULT: ReadonlyArray<ObjectMapping> = [
     {
         type: "PrimitiveCollection",
         clsCtor: Int8Array,
@@ -113,7 +113,7 @@ export class ObjectMapper {
     private mappingsCustom: ObjectMapping[];
 
     public constructor() {
-        this.mappingsBuiltin = [...DEFAULT_BUILTIN_OBJECT_MAPPING];
+        this.mappingsBuiltin = [...OBJECT_MAPPINGS_DEFAULT];
         this.mappingsCustom = [];
     }
 

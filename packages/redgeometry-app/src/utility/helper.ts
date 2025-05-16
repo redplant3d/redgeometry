@@ -3,8 +3,8 @@ import { Path2 } from "redgeometry/src/core/path";
 import { PathClip2 } from "redgeometry/src/core/path-clip";
 import {
     BooleanOperator,
-    DEFAULT_PATH_QUALITY_OPTIONS,
     JoinType,
+    PATH_QUALITY_OPTIONS_DEFAULT,
     WindingOperator,
     type CustomWindingOperator,
 } from "redgeometry/src/core/path-options";
@@ -35,7 +35,7 @@ export function createRandomMesh(
 ): Mesh2 {
     const [polygonA, polygonB] = createRandomPolygonPair(random, generator, offset, width, height);
 
-    const clip = new PathClip2(DEFAULT_PATH_QUALITY_OPTIONS);
+    const clip = new PathClip2(PATH_QUALITY_OPTIONS_DEFAULT);
 
     for (const edge of polygonA.getEdges()) {
         clip.addEdge(edge, 0);
