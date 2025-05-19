@@ -432,10 +432,8 @@ export class MinMaxBox2 implements ReadonlyMinMaxBox2 {
     }
 
     public toString(): string {
-        // prettier-ignore
         return (
-            `{minX: ${this.minX}, minY: ${this.minY},\n` +
-            ` maxX: ${this.maxX}, maxY: ${this.maxY}}`
+            "{minX: " + this.minX + ", minY: " + this.minY + "," + " maxX: " + this.maxX + ", maxY: " + this.maxY + "}"
         );
     }
 
@@ -734,8 +732,20 @@ export class MinMaxBox3 implements ReadonlyMinMaxBox3 {
 
     public toString(): string {
         return (
-            `{minX: ${this.minX}, minY: ${this.minY}, minZ: ${this.minZ},\n` +
-            ` maxX: ${this.maxX}, maxY: ${this.maxY}, maxZ: ${this.maxZ}}`
+            "{minX: " +
+            this.minX +
+            ", minY: " +
+            this.minY +
+            ", minZ: " +
+            this.minZ +
+            "," +
+            " maxX: " +
+            this.maxX +
+            ", maxY: " +
+            this.maxY +
+            ", maxZ: " +
+            this.maxZ +
+            "}"
         );
     }
 
@@ -960,7 +970,7 @@ export class AxisAlignedBox2 implements ReadonlyAxisAlignedBox2 {
     }
 
     public toString(): string {
-        return `{center: ${this.center}, extents: ${this.extents}}`;
+        return "{center: " + this.center.toString() + ", extents: " + this.extents.toString() + "}";
     }
 }
 
@@ -1196,7 +1206,7 @@ export class AxisAlignedBox3 implements ReadonlyAxisAlignedBox3 {
     }
 
     public toString(): string {
-        return `{center: ${this.center}, extents: ${this.extents}}`;
+        return "{center: " + this.center.toString() + ", extents: " + this.extents.toString() + "}";
     }
 }
 
@@ -1393,7 +1403,15 @@ export class OrientedBox2 implements ReadonlyOrientedBox2 {
     }
 
     public toString(): string {
-        return `{center: ${this.center}, extents: ${this.extents}, rotation: ${this.rotation}}`;
+        return (
+            "{center: " +
+            this.center.toString() +
+            ", extents: " +
+            this.extents.toString() +
+            ", rotation: " +
+            this.rotation.toString() +
+            "}"
+        );
     }
 }
 
@@ -1625,6 +1643,14 @@ export class OrientedBox3 implements ReadonlyOrientedBox3 {
     }
 
     public toString(): string {
-        return `{center: ${this.center}, extents: ${this.extents}, rotation: ${this.rotation}}`;
+        return (
+            "{center: " +
+            this.center.toString() +
+            ", extents: " +
+            this.extents.toString() +
+            ", rotation: " +
+            this.rotation.toString() +
+            "}"
+        );
     }
 }

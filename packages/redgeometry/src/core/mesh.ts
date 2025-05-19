@@ -98,7 +98,7 @@ export class MeshEdge2 {
         }
     }
 
-    public static compareStatus(e1: MeshEdge2, e2: MeshEdge2): number {
+    public static compareStatus(this: void, e1: MeshEdge2, e2: MeshEdge2): number {
         if (e1.p0.eq(e2.p0)) {
             if (e1.p1.eq(e2.p1)) {
                 // Edges are equal
@@ -332,7 +332,7 @@ export class MeshEdge2 {
     }
 
     public toString(): string {
-        return `{p0: ${this.p0}, p1: ${this.p1}}`;
+        return "{p0: " + this.p0.toString() + ", p1: " + this.p1.toString() + "}";
     }
 
     public validate(): void {
@@ -398,7 +398,7 @@ export class MeshChain2 {
     public printDebug(): void {
         let message = "MeshChain2 {\n";
         for (const e of this.getEdgeIterator()) {
-            message += `    MeshEdge2 ${e}\n`;
+            message += "    MeshEdge2 " + e.toString() + "\n";
         }
         message += "}";
 
@@ -512,7 +512,7 @@ export class MeshFace2 {
         let message = "MeshFace2 {\n";
 
         for (const e of this.getEdgeIterator()) {
-            message += `    MeshEdge2 ${e}\n`;
+            message += "    MeshEdge2 " + e.toString() + "\n";
         }
 
         message += "}";
@@ -1006,7 +1006,7 @@ export class Mesh2 {
         for (const chain of this.getChains()) {
             message += "    MeshChain2 {\n";
             for (const e of chain.getEdgeIterator()) {
-                message += `        MeshEdge2 ${e}\n`;
+                message += "        MeshEdge2 " + e.toString() + "\n";
             }
             message += "    }\n";
         }
@@ -1014,7 +1014,7 @@ export class Mesh2 {
         for (const face of this.getFaces()) {
             message += "    MeshFace2 {\n";
             for (const e of face.getEdgeIterator()) {
-                message += `        MeshEdge2 ${e}\n`;
+                message += "        MeshEdge2 " + e.toString() + "\n";
             }
             message += "    }\n";
         }

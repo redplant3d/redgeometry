@@ -93,7 +93,7 @@ export class ColorRgba implements ReadonlyColorRgba {
         const g = this.clampFloatToHex(this.g);
         const b = this.clampFloatToHex(this.b);
         const a = this.clampFloatToHex(this.a);
-        return `#${r}${g}${b}${a}`;
+        return "#" + r + g + b + a;
     }
 
     public toArray(): [number, number, number, number] {

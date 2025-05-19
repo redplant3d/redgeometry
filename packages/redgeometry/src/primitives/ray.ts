@@ -175,7 +175,7 @@ export class Ray2 implements ReadonlyRay2 {
     }
 
     public toString(): string {
-        return `{p: ${this.origin}, p: ${this.origin}}`;
+        return "{origin: " + this.origin.toString() + ", direction: " + this.direction.toString() + "}";
     }
 
     public translate(v: ReadonlyVector2): Ray2 {
@@ -321,7 +321,7 @@ export class Ray3 implements ReadonlyRay3 {
     }
 
     public toString(): string {
-        return `{p: ${this.origin}, p: ${this.origin}}`;
+        return "{origin: " + this.origin.toString() + ", direction: " + this.direction.toString() + "}";
     }
 
     public translate(v: ReadonlyVector3): Ray3 {

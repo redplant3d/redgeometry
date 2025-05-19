@@ -21,43 +21,43 @@ export class ValidationHelper {
 
     public equal<T>(valueA: T, valueB: T, fmt: string, ...params: FormatParameters): void {
         if (valueA !== valueB) {
-            const message = `${formatString(fmt, ...params)}: '${valueA}' expected to be EQUAL to '${valueB}'`;
-            this.errors.push(message);
+            const fmtStr = formatString(fmt, ...params);
+            this.errors.push(fmtStr + ": '" + valueA + "' expected to be EQUAL to '" + valueB + "'");
         }
     }
 
     public greaterThan<T>(valueA: T, valueB: T, fmt: string, ...params: FormatParameters): void {
         if (valueA <= valueB) {
-            const message = `${formatString(fmt, ...params)}: '${valueA}' expected to be GREATER THAN '${valueB}'`;
-            this.errors.push(message);
+            const fmtStr = formatString(fmt, ...params);
+            this.errors.push(fmtStr + ": '" + valueA + "' expected to be GREATER THAN '" + valueB + "'");
         }
     }
 
     public greaterThanOrEqual<T>(valueA: T, valueB: T, fmt: string, ...params: FormatParameters): void {
         if (valueA < valueB) {
-            const message = `${formatString(fmt, ...params)}: '${valueA}' expected to be GREATER THAN OR EQUAL to'${valueB}'`;
-            this.errors.push(message);
+            const fmtStr = formatString(fmt, ...params);
+            this.errors.push(fmtStr + ": " + valueA + " expected to be GREATER THAN OR EQUAL to'" + valueB + "'");
         }
     }
 
     public lessThan<T>(valueA: T, valueB: T, fmt: string, ...params: FormatParameters): void {
         if (valueA >= valueB) {
-            const message = `${formatString(fmt, ...params)}: '${valueA}' expected to be LESS THAN '${valueB}'`;
-            this.errors.push(message);
+            const fmtStr = formatString(fmt, ...params);
+            this.errors.push(fmtStr + ": '" + valueA + "' expected to be LESS THAN '" + valueB + "'");
         }
     }
 
     public lessThanOrEqual<T>(valueA: T, valueB: T, fmt: string, ...params: FormatParameters): void {
         if (valueA > valueB) {
-            const message = `${formatString(fmt, ...params)}: '${valueA}' expected to be LESS THAN OR EQUAL to '${valueB}'`;
-            this.errors.push(message);
+            const fmtStr = formatString(fmt, ...params);
+            this.errors.push(fmtStr + ": '" + valueA + "' expected to be LESS THAN OR EQUAL to '" + valueB + "'");
         }
     }
 
     public notEqual<T>(valueA: T, valueB: T, fmt: string, ...params: FormatParameters): void {
         if (valueA === valueB) {
-            const message = `${formatString(fmt, ...params)}: '${valueA}' expected to be NOT EQUAL to '${valueB}'`;
-            this.errors.push(message);
+            const fmtStr = formatString(fmt, ...params);
+            this.errors.push(fmtStr + ": '" + valueA + "' expected to be NOT EQUAL to '" + valueB + "'");
         }
     }
 }

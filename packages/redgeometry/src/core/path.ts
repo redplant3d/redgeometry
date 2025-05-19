@@ -440,20 +440,20 @@ export class Path2 implements PathSink2 {
             switch (command.type) {
                 case PathCommandType.Move: {
                     const p0 = points[pIdx++];
-                    svgData += `M${p0.x} ${p0.y}`;
+                    svgData += "M" + p0.x + " " + p0.y;
 
                     break;
                 }
                 case PathCommandType.Linear: {
                     const p1 = points[pIdx++];
-                    svgData += `L${p1.x} ${p1.y}`;
+                    svgData += "L" + p1.x + " " + p1.y;
 
                     break;
                 }
                 case PathCommandType.Quadratic: {
                     const p1 = points[pIdx++];
                     const p2 = points[pIdx++];
-                    svgData += `Q${p1.x} ${p1.y} ${p2.x} ${p2.y}`;
+                    svgData += "Q" + p1.x + " " + p1.y + " " + p2.x + " " + p2.y;
 
                     break;
                 }
@@ -461,7 +461,7 @@ export class Path2 implements PathSink2 {
                     const p1 = points[pIdx++];
                     const p2 = points[pIdx++];
                     const p3 = points[pIdx++];
-                    svgData += `C${p1.x} ${p1.y} ${p2.x} ${p2.y} ${p3.x} ${p3.y}`;
+                    svgData += "C" + p1.x + " " + p1.y + " " + p2.x + " " + p2.y + " " + p3.x + " " + p3.y;
 
                     break;
                 }
@@ -469,7 +469,7 @@ export class Path2 implements PathSink2 {
                     // Workaround (conics not supported by HTML canvas)
                     const p1 = points[pIdx++];
                     const p2 = points[pIdx++];
-                    svgData += `L${p1.x} ${p1.y} L${p2.x} ${p2.y}`;
+                    svgData += "L" + p1.x + " " + p1.y + " L" + p2.x + " " + p2.y;
 
                     break;
                 }

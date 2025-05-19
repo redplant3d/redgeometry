@@ -578,11 +578,10 @@ export class Matrix3A implements ReadonlyMatrix3A {
     public toString(): string {
         const e = this.elements;
 
-        // prettier-ignore
-        return (
-            `{e0: ${e[0]}, e2: ${e[2]}, e4: ${e[3]},\n` +
-            ` e1: ${e[1]}, e3: ${e[3]}, e5: ${e[5]}}`
-        );
+        let str = "{e0: " + e[0] + ", e2: " + e[2] + ", e4: " + e[4] + ",\n";
+        str += " e1: " + e[1] + ", e3: " + e[3] + ", e5: " + e[5] + "}";
+
+        return str;
     }
 
     /**
@@ -1280,12 +1279,11 @@ export class Matrix3 implements ReadonlyMatrix3 {
     public toString(): string {
         const e = this.elements;
 
-        // prettier-ignore
-        return (
-            `{e0: ${e[0]}, e3: ${e[3]}, e6: ${e[6]},\n` +
-            ` e1: ${e[1]}, e4: ${e[4]}, e7: ${e[7]},\n` +
-            ` e2: ${e[2]}, e5: ${e[5]}, e8: ${e[8]}}`
-        );
+        let str = "{e0: " + e[0] + ", e3: " + e[3] + ", e6: " + e[6] + ",\n";
+        str += " e1: " + e[1] + ", e4: " + e[4] + ", e7: " + e[7] + ",\n";
+        str += " e2: " + e[2] + ", e5: " + e[5] + ", e8: " + e[8] + "}";
+
+        return str;
     }
 
     /**
@@ -2119,12 +2117,11 @@ export class Matrix4A implements ReadonlyMatrix4A {
     public toString(): string {
         const e = this.elements;
 
-        // prettier-ignore
-        return (
-            `{e0: ${e[0]}, e3: ${e[3]}, e6: ${e[6]}, e9: ${e[9]},\n` +
-            ` e1: ${e[1]}, e4: ${e[4]}, e7: ${e[7]}, e10: ${e[10]},\n` +
-            ` e2: ${e[2]}, e5: ${e[5]}, e8: ${e[8]}, e11: ${e[11]}}`
-        );
+        let str = "{e0: " + e[0] + ", e3: " + e[3] + ", e6: " + e[6] + ", e9: " + e[9] + ",\n";
+        str += " e1: " + e[1] + ", e4: " + e[4] + ", e7: " + e[7] + ", e10: " + e[10] + ",\n";
+        str += " e2: " + e[2] + ", e5: " + e[5] + ", e8: " + e[8] + ", e11: " + e[11] + "}";
+
+        return str;
     }
 
     /**
@@ -3360,13 +3357,12 @@ export class Matrix4 implements ReadonlyMatrix4 {
     public toString(): string {
         const e = this.elements;
 
-        // prettier-ignore
-        return (
-            `{e0: ${e[0]}, e4: ${e[4]}, e8: ${e[8]}, e12: ${e[12]},\n` +
-            ` e1: ${e[1]}, e5: ${e[5]}, e9: ${e[9]}, e13: ${e[13]},\n` +
-            ` e2: ${e[2]}, e6: ${e[6]}, e10: ${e[10]}, e14: ${e[14]},\n` +
-            ` e3: ${e[3]}, e7: ${e[7]}, e11: ${e[11]}, e15: ${e[15]}}`
-        );
+        let str = "{e0: " + e[0] + ", e4: " + e[4] + ", e8: " + e[8] + ", e12: " + e[12] + ",\n";
+        str += " e1: " + e[1] + ", e5: " + e[5] + ", e9: " + e[9] + ", e13: " + e[13] + ",\n";
+        str += " e2: " + e[2] + ", e6: " + e[6] + ", e10: " + e[10] + ", e14: " + e[14] + ",\n";
+        str += " e3: " + e[3] + ", e7: " + e[7] + ", e11: " + e[11] + ", e15: " + e[15] + "}";
+
+        return str;
     }
 
     /**

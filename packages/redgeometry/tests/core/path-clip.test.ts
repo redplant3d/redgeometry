@@ -85,11 +85,11 @@ function checkQueue(before: PathSweepEvent2, after: PathSweepEvent2, id: string)
     const isValid = (beforeAfter === 0 && afterBefore === 0) || (beforeAfter < 0 && afterBefore > 0);
 
     if (!isValid) {
-        console.error(
-            `Event order wrong: ${id}\n` +
-                `\tBefore: ${before.p0} -> ${before.p1} (${before.left})\n` +
-                `\tAfter: ${after.p0} -> ${after.p1} (${after.left})`,
-        );
+        let message = "Event order wrong: " + id + "\n";
+        message += "    Before: " + before.p0.toString() + " -> " + before.p1.toString() + " (" + before.left + ")\n";
+        message += "    After: " + after.p0.toString() + " -> " + after.p1.toString() + " (" + after.left + ")";
+
+        console.error(message);
     }
 
     expect(isValid).toEqual(true);
@@ -102,11 +102,11 @@ function checkStatus(below: PathSweepEvent2, above: PathSweepEvent2, id: string)
     const isValid = (belowAbove === 0 && aboveBelow === 0) || (belowAbove < 0 && aboveBelow > 0);
 
     if (!isValid) {
-        console.error(
-            `Event order wrong: ${id}\n` +
-                `\tBelow: ${below.p0} -> ${below.p1}\n` +
-                `\tAbove: ${above.p0} -> ${above.p1}`,
-        );
+        let message = "Event order wrong: " + id + "\n";
+        message += "    Below: " + below.p0.toString() + " -> " + below.p1.toString() + "\n";
+        message += "    Above: " + above.p0.toString() + " -> " + above.p1.toString();
+
+        console.error(message);
     }
 
     expect(isValid).toEqual(true);

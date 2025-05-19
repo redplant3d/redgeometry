@@ -150,10 +150,10 @@ export class SystemSchedule {
             const name = entry.options.fn.name;
             const idx = entry.idx;
 
-            str += `#${i} - ${name} (#${idx}, ${mode})\n`;
+            str += "#" + i + " - " + name + " (#" + idx + ", " + mode + ")\n";
 
             for (const dep of entry.depsAsync) {
-                str += `    ^ ${dep.options.fn.name}\n`;
+                str += "    ^ " + dep.options.fn.name + "\n";
             }
         }
 

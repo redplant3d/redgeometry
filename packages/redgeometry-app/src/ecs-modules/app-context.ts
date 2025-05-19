@@ -286,7 +286,7 @@ export class AppContextPlugin implements WorldPlugin {
         ctx.restore();
     }
 
-    public fillPath(path: Path2, style: CanvasStyle = "#000000", fillRule?: "evenodd" | "nonzero" | undefined): void {
+    public fillPath(path: Path2, style: CanvasStyle = "#000000", fillRule?: "evenodd" | "nonzero"): void {
         const ctx = this.context;
         ctx.beginPath();
 
@@ -298,11 +298,7 @@ export class AppContextPlugin implements WorldPlugin {
         ctx.restore();
     }
 
-    public fillPaths(
-        paths: Path2[],
-        style: CanvasStyle = "#000000",
-        fillRule?: "evenodd" | "nonzero" | undefined,
-    ): void {
+    public fillPaths(paths: Path2[], style: CanvasStyle = "#000000", fillRule?: "evenodd" | "nonzero"): void {
         const ctx = this.context;
         ctx.beginPath();
 

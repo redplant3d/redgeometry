@@ -18,7 +18,7 @@ export class PathSweepEvent2 {
         this.left = left;
     }
 
-    public static compareQueue(ev1: PathSweepEvent2, ev2: PathSweepEvent2): number {
+    public static compareQueue(this: void, ev1: PathSweepEvent2, ev2: PathSweepEvent2): number {
         // `result` < 0 -> `e1 < e2`
         // `result` > 0 -> `e2 < e1`
         if (ev1.p0.x !== ev2.p0.x) {
@@ -39,7 +39,7 @@ export class PathSweepEvent2 {
         }
     }
 
-    public static compareStatus(ev1: PathSweepEvent2, ev2: PathSweepEvent2): number {
+    public static compareStatus(this: void, ev1: PathSweepEvent2, ev2: PathSweepEvent2): number {
         // `result < 0` -> `e1 < e2`
         // `result > 0` -> `e2 < e1`
         if (ev1.p0.eq(ev2.p0)) {

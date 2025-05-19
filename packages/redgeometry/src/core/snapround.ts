@@ -105,7 +105,7 @@ export class SnapRoundSweepEvent2 {
         this.left = left;
     }
 
-    public static compareQueue(e1: SnapRoundSweepEvent2, e2: SnapRoundSweepEvent2): number {
+    public static compareQueue(this: void, e1: SnapRoundSweepEvent2, e2: SnapRoundSweepEvent2): number {
         // result < 0 -> e1 < e2
         // result > 0 -> e2 < e1
         if (e1.p0.x !== e2.p0.x) {
@@ -122,7 +122,7 @@ export class SnapRoundSweepEvent2 {
         }
     }
 
-    public static compareStatus(e1: SnapRoundSweepEvent2, e2: SnapRoundSweepEvent2): number {
+    public static compareStatus(this: void, e1: SnapRoundSweepEvent2, e2: SnapRoundSweepEvent2): number {
         // Just sort by key
         return e1.key - e2.key;
     }

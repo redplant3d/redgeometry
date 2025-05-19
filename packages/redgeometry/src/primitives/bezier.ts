@@ -349,7 +349,7 @@ export class Bezier1Curve2 implements ReadonlyBezier1Curve2 {
     }
 
     public toString(): string {
-        return `{p0: ${this.p0}, p1: ${this.p1}}`;
+        return "{p0: " + this.p0.toString() + ", p1: " + this.p1.toString() + "}";
     }
 }
 
@@ -728,7 +728,7 @@ export class Bezier2Curve2 implements ReadonlyBezier2Curve2 {
     }
 
     public toString(): string {
-        return `{p0: ${this.p0}, p1: ${this.p1}, p2: ${this.p2}}`;
+        return "{p0: " + this.p0.toString() + ", p1: " + this.p1.toString() + ", p2: " + this.p2.toString() + "}";
     }
 }
 
@@ -1121,7 +1121,17 @@ export class Bezier3Curve2 implements ReadonlyBezier3Curve2 {
     }
 
     public toString(): string {
-        return `{p0: ${this.p0}, p1: ${this.p1}, p2: ${this.p2},p2: ${this.p3}}`;
+        return (
+            "{p0: " +
+            this.p0.toString() +
+            ", p1: " +
+            this.p1.toString() +
+            ", p2: " +
+            this.p2.toString() +
+            ", p3: " +
+            this.p3.toString() +
+            "}"
+        );
     }
 }
 
@@ -1501,6 +1511,16 @@ export class BezierRCurve2 implements ReadonlyBezierRCurve2 {
     }
 
     public toString(): string {
-        return `{p0: ${this.p0}, p1: ${this.p1}, p2: ${this.p2}, w: ${this.w}}`;
+        return (
+            "{p0: " +
+            this.p0.toString() +
+            ", p1: " +
+            this.p1.toString() +
+            ", p2: " +
+            this.p2.toString() +
+            ", w: " +
+            this.w +
+            "}"
+        );
     }
 }

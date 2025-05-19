@@ -218,7 +218,7 @@ export class Complex implements ReadonlyComplex {
     }
 
     public toString(): string {
-        return `{a: ${this.a}, b: ${this.b}}`;
+        return "{a: " + this.a + ", b: " + this.b + "}";
     }
 
     public unit(): Complex {

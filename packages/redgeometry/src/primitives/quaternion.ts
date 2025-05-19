@@ -676,7 +676,7 @@ export class Quaternion implements ReadonlyQuaternion {
     }
 
     public toString(): string {
-        return `{a: ${this.a}, b: ${this.b}, c: ${this.c}, d: ${this.d}}`;
+        return "{a: " + this.a + ", b: " + this.b + ", c: " + this.c + ", d: " + this.d + "}";
     }
 
     public unit(): Quaternion {

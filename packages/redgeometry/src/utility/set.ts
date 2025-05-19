@@ -106,8 +106,7 @@ export class Bitset {
 
         // LSB to MSB
         for (let i = 0; i < this.data.length; i++) {
-            str += this.data[i].toString(2).padStart(32, "0");
-            str += "\n";
+            str += this.data[i].toString(2).padStart(32, "0") + "\n";
         }
 
         return str;

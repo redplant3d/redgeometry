@@ -59,7 +59,7 @@ export class PathOverlayState2 {
         this.map.clear();
     }
 
-    private static compareTag(a: number, b: number): number {
+    private static compareTag(this: void, a: number, b: number): number {
         return a - b;
     }
 }

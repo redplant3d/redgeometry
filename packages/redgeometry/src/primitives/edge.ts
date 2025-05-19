@@ -454,7 +454,7 @@ export class Edge2 implements ReadonlyEdge2 {
     }
 
     public toString(): string {
-        return `{p0: ${this.p0}, p1: ${this.p1}}`;
+        return "{p0: " + this.p0.toString() + ", p1: " + this.p1.toString() + "}";
     }
 
     public translate(v: ReadonlyVector2): Edge2 {
@@ -617,7 +617,7 @@ export class Edge3 implements ReadonlyEdge3 {
     }
 
     public toString(): string {
-        return `{p0: ${this.p0}, p1: ${this.p1}}`;
+        return "{p0: " + this.p0.toString() + ", p1: " + this.p1.toString() + "}";
     }
 
     public translate(v: ReadonlyVector3): Edge3 {

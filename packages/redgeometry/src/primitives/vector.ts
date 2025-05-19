@@ -593,7 +593,7 @@ export class Vector2 implements ReadonlyVector2 {
     }
 
     public toString(): string {
-        return `{x: ${this.x}, y: ${this.y}}`;
+        return "{x: " + this.x + ", y: " + this.y + "}";
     }
 
     public unit(): Vector2 {
@@ -1096,7 +1096,7 @@ export class Vector3 implements ReadonlyVector3 {
     }
 
     public toString(): string {
-        return `{x: ${this.x}, y: ${this.y}, z: ${this.z}}`;
+        return "{x: " + this.x + ", y: " + this.y + ", z: " + this.z + "}";
     }
 
     public unit(): Vector3 {
@@ -1495,7 +1495,7 @@ export class Vector4 implements ReadonlyVector4 {
     }
 
     public toString(): string {
-        return `{x: ${this.x}, y: ${this.y}, z: ${this.z}}, w: ${this.w}}`;
+        return "{x: " + this.x + ", y: " + this.y + ", z: " + this.z + ", w: " + this.w + "}";
     }
 
     public unit(): Vector4 {
