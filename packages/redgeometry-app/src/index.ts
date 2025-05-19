@@ -1,7 +1,6 @@
 import { LocalAppContext, WebAppContext } from "./ecs/app.js";
 import { BPLUS_TREE_MAIN_WORLD, BPLUS_TREE_REMOTE_WORLD } from "./parts/bplus-tree.js";
 import { ECS_MAIN_WORLD, ECS_REMOTE_WORLD } from "./parts/ecs-bounce.js";
-import { GPU_CUBE_MAIN_WORLD, GPU_CUBE_REMOTE_WORLD } from "./parts/gpu-cube.js";
 import { IMAGE_MAIN_WORLD, IMAGE_REMOTE_WORLD } from "./parts/image.js";
 import { MATRIX_MAIN_WORLD, MATRIX_REMOTE_WORLD } from "./parts/matrix.js";
 import { MESH_MAIN_WORLD, MESH_REMOTE_WORLD } from "./parts/mesh.js";
@@ -31,11 +30,6 @@ launcher.addPart(
     { id: "ecs-bounce", runWorldId: "main", runScheduleId: "start" },
     { id: "ecs-bounce-main", parent: undefined, worlds: [ECS_MAIN_WORLD] },
     { id: "ecs-bounce-remote", parent: "ecs-bounce-main", worlds: [ECS_REMOTE_WORLD] },
-);
-launcher.addPart(
-    { id: "gpu-cube", runWorldId: "main", runScheduleId: "start" },
-    { id: "gpu-cube-main", parent: undefined, worlds: [GPU_CUBE_MAIN_WORLD] },
-    { id: "gpu-cube-remote", parent: "gpu-cube-main", worlds: [GPU_CUBE_REMOTE_WORLD] },
 );
 launcher.addPart(
     { id: "image", runWorldId: "main", runScheduleId: "start" },
