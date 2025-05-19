@@ -1,4 +1,4 @@
-import type { NumberBuffer, TypedBuffer } from "redgeometry/src/utility/buffer";
+import type { NumberBuffer, TypedBuffer } from "./buffer.js";
 
 export function gpuCreateBuffer(
     device: GPUDevice,

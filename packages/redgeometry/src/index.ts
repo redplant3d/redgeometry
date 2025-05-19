@@ -19,7 +19,6 @@ export * from "./primitives/quaternion.js";
 export * from "./primitives/ray.js";
 export * from "./primitives/vector.js";
 export * from "./utility/array.js";
-export * from "./utility/buffer.js";
 export * from "./utility/debug.js";
 export * from "./utility/float128.js";
 export * from "./utility/hash.js";

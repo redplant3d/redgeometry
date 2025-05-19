@@ -1,9 +1,9 @@
 import type { SerializationMap } from "redgeometry/src/internal/serialize";
 import { assertDebug, throwError } from "redgeometry/src/utility/debug";
-import { ObjectPool } from "redgeometry/src/utility/object";
 import { Bitset } from "redgeometry/src/utility/set";
 import type { Component, ComponentId, ComponentIdOf, ComponentIdsOf, EntityId } from "../ecs/types.js";
 import { ChangeFlags } from "../ecs/world.js";
+import { ObjectPool } from "./object.js";
 
 enum EntityChangeFlags {
     None,

@@ -1,8 +1,8 @@
 import type { ReadonlyMatrix4 } from "redgeometry/src/primitives/matrix";
-import { type Float32Buffer, type NumberBuffer } from "redgeometry/src/utility/buffer";
 import { assertDebug, log } from "redgeometry/src/utility/debug";
 import type { ComponentIdsOf, DefaultSystemStage, EntityId, WorldModule } from "../ecs/types.js";
 import type { World } from "../ecs/world.js";
+import { type Float32Buffer, type NumberBuffer } from "../utility/buffer.js";
 import { gpuCreateBuffer } from "../utility/gpu.js";
 import { AssetModule, AssetPlugin, type AssetId } from "./asset.js";
 import { cameraSystem, type CameraComponent } from "./camera.js";
