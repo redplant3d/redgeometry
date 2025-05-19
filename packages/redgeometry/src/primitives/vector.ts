@@ -25,6 +25,7 @@ export interface ReadonlyVector2 {
     abs(): Vector2;
     add(v: ReadonlyVector2): Vector2;
     addMulS(v: ReadonlyVector2, s: number): Vector2;
+    addS(s: number): Vector2;
     angle(): number;
     angleTo(v: ReadonlyVector2): number;
     clamp(vmin: ReadonlyVector2, vmax: ReadonlyVector2): Vector2;
@@ -32,6 +33,7 @@ export interface ReadonlyVector2 {
     cross(v: ReadonlyVector2): number;
     distance(v: ReadonlyVector2): number;
     distanceSq(v: ReadonlyVector2): number;
+    div(v: ReadonlyVector2): Vector2;
     divS(s: number): Vector2;
     dot(v: ReadonlyVector2): number;
     eq(v: ReadonlyVector2): boolean;
@@ -50,9 +52,9 @@ export interface ReadonlyVector2 {
     neg(): Vector2;
     nlerp(v: ReadonlyVector2, t: number): Vector2;
     normal(): Vector2;
-    setMul(v1: ReadonlyVector2, v2: ReadonlyVector2): void;
     slerp(v: ReadonlyVector2, t: number): Vector2;
     sub(v: ReadonlyVector2): Vector2;
+    subS(s: number): Vector2;
     toArray(): [number, number];
     toString(): string;
     unit(): Vector2;
@@ -67,12 +69,14 @@ export interface ReadonlyVector3 {
     abs(): Vector3;
     add(v: ReadonlyVector3): Vector3;
     addMulS(v: ReadonlyVector3, s: number): Vector3;
+    addS(s: number): Vector3;
     angleTo(v: ReadonlyVector3): number;
     clamp(vmin: ReadonlyVector3, vmax: ReadonlyVector3): Vector3;
     clone(): Vector3;
     cross(v: ReadonlyVector3): Vector3;
     distance(v: ReadonlyVector3): number;
     distanceSq(v: ReadonlyVector3): number;
+    div(v: ReadonlyVector3): Vector3;
     divS(s: number): Vector3;
     dot(v: ReadonlyVector3): number;
     eq(v: ReadonlyVector3): boolean;
@@ -96,9 +100,9 @@ export interface ReadonlyVector3 {
     normalAroundY(): Vector3;
     normalAroundZ(): Vector3;
     orthonormalBasis(): { n1: Vector3; n2: Vector3 };
-    setMul(v1: ReadonlyVector3, v2: ReadonlyVector3): void;
     slerp(v: ReadonlyVector3, t: number): Vector3;
     sub(v: ReadonlyVector3): Vector3;
+    subS(s: number): Vector3;
     toArray(): [number, number, number];
     toString(): string;
     unit(): Vector3;
@@ -116,10 +120,12 @@ export interface ReadonlyVector4 {
     abs(): Vector4;
     add(v: ReadonlyVector4): Vector4;
     addMulS(v: ReadonlyVector4, s: number): Vector4;
+    addS(s: number): Vector4;
     clamp(vmin: ReadonlyVector4, vmax: ReadonlyVector4): Vector4;
     clone(): Vector4;
     distance(v: ReadonlyVector4): number;
     distanceSq(v: ReadonlyVector4): number;
+    div(v: ReadonlyVector4): Vector4;
     divS(s: number): Vector4;
     dot(v: ReadonlyVector4): number;
     eq(v: ReadonlyVector4): boolean;
@@ -137,8 +143,8 @@ export interface ReadonlyVector4 {
     mulS(s: number): Vector4;
     neg(): Vector4;
     nlerp(v: ReadonlyVector4, t: number): Vector4;
-    setMul(v1: ReadonlyVector4, v2: ReadonlyVector4): void;
     sub(v: ReadonlyVector4): Vector4;
+    subS(s: number): Vector4;
     toArray(): [number, number, number, number];
     toString(): string;
     unit(): Vector4;
@@ -286,6 +292,13 @@ export class Vector2 implements ReadonlyVector2 {
     }
 
     /**
+     * Returns the sum of the current vector and a scalar `s`.
+     */
+    public addS(s: number): Vector2 {
+        return new Vector2(this.x + s, this.y + s);
+    }
+
+    /**
      * Returns the angle of the vector from polar coordinates in radians.
      */
     public angle(): number {
@@ -349,9 +362,14 @@ export class Vector2 implements ReadonlyVector2 {
     }
 
     /**
+     * Returns the element-wise quotient of the current vector and a vector `v`.
+     */
+    public div(v: ReadonlyVector2): Vector2 {
+        return new Vector2(this.x / v.x, this.y / v.y);
+    }
+
+    /**
      * Returns the quotient of the current vector and a scalar `s`.
-     *
-     * Note: Each element is divided separately.
      */
     public divS(s: number): Vector2 {
         return new Vector2(this.x / s, this.y / s);
@@ -420,7 +438,7 @@ export class Vector2 implements ReadonlyVector2 {
     }
 
     /**
-     * Returns the product of the current vector and a vector `v`.
+     * Returns the element-wise product of the current vector and a vector `v`.
      */
     public mul(v: ReadonlyVector2): Vector2 {
         return new Vector2(this.x * v.x, this.y * v.y);
@@ -478,6 +496,16 @@ export class Vector2 implements ReadonlyVector2 {
         this.y = v1.y + s * v2.y;
     }
 
+    public setAddS(v: ReadonlyVector2, s: number): void {
+        this.x = v.x + s;
+        this.y = v.y + s;
+    }
+
+    public setDiv(v1: ReadonlyVector2, v2: ReadonlyVector2): void {
+        this.x = v1.x / v2.x;
+        this.y = v1.y / v2.y;
+    }
+
     public setDivS(v: ReadonlyVector2, s: number): void {
         this.x = v.x / s;
         this.y = v.y / s;
@@ -496,6 +524,11 @@ export class Vector2 implements ReadonlyVector2 {
     public setSub(v1: ReadonlyVector2, v2: ReadonlyVector2): void {
         this.x = v1.x - v2.x;
         this.y = v1.y - v2.y;
+    }
+
+    public setSubS(v: ReadonlyVector2, s: number): void {
+        this.x = v.x - s;
+        this.y = v.y - s;
     }
 
     public setToOne(): void {
@@ -546,6 +579,13 @@ export class Vector2 implements ReadonlyVector2 {
      */
     public sub(v: ReadonlyVector2): Vector2 {
         return new Vector2(this.x - v.x, this.y - v.y);
+    }
+
+    /**
+     * Returns the difference of the current vector and a scalar `s`.
+     */
+    public subS(s: number): Vector2 {
+        return new Vector2(this.x - s, this.y - s);
     }
 
     public toArray(): [number, number] {
@@ -677,6 +717,13 @@ export class Vector3 implements ReadonlyVector3 {
     }
 
     /**
+     * Returns the sum of the current vector and a scalar `s`.
+     */
+    public addS(s: number): Vector3 {
+        return new Vector3(this.x + s, this.y + s, this.z + s);
+    }
+
+    /**
      * Returns the angle between the current vector and `v` in radians.
      *
      * Note: The returned value is unsigned and less than or equal to `PI`.
@@ -730,9 +777,14 @@ export class Vector3 implements ReadonlyVector3 {
     }
 
     /**
+     * Returns the element-wise quotient of the current vector and a vector `v`.
+     */
+    public div(v: ReadonlyVector3): Vector3 {
+        return new Vector3(this.x / v.x, this.y / v.y, this.z / v.z);
+    }
+
+    /**
      * Returns the quotient of the current vector and a scalar `s`.
-     *
-     * Note: Each element is divided separately.
      */
     public divS(s: number): Vector3 {
         return new Vector3(this.x / s, this.y / s, this.z / s);
@@ -798,7 +850,7 @@ export class Vector3 implements ReadonlyVector3 {
     }
 
     /**
-     * Returns the product of the current vector and a vector `v`.
+     * Returns the element-wise product of the current vector and a vector `v`.
      */
     public mul(v: ReadonlyVector3): Vector3 {
         return new Vector3(this.x * v.x, this.y * v.y, this.z * v.z);
@@ -927,12 +979,24 @@ export class Vector3 implements ReadonlyVector3 {
         this.z = v1.z + s * v2.z;
     }
 
+    public setAddS(v: ReadonlyVector3, s: number): void {
+        this.x = v.x + s;
+        this.y = v.y + s;
+        this.z = v.z + s;
+    }
+
     public setCross(v1: ReadonlyVector3, v2: ReadonlyVector3): void {
         const vx = v1.y * v2.z - v1.z * v2.y;
         const vy = v1.z * v2.x - v1.x * v2.z;
         const vz = v1.x * v2.y - v1.y * v2.x;
 
         this.set(vx, vy, vz);
+    }
+
+    public setDiv(v1: ReadonlyVector3, v2: ReadonlyVector3): void {
+        this.x = v1.x / v2.x;
+        this.y = v1.y / v2.y;
+        this.z = v1.z / v2.z;
     }
 
     public setDivS(v: ReadonlyVector3, s: number): void {
@@ -957,6 +1021,12 @@ export class Vector3 implements ReadonlyVector3 {
         this.x = v1.x - v2.x;
         this.y = v1.y - v2.y;
         this.z = v1.z - v2.z;
+    }
+
+    public setSubS(v: ReadonlyVector3, s: number): void {
+        this.x = v.x - s;
+        this.y = v.y - s;
+        this.z = v.z - s;
     }
 
     public setToOne(): void {
@@ -1012,6 +1082,13 @@ export class Vector3 implements ReadonlyVector3 {
      */
     public sub(v: ReadonlyVector3): Vector3 {
         return new Vector3(this.x - v.x, this.y - v.y, this.z - v.z);
+    }
+
+    /**
+     * Returns the difference of the current vector and a scalar `s`.
+     */
+    public subS(s: number): Vector3 {
+        return new Vector3(this.x - s, this.y - s, this.z - s);
     }
 
     public toArray(): [number, number, number] {
@@ -1154,6 +1231,13 @@ export class Vector4 implements ReadonlyVector4 {
         return new Vector4(this.x + s * v.x, this.y + s * v.y, this.z + s * v.z, this.w + s * v.w);
     }
 
+    /**
+     * Returns the sum of the current vector and a scalar `s`.
+     */
+    public addS(s: number): Vector4 {
+        return new Vector4(this.x + s, this.y + s, this.z + s, this.w + s);
+    }
+
     public clamp(vmin: ReadonlyVector4, vmax: ReadonlyVector4): Vector4 {
         const x = clamp(this.x, vmin.x, vmax.x);
         const y = clamp(this.y, vmin.y, vmax.y);
@@ -1180,9 +1264,14 @@ export class Vector4 implements ReadonlyVector4 {
     }
 
     /**
+     * Returns the element-wise quotient of the current vector and a vector `v`.
+     */
+    public div(v: ReadonlyVector4): Vector4 {
+        return new Vector4(this.x / v.x, this.y / v.y, this.z / v.z, this.w / v.w);
+    }
+
+    /**
      * Returns the quotient of the current vector and a scalar `s`.
-     *
-     * Note: Each element is divided separately.
      */
     public divS(s: number): Vector4 {
         return new Vector4(this.x / s, this.y / s, this.z / s, this.w / s);
@@ -1261,7 +1350,7 @@ export class Vector4 implements ReadonlyVector4 {
     }
 
     /**
-     * Returns the product of the current vector and a vector `v`.
+     * Returns the element-wise product of the current vector and a vector `v`.
      */
     public mul(v: ReadonlyVector4): Vector4 {
         return new Vector4(this.x * v.x, this.y * v.y, this.z * v.z, this.w * v.w);
@@ -1317,6 +1406,20 @@ export class Vector4 implements ReadonlyVector4 {
         this.w = v1.w + s * v2.w;
     }
 
+    public setAddS(v: ReadonlyVector4, s: number): void {
+        this.x = v.x + s;
+        this.y = v.y + s;
+        this.z = v.z + s;
+        this.w = v.w + s;
+    }
+
+    public setDiv(v1: ReadonlyVector4, v2: ReadonlyVector4): void {
+        this.x = v1.x / v2.x;
+        this.y = v1.y / v2.y;
+        this.z = v1.z / v2.z;
+        this.w = v1.w / v2.w;
+    }
+
     public setDivS(v: ReadonlyVector4, s: number): void {
         this.x = v.x / s;
         this.y = v.y / s;
@@ -1345,6 +1448,13 @@ export class Vector4 implements ReadonlyVector4 {
         this.w = v1.w - v2.w;
     }
 
+    public setSubS(v: ReadonlyVector4, s: number): void {
+        this.x = v.x - s;
+        this.y = v.y - s;
+        this.z = v.z - s;
+        this.w = v.w - s;
+    }
+
     public setToOne(): void {
         this.set(1, 1, 1, 1);
     }
@@ -1371,6 +1481,13 @@ export class Vector4 implements ReadonlyVector4 {
 
     public sub(v: ReadonlyVector4): Vector4 {
         return new Vector4(this.x - v.x, this.y - v.y, this.z - v.z, this.w - v.w);
+    }
+
+    /**
+     * Returns the difference of the current vector and a scalar `s`.
+     */
+    public subS(s: number): Vector4 {
+        return new Vector4(this.x - s, this.y - s, this.z - s, this.w - s);
     }
 
     public toArray(): [number, number, number, number] {
