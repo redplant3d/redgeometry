@@ -30,7 +30,8 @@ export interface ReadonlyVector2 {
     clamp(vmin: ReadonlyVector2, vmax: ReadonlyVector2): Vector2;
     clone(): Vector2;
     cross(v: ReadonlyVector2): number;
-    distanceTo(p: ReadonlyVector2): number;
+    distance(v: ReadonlyVector2): number;
+    distanceSq(v: ReadonlyVector2): number;
     divS(s: number): Vector2;
     dot(v: ReadonlyVector2): number;
     eq(v: ReadonlyVector2): boolean;
@@ -70,7 +71,8 @@ export interface ReadonlyVector3 {
     clamp(vmin: ReadonlyVector3, vmax: ReadonlyVector3): Vector3;
     clone(): Vector3;
     cross(v: ReadonlyVector3): Vector3;
-    distanceTo(p: ReadonlyVector3): number;
+    distance(v: ReadonlyVector3): number;
+    distanceSq(v: ReadonlyVector3): number;
     divS(s: number): Vector3;
     dot(v: ReadonlyVector3): number;
     eq(v: ReadonlyVector3): boolean;
@@ -116,6 +118,8 @@ export interface ReadonlyVector4 {
     addMulS(v: ReadonlyVector4, s: number): Vector4;
     clamp(vmin: ReadonlyVector4, vmax: ReadonlyVector4): Vector4;
     clone(): Vector4;
+    distance(v: ReadonlyVector4): number;
+    distanceSq(v: ReadonlyVector4): number;
     divS(s: number): Vector4;
     dot(v: ReadonlyVector4): number;
     eq(v: ReadonlyVector4): boolean;
@@ -333,10 +337,15 @@ export class Vector2 implements ReadonlyVector2 {
         return this.x * v.y - this.y * v.x;
     }
 
-    public distanceTo(p: ReadonlyVector2): number {
-        const x = this.x - p.x;
-        const y = this.y - p.y;
-        return Math.sqrt(x * x + y * y);
+    public distance(v: ReadonlyVector2): number {
+        const d2 = this.distanceSq(v);
+        return Math.sqrt(d2);
+    }
+
+    public distanceSq(v: ReadonlyVector2): number {
+        const x = this.x - v.x;
+        const y = this.y - v.y;
+        return x * x + y * y;
     }
 
     /**
@@ -708,11 +717,16 @@ export class Vector3 implements ReadonlyVector3 {
         return new Vector3(x, y, z);
     }
 
-    public distanceTo(p: ReadonlyVector3): number {
-        const x = this.x - p.x;
-        const y = this.y - p.y;
-        const z = this.z - p.z;
-        return Math.sqrt(x * x + y * y + z * z);
+    public distance(v: ReadonlyVector3): number {
+        const d2 = this.distanceSq(v);
+        return Math.sqrt(d2);
+    }
+
+    public distanceSq(v: ReadonlyVector3): number {
+        const x = this.x - v.x;
+        const y = this.y - v.y;
+        const z = this.z - v.z;
+        return x * x + y * y + z * z;
     }
 
     /**
@@ -1150,6 +1164,19 @@ export class Vector4 implements ReadonlyVector4 {
 
     public clone(): Vector4 {
         return new Vector4(this.x, this.y, this.z, this.w);
+    }
+
+    public distance(v: ReadonlyVector4): number {
+        const d2 = this.distanceSq(v);
+        return Math.sqrt(d2);
+    }
+
+    public distanceSq(v: ReadonlyVector4): number {
+        const x = this.x - v.x;
+        const y = this.y - v.y;
+        const z = this.z - v.z;
+        const w = this.w - v.w;
+        return x * x + y * y + z * z + w * w;
     }
 
     /**

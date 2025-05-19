@@ -1157,8 +1157,8 @@ export class BezierRCurve2 implements ReadonlyBezierRCurve2 {
 
     public static fromCenterPoint(p0: Vector2, p1: Vector2, p2: Vector2, pc: ReadonlyVector2): BezierRCurve2 {
         const pm = p0.lerp(p2, 0.5);
-        const dm = pm.distanceTo(pc);
-        const d1 = p1.distanceTo(pc);
+        const dm = pm.distance(pc);
+        const d1 = p1.distance(pc);
         const w = Math.sqrt(dm / d1);
         return new BezierRCurve2(p0, p1, p2, w);
     }

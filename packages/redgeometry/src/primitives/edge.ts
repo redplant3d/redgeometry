@@ -156,7 +156,7 @@ export class Edge2 implements ReadonlyEdge2 {
         const p0 = e1.getValueAt(t);
         const p1 = e2.getValueAt(u);
 
-        return p0.distanceTo(p1);
+        return p0.distance(p1);
     }
 
     public static getClosestParameter(e1: ReadonlyEdge2, e2: ReadonlyEdge2): [number, number] {
@@ -372,7 +372,7 @@ export class Edge2 implements ReadonlyEdge2 {
     }
 
     public getClosestPointDistance(p: ReadonlyVector2): number {
-        return this.getClosestPoint(p).distanceTo(p);
+        return this.getClosestPoint(p).distance(p);
     }
 
     /**
@@ -541,7 +541,7 @@ export class Edge3 implements ReadonlyEdge3 {
     }
 
     public getClosestPointDistance(p: ReadonlyVector3): number {
-        return this.getClosestPoint(p).distanceTo(p);
+        return this.getClosestPoint(p).distance(p);
     }
 
     /**
