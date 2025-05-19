@@ -15,7 +15,7 @@ import { AppMainModule, AppRemoteModule, type AppStateData } from "../ecs-module
 import type { WorldOptions } from "../ecs/app.js";
 import type { DefaultSystemStage, WorldModule } from "../ecs/types.js";
 import { WORLD_SCHEDULE_OPTIONS_DEFAULT, type World } from "../ecs/world.js";
-import { ColorRgba } from "../render/color.js";
+import { ColorRgba } from "../utility/color.js";
 import { createRandomPolygonPair, getWindingOperator } from "../utility/helper.js";
 type PathOverlayTagEntry = { tag: number[]; faces: MeshFace2[] };
 

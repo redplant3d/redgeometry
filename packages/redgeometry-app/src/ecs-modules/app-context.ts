@@ -10,8 +10,8 @@ import { assertUnreachable, throwError } from "redgeometry/src/utility/debug";
 import type { Random } from "redgeometry/src/utility/random";
 import type { DefaultSystemStage, WorldModule, WorldPlugin } from "../ecs/types.js";
 import type { World } from "../ecs/world.js";
-import type { Image2 } from "../render/image.js";
 import { createRandomColor } from "../utility/helper.js";
+import type { Image2 } from "../utility/image.js";
 import type { AppCanvasData } from "./app.js";
 
 type CanvasStyle = string | CanvasGradient | CanvasPattern;

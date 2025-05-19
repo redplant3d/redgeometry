@@ -13,7 +13,7 @@ import type { ReadonlyMinMaxBox2 } from "redgeometry/src/primitives/box";
 import { Edge2 } from "redgeometry/src/primitives/edge";
 import { Vector2 } from "redgeometry/src/primitives/vector";
 import type { Random } from "redgeometry/src/utility/random";
-import { ColorRgba } from "../render/color.js";
+import { ColorRgba } from "./color.js";
 
 export function createRandomColor(random: Random, s: number, v: number, a: number): ColorRgba {
     return ColorRgba.fromHSV(random.nextFloat(), s, v, a);

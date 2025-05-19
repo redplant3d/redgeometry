@@ -1,7 +1,6 @@
 import { LocalAppContext, WebAppContext } from "./ecs/app.js";
 import { BPLUS_TREE_MAIN_WORLD, BPLUS_TREE_REMOTE_WORLD } from "./parts/bplus-tree.js";
 import { ECS_MAIN_WORLD, ECS_REMOTE_WORLD } from "./parts/ecs-bounce.js";
-import { IMAGE_MAIN_WORLD, IMAGE_REMOTE_WORLD } from "./parts/image.js";
 import { MATRIX_MAIN_WORLD, MATRIX_REMOTE_WORLD } from "./parts/matrix.js";
 import { MESH_MAIN_WORLD, MESH_REMOTE_WORLD } from "./parts/mesh.js";
 import { PATH_AREA_MAIN_WORLD, PATH_AREA_REMOTE_WORLD } from "./parts/path-area.js";
@@ -30,11 +29,6 @@ launcher.addPart(
     { id: "ecs-bounce", runWorldId: "main", runScheduleId: "start" },
     { id: "ecs-bounce-main", parent: undefined, worlds: [ECS_MAIN_WORLD] },
     { id: "ecs-bounce-remote", parent: "ecs-bounce-main", worlds: [ECS_REMOTE_WORLD] },
-);
-launcher.addPart(
-    { id: "image", runWorldId: "main", runScheduleId: "start" },
-    { id: "image-main", parent: undefined, worlds: [IMAGE_MAIN_WORLD] },
-    { id: "image-remote", parent: "image-main", worlds: [IMAGE_REMOTE_WORLD] },
 );
 launcher.addPart(
     { id: "matrix", runWorldId: "main", runScheduleId: "start" },

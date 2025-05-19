@@ -10,7 +10,7 @@ import { AppMainModule, AppRemoteModule, type AppStateData } from "../ecs-module
 import type { WorldOptions } from "../ecs/app.js";
 import type { DefaultSystemStage, WorldModule } from "../ecs/types.js";
 import { WORLD_SCHEDULE_OPTIONS_DEFAULT, type World } from "../ecs/world.js";
-import { Image2 } from "../render/image.js";
+import { Image2 } from "../utility/image.js";
 
 const SOBOL_XOR_1 = [
     0x00000000, 0x00000001, 0x00000001, 0x00000007, 0x00000001, 0x00000013, 0x00000015, 0x0000007f, 0x00000001,
