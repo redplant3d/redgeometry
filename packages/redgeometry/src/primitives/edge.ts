@@ -27,6 +27,7 @@ export interface ReadonlyEdge2 {
     readonly p1: ReadonlyVector2;
 
     clone(): Edge2;
+    direction(): Vector2;
     eq(e: ReadonlyEdge2): boolean;
     getBounds(): MinMaxBox2;
     getClosestPoint(p: ReadonlyVector2): Vector2;
@@ -44,7 +45,6 @@ export interface ReadonlyEdge2 {
     toRay(): Ray2;
     toString(): string;
     translate(v: ReadonlyVector2): Edge2;
-    vector(): Vector2;
 }
 
 export interface ReadonlyEdge3 {
@@ -52,6 +52,7 @@ export interface ReadonlyEdge3 {
     readonly p1: ReadonlyVector3;
 
     clone(): Edge3;
+    direction(): Vector3;
     eq(e: ReadonlyEdge3): boolean;
     getBounds(): MinMaxBox3;
     getClosestPoint(p: ReadonlyVector3): Vector3;
@@ -67,7 +68,6 @@ export interface ReadonlyEdge3 {
     toRay(): Ray3;
     toString(): string;
     translate(v: ReadonlyVector3): Edge3;
-    vector(): Vector3;
 }
 
 export class Edge2 implements ReadonlyEdge2 {
@@ -162,8 +162,8 @@ export class Edge2 implements ReadonlyEdge2 {
     public static getClosestParameter(e1: ReadonlyEdge2, e2: ReadonlyEdge2): [number, number] {
         // Based on the nonrobust implementation of *Robust Computation
         // of Distance Between Line Segments* by David Eberly
-        const r = e1.vector();
-        const s = e2.vector();
+        const r = e1.direction();
+        const s = e2.direction();
         const v = e1.p0.sub(e2.p0);
 
         const a = r.dot(r);
@@ -246,8 +246,8 @@ export class Edge2 implements ReadonlyEdge2 {
     }
 
     public static getIntersection(e1: ReadonlyEdge2, e2: ReadonlyEdge2): Vector2 | undefined {
-        const v1 = e1.vector();
-        const v2 = e2.vector();
+        const v1 = e1.direction();
+        const v2 = e2.direction();
         const den = v1.cross(v2);
 
         if (den === 0) {
@@ -269,8 +269,8 @@ export class Edge2 implements ReadonlyEdge2 {
     }
 
     public static getIntersectionParameter(e1: ReadonlyEdge2, e2: ReadonlyEdge2): [number, number] {
-        const v1 = e1.vector();
-        const v2 = e2.vector();
+        const v1 = e1.direction();
+        const v2 = e2.direction();
         const den = v1.cross(v2);
 
         if (den === 0) {
@@ -346,6 +346,10 @@ export class Edge2 implements ReadonlyEdge2 {
         return new Edge2(this.p0, this.p1);
     }
 
+    public direction(): Vector2 {
+        return this.p1.sub(this.p0);
+    }
+
     public eq(e: ReadonlyEdge2): boolean {
         return this.p0.eq(e.p0) && this.p1.eq(e.p1);
     }
@@ -379,7 +383,7 @@ export class Edge2 implements ReadonlyEdge2 {
      * Returns the parameterized value where a point `p` is orthogonal on the edge.
      */
     public getParameterFromPoint(p: ReadonlyVector2): number {
-        const v1 = this.vector();
+        const v1 = this.direction();
         const v2 = p.sub(this.p0);
 
         return v1.dot(v2) / v1.lenSq();
@@ -389,7 +393,7 @@ export class Edge2 implements ReadonlyEdge2 {
      * Returns the signed distance to where a point `p` is orthogonal on the edge.
      */
     public getSignedDistanceFromPoint(p: ReadonlyVector2): number {
-        const v1 = this.vector();
+        const v1 = this.direction();
         const v2 = this.p0.sub(p);
 
         return v1.cross(v2) / v1.len();
@@ -418,7 +422,7 @@ export class Edge2 implements ReadonlyEdge2 {
     }
 
     public normal(): Edge2 {
-        const vn = this.vector().normal();
+        const vn = this.direction().normal();
         const p1 = this.p0.add(vn);
         return new Edge2(this.p0, p1);
     }
@@ -446,7 +450,7 @@ export class Edge2 implements ReadonlyEdge2 {
     }
 
     public toRay(): Ray2 {
-        return new Ray2(this.p0, this.vector());
+        return new Ray2(this.p0, this.direction());
     }
 
     public toString(): string {
@@ -457,10 +461,6 @@ export class Edge2 implements ReadonlyEdge2 {
         const p0 = this.p0.add(v);
         const p1 = this.p1.add(v);
         return new Edge2(p0, p1);
-    }
-
-    public vector(): Vector2 {
-        return this.p1.sub(this.p0);
     }
 }
 
@@ -515,6 +515,10 @@ export class Edge3 implements ReadonlyEdge3 {
         return new Edge3(this.p0, this.p1);
     }
 
+    public direction(): Vector3 {
+        return this.p1.sub(this.p0);
+    }
+
     public eq(e: ReadonlyEdge3): boolean {
         return this.p0.eq(e.p0) && this.p1.eq(e.p1);
     }
@@ -548,14 +552,14 @@ export class Edge3 implements ReadonlyEdge3 {
      * Returns the distance to where a point `p` is orthogonal on the edge.
      */
     public getDistanceFromPoint(p: ReadonlyVector3): number {
-        const v1 = this.vector();
+        const v1 = this.direction();
         const v2 = this.p0.sub(p);
 
         return v1.cross(v2).len() / v1.len();
     }
 
     public getNormalAround(v: ReadonlyVector3): Edge3 {
-        const vn = this.vector().cross(v);
+        const vn = this.direction().cross(v);
         const p1 = this.p0.add(vn);
         return new Edge3(this.p0, p1);
     }
@@ -564,7 +568,7 @@ export class Edge3 implements ReadonlyEdge3 {
      * Returns the parameterized value where a point `p` is orthogonal on the edge.
      */
     public getParameterFromPoint(p: ReadonlyVector3): number {
-        const v1 = this.vector();
+        const v1 = this.direction();
         const v2 = p.sub(this.p0);
 
         return v1.dot(v2) / v1.lenSq();
@@ -609,7 +613,7 @@ export class Edge3 implements ReadonlyEdge3 {
     }
 
     public toRay(): Ray3 {
-        return new Ray3(this.p0, this.vector());
+        return new Ray3(this.p0, this.direction());
     }
 
     public toString(): string {
@@ -620,9 +624,5 @@ export class Edge3 implements ReadonlyEdge3 {
         const p0 = this.p0.add(v);
         const p1 = this.p1.add(v);
         return new Edge3(p0, p1);
-    }
-
-    public vector(): Vector3 {
-        return this.p1.sub(this.p0);
     }
 }
