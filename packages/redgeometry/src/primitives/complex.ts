@@ -1,4 +1,4 @@
-import { eqApproxAbs, eqApproxRel } from "../utility/scalar.js";
+import { eqApproxAbs, eqApproxRel, lerp } from "../utility/scalar.js";
 import { Vector2, type ReadonlyVector2 } from "./vector.js";
 
 export type ComplexLike = {
@@ -22,6 +22,7 @@ export interface ReadonlyComplex {
     lenSq(): number;
     mul(z: ReadonlyComplex): Complex;
     mulV(v: ReadonlyVector2): Vector2;
+    nlerp(v: ReadonlyComplex, t: number): Complex;
     sub(z: ReadonlyComplex): Complex;
     toArray(): [number, number];
     toString(): string;
@@ -147,6 +148,22 @@ export class Complex implements ReadonlyComplex {
      */
     public mulV(v: ReadonlyVector2): Vector2 {
         return new Vector2(this.a * v.x - this.b * v.y, this.a * v.y + this.b * v.x);
+    }
+
+    /**
+     * Returns the normalized linear interpolation of the current complex.
+     */
+    public nlerp(z: ReadonlyComplex, t: number): Complex {
+        const a = lerp(this.a, z.a, t);
+        const b = lerp(this.b, z.b, t);
+
+        const len = Math.sqrt(a * a + b * b);
+
+        if (len === 0) {
+            return Complex.createIdentity();
+        }
+
+        return new Complex(a / len, b / len);
     }
 
     public set(a: number, b: number): void {

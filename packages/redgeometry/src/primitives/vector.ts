@@ -47,6 +47,7 @@ export interface ReadonlyVector2 {
     mul(v: ReadonlyVector2): Vector2;
     mulS(s: number): Vector2;
     neg(): Vector2;
+    nlerp(v: ReadonlyVector2, t: number): Vector2;
     normal(): Vector2;
     setMul(v1: ReadonlyVector2, v2: ReadonlyVector2): void;
     slerp(v: ReadonlyVector2, t: number): Vector2;
@@ -86,6 +87,7 @@ export interface ReadonlyVector3 {
     mul(v: ReadonlyVector3): Vector3;
     mulS(s: number): Vector3;
     neg(): Vector3;
+    nlerp(v: ReadonlyVector3, t: number): Vector3;
     normalAround(v: ReadonlyVector3): Vector3;
     normalAroundAny(): Vector3;
     normalAroundX(): Vector3;
@@ -130,6 +132,7 @@ export interface ReadonlyVector4 {
     mul(v: ReadonlyVector4): Vector4;
     mulS(s: number): Vector4;
     neg(): Vector4;
+    nlerp(v: ReadonlyVector4, t: number): Vector4;
     setMul(v1: ReadonlyVector4, v2: ReadonlyVector4): void;
     sub(v: ReadonlyVector4): Vector4;
     toArray(): [number, number, number, number];
@@ -423,6 +426,22 @@ export class Vector2 implements ReadonlyVector2 {
 
     public neg(): Vector2 {
         return new Vector2(-this.x, -this.y);
+    }
+
+    /**
+     * Returns the normalized linear interpolation of the current vector.
+     */
+    public nlerp(v: ReadonlyVector2, t: number): Vector2 {
+        const x = lerp(this.x, v.x, t);
+        const y = lerp(this.y, v.y, t);
+
+        const len = Math.sqrt(x * x + y * y);
+
+        if (len === 0) {
+            return Vector2.createZero();
+        }
+
+        return new Vector2(x / len, y / len);
     }
 
     /**
@@ -780,6 +799,23 @@ export class Vector3 implements ReadonlyVector3 {
 
     public neg(): Vector3 {
         return new Vector3(-this.x, -this.y, -this.z);
+    }
+
+    /**
+     * Returns the normalized linear interpolation of the current vector.
+     */
+    public nlerp(v: ReadonlyVector3, t: number): Vector3 {
+        const x = lerp(this.x, v.x, t);
+        const y = lerp(this.y, v.y, t);
+        const z = lerp(this.z, v.z, t);
+
+        const len = Math.sqrt(x * x + y * y + z * z);
+
+        if (len === 0) {
+            return Vector3.createZero();
+        }
+
+        return new Vector3(x / len, y / len, z / len);
     }
 
     public normalAround(v: ReadonlyVector3): Vector3 {
@@ -1213,6 +1249,24 @@ export class Vector4 implements ReadonlyVector4 {
 
     public neg(): Vector4 {
         return new Vector4(-this.x, -this.y, -this.z, -this.w);
+    }
+
+    /**
+     * Returns the normalized linear interpolation of the current vector.
+     */
+    public nlerp(v: ReadonlyVector4, t: number): Vector4 {
+        const x = lerp(this.x, v.x, t);
+        const y = lerp(this.y, v.y, t);
+        const z = lerp(this.z, v.z, t);
+        const w = lerp(this.w, v.w, t);
+
+        const len = Math.sqrt(x * x + y * y + z * z + w * w);
+
+        if (len === 0) {
+            return Vector4.createZero();
+        }
+
+        return new Vector4(x / len, y / len, z / len, w / len);
     }
 
     public set(x: number, y: number, z: number, w: number): void {

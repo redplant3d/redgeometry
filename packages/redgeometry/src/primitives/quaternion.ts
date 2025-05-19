@@ -32,6 +32,7 @@ export interface ReadonlyQuaternion {
     lerp(q: ReadonlyQuaternion, t: number): Quaternion;
     mul(q: ReadonlyQuaternion): Quaternion;
     mulV(v: ReadonlyVector3): Vector3;
+    nlerp(v: ReadonlyQuaternion, t: number): Quaternion;
     pow(x: number): Quaternion;
     slerp(q: ReadonlyQuaternion, t: number): Quaternion;
     sub(q: ReadonlyQuaternion): Quaternion;
@@ -448,6 +449,24 @@ export class Quaternion implements ReadonlyQuaternion {
             qa * this.c + qb * this.d + qc * this.a - qd * this.b,
             qa * this.d - qb * this.c + qc * this.b + qd * this.a,
         );
+    }
+
+    /**
+     * Returns the normalized linear interpolation of the current quaternion.
+     */
+    public nlerp(z: ReadonlyQuaternion, t: number): Quaternion {
+        const a = lerp(this.a, z.a, t);
+        const b = lerp(this.b, z.b, t);
+        const c = lerp(this.c, z.c, t);
+        const d = lerp(this.d, z.d, t);
+
+        const len = Math.sqrt(a * a + b * b + c * c + d * d);
+
+        if (len === 0) {
+            return Quaternion.createIdentity();
+        }
+
+        return new Quaternion(a / len, b / len, c / len, d / len);
     }
 
     /**
