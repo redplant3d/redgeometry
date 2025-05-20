@@ -1,4 +1,4 @@
-import { Mesh2, MeshEdge2, type MeshFace2 } from "redgeometry/src/core/mesh";
+import { MeshEdge2, type Mesh2, type MeshFace2 } from "redgeometry/src/core/mesh";
 import { Edge2 } from "redgeometry/src/primitives/edge";
 import { Vector2, type ReadonlyVector2 } from "redgeometry/src/primitives/vector";
 import { assertDebug, log } from "redgeometry/src/utility/debug";

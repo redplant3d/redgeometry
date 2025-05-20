@@ -1,8 +1,8 @@
 import type { Mesh2, MeshFace2 } from "redgeometry/src/core/mesh";
-import { Path2, PathCommandType } from "redgeometry/src/core/path";
-import { Polygon2 } from "redgeometry/src/core/polygon";
+import { PathCommandType, type Path2 } from "redgeometry/src/core/path";
+import type { Polygon2 } from "redgeometry/src/core/polygon";
 import type { ReadonlyMinMaxBox2 } from "redgeometry/src/primitives/box";
-import { Edge2, type ReadonlyEdge2 } from "redgeometry/src/primitives/edge";
+import type { Edge2, ReadonlyEdge2 } from "redgeometry/src/primitives/edge";
 import type { ReadonlyMatrix3A } from "redgeometry/src/primitives/matrix";
 import type { ReadonlyRay2 } from "redgeometry/src/primitives/ray";
 import { Vector2, type ReadonlyVector2 } from "redgeometry/src/primitives/vector";
