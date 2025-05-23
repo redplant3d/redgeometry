@@ -44,7 +44,7 @@ export interface ReadonlyBezier1Curve2 {
     readonly p0: ReadonlyVector2;
     readonly p1: ReadonlyVector2;
     readonly pn: ReadonlyVector2;
-    readonly type: CurveType.Bezier1;
+    readonly type: typeof CurveType.Bezier1;
 
     clone(): Bezier1Curve2;
     getBounds(): MinMaxBox2;
@@ -73,7 +73,7 @@ export interface ReadonlyBezier2Curve2 {
     readonly p1: ReadonlyVector2;
     readonly p2: ReadonlyVector2;
     readonly pn: ReadonlyVector2;
-    readonly type: CurveType.Bezier2;
+    readonly type: typeof CurveType.Bezier2;
 
     clone(): Bezier2Curve2;
     getBounds(): MinMaxBox2;
@@ -113,7 +113,7 @@ export interface ReadonlyBezier3Curve2 {
     readonly p2: ReadonlyVector2;
     readonly p3: ReadonlyVector2;
     readonly pn: ReadonlyVector2;
-    readonly type: CurveType.Bezier3;
+    readonly type: typeof CurveType.Bezier3;
 
     clone(): Bezier3Curve2;
     getBounds(): MinMaxBox2;
@@ -148,7 +148,7 @@ export interface ReadonlyBezierRCurve2 {
     readonly p1: ReadonlyVector2;
     readonly p2: ReadonlyVector2;
     readonly pn: ReadonlyVector2;
-    readonly type: CurveType.BezierR;
+    readonly type: typeof CurveType.BezierR;
     readonly w: number;
 
     clone(): BezierRCurve2;
@@ -180,12 +180,13 @@ export type ReadonlyBezierCurve2 =
     | ReadonlyBezier3Curve2
     | ReadonlyBezierRCurve2;
 
-export enum CurveType {
-    Bezier1,
-    Bezier2,
-    Bezier3,
-    BezierR,
-}
+export const CurveType = {
+    Bezier1: 0,
+    Bezier2: 1,
+    Bezier3: 2,
+    BezierR: 3,
+} as const;
+export type CurveType = (typeof CurveType)[keyof typeof CurveType];
 
 export class Bezier1Curve2 implements ReadonlyBezier1Curve2 {
     public p0: ReadonlyVector2;
@@ -200,7 +201,7 @@ export class Bezier1Curve2 implements ReadonlyBezier1Curve2 {
         return this.p1;
     }
 
-    public get type(): CurveType.Bezier1 {
+    public get type(): typeof CurveType.Bezier1 {
         return CurveType.Bezier1;
     }
 
@@ -368,7 +369,7 @@ export class Bezier2Curve2 implements ReadonlyBezier2Curve2 {
         return this.p2;
     }
 
-    public get type(): CurveType.Bezier2 {
+    public get type(): typeof CurveType.Bezier2 {
         return CurveType.Bezier2;
     }
 
@@ -749,7 +750,7 @@ export class Bezier3Curve2 implements ReadonlyBezier3Curve2 {
         return this.p3;
     }
 
-    public get type(): CurveType.Bezier3 {
+    public get type(): typeof CurveType.Bezier3 {
         return CurveType.Bezier3;
     }
 
@@ -1152,7 +1153,7 @@ export class BezierRCurve2 implements ReadonlyBezierRCurve2 {
         return this.p2;
     }
 
-    public get type(): CurveType.BezierR {
+    public get type(): typeof CurveType.BezierR {
         return CurveType.BezierR;
     }
 

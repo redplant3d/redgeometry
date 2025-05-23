@@ -38,26 +38,27 @@ export interface PathSink2 {
     quadTo(p1: ReadonlyVector2, p2: ReadonlyVector2): void;
 }
 
-export enum PathCommandType {
-    Move,
-    Linear,
-    Quadratic,
-    Cubic,
-    Conic,
-    Close,
-}
+export const PathCommandType = {
+    Move: 0,
+    Linear: 1,
+    Quadratic: 2,
+    Cubic: 3,
+    Conic: 4,
+    Close: 5,
+} as const;
+export type PathCommandType = (typeof PathCommandType)[keyof typeof PathCommandType];
 
 export type Path2Like = {
     readonly points: Vector2Like[];
     readonly commands: PathCommand[];
 };
 
-export type PathCommandMove = { type: PathCommandType.Move };
-export type PathCommandLine = { type: PathCommandType.Linear };
-export type PathCommandQuad = { type: PathCommandType.Quadratic };
-export type PathCommandCubic = { type: PathCommandType.Cubic };
-export type PathCommandConic = { type: PathCommandType.Conic; w: number };
-export type PathCommandClose = { type: PathCommandType.Close };
+export type PathCommandMove = { type: typeof PathCommandType.Move };
+export type PathCommandLine = { type: typeof PathCommandType.Linear };
+export type PathCommandQuad = { type: typeof PathCommandType.Quadratic };
+export type PathCommandCubic = { type: typeof PathCommandType.Cubic };
+export type PathCommandConic = { type: typeof PathCommandType.Conic; w: number };
+export type PathCommandClose = { type: typeof PathCommandType.Close };
 
 export type PathCommand =
     | PathCommandMove

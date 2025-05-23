@@ -1,27 +1,28 @@
-export enum RootType {
-    Zero,
-    One,
-    Two,
-    Three,
-}
+export const RootType = {
+    Zero: 0,
+    One: 1,
+    Two: 2,
+    Three: 3,
+} as const;
+export type RootType = (typeof RootType)[keyof typeof RootType];
 
 export type Root0 = {
-    type: RootType.Zero;
+    type: typeof RootType.Zero;
 };
 
 export type Root1 = {
-    type: RootType.One;
+    type: typeof RootType.One;
     x: number;
 };
 
 export type Root2 = {
-    type: RootType.Two;
+    type: typeof RootType.Two;
     x1: number;
     x2: number;
 };
 
 export type Root3 = {
-    type: RootType.Three;
+    type: typeof RootType.Three;
     x1: number;
     x2: number;
     x3: number;

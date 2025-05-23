@@ -6,38 +6,43 @@ import { PathSimplifyIncremental2, PathSimplifyRecursive2, type PathSimplify2 } 
 import { PathStrokeIncremental2, PathStrokeRecursive2, type PathStroke2 } from "./path-stroke.js";
 import type { PathSink2 } from "./path.js";
 
-export enum ApproximationMode {
-    Incremental,
-    Recursive,
-}
+export const ApproximationMode = {
+    Incremental: 0,
+    Recursive: 1,
+} as const;
+export type ApproximationMode = (typeof ApproximationMode)[keyof typeof ApproximationMode];
 
-export enum JoinType {
-    Bevel,
-    Miter,
-    MiterClip,
-    Round,
-}
+export const JoinType = {
+    Bevel: 0,
+    Miter: 1,
+    MiterClip: 2,
+    Round: 3,
+} as const;
+export type JoinType = (typeof JoinType)[keyof typeof JoinType];
 
-export enum CapType {
-    Butt,
-    Square,
-    Round,
-}
+export const CapType = {
+    Butt: 0,
+    Square: 1,
+    Round: 2,
+} as const;
+export type CapType = (typeof CapType)[keyof typeof CapType];
 
-export enum WindingOperator {
-    NonZero,
-    EvenOdd,
-    Positive,
-    Negative,
-}
+export const WindingOperator = {
+    NonZero: 0,
+    EvenOdd: 1,
+    Positive: 2,
+    Negative: 3,
+} as const;
+export type WindingOperator = (typeof WindingOperator)[keyof typeof WindingOperator];
 
-export enum BooleanOperator {
-    Union,
-    Intersection,
-    Exclusion,
-    AWithoutB,
-    BWithoutA,
-}
+export const BooleanOperator = {
+    Union: 0,
+    Intersection: 1,
+    Exclusion: 2,
+    AWithoutB: 3,
+    BWithoutA: 4,
+} as const;
+export type BooleanOperator = (typeof BooleanOperator)[keyof typeof BooleanOperator];
 
 export type PathQualityOptions = {
     clipPrecision: number;

@@ -63,12 +63,13 @@ export type WorldScheduleStage<T extends SystemStage> = {
     id: T;
 };
 
-export enum ChangeFlags {
-    None = 0,
-    Created = 1,
-    Updated = 2,
-    Deleted = 4,
-}
+export const ChangeFlags = {
+    None: 0,
+    Created: 1,
+    Updated: 2,
+    Deleted: 4,
+} as const;
+export type ChangeFlags = (typeof ChangeFlags)[keyof typeof ChangeFlags] | (number & {});
 
 export const WORLD_SCHEDULE_OPTIONS_DEFAULT: WorldScheduleOptions<DefaultWorldScheduleId, DefaultSystemStage>[] = [
     {

@@ -6,10 +6,11 @@ import { assertDebug, log } from "../utility/debug.js";
 import { Float128 } from "../utility/float128.js";
 import { solveLinear } from "../utility/solve.js";
 
-enum PixelType {
-    Magnet,
-    Pin,
-}
+const PixelType = {
+    Magnet: 0,
+    Pin: 1,
+} as const;
+export type PixelType = (typeof PixelType)[keyof typeof PixelType];
 
 type Pixel2 = {
     type: PixelType;

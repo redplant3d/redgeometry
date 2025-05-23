@@ -67,60 +67,63 @@ type CodeState = {
     state: ButtonState;
 };
 
-export enum KeyboardButtons {
-    Digit1,
-    Digit2,
-    Digit3,
-    Digit4,
-    Digit5,
-    Digit6,
-    Digit7,
-    Digit8,
-    Digit9,
-    KeyA,
-    KeyB,
-    KeyC,
-    KeyD,
-    KeyE,
-    KeyF,
-    KeyG,
-    KeyH,
-    KeyI,
-    KeyJ,
-    KeyK,
-    KeyL,
-    KeyM,
-    KeyN,
-    KeyO,
-    KeyP,
-    KeyQ,
-    KeyR,
-    KeyS,
-    KeyT,
-    KeyU,
-    KeyV,
-    KeyW,
-    KeyX,
-    KeyY,
-    KeyZ,
-    ShiftLeft,
-    Space,
-}
+export const KeyboardButtons = {
+    Digit1: 0,
+    Digit2: 1,
+    Digit3: 2,
+    Digit4: 3,
+    Digit5: 4,
+    Digit6: 5,
+    Digit7: 6,
+    Digit8: 7,
+    Digit9: 8,
+    KeyA: 9,
+    KeyB: 10,
+    KeyC: 11,
+    KeyD: 12,
+    KeyE: 13,
+    KeyF: 14,
+    KeyG: 15,
+    KeyH: 16,
+    KeyI: 17,
+    KeyJ: 18,
+    KeyK: 19,
+    KeyL: 20,
+    KeyM: 21,
+    KeyN: 22,
+    KeyO: 23,
+    KeyP: 24,
+    KeyQ: 25,
+    KeyR: 26,
+    KeyS: 27,
+    KeyT: 28,
+    KeyU: 29,
+    KeyV: 30,
+    KeyW: 31,
+    KeyX: 32,
+    KeyY: 33,
+    KeyZ: 34,
+    ShiftLeft: 35,
+    Space: 36,
+} as const;
+export type KeyboardButtons = (typeof KeyboardButtons)[keyof typeof KeyboardButtons];
 
-export enum MouseButtons {
-    Mouse1,
-    Mouse2,
-    Mouse3,
-    Mouse4,
-    Mouse5,
-}
+export const MouseButtons = {
+    Mouse1: 0,
+    Mouse2: 1,
+    Mouse3: 2,
+    Mouse4: 3,
+    Mouse5: 4,
+} as const;
+export type MouseButtons = (typeof MouseButtons)[keyof typeof MouseButtons];
 
-enum ButtonState {
-    None,
-    Pressed,
-    Pressing,
-    Released,
-}
+const ButtonState = {
+    None: 0,
+    Pressed: 1,
+    Pressing: 2,
+    Released: 3,
+} as const;
+type ButtonState = (typeof ButtonState)[keyof typeof ButtonState];
 
 const MOUSE_BUTTONS_LOOKUP: Record<number, MouseButtons> = {
     0: MouseButtons.Mouse1,

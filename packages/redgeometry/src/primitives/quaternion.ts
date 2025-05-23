@@ -41,14 +41,15 @@ export interface ReadonlyQuaternion {
     unit(): Quaternion;
 }
 
-export enum RotationOrder {
-    XYZ,
-    XZY,
-    YXZ,
-    YZX,
-    ZXY,
-    ZYX,
-}
+export const RotationOrder = {
+    XYZ: 0,
+    XZY: 1,
+    YXZ: 2,
+    YZX: 3,
+    ZXY: 4,
+    ZYX: 5,
+} as const;
+export type RotationOrder = (typeof RotationOrder)[keyof typeof RotationOrder];
 
 /**
  * A quaternion to be used for 3D rotations.

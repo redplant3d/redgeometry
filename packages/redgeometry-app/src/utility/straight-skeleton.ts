@@ -4,12 +4,13 @@ import { Vector2, type ReadonlyVector2 } from "redgeometry/src/primitives/vector
 import { assertDebug, log } from "redgeometry/src/utility/debug";
 import { RootType, solveLinear, solveQuadratic, type Root1, type Root2 } from "redgeometry/src/utility/solve";
 
-export enum KineticEventType {
-    EdgeEvent,
-    SplitEvent,
-    FlipEvent,
-    FullEvent,
-}
+export const KineticEventType = {
+    EdgeEvent: 0,
+    SplitEvent: 1,
+    FlipEvent: 2,
+    FullEvent: 3,
+} as const;
+export type KineticEventType = (typeof KineticEventType)[keyof typeof KineticEventType];
 
 export class KineticVertex {
     public n1: ReadonlyVector2;

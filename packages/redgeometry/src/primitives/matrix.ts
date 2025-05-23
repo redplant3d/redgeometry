@@ -38,7 +38,7 @@ export type Matrix4Like = {
 
 export interface ReadonlyMatrix3A {
     readonly elements: ReadonlyMatrixElements3A;
-    readonly type: MatrixType.Affine;
+    readonly type: typeof MatrixType.Affine;
 
     clone(): Matrix3A;
     determinant(): number;
@@ -58,7 +58,7 @@ export interface ReadonlyMatrix3A {
 
 export interface ReadonlyMatrix3 {
     readonly elements: ReadonlyMatrixElements3;
-    readonly type: MatrixType.Projective;
+    readonly type: typeof MatrixType.Projective;
 
     add(mat: ReadonlyMatrix3): Matrix3;
     clone(): Matrix3;
@@ -79,7 +79,7 @@ export interface ReadonlyMatrix3 {
 
 export interface ReadonlyMatrix4A {
     readonly elements: ReadonlyMatrixElements4A;
-    readonly type: MatrixType.Affine;
+    readonly type: typeof MatrixType.Affine;
 
     clone(): Matrix4A;
     determinant(): number;
@@ -99,7 +99,7 @@ export interface ReadonlyMatrix4A {
 
 export interface ReadonlyMatrix4 {
     readonly elements: ReadonlyMatrixElements4;
-    readonly type: MatrixType.Projective;
+    readonly type: typeof MatrixType.Projective;
 
     add(mat: ReadonlyMatrix4): Matrix4;
     clone(): Matrix4;
@@ -119,10 +119,11 @@ export interface ReadonlyMatrix4 {
     transpose(): Matrix4;
 }
 
-export enum MatrixType {
-    Affine,
-    Projective,
-}
+export const MatrixType = {
+    Affine: 0,
+    Projective: 1,
+} as const;
+export type MatrixType = (typeof MatrixType)[keyof typeof MatrixType];
 
 /**
  * Represents a column-major matrix for affine transformations in 2D:
@@ -148,7 +149,7 @@ export class Matrix3A implements ReadonlyMatrix3A {
         this.elements = elements;
     }
 
-    public get type(): MatrixType.Affine {
+    public get type(): typeof MatrixType.Affine {
         return MatrixType.Affine;
     }
 
@@ -682,7 +683,7 @@ export class Matrix3 implements ReadonlyMatrix3 {
         this.elements = elements;
     }
 
-    public get type(): MatrixType.Projective {
+    public get type(): typeof MatrixType.Projective {
         return MatrixType.Projective;
     }
 
@@ -1389,7 +1390,7 @@ export class Matrix4A implements ReadonlyMatrix4A {
         this.elements = elements;
     }
 
-    public get type(): MatrixType.Affine {
+    public get type(): typeof MatrixType.Affine {
         return MatrixType.Affine;
     }
 
@@ -2232,7 +2233,7 @@ export class Matrix4 implements ReadonlyMatrix4 {
         this.elements = elements;
     }
 
-    public get type(): MatrixType.Projective {
+    public get type(): typeof MatrixType.Projective {
         return MatrixType.Projective;
     }
 

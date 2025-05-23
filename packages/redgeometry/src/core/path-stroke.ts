@@ -64,7 +64,7 @@ export class PathStrokeIncremental2 implements PathStroke2 {
         let cIdx = 0;
         let pIdx = 0;
 
-        let ct0 = PathCommandType.Move;
+        let ct0: PathCommandType = PathCommandType.Move;
 
         let ps: ReadonlyVector2 = Vector2.ZERO;
         let p0: ReadonlyVector2 = Vector2.ZERO;
@@ -317,7 +317,7 @@ export class PathStrokeRecursive2 implements PathStroke2 {
         const commands = input.getCommands();
         const points = input.getPoints();
 
-        let ct0 = PathCommandType.Move;
+        let ct0: PathCommandType = PathCommandType.Move;
 
         let cIdx = 0;
         let pIdx = 0;

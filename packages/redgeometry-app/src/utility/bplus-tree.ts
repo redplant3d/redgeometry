@@ -1,14 +1,14 @@
 import type { Immutable } from "redgeometry/src/utility/types";
 
 export type InternalNode<T> = {
-    type: NodeType.Internal;
+    type: typeof NodeType.Internal;
     parent: InternalNode<T> | undefined;
     length: number;
     keys: T[];
     children: Node<T>[];
 };
 export type LeafNode<T> = {
-    type: NodeType.Leaf;
+    type: typeof NodeType.Leaf;
     parent: InternalNode<T> | undefined;
     length: number;
     values: T[];
@@ -16,10 +16,11 @@ export type LeafNode<T> = {
 };
 export type Node<T> = InternalNode<T> | LeafNode<T>;
 
-export enum NodeType {
-    Internal,
-    Leaf,
-}
+export const NodeType = {
+    Internal: 0,
+    Leaf: 1,
+} as const;
+export type NodeType = (typeof NodeType)[keyof typeof NodeType];
 
 export class BPlusTree<T> {
     private branchSize: number;
