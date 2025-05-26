@@ -15,7 +15,7 @@ import {
 import { Vector2, type ReadonlyVector2 } from "../primitives/vector.js";
 import { assertUnreachable } from "../utility/debug.js";
 import type { PathQualityOptions } from "./path-options.js";
-import { PathCommandType, type Path2 } from "./path.js";
+import { type Path2 } from "./path.js";
 
 export interface PathFlatten2 {
     process(input: Path2, output: Path2, forceClose: boolean): void;
@@ -57,7 +57,7 @@ export class PathFlattenIncremental2 implements PathFlatten2 {
         while (cIdx < commands.length) {
             const command = commands[cIdx++];
             switch (command.type) {
-                case PathCommandType.Move: {
+                case 0 /* Move */: {
                     if (forceClose && !p0.eq(ps)) {
                         output.lineTo(ps);
                     }
@@ -66,31 +66,31 @@ export class PathFlattenIncremental2 implements PathFlatten2 {
                     p0 = ps;
                     break;
                 }
-                case PathCommandType.Linear: {
+                case 1 /* Linear */: {
                     const p1 = points[pIdx++];
                     output.lineTo(p1);
                     p0 = p1;
                     break;
                 }
-                case PathCommandType.Quadratic: {
+                case 2 /* Quadratic */: {
                     const c = new Bezier2Curve2(p0, points[pIdx++], points[pIdx++]);
                     this.flattenQuadratic(c, output);
                     p0 = c.p2;
                     break;
                 }
-                case PathCommandType.Cubic: {
+                case 3 /* Cubic */: {
                     const c = new Bezier3Curve2(p0, points[pIdx++], points[pIdx++], points[pIdx++]);
                     this.flattenCubic(c, output);
                     p0 = c.p3;
                     break;
                 }
-                case PathCommandType.Conic: {
+                case 4 /* Conic */: {
                     const c = new BezierRCurve2(p0, points[pIdx++], points[pIdx++], command.w);
                     this.flattenConic(c, output);
                     p0 = c.p2;
                     break;
                 }
-                case PathCommandType.Close: {
+                case 5 /* Close */: {
                     if (!p0.eq(ps)) {
                         output.lineTo(ps);
                     }
@@ -190,7 +190,7 @@ export class PathFlattenRecursive2 implements PathFlatten2 {
         while (cIdx < commands.length) {
             const command = commands[cIdx++];
             switch (command.type) {
-                case PathCommandType.Move: {
+                case 0 /* Move */: {
                     if (forceClose && !p0.eq(ps)) {
                         output.lineTo(ps);
                     }
@@ -199,31 +199,31 @@ export class PathFlattenRecursive2 implements PathFlatten2 {
                     p0 = ps;
                     break;
                 }
-                case PathCommandType.Linear: {
+                case 1 /* Linear */: {
                     const p1 = points[pIdx++];
                     output.lineTo(p1);
                     p0 = p1;
                     break;
                 }
-                case PathCommandType.Quadratic: {
+                case 2 /* Quadratic */: {
                     const c = new Bezier2Curve2(p0, points[pIdx++], points[pIdx++]);
                     this.flattenQuadratic(c, output);
                     p0 = c.p2;
                     break;
                 }
-                case PathCommandType.Cubic: {
+                case 3 /* Cubic */: {
                     const c = new Bezier3Curve2(p0, points[pIdx++], points[pIdx++], points[pIdx++]);
                     this.flattenCubic(c, output);
                     p0 = c.p3;
                     break;
                 }
-                case PathCommandType.Conic: {
+                case 4 /* Conic */: {
                     const c = new BezierRCurve2(p0, points[pIdx++], points[pIdx++], command.w);
                     this.flattenConic(c, output);
                     p0 = c.p2;
                     break;
                 }
-                case PathCommandType.Close: {
+                case 5 /* Close */: {
                     if (!p0.eq(ps)) {
                         output.lineTo(ps);
                     }

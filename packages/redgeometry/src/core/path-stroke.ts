@@ -77,7 +77,7 @@ export class PathStrokeIncremental2 implements PathStroke2 {
             const ct1 = cmd.type;
 
             switch (ct1) {
-                case PathCommandType.Move: {
+                case 0 /* Move */: {
                     if (!m0.isZero()) {
                         this.state.finalizeOpen();
                     } else if (ct0 !== PathCommandType.Move && ct0 !== PathCommandType.Close) {
@@ -89,7 +89,7 @@ export class PathStrokeIncremental2 implements PathStroke2 {
                     m0 = Vector2.ZERO;
                     break;
                 }
-                case PathCommandType.Linear: {
+                case 1 /* Linear */: {
                     const c = new Bezier1Curve2(p0, points[pIdx++]);
                     const m = c.getDerivative();
 
@@ -103,7 +103,7 @@ export class PathStrokeIncremental2 implements PathStroke2 {
 
                     break;
                 }
-                case PathCommandType.Quadratic: {
+                case 2 /* Quadratic */: {
                     const c = new Bezier2Curve2(p0, points[pIdx++], points[pIdx++]);
                     const m = c.getTangentStart();
 
@@ -117,7 +117,7 @@ export class PathStrokeIncremental2 implements PathStroke2 {
 
                     break;
                 }
-                case PathCommandType.Cubic: {
+                case 3 /* Cubic */: {
                     const c = new Bezier3Curve2(p0, points[pIdx++], points[pIdx++], points[pIdx++]);
                     const m = c.getTangentStart();
 
@@ -131,7 +131,7 @@ export class PathStrokeIncremental2 implements PathStroke2 {
 
                     break;
                 }
-                case PathCommandType.Conic: {
+                case 4 /* Conic */: {
                     const c = new BezierRCurve2(p0, points[pIdx++], points[pIdx++], cmd.w);
                     const m = c.getTangentStart();
 
@@ -145,7 +145,7 @@ export class PathStrokeIncremental2 implements PathStroke2 {
 
                     break;
                 }
-                case PathCommandType.Close: {
+                case 5 /* Close */: {
                     const c = new Bezier1Curve2(p0, ps);
                     const m = c.getDerivative();
 
@@ -333,7 +333,7 @@ export class PathStrokeRecursive2 implements PathStroke2 {
             const ct1 = cmd.type;
 
             switch (cmd.type) {
-                case PathCommandType.Move: {
+                case 0 /* Move */: {
                     if (!m0.isZero()) {
                         this.state.finalizeOpen();
                     } else if (ct0 !== PathCommandType.Move && ct0 !== PathCommandType.Close) {
@@ -345,7 +345,7 @@ export class PathStrokeRecursive2 implements PathStroke2 {
                     m0 = Vector2.ZERO;
                     break;
                 }
-                case PathCommandType.Linear: {
+                case 1 /* Linear */: {
                     const c = new Bezier1Curve2(p0, points[pIdx++]);
                     const m = c.getDerivative();
 
@@ -359,7 +359,7 @@ export class PathStrokeRecursive2 implements PathStroke2 {
 
                     break;
                 }
-                case PathCommandType.Quadratic: {
+                case 2 /* Quadratic */: {
                     const c = new Bezier2Curve2(p0, points[pIdx++], points[pIdx++]);
                     const m = c.getTangentStart();
 
@@ -373,7 +373,7 @@ export class PathStrokeRecursive2 implements PathStroke2 {
 
                     break;
                 }
-                case PathCommandType.Cubic: {
+                case 3 /* Cubic */: {
                     const c = new Bezier3Curve2(p0, points[pIdx++], points[pIdx++], points[pIdx++]);
                     const m = c.getTangentStart();
 
@@ -387,7 +387,7 @@ export class PathStrokeRecursive2 implements PathStroke2 {
 
                     break;
                 }
-                case PathCommandType.Conic: {
+                case 4 /* Conic */: {
                     const c = new BezierRCurve2(p0, points[pIdx++], points[pIdx++], cmd.w);
                     const m = c.getTangentStart();
 
@@ -401,7 +401,7 @@ export class PathStrokeRecursive2 implements PathStroke2 {
 
                     break;
                 }
-                case PathCommandType.Close: {
+                case 5 /* Close */: {
                     const c = new Bezier1Curve2(p0, ps);
                     const m = c.getDerivative();
 

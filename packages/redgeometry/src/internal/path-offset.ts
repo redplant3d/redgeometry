@@ -74,12 +74,12 @@ export function insertOuterJoin(
     const mld = ml * Math.abs(d);
 
     switch (join) {
-        case JoinType.Bevel: {
+        case 0 /* Bevel */: {
             path.lineTo(p.addMulS(n1, d));
 
             break;
         }
-        case JoinType.Miter: {
+        case 1 /* Miter */: {
             let k = n0.add(n1);
 
             k = k.mulS(2 * d).divS(k.lenSq());
@@ -92,7 +92,7 @@ export function insertOuterJoin(
 
             break;
         }
-        case JoinType.MiterClip: {
+        case 2 /* MiterClip */: {
             let k = n0.add(n1);
 
             k = k.mulS(2 * d).divS(k.lenSq());
@@ -126,7 +126,7 @@ export function insertOuterJoin(
 
             break;
         }
-        case JoinType.Round: {
+        case 3 /* Round */: {
             const pp0 = p.addMulS(n0, d);
             const pp2 = p.addMulS(n1, d);
 

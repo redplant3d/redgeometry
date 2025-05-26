@@ -312,13 +312,13 @@ export class StraightSkeleton {
 
     private getKineticEventTypeName(type: KineticEventType): string {
         switch (type) {
-            case KineticEventType.EdgeEvent:
+            case 0 /* EdgeEvent */:
                 return "EdgeEvent";
-            case KineticEventType.SplitEvent:
+            case 1 /* SplitEvent */:
                 return "SplitEvent";
-            case KineticEventType.FlipEvent:
+            case 2 /* FlipEvent */:
                 return "FlipEvent";
-            case KineticEventType.FullEvent:
+            case 3 /* FullEvent */:
                 return "FullEvent";
         }
     }
@@ -365,7 +365,7 @@ export class StraightSkeleton {
         const t = ev.t1;
 
         switch (ev.type) {
-            case KineticEventType.EdgeEvent: {
+            case 0 /* EdgeEvent */: {
                 // `e0` is collapsing
                 this.stopVertexAt(vtx0, t);
                 this.stopVertexAt(vtx1, t);
@@ -389,7 +389,7 @@ export class StraightSkeleton {
 
                 break;
             }
-            case KineticEventType.SplitEvent: {
+            case 1 /* SplitEvent */: {
                 // `e0.p0` is crashing into `e1`
                 this.stopVertexAt(vtx0, t);
 
@@ -404,7 +404,7 @@ export class StraightSkeleton {
 
                 break;
             }
-            case KineticEventType.FlipEvent: {
+            case 2 /* FlipEvent */: {
                 // `e0` is the edge that is crossed
                 MeshEdge2.swap(e0);
 
@@ -413,7 +413,7 @@ export class StraightSkeleton {
 
                 break;
             }
-            case KineticEventType.FullEvent: {
+            case 3 /* FullEvent */: {
                 // Three waveforms are collapsing in a single point
                 this.stopVertexAt(vtx0, t);
                 this.stopVertexAt(vtx1, t);

@@ -54,13 +54,13 @@ export function copyCommandsReversed(
 
 export function isWindingInside(wind: number, windingOperator: WindingOperator | CustomWindingOperator): boolean {
     switch (windingOperator) {
-        case WindingOperator.NonZero:
+        case 0 /* NonZero */:
             return wind !== 0;
-        case WindingOperator.EvenOdd:
+        case 1 /* EvenOdd */:
             return (wind & 1) !== 0;
-        case WindingOperator.Positive:
+        case 2 /* Positive */:
             return wind > 0;
-        case WindingOperator.Negative:
+        case 3 /* Negative */:
             return wind < 0;
         default:
             return windingOperator(wind);

@@ -439,26 +439,26 @@ export class Path2 implements PathSink2 {
         while (cIdx < commands.length) {
             const command = commands[cIdx++];
             switch (command.type) {
-                case PathCommandType.Move: {
+                case 0 /* Move */: {
                     const p0 = points[pIdx++];
                     svgData += "M" + p0.x + " " + p0.y;
 
                     break;
                 }
-                case PathCommandType.Linear: {
+                case 1 /* Linear */: {
                     const p1 = points[pIdx++];
                     svgData += "L" + p1.x + " " + p1.y;
 
                     break;
                 }
-                case PathCommandType.Quadratic: {
+                case 2 /* Quadratic */: {
                     const p1 = points[pIdx++];
                     const p2 = points[pIdx++];
                     svgData += "Q" + p1.x + " " + p1.y + " " + p2.x + " " + p2.y;
 
                     break;
                 }
-                case PathCommandType.Cubic: {
+                case 3 /* Cubic */: {
                     const p1 = points[pIdx++];
                     const p2 = points[pIdx++];
                     const p3 = points[pIdx++];
@@ -466,7 +466,7 @@ export class Path2 implements PathSink2 {
 
                     break;
                 }
-                case PathCommandType.Conic: {
+                case 4 /* Conic */: {
                     // Workaround (conics not supported by HTML canvas)
                     const p1 = points[pIdx++];
                     const p2 = points[pIdx++];
@@ -474,7 +474,7 @@ export class Path2 implements PathSink2 {
 
                     break;
                 }
-                case PathCommandType.Close: {
+                case 5 /* Close */: {
                     svgData += "Z";
 
                     break;

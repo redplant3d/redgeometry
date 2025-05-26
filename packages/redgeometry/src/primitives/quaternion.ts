@@ -149,22 +149,22 @@ export class Quaternion implements ReadonlyQuaternion {
         const qd2 = sinX * sinY * cosZ;
 
         switch (order) {
-            case RotationOrder.XYZ: {
+            case 0 /* XYZ */: {
                 return new Quaternion(qa1 - qa2, qb1 + qb2, qc1 - qc2, qd1 + qd2);
             }
-            case RotationOrder.XZY: {
+            case 1 /* XZY */: {
                 return new Quaternion(qa1 + qa2, qb1 - qb2, qc1 - qc2, qd1 + qd2);
             }
-            case RotationOrder.YXZ: {
+            case 2 /* YXZ */: {
                 return new Quaternion(qa1 + qa2, qb1 + qb2, qc1 - qc2, qd1 - qd2);
             }
-            case RotationOrder.YZX: {
+            case 3 /* YZX */: {
                 return new Quaternion(qa1 - qa2, qb1 + qb2, qc1 + qc2, qd1 - qd2);
             }
-            case RotationOrder.ZXY: {
+            case 4 /* ZXY */: {
                 return new Quaternion(qa1 - qa2, qb1 - qb2, qc1 + qc2, qd1 + qd2);
             }
-            case RotationOrder.ZYX: {
+            case 5 /* ZYX */: {
                 return new Quaternion(qa1 + qa2, qb1 - qb2, qc1 + qc2, qd1 - qd2);
             }
             default: {
@@ -336,42 +336,42 @@ export class Quaternion implements ReadonlyQuaternion {
         const qcd2 = 2 * this.c * this.d;
 
         switch (order) {
-            case RotationOrder.XYZ: {
+            case 0 /* XYZ */: {
                 return {
                     x: Math.atan2(qab2 - qcd2, qaa - qbb - qcc + qdd),
                     y: Math.asin(qbd2 + qac2),
                     z: Math.atan2(qad2 - qbc2, qaa + qbb - qcc - qdd),
                 };
             }
-            case RotationOrder.XZY: {
+            case 1 /* XZY */: {
                 return {
                     x: Math.atan2(qcd2 + qab2, qaa - qbb + qcc - qdd),
                     y: Math.atan2(qbd2 + qac2, qaa + qbb - qcc - qdd),
                     z: Math.asin(qad2 - qbc2),
                 };
             }
-            case RotationOrder.YXZ: {
+            case 2 /* YXZ */: {
                 return {
                     x: Math.asin(qab2 - qcd2),
                     y: Math.atan2(qbd2 + qac2, qaa - qbb - qcc + qdd),
                     z: Math.atan2(qbc2 + qad2, qaa - qbb + qcc - qdd),
                 };
             }
-            case RotationOrder.YZX: {
+            case 3 /* YZX */: {
                 return {
                     x: Math.atan2(qab2 - qcd2, qaa - qbb + qcc - qdd),
                     y: Math.atan2(qac2 - qbd2, qaa + qbb - qcc - qdd),
                     z: Math.asin(qbc2 + qad2),
                 };
             }
-            case RotationOrder.ZXY: {
+            case 4 /* ZXY */: {
                 return {
                     x: Math.asin(qcd2 + qab2),
                     y: Math.atan2(qac2 - qbd2, qaa - qbb - qcc + qdd),
                     z: Math.atan2(qad2 - qbc2, qaa - qbb + qcc - qdd),
                 };
             }
-            case RotationOrder.ZYX: {
+            case 5 /* ZYX */: {
                 return {
                     x: Math.atan2(qcd2 + qab2, qaa - qbb - qcc + qdd),
                     y: Math.asin(qac2 - qbd2),

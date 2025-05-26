@@ -144,9 +144,9 @@ export const MAX_PARAMETER: number = 1 - MIN_PARAMETER;
 
 export function createPathFlatten(options: PathQualityOptions): PathFlatten2 {
     switch (options.flattenMode) {
-        case ApproximationMode.Incremental:
+        case 0 /* Incremental */:
             return new PathFlattenIncremental2(options);
-        case ApproximationMode.Recursive:
+        case 1 /* Recursive */:
             return new PathFlattenRecursive2(options);
         default:
             return options.flattenMode;
@@ -155,9 +155,9 @@ export function createPathFlatten(options: PathQualityOptions): PathFlatten2 {
 
 export function createPathSimplify(options: PathQualityOptions): PathSimplify2 {
     switch (options.simplifyMode) {
-        case ApproximationMode.Incremental:
+        case 0 /* Incremental */:
             return new PathSimplifyIncremental2(options);
-        case ApproximationMode.Recursive:
+        case 1 /* Recursive */:
             return new PathSimplifyRecursive2(options);
         default:
             return options.simplifyMode;
@@ -166,9 +166,9 @@ export function createPathSimplify(options: PathQualityOptions): PathSimplify2 {
 
 export function createPathOffset(options: PathQualityOptions): PathOffset2 {
     switch (options.offsetMode) {
-        case ApproximationMode.Incremental:
+        case 0 /* Incremental */:
             return new PathOffsetIncremental2(options);
-        case ApproximationMode.Recursive:
+        case 1 /* Recursive */:
             return new PathOffsetRecursive2(options);
         default:
             return options.offsetMode;
@@ -177,9 +177,9 @@ export function createPathOffset(options: PathQualityOptions): PathOffset2 {
 
 export function createPathDash(options: PathQualityOptions): PathDash2 {
     switch (options.dashMode) {
-        case ApproximationMode.Incremental:
+        case 0 /* Incremental */:
             return new PathDashIncremental2(options);
-        case ApproximationMode.Recursive:
+        case 1 /* Recursive */:
             return new PathDashRecursive2(options);
         default:
             return options.dashMode;
@@ -188,9 +188,9 @@ export function createPathDash(options: PathQualityOptions): PathDash2 {
 
 export function createPathStroke(options: PathQualityOptions): PathStroke2 {
     switch (options.strokeMode) {
-        case ApproximationMode.Incremental:
+        case 0 /* Incremental */:
             return new PathStrokeIncremental2(options);
-        case ApproximationMode.Recursive:
+        case 1 /* Recursive */:
             return new PathStrokeRecursive2(options);
         default:
             return options.strokeMode;

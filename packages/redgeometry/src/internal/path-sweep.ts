@@ -121,22 +121,22 @@ export function isInWinding(
     let in1 = false;
 
     switch (windingOperator) {
-        case WindingOperator.NonZero: {
+        case 0 /* NonZero */: {
             in0 = w0 !== 0;
             in1 = w1 !== 0;
             break;
         }
-        case WindingOperator.EvenOdd: {
+        case 1 /* EvenOdd */: {
             in0 = (w0 & 1) !== 0;
             in1 = (w1 & 1) !== 0;
             break;
         }
-        case WindingOperator.Positive: {
+        case 2 /* Positive */: {
             in0 = w0 > 0;
             in1 = w1 > 0;
             break;
         }
-        case WindingOperator.Negative: {
+        case 3 /* Negative */: {
             in0 = w0 < 0;
             in1 = w1 < 0;
             break;
@@ -184,27 +184,27 @@ export function isIncOutBoolean(
     let out = false;
 
     switch (booleanOperator) {
-        case BooleanOperator.Union: {
+        case 0 /* Union */: {
             inc = !ina0 && !inb0 && (ina1 || inb1);
             out = !ina1 && !inb1 && (ina0 || inb0);
             break;
         }
-        case BooleanOperator.Intersection: {
+        case 1 /* Intersection */: {
             inc = ina1 && inb1 && (!ina0 || !inb0);
             out = ina0 && inb0 && (!ina1 || !inb1);
             break;
         }
-        case BooleanOperator.Exclusion: {
+        case 2 /* Exclusion */: {
             inc = ina0 === inb0 && ina1 !== inb1;
             out = ina0 !== inb0 && ina1 === inb1;
             break;
         }
-        case BooleanOperator.AWithoutB: {
+        case 3 /* AWithoutB */: {
             inc = ina1 && !inb1 && (!ina0 || inb0);
             out = ina0 && !inb0 && (!ina1 || inb1);
             break;
         }
-        case BooleanOperator.BWithoutA: {
+        case 4 /* BWithoutA */: {
             inc = !ina1 && inb1 && (ina0 || !inb0);
             out = !ina0 && inb0 && (ina1 || !inb1);
             break;

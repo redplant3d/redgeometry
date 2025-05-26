@@ -443,11 +443,11 @@ export function insertStrokeJoin(
 
 export function insertStrokeCap(path: Path2, p1: ReadonlyVector2, cap: CapType | CustomCap): void {
     switch (cap) {
-        case CapType.Butt: {
+        case 0 /* Butt */: {
             path.lineTo(p1);
             break;
         }
-        case CapType.Square: {
+        case 1 /* Square */: {
             const p0 = path.getLastPoint();
 
             if (p0 === undefined) {
@@ -461,7 +461,7 @@ export function insertStrokeCap(path: Path2, p1: ReadonlyVector2, cap: CapType |
 
             break;
         }
-        case CapType.Round: {
+        case 2 /* Round */: {
             const p0 = path.getLastPoint();
 
             if (p0 === undefined) {

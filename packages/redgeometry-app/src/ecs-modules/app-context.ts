@@ -1,5 +1,5 @@
 import type { Mesh2, MeshFace2 } from "redgeometry/src/core/mesh";
-import { PathCommandType, type Path2 } from "redgeometry/src/core/path";
+import { type Path2 } from "redgeometry/src/core/path";
 import type { Polygon2 } from "redgeometry/src/core/polygon";
 import type { ReadonlyMinMaxBox2 } from "redgeometry/src/primitives/box";
 import type { Edge2, ReadonlyEdge2 } from "redgeometry/src/primitives/edge";
@@ -430,19 +430,19 @@ export class AppContextPlugin implements WorldPlugin {
             const command = commands[cIdx++];
 
             switch (command.type) {
-                case PathCommandType.Move: {
+                case 0 /* Move */: {
                     p0 = points[pIdx++];
                     ctx.moveTo(p0.x, p0.y);
                     break;
                 }
-                case PathCommandType.Linear: {
+                case 1 /* Linear */: {
                     const p1 = points[pIdx++];
 
                     ctx.lineTo(p1.x, p1.y);
                     p0 = p1;
                     break;
                 }
-                case PathCommandType.Quadratic: {
+                case 2 /* Quadratic */: {
                     const p1 = points[pIdx++];
                     const p2 = points[pIdx++];
 
@@ -450,7 +450,7 @@ export class AppContextPlugin implements WorldPlugin {
                     p0 = p2;
                     break;
                 }
-                case PathCommandType.Cubic: {
+                case 3 /* Cubic */: {
                     const p1 = points[pIdx++];
                     const p2 = points[pIdx++];
                     const p3 = points[pIdx++];
@@ -459,7 +459,7 @@ export class AppContextPlugin implements WorldPlugin {
                     p0 = p3;
                     break;
                 }
-                case PathCommandType.Conic: {
+                case 4 /* Conic */: {
                     const p1 = points[pIdx++];
                     const p2 = points[pIdx++];
                     const w = command.w;
@@ -473,7 +473,7 @@ export class AppContextPlugin implements WorldPlugin {
                     p0 = p2;
                     break;
                 }
-                case PathCommandType.Close: {
+                case 5 /* Close */: {
                     ctx.closePath();
                     break;
                 }

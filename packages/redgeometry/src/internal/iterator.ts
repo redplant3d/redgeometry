@@ -1,5 +1,5 @@
 import type { MeshEdge2 } from "../core/mesh.js";
-import { PathCommandType, type PathCommand } from "../core/path.js";
+import { type PathCommand } from "../core/path.js";
 import {
     Bezier1Curve2,
     Bezier2Curve2,
@@ -95,37 +95,37 @@ export class Path2CurveIterator implements IterableIterator<ReadonlyBezierCurve2
         while (this.cIdx < commands.length) {
             const command = commands[this.cIdx++];
             switch (command.type) {
-                case PathCommandType.Move: {
+                case 0 /* Move */: {
                     this.ps = points[this.pIdx++];
                     this.p0 = this.ps;
 
                     break;
                 }
-                case PathCommandType.Linear: {
+                case 1 /* Linear */: {
                     const c = new Bezier1Curve2(this.p0, points[this.pIdx++]);
                     this.p0 = c.p1;
 
                     return { done: false, value: c };
                 }
-                case PathCommandType.Quadratic: {
+                case 2 /* Quadratic */: {
                     const c = new Bezier2Curve2(this.p0, points[this.pIdx++], points[this.pIdx++]);
                     this.p0 = c.p2;
 
                     return { done: false, value: c };
                 }
-                case PathCommandType.Cubic: {
+                case 3 /* Cubic */: {
                     const c = new Bezier3Curve2(this.p0, points[this.pIdx++], points[this.pIdx++], points[this.pIdx++]);
                     this.p0 = c.p3;
 
                     return { done: false, value: c };
                 }
-                case PathCommandType.Conic: {
+                case 4 /* Conic */: {
                     const c = new BezierRCurve2(this.p0, points[this.pIdx++], points[this.pIdx++], command.w);
                     this.p0 = c.p2;
 
                     return { done: false, value: c };
                 }
-                case PathCommandType.Close: {
+                case 5 /* Close */: {
                     const c = new Bezier1Curve2(this.p0, this.ps);
                     this.p0 = c.p1;
 

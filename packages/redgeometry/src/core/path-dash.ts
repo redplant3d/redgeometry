@@ -22,7 +22,7 @@ import {
 import { Vector2, type ReadonlyVector2 } from "../primitives/vector.js";
 import { assertUnreachable } from "../utility/debug.js";
 import { MAX_PARAMETER, type PathDashOptions, type PathQualityOptions } from "./path-options.js";
-import { PathCommandType, type Path2 } from "./path.js";
+import { type Path2 } from "./path.js";
 
 export interface PathDash2 {
     process(input: Path2, output: Path2, options: PathDashOptions): void;
@@ -62,7 +62,7 @@ export class PathDashIncremental2 implements PathDash2 {
         while (cIdx < commands.length) {
             const command = commands[cIdx++];
             switch (command.type) {
-                case PathCommandType.Move: {
+                case 0 /* Move */: {
                     if (!m0.isZero()) {
                         this.state.finalizeOpen(output);
                     }
@@ -73,7 +73,7 @@ export class PathDashIncremental2 implements PathDash2 {
                     ps = p0;
                     break;
                 }
-                case PathCommandType.Linear: {
+                case 1 /* Linear */: {
                     const c = new Bezier1Curve2(p0, points[pIdx++]);
                     const m = c.getDerivative();
 
@@ -87,7 +87,7 @@ export class PathDashIncremental2 implements PathDash2 {
 
                     break;
                 }
-                case PathCommandType.Quadratic: {
+                case 2 /* Quadratic */: {
                     const c = new Bezier2Curve2(p0, points[pIdx++], points[pIdx++]);
                     const m = c.getTangentStart();
 
@@ -101,7 +101,7 @@ export class PathDashIncremental2 implements PathDash2 {
 
                     break;
                 }
-                case PathCommandType.Cubic: {
+                case 3 /* Cubic */: {
                     const c = new Bezier3Curve2(p0, points[pIdx++], points[pIdx++], points[pIdx++]);
                     const m = c.getTangentStart();
 
@@ -115,7 +115,7 @@ export class PathDashIncremental2 implements PathDash2 {
 
                     break;
                 }
-                case PathCommandType.Conic: {
+                case 4 /* Conic */: {
                     const c = new BezierRCurve2(p0, points[pIdx++], points[pIdx++], command.w);
                     const m = c.getTangentStart();
 
@@ -129,7 +129,7 @@ export class PathDashIncremental2 implements PathDash2 {
 
                     break;
                 }
-                case PathCommandType.Close: {
+                case 5 /* Close */: {
                     const c = new Bezier1Curve2(p0, ps);
                     const m = c.getDerivative();
 
@@ -268,7 +268,7 @@ export class PathDashRecursive2 implements PathDash2 {
         while (cIdx < commands.length) {
             const command = commands[cIdx++];
             switch (command.type) {
-                case PathCommandType.Move: {
+                case 0 /* Move */: {
                     if (!m0.isZero()) {
                         this.state.finalizeOpen(output);
                     }
@@ -279,7 +279,7 @@ export class PathDashRecursive2 implements PathDash2 {
                     ps = p0;
                     break;
                 }
-                case PathCommandType.Linear: {
+                case 1 /* Linear */: {
                     const c = new Bezier1Curve2(p0, points[pIdx++]);
                     const m = c.getDerivative();
 
@@ -293,7 +293,7 @@ export class PathDashRecursive2 implements PathDash2 {
 
                     break;
                 }
-                case PathCommandType.Quadratic: {
+                case 2 /* Quadratic */: {
                     const c = new Bezier2Curve2(p0, points[pIdx++], points[pIdx++]);
                     const m = c.getTangentStart();
 
@@ -307,7 +307,7 @@ export class PathDashRecursive2 implements PathDash2 {
 
                     break;
                 }
-                case PathCommandType.Cubic: {
+                case 3 /* Cubic */: {
                     const c = new Bezier3Curve2(p0, points[pIdx++], points[pIdx++], points[pIdx++]);
                     const m = c.getTangentStart();
 
@@ -321,7 +321,7 @@ export class PathDashRecursive2 implements PathDash2 {
 
                     break;
                 }
-                case PathCommandType.Conic: {
+                case 4 /* Conic */: {
                     const c = new BezierRCurve2(p0, points[pIdx++], points[pIdx++], command.w);
                     const m = c.getTangentStart();
 
@@ -335,7 +335,7 @@ export class PathDashRecursive2 implements PathDash2 {
 
                     break;
                 }
-                case PathCommandType.Close: {
+                case 5 /* Close */: {
                     const c = new Bezier1Curve2(p0, ps);
                     const m = c.getDerivative();
 
