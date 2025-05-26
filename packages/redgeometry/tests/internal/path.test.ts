@@ -2,10 +2,10 @@ import { expect, test } from "vitest";
 import { PathCommandType, type PathCommand } from "../../src/core/path.js";
 import { copyCommandsReversed } from "../../src/internal/path.js";
 
-const cmdMove: PathCommand = { type: PathCommandType.Move };
-const cmdLine: PathCommand = { type: PathCommandType.Linear };
-const cmdQuad: PathCommand = { type: PathCommandType.Quadratic };
-const cmdClose: PathCommand = { type: PathCommandType.Close };
+const cmdMove: PathCommand = { type: PathCommandType.MOVE };
+const cmdLine: PathCommand = { type: PathCommandType.LINEAR };
+const cmdQuad: PathCommand = { type: PathCommandType.QUADRATIC };
+const cmdClose: PathCommand = { type: PathCommandType.CLOSE };
 
 test("copyCommandsReversedAppend", () => {
     const input1: PathCommand[] = [];
@@ -74,7 +74,7 @@ test("copyCommandsReversed", () => {
 function copyCommandsReversedHelper(inputCommands: PathCommand[], append: boolean): PathCommand[] {
     const output: PathCommand[] = [];
 
-    if (append && inputCommands[0]?.type === PathCommandType.Move) {
+    if (append && inputCommands[0]?.type === PathCommandType.MOVE) {
         copyCommandsReversed(inputCommands, 1, output, output.length, inputCommands.length - 1);
     } else {
         copyCommandsReversed(inputCommands, 0, output, output.length, inputCommands.length);

@@ -315,8 +315,8 @@ export class StrokeState {
         this.insertQuadraticSimpleStroke(c1);
 
         if (this.currentPhase) {
-            insertOuterJoin(this.left, p1, n0, n1, this.distance, 0, JoinType.Round);
-            insertOuterJoin(this.right, p1, n0.neg(), n1.neg(), this.distance, 0, JoinType.Round);
+            insertOuterJoin(this.left, p1, n0, n1, this.distance, 0, JoinType.ROUND);
+            insertOuterJoin(this.right, p1, n0.neg(), n1.neg(), this.distance, 0, JoinType.ROUND);
         }
 
         this.insertQuadraticSimpleStroke(c2);
@@ -331,8 +331,8 @@ export class StrokeState {
 
         this.insertQuadraticSimpleStroke(c1);
 
-        insertOuterJoin(this.left, p1, n0, n1, this.distance, 0, JoinType.Round);
-        insertOuterJoin(this.right, p1, n0.neg(), n1.neg(), this.distance, 0, JoinType.Round);
+        insertOuterJoin(this.left, p1, n0, n1, this.distance, 0, JoinType.ROUND);
+        insertOuterJoin(this.right, p1, n0.neg(), n1.neg(), this.distance, 0, JoinType.ROUND);
 
         this.insertQuadraticSimpleStroke(c2);
     }
@@ -443,11 +443,11 @@ export function insertStrokeJoin(
 
 export function insertStrokeCap(path: Path2, p1: ReadonlyVector2, cap: CapType | CustomCap): void {
     switch (cap) {
-        case 0 /* Butt */: {
+        case 0 /* BUTT */: {
             path.lineTo(p1);
             break;
         }
-        case 1 /* Square */: {
+        case 1 /* SQUARE */: {
             const p0 = path.getLastPoint();
 
             if (p0 === undefined) {
@@ -461,7 +461,7 @@ export function insertStrokeCap(path: Path2, p1: ReadonlyVector2, cap: CapType |
 
             break;
         }
-        case 2 /* Round */: {
+        case 2 /* ROUND */: {
             const p0 = path.getLastPoint();
 
             if (p0 === undefined) {

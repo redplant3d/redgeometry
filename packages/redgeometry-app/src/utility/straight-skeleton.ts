@@ -5,10 +5,10 @@ import { assertDebug, log } from "redgeometry/src/utility/debug";
 import { solveLinear, solveQuadratic, type Root1, type Root2 } from "redgeometry/src/utility/solve";
 
 export const KineticEventType = {
-    EdgeEvent: 0,
-    SplitEvent: 1,
-    FlipEvent: 2,
-    FullEvent: 3,
+    EDGE: 0,
+    SPLIT: 1,
+    FLIP: 2,
+    FULL: 3,
 } as const;
 export type KineticEventType = (typeof KineticEventType)[keyof typeof KineticEventType];
 
@@ -143,7 +143,7 @@ export class StraightSkeleton {
 
             this.handleEvent(ev);
 
-            if (ev.type !== KineticEventType.FlipEvent) {
+            if (ev.type !== KineticEventType.FLIP) {
                 faces.splice(0, 1);
             }
 
@@ -312,13 +312,13 @@ export class StraightSkeleton {
 
     private getKineticEventTypeName(type: KineticEventType): string {
         switch (type) {
-            case 0 /* EdgeEvent */:
+            case 0 /* EDGE */:
                 return "EdgeEvent";
-            case 1 /* SplitEvent */:
+            case 1 /* SPLIT */:
                 return "SplitEvent";
-            case 2 /* FlipEvent */:
+            case 2 /* FLIP */:
                 return "FlipEvent";
-            case 3 /* FullEvent */:
+            case 3 /* FULL */:
                 return "FullEvent";
         }
     }
@@ -365,7 +365,7 @@ export class StraightSkeleton {
         const t = ev.t1;
 
         switch (ev.type) {
-            case 0 /* EdgeEvent */: {
+            case 0 /* EDGE */: {
                 // `e0` is collapsing
                 this.stopVertexAt(vtx0, t);
                 this.stopVertexAt(vtx1, t);
@@ -389,7 +389,7 @@ export class StraightSkeleton {
 
                 break;
             }
-            case 1 /* SplitEvent */: {
+            case 1 /* SPLIT */: {
                 // `e0.p0` is crashing into `e1`
                 this.stopVertexAt(vtx0, t);
 
@@ -404,7 +404,7 @@ export class StraightSkeleton {
 
                 break;
             }
-            case 2 /* FlipEvent */: {
+            case 2 /* FLIP */: {
                 // `e0` is the edge that is crossed
                 MeshEdge2.swap(e0);
 
@@ -413,7 +413,7 @@ export class StraightSkeleton {
 
                 break;
             }
-            case 3 /* FullEvent */: {
+            case 3 /* FULL */: {
                 // Three waveforms are collapsing in a single point
                 this.stopVertexAt(vtx0, t);
                 this.stopVertexAt(vtx1, t);
@@ -467,7 +467,7 @@ export class StraightSkeleton {
             e = e2;
         }
 
-        return new KineticEvent(KineticEventType.FlipEvent, e, t1);
+        return new KineticEvent(KineticEventType.FLIP, e, t1);
     }
 
     /**
@@ -486,7 +486,7 @@ export class StraightSkeleton {
         const te = this.getEdgeCollapseParameter(vtx1, vtx2);
 
         if (te <= tv && te > 0) {
-            return { type: KineticEventType.EdgeEvent, e: e1, t1: te };
+            return { type: KineticEventType.EDGE, e: e1, t1: te };
         }
 
         // If the longest edge is the wavefront edge, it is a split event, otherwise it is a flip event.
@@ -512,9 +512,9 @@ export class StraightSkeleton {
         }
 
         if (e === e1) {
-            return new KineticEvent(KineticEventType.SplitEvent, e0, tv);
+            return new KineticEvent(KineticEventType.SPLIT, e0, tv);
         } else {
-            return new KineticEvent(KineticEventType.FlipEvent, e, tv);
+            return new KineticEvent(KineticEventType.FLIP, e, tv);
         }
     }
 
@@ -531,9 +531,9 @@ export class StraightSkeleton {
         const t2 = this.getEdgeCollapseParameter(vtx0, vtx2);
 
         if (t1 < t2 || t2 < 0) {
-            return new KineticEvent(KineticEventType.EdgeEvent, e0, t1);
+            return new KineticEvent(KineticEventType.EDGE, e0, t1);
         } else {
-            return new KineticEvent(KineticEventType.EdgeEvent, e2, t2);
+            return new KineticEvent(KineticEventType.EDGE, e2, t2);
         }
     }
 
@@ -546,7 +546,7 @@ export class StraightSkeleton {
 
         const t1 = this.getEdgeCollapseParameter(vtx0, vtx1);
 
-        return new KineticEvent(KineticEventType.FullEvent, e0, t1);
+        return new KineticEvent(KineticEventType.FULL, e0, t1);
     }
 
     private printEdgesLnext(edge: MeshEdge2, validate: boolean): void {

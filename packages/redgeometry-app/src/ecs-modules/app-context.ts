@@ -430,19 +430,19 @@ export class AppContextPlugin implements WorldPlugin {
             const command = commands[cIdx++];
 
             switch (command.type) {
-                case 0 /* Move */: {
+                case 0 /* MOVE */: {
                     p0 = points[pIdx++];
                     ctx.moveTo(p0.x, p0.y);
                     break;
                 }
-                case 1 /* Linear */: {
+                case 1 /* LINEAR */: {
                     const p1 = points[pIdx++];
 
                     ctx.lineTo(p1.x, p1.y);
                     p0 = p1;
                     break;
                 }
-                case 2 /* Quadratic */: {
+                case 2 /* QUADRATIC */: {
                     const p1 = points[pIdx++];
                     const p2 = points[pIdx++];
 
@@ -450,7 +450,7 @@ export class AppContextPlugin implements WorldPlugin {
                     p0 = p2;
                     break;
                 }
-                case 3 /* Cubic */: {
+                case 3 /* CUBIC */: {
                     const p1 = points[pIdx++];
                     const p2 = points[pIdx++];
                     const p3 = points[pIdx++];
@@ -459,7 +459,7 @@ export class AppContextPlugin implements WorldPlugin {
                     p0 = p3;
                     break;
                 }
-                case 4 /* Conic */: {
+                case 4 /* CONIC */: {
                     const p1 = points[pIdx++];
                     const p2 = points[pIdx++];
                     const w = command.w;
@@ -473,7 +473,7 @@ export class AppContextPlugin implements WorldPlugin {
                     p0 = p2;
                     break;
                 }
-                case 5 /* Close */: {
+                case 5 /* CLOSE */: {
                     ctx.closePath();
                     break;
                 }

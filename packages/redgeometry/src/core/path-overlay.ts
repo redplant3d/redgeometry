@@ -47,7 +47,7 @@ export class PathOverlay2 {
     public addPath(path: Path2, set = 0, weight = 1, snap = false): void {
         // Workaround: Flatten whole path
         const buffer = path.flatten(false, {
-            flattenMode: ApproximationMode.Recursive,
+            flattenMode: ApproximationMode.RECURSIVE,
             flattenTolerance: this.flattenTolerance,
         });
 

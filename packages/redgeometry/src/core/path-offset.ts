@@ -56,7 +56,7 @@ export class PathOffsetIncremental2 implements PathOffset2 {
 
         this.buffer = Path2.createEmpty();
         this.d = 0;
-        this.join = JoinType.Bevel;
+        this.join = JoinType.BEVEL;
         this.miterLimit = 0;
         this.ms = Vector2.ZERO;
         this.ps = Vector2.ZERO;
@@ -88,7 +88,7 @@ export class PathOffsetIncremental2 implements PathOffset2 {
         while (cIdx < commands.length) {
             const command = commands[cIdx++];
             switch (command.type) {
-                case 0 /* Move */: {
+                case 0 /* MOVE */: {
                     if (!m0.isZero()) {
                         this.finalizeOpenOffset(output);
                     }
@@ -100,7 +100,7 @@ export class PathOffsetIncremental2 implements PathOffset2 {
 
                     break;
                 }
-                case 1 /* Linear */: {
+                case 1 /* LINEAR */: {
                     const c = new Bezier1Curve2(p0, points[pIdx++]);
                     const m = c.getDerivative();
 
@@ -114,7 +114,7 @@ export class PathOffsetIncremental2 implements PathOffset2 {
 
                     break;
                 }
-                case 2 /* Quadratic */: {
+                case 2 /* QUADRATIC */: {
                     const c = new Bezier2Curve2(p0, points[pIdx++], points[pIdx++]);
                     const m = c.getTangentStart();
 
@@ -128,7 +128,7 @@ export class PathOffsetIncremental2 implements PathOffset2 {
 
                     break;
                 }
-                case 3 /* Cubic */: {
+                case 3 /* CUBIC */: {
                     const c = new Bezier3Curve2(p0, points[pIdx++], points[pIdx++], points[pIdx++]);
                     const m = c.getTangentStart();
 
@@ -142,7 +142,7 @@ export class PathOffsetIncremental2 implements PathOffset2 {
 
                     break;
                 }
-                case 4 /* Conic */: {
+                case 4 /* CONIC */: {
                     const c = new BezierRCurve2(p0, points[pIdx++], points[pIdx++], command.w);
                     const m = c.getTangentStart();
 
@@ -156,7 +156,7 @@ export class PathOffsetIncremental2 implements PathOffset2 {
 
                     break;
                 }
-                case 5 /* Close */: {
+                case 5 /* CLOSE */: {
                     const c = new Bezier1Curve2(p0, this.ps);
                     const m = c.getDerivative();
 
@@ -348,7 +348,7 @@ export class PathOffsetRecursive2 implements PathOffset2 {
 
         this.buffer = Path2.createEmpty();
         this.d = 0;
-        this.join = JoinType.Bevel;
+        this.join = JoinType.BEVEL;
         this.miterLimit = 0;
         this.ms = Vector2.ZERO;
         this.ps = Vector2.ZERO;
@@ -380,7 +380,7 @@ export class PathOffsetRecursive2 implements PathOffset2 {
         while (cIdx < commands.length) {
             const command = commands[cIdx++];
             switch (command.type) {
-                case 0 /* Move */: {
+                case 0 /* MOVE */: {
                     if (!m0.isZero()) {
                         this.finalizeOpenOffset(output);
                     }
@@ -392,7 +392,7 @@ export class PathOffsetRecursive2 implements PathOffset2 {
 
                     break;
                 }
-                case 1 /* Linear */: {
+                case 1 /* LINEAR */: {
                     const c = new Bezier1Curve2(p0, points[pIdx++]);
                     const m = c.getDerivative();
 
@@ -406,7 +406,7 @@ export class PathOffsetRecursive2 implements PathOffset2 {
 
                     break;
                 }
-                case 2 /* Quadratic */: {
+                case 2 /* QUADRATIC */: {
                     const c = new Bezier2Curve2(p0, points[pIdx++], points[pIdx++]);
                     const m = c.getTangentStart();
 
@@ -420,7 +420,7 @@ export class PathOffsetRecursive2 implements PathOffset2 {
 
                     break;
                 }
-                case 3 /* Cubic */: {
+                case 3 /* CUBIC */: {
                     const c = new Bezier3Curve2(p0, points[pIdx++], points[pIdx++], points[pIdx++]);
                     const m = c.getTangentStart();
 
@@ -434,7 +434,7 @@ export class PathOffsetRecursive2 implements PathOffset2 {
 
                     break;
                 }
-                case 4 /* Conic */: {
+                case 4 /* CONIC */: {
                     const c = new BezierRCurve2(p0, points[pIdx++], points[pIdx++], command.w);
                     const m = c.getTangentStart();
 
@@ -448,7 +448,7 @@ export class PathOffsetRecursive2 implements PathOffset2 {
 
                     break;
                 }
-                case 5 /* Close */: {
+                case 5 /* CLOSE */: {
                     const c = new Bezier1Curve2(p0, this.ps);
                     const m = c.getDerivative();
 

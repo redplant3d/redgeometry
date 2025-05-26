@@ -64,10 +64,10 @@ export type WorldScheduleStage<T extends SystemStage> = {
 };
 
 export const ChangeFlags = {
-    None: 0,
-    Created: 1,
-    Updated: 2,
-    Deleted: 4,
+    NONE: 0,
+    CREATED: 1,
+    UPDATED: 2,
+    DELETED: 4,
 } as const;
 export type ChangeFlags = (typeof ChangeFlags)[keyof typeof ChangeFlags] | (number & {});
 

@@ -308,11 +308,11 @@ function notificationSystem(world: World): void {
     let deletedCount = 0;
 
     for (const entityId of world.getEntitiesChanged()) {
-        if (world.hasChangeFlag<ObjectComponent>(entityId, "object", ChangeFlags.Created)) {
+        if (world.hasChangeFlag<ObjectComponent>(entityId, "object", ChangeFlags.CREATED)) {
             createdCount += 1;
         }
 
-        if (world.hasChangeFlag<ObjectComponent>(entityId, "object", ChangeFlags.Deleted)) {
+        if (world.hasChangeFlag<ObjectComponent>(entityId, "object", ChangeFlags.DELETED)) {
             deletedCount += 1;
         }
     }

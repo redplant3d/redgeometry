@@ -47,9 +47,9 @@ export function createRandomMesh(
 
     const mesh = Mesh2.createEmpty();
     clip.process(mesh, {
-        booleanOperator: BooleanOperator.Exclusion,
-        windingOperatorA: WindingOperator.NonZero,
-        windingOperatorB: WindingOperator.NonZero,
+        booleanOperator: BooleanOperator.EXCLUSION,
+        windingOperatorA: WindingOperator.NON_ZERO,
+        windingOperatorB: WindingOperator.NON_ZERO,
     });
 
     return mesh;
@@ -251,42 +251,42 @@ export function createRandomSeed(): number {
 export function getBooleanOperator(value: string): BooleanOperator {
     switch (value) {
         case "intersection":
-            return BooleanOperator.Intersection;
+            return BooleanOperator.INTERSECTION;
         case "exclusion":
-            return BooleanOperator.Exclusion;
+            return BooleanOperator.EXCLUSION;
         case "awithoutb":
-            return BooleanOperator.AWithoutB;
+            return BooleanOperator.A_WITHOUT_B;
         case "bwithouta":
-            return BooleanOperator.BWithoutA;
+            return BooleanOperator.B_WITHOUT_A;
         default:
-            return BooleanOperator.Union;
+            return BooleanOperator.UNION;
     }
 }
 
 export function getJoinType(value: string): JoinType {
     switch (value) {
         case "miter":
-            return JoinType.Miter;
+            return JoinType.MITER;
         case "miterclip":
-            return JoinType.MiterClip;
+            return JoinType.MITER_CLIP;
         case "round":
-            return JoinType.Round;
+            return JoinType.ROUND;
         default:
-            return JoinType.Bevel;
+            return JoinType.BEVEL;
     }
 }
 
 export function getWindingOperator(value: string): WindingOperator | CustomWindingOperator {
     switch (value) {
         case "evenodd":
-            return WindingOperator.EvenOdd;
+            return WindingOperator.EVEN_ODD;
         case "positive":
-            return WindingOperator.Positive;
+            return WindingOperator.POSITIVE;
         case "negative":
-            return WindingOperator.Negative;
+            return WindingOperator.NEGATIVE;
         case "absgeqtwo":
             return (wind: number) => Math.abs(wind) > 2;
         default:
-            return WindingOperator.NonZero;
+            return WindingOperator.NON_ZERO;
     }
 }

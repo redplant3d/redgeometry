@@ -86,7 +86,7 @@ function updateSystem(world: World): void {
         dataId: "app-part-remote",
         input: path,
         bounds: path.getBounds(),
-        isInside: path.hasPointInside(p, WindingOperator.EvenOdd),
+        isInside: path.hasPointInside(p, WindingOperator.EVEN_ODD),
     });
 
     // log.info("Path area = {}", path.signedArea());

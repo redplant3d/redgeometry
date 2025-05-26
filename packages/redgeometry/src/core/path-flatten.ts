@@ -57,7 +57,7 @@ export class PathFlattenIncremental2 implements PathFlatten2 {
         while (cIdx < commands.length) {
             const command = commands[cIdx++];
             switch (command.type) {
-                case 0 /* Move */: {
+                case 0 /* MOVE */: {
                     if (forceClose && !p0.eq(ps)) {
                         output.lineTo(ps);
                     }
@@ -66,31 +66,31 @@ export class PathFlattenIncremental2 implements PathFlatten2 {
                     p0 = ps;
                     break;
                 }
-                case 1 /* Linear */: {
+                case 1 /* LINEAR */: {
                     const p1 = points[pIdx++];
                     output.lineTo(p1);
                     p0 = p1;
                     break;
                 }
-                case 2 /* Quadratic */: {
+                case 2 /* QUADRATIC */: {
                     const c = new Bezier2Curve2(p0, points[pIdx++], points[pIdx++]);
                     this.flattenQuadratic(c, output);
                     p0 = c.p2;
                     break;
                 }
-                case 3 /* Cubic */: {
+                case 3 /* CUBIC */: {
                     const c = new Bezier3Curve2(p0, points[pIdx++], points[pIdx++], points[pIdx++]);
                     this.flattenCubic(c, output);
                     p0 = c.p3;
                     break;
                 }
-                case 4 /* Conic */: {
+                case 4 /* CONIC */: {
                     const c = new BezierRCurve2(p0, points[pIdx++], points[pIdx++], command.w);
                     this.flattenConic(c, output);
                     p0 = c.p2;
                     break;
                 }
-                case 5 /* Close */: {
+                case 5 /* CLOSE */: {
                     if (!p0.eq(ps)) {
                         output.lineTo(ps);
                     }
@@ -190,7 +190,7 @@ export class PathFlattenRecursive2 implements PathFlatten2 {
         while (cIdx < commands.length) {
             const command = commands[cIdx++];
             switch (command.type) {
-                case 0 /* Move */: {
+                case 0 /* MOVE */: {
                     if (forceClose && !p0.eq(ps)) {
                         output.lineTo(ps);
                     }
@@ -199,31 +199,31 @@ export class PathFlattenRecursive2 implements PathFlatten2 {
                     p0 = ps;
                     break;
                 }
-                case 1 /* Linear */: {
+                case 1 /* LINEAR */: {
                     const p1 = points[pIdx++];
                     output.lineTo(p1);
                     p0 = p1;
                     break;
                 }
-                case 2 /* Quadratic */: {
+                case 2 /* QUADRATIC */: {
                     const c = new Bezier2Curve2(p0, points[pIdx++], points[pIdx++]);
                     this.flattenQuadratic(c, output);
                     p0 = c.p2;
                     break;
                 }
-                case 3 /* Cubic */: {
+                case 3 /* CUBIC */: {
                     const c = new Bezier3Curve2(p0, points[pIdx++], points[pIdx++], points[pIdx++]);
                     this.flattenCubic(c, output);
                     p0 = c.p3;
                     break;
                 }
-                case 4 /* Conic */: {
+                case 4 /* CONIC */: {
                     const c = new BezierRCurve2(p0, points[pIdx++], points[pIdx++], command.w);
                     this.flattenConic(c, output);
                     p0 = c.p2;
                     break;
                 }
-                case 5 /* Close */: {
+                case 5 /* CLOSE */: {
                     if (!p0.eq(ps)) {
                         output.lineTo(ps);
                     }

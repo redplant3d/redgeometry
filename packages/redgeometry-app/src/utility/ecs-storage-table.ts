@@ -6,10 +6,10 @@ import { ChangeFlags } from "../ecs/world.js";
 import { ObjectPool } from "./object.js";
 
 const EntityChangeFlags = {
-    None: 0,
-    Created: 1,
-    Updated: 2,
-    Deleted: 4,
+    NONE: 0,
+    CREATED: 1,
+    UPDATED: 2,
+    DELETED: 4,
 } as const;
 export type EntityChangeFlags = (typeof EntityChangeFlags)[keyof typeof EntityChangeFlags] | (number & {});
 
@@ -431,7 +431,7 @@ class EntityEntries {
         this.componentEntityRefs.push(componentEntityRef);
         this.componentChangeRefHeads.push(componentChangeRefHead);
         this.changeTicks.push(changeTick);
-        this.changeFlags.push(EntityChangeFlags.Created);
+        this.changeFlags.push(EntityChangeFlags.CREATED);
         this.parentEntityIds.push(parent);
         this.childrenEntityIds.push(undefined);
         this.depths.push(depth);
@@ -563,7 +563,7 @@ class EntityEntries {
             entityChangeEntries.update(entityId, entityRef);
         }
 
-        this.changeFlags[entityRef] |= EntityChangeFlags.Updated;
+        this.changeFlags[entityRef] |= EntityChangeFlags.UPDATED;
     }
 
     private addEntityToParent(entityRef: EntityRef, parentEntityRef: EntityRef): void {
@@ -602,7 +602,7 @@ class EntityEntries {
     private updateHierarchy(entityRef: EntityRef, parentEntityRef: EntityRef, changeTick: number): void {
         this.depths[entityRef] = this.depths[parentEntityRef] + 1;
         this.changeTicks[entityRef] = changeTick;
-        this.changeFlags[entityRef] = EntityChangeFlags.Updated;
+        this.changeFlags[entityRef] = EntityChangeFlags.UPDATED;
 
         const childrenEntityIds = this.childrenEntityIds[entityRef];
 
@@ -745,7 +745,7 @@ class ComponentTable {
         for (const component of components) {
             const entry = this.getEntryOrThrow(component.componentId);
             const componentRef = entry.getComponentRef();
-            const changeRef = changeEntries.create(changeRefHead, componentRef, ChangeFlags.Created);
+            const changeRef = changeEntries.create(changeRefHead, componentRef, ChangeFlags.CREATED);
 
             entry.create(component, changeTick, changeRef);
 
@@ -866,7 +866,7 @@ class ComponentTableEntry {
     ): void {
         if (this.changeTicks[componentEntityRef] !== changeTick) {
             const changeRefHead = entityEntries.getChangeRefHead(entityRef, changeTick);
-            const changeRef = changeEntries.create(changeRefHead, this.componentRef, ChangeFlags.Updated);
+            const changeRef = changeEntries.create(changeRefHead, this.componentRef, ChangeFlags.UPDATED);
 
             // Update for current table entry
             this.changeTicks[componentEntityRef] = changeTick;
@@ -876,7 +876,7 @@ class ComponentTableEntry {
             entityEntries.componentChangeRefHeads[entityRef] = changeRef;
         } else {
             const changeRef = this.changeRefs[componentEntityRef];
-            changeEntries.set(changeRef, ChangeFlags.Updated);
+            changeEntries.set(changeRef, ChangeFlags.UPDATED);
         }
     }
 }
@@ -920,7 +920,7 @@ class ComponentChangeEntries {
             currRef = this.nextEntryRefs[currRef];
         }
 
-        return ChangeFlags.None;
+        return ChangeFlags.NONE;
     }
 
     public get(changeRef: number): ChangeFlags {

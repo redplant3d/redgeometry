@@ -91,7 +91,7 @@ function updateSystem(world: World): void {
     // path.lineToXY(100, 200);
     // path.close();
 
-    const mesh = path.toMesh(WindingOperator.NonZero);
+    const mesh = path.toMesh(WindingOperator.NON_ZERO);
     // const mesh = this.getRandomMesh(random, generator, 25, canvasWidth, canvasHeight);
 
     const meshOriginal = mesh.clone();

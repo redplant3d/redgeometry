@@ -39,12 +39,12 @@ export interface PathSink2 {
 }
 
 export const PathCommandType = {
-    Move: 0,
-    Linear: 1,
-    Quadratic: 2,
-    Cubic: 3,
-    Conic: 4,
-    Close: 5,
+    MOVE: 0,
+    LINEAR: 1,
+    QUADRATIC: 2,
+    CUBIC: 3,
+    CONIC: 4,
+    CLOSE: 5,
 } as const;
 export type PathCommandType = (typeof PathCommandType)[keyof typeof PathCommandType];
 
@@ -53,12 +53,12 @@ export type Path2Like = {
     readonly commands: PathCommand[];
 };
 
-export type PathCommandMove = { type: typeof PathCommandType.Move };
-export type PathCommandLine = { type: typeof PathCommandType.Linear };
-export type PathCommandQuad = { type: typeof PathCommandType.Quadratic };
-export type PathCommandCubic = { type: typeof PathCommandType.Cubic };
-export type PathCommandConic = { type: typeof PathCommandType.Conic; w: number };
-export type PathCommandClose = { type: typeof PathCommandType.Close };
+export type PathCommandMove = { type: typeof PathCommandType.MOVE };
+export type PathCommandLine = { type: typeof PathCommandType.LINEAR };
+export type PathCommandQuad = { type: typeof PathCommandType.QUADRATIC };
+export type PathCommandCubic = { type: typeof PathCommandType.CUBIC };
+export type PathCommandConic = { type: typeof PathCommandType.CONIC; w: number };
+export type PathCommandClose = { type: typeof PathCommandType.CLOSE };
 
 export type PathCommand =
     | PathCommandMove
@@ -341,11 +341,11 @@ export class Path2 implements PathSink2 {
     }
 
     public close(): void {
-        this.commands.push({ type: PathCommandType.Close });
+        this.commands.push({ type: PathCommandType.CLOSE });
     }
 
     public conicTo(p1: ReadonlyVector2, p2: ReadonlyVector2, w: number): void {
-        this.commands.push({ type: PathCommandType.Conic, w });
+        this.commands.push({ type: PathCommandType.CONIC, w });
         this.points.push(p1);
         this.points.push(p2);
     }
@@ -362,7 +362,7 @@ export class Path2 implements PathSink2 {
     }
 
     public cubicTo(p1: ReadonlyVector2, p2: ReadonlyVector2, p3: ReadonlyVector2): void {
-        this.commands.push({ type: PathCommandType.Cubic });
+        this.commands.push({ type: PathCommandType.CUBIC });
         this.points.push(p1);
         this.points.push(p2);
         this.points.push(p3);
@@ -439,26 +439,26 @@ export class Path2 implements PathSink2 {
         while (cIdx < commands.length) {
             const command = commands[cIdx++];
             switch (command.type) {
-                case 0 /* Move */: {
+                case 0 /* MOVE */: {
                     const p0 = points[pIdx++];
                     svgData += "M" + p0.x + " " + p0.y;
 
                     break;
                 }
-                case 1 /* Linear */: {
+                case 1 /* LINEAR */: {
                     const p1 = points[pIdx++];
                     svgData += "L" + p1.x + " " + p1.y;
 
                     break;
                 }
-                case 2 /* Quadratic */: {
+                case 2 /* QUADRATIC */: {
                     const p1 = points[pIdx++];
                     const p2 = points[pIdx++];
                     svgData += "Q" + p1.x + " " + p1.y + " " + p2.x + " " + p2.y;
 
                     break;
                 }
-                case 3 /* Cubic */: {
+                case 3 /* CUBIC */: {
                     const p1 = points[pIdx++];
                     const p2 = points[pIdx++];
                     const p3 = points[pIdx++];
@@ -466,7 +466,7 @@ export class Path2 implements PathSink2 {
 
                     break;
                 }
-                case 4 /* Conic */: {
+                case 4 /* CONIC */: {
                     // Workaround (conics not supported by HTML canvas)
                     const p1 = points[pIdx++];
                     const p2 = points[pIdx++];
@@ -474,7 +474,7 @@ export class Path2 implements PathSink2 {
 
                     break;
                 }
-                case 5 /* Close */: {
+                case 5 /* CLOSE */: {
                     svgData += "Z";
 
                     break;
@@ -534,15 +534,15 @@ export class Path2 implements PathSink2 {
     }
 
     public isClosed(): boolean {
-        return this.getLastCommand()?.type === PathCommandType.Close;
+        return this.getLastCommand()?.type === PathCommandType.CLOSE;
     }
 
     public isValid(): boolean {
-        return this.getFirstCommand()?.type === PathCommandType.Move;
+        return this.getFirstCommand()?.type === PathCommandType.MOVE;
     }
 
     public lineTo(p1: ReadonlyVector2): void {
-        this.commands.push({ type: PathCommandType.Linear });
+        this.commands.push({ type: PathCommandType.LINEAR });
         this.points.push(p1);
     }
 
@@ -552,7 +552,7 @@ export class Path2 implements PathSink2 {
     }
 
     public moveTo(p0: ReadonlyVector2): void {
-        this.commands.push({ type: PathCommandType.Move });
+        this.commands.push({ type: PathCommandType.MOVE });
         this.points.push(p0);
     }
 
@@ -569,7 +569,7 @@ export class Path2 implements PathSink2 {
     }
 
     public quadTo(p1: ReadonlyVector2, p2: ReadonlyVector2): void {
-        this.commands.push({ type: PathCommandType.Quadratic });
+        this.commands.push({ type: PathCommandType.QUADRATIC });
         this.points.push(p1);
         this.points.push(p2);
     }

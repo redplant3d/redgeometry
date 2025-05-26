@@ -19,12 +19,12 @@ export function copyCommandsReversed(
     let destIdx = destStart;
     let needsClose = false;
 
-    if (src[srcStart]?.type === PathCommandType.Move) {
-        dest[destIdx++] = { type: PathCommandType.Move };
+    if (src[srcStart]?.type === PathCommandType.MOVE) {
+        dest[destIdx++] = { type: PathCommandType.MOVE };
         srcEnd += 1;
     }
 
-    if (src[srcIdx]?.type === PathCommandType.Close) {
+    if (src[srcIdx]?.type === PathCommandType.CLOSE) {
         needsClose = true;
         srcIdx -= 1;
     }
@@ -32,15 +32,15 @@ export function copyCommandsReversed(
     while (srcIdx >= srcEnd) {
         const cmd = src[srcIdx--];
 
-        if (cmd.type === PathCommandType.Move) {
+        if (cmd.type === PathCommandType.MOVE) {
             if (needsClose) {
-                dest[destIdx++] = { type: PathCommandType.Close };
+                dest[destIdx++] = { type: PathCommandType.CLOSE };
             }
 
-            dest[destIdx++] = { type: PathCommandType.Move };
+            dest[destIdx++] = { type: PathCommandType.MOVE };
             needsClose = false;
-        } else if (cmd.type === PathCommandType.Close) {
-            dest[destIdx++] = { type: PathCommandType.Move };
+        } else if (cmd.type === PathCommandType.CLOSE) {
+            dest[destIdx++] = { type: PathCommandType.MOVE };
             needsClose = true;
         } else {
             dest[destIdx++] = cmd;
@@ -48,19 +48,19 @@ export function copyCommandsReversed(
     }
 
     if (needsClose) {
-        dest[destIdx++] = { type: PathCommandType.Close };
+        dest[destIdx++] = { type: PathCommandType.CLOSE };
     }
 }
 
 export function isWindingInside(wind: number, windingOperator: WindingOperator | CustomWindingOperator): boolean {
     switch (windingOperator) {
-        case 0 /* NonZero */:
+        case 0 /* NON_ZERO */:
             return wind !== 0;
-        case 1 /* EvenOdd */:
+        case 1 /* EVEN_ODD */:
             return (wind & 1) !== 0;
-        case 2 /* Positive */:
+        case 2 /* POSITIVE */:
             return wind > 0;
-        case 3 /* Negative */:
+        case 3 /* NEGATIVE */:
             return wind < 0;
         default:
             return windingOperator(wind);

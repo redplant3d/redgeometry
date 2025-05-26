@@ -7,40 +7,40 @@ import { PathStrokeIncremental2, PathStrokeRecursive2, type PathStroke2 } from "
 import type { PathSink2 } from "./path.js";
 
 export const ApproximationMode = {
-    Incremental: 0,
-    Recursive: 1,
+    INCREMENTAL: 0,
+    RECURSIVE: 1,
 } as const;
 export type ApproximationMode = (typeof ApproximationMode)[keyof typeof ApproximationMode];
 
 export const JoinType = {
-    Bevel: 0,
-    Miter: 1,
-    MiterClip: 2,
-    Round: 3,
+    BEVEL: 0,
+    MITER: 1,
+    MITER_CLIP: 2,
+    ROUND: 3,
 } as const;
 export type JoinType = (typeof JoinType)[keyof typeof JoinType];
 
 export const CapType = {
-    Butt: 0,
-    Square: 1,
-    Round: 2,
+    BUTT: 0,
+    SQUARE: 1,
+    ROUND: 2,
 } as const;
 export type CapType = (typeof CapType)[keyof typeof CapType];
 
 export const WindingOperator = {
-    NonZero: 0,
-    EvenOdd: 1,
-    Positive: 2,
-    Negative: 3,
+    NON_ZERO: 0,
+    EVEN_ODD: 1,
+    POSITIVE: 2,
+    NEGATIVE: 3,
 } as const;
 export type WindingOperator = (typeof WindingOperator)[keyof typeof WindingOperator];
 
 export const BooleanOperator = {
-    Union: 0,
-    Intersection: 1,
-    Exclusion: 2,
-    AWithoutB: 3,
-    BWithoutA: 4,
+    UNION: 0,
+    INTERSECTION: 1,
+    EXCLUSION: 2,
+    A_WITHOUT_B: 3,
+    B_WITHOUT_A: 4,
 } as const;
 export type BooleanOperator = (typeof BooleanOperator)[keyof typeof BooleanOperator];
 
@@ -91,20 +91,20 @@ export type StrokeCaps = {
 export type CustomCap = (path: PathSink2, p0: ReadonlyVector2, p1: ReadonlyVector2) => void;
 export type CustomWindingOperator = (wind: number) => boolean;
 
-export const BUTT_CAPS: Readonly<StrokeCaps> = { start: CapType.Butt, end: CapType.Butt };
-export const ROUND_CAPS: Readonly<StrokeCaps> = { start: CapType.Round, end: CapType.Round };
-export const SQUARE_CAPS: Readonly<StrokeCaps> = { start: CapType.Square, end: CapType.Square };
+export const BUTT_CAPS: Readonly<StrokeCaps> = { start: CapType.BUTT, end: CapType.BUTT };
+export const ROUND_CAPS: Readonly<StrokeCaps> = { start: CapType.ROUND, end: CapType.ROUND };
+export const SQUARE_CAPS: Readonly<StrokeCaps> = { start: CapType.SQUARE, end: CapType.SQUARE };
 
 export const PATH_QUALITY_OPTIONS_DEFAULT: Readonly<PathQualityOptions> = {
     clipPrecision: 65536,
-    dashMode: ApproximationMode.Incremental,
-    flattenMode: ApproximationMode.Incremental,
+    dashMode: ApproximationMode.INCREMENTAL,
+    flattenMode: ApproximationMode.INCREMENTAL,
     flattenTolerance: 0.2,
-    offsetMode: ApproximationMode.Incremental,
+    offsetMode: ApproximationMode.INCREMENTAL,
     offsetTolerance: 0.39269908169,
-    simplifyMode: ApproximationMode.Incremental,
+    simplifyMode: ApproximationMode.INCREMENTAL,
     simplifyTolerance: 0.05,
-    strokeMode: ApproximationMode.Incremental,
+    strokeMode: ApproximationMode.INCREMENTAL,
 };
 
 export const PATH_DASH_OPTIONS_DEFAULT: Readonly<PathDashOptions> = {
@@ -113,7 +113,7 @@ export const PATH_DASH_OPTIONS_DEFAULT: Readonly<PathDashOptions> = {
 };
 
 export const PATH_OFFSET_OPTIONS_DEFAULT: Readonly<PathOffsetOptions> = {
-    join: JoinType.Miter,
+    join: JoinType.MITER,
     miterLimit: 4,
     distance: 1,
 };
@@ -123,15 +123,15 @@ export const PATH_STROKE_OPTIONS_DEFAULT: Readonly<PathStrokeOptions> = {
     dashArray: [],
     dashCaps: BUTT_CAPS,
     dashOffset: 0,
-    join: JoinType.Miter,
+    join: JoinType.MITER,
     miterLimit: 4,
     width: 1,
 };
 
 export const PATH_CLIP_OPTIONS_DEFAULT: Readonly<PathClipOptions> = {
-    booleanOperator: BooleanOperator.Union,
-    windingOperatorA: WindingOperator.NonZero,
-    windingOperatorB: WindingOperator.NonZero,
+    booleanOperator: BooleanOperator.UNION,
+    windingOperatorA: WindingOperator.NON_ZERO,
+    windingOperatorB: WindingOperator.NON_ZERO,
 };
 
 // Threshold for acute (179.9999 degrees) and obtuse (0.0001 degrees) angles.
@@ -144,9 +144,9 @@ export const MAX_PARAMETER: number = 1 - MIN_PARAMETER;
 
 export function createPathFlatten(options: PathQualityOptions): PathFlatten2 {
     switch (options.flattenMode) {
-        case 0 /* Incremental */:
+        case 0 /* INCREMENTAL */:
             return new PathFlattenIncremental2(options);
-        case 1 /* Recursive */:
+        case 1 /* RECURSIVE */:
             return new PathFlattenRecursive2(options);
         default:
             return options.flattenMode;
@@ -155,9 +155,9 @@ export function createPathFlatten(options: PathQualityOptions): PathFlatten2 {
 
 export function createPathSimplify(options: PathQualityOptions): PathSimplify2 {
     switch (options.simplifyMode) {
-        case 0 /* Incremental */:
+        case 0 /* INCREMENTAL */:
             return new PathSimplifyIncremental2(options);
-        case 1 /* Recursive */:
+        case 1 /* RECURSIVE */:
             return new PathSimplifyRecursive2(options);
         default:
             return options.simplifyMode;
@@ -166,9 +166,9 @@ export function createPathSimplify(options: PathQualityOptions): PathSimplify2 {
 
 export function createPathOffset(options: PathQualityOptions): PathOffset2 {
     switch (options.offsetMode) {
-        case 0 /* Incremental */:
+        case 0 /* INCREMENTAL */:
             return new PathOffsetIncremental2(options);
-        case 1 /* Recursive */:
+        case 1 /* RECURSIVE */:
             return new PathOffsetRecursive2(options);
         default:
             return options.offsetMode;
@@ -177,9 +177,9 @@ export function createPathOffset(options: PathQualityOptions): PathOffset2 {
 
 export function createPathDash(options: PathQualityOptions): PathDash2 {
     switch (options.dashMode) {
-        case 0 /* Incremental */:
+        case 0 /* INCREMENTAL */:
             return new PathDashIncremental2(options);
-        case 1 /* Recursive */:
+        case 1 /* RECURSIVE */:
             return new PathDashRecursive2(options);
         default:
             return options.dashMode;
@@ -188,9 +188,9 @@ export function createPathDash(options: PathQualityOptions): PathDash2 {
 
 export function createPathStroke(options: PathQualityOptions): PathStroke2 {
     switch (options.strokeMode) {
-        case 0 /* Incremental */:
+        case 0 /* INCREMENTAL */:
             return new PathStrokeIncremental2(options);
-        case 1 /* Recursive */:
+        case 1 /* RECURSIVE */:
             return new PathStrokeRecursive2(options);
         default:
             return options.strokeMode;

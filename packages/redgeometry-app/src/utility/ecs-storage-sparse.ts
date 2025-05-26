@@ -374,14 +374,14 @@ export class EntityHierarchySelector {
 
 function createComponent(componentEntry: ComponentEntry, entityId: EntityId, component: Component): void {
     componentEntry.components.set(entityId, component);
-    componentEntry.changeFlags.set(entityId, ChangeFlags.Created | ChangeFlags.Updated);
+    componentEntry.changeFlags.set(entityId, ChangeFlags.CREATED | ChangeFlags.UPDATED);
 }
 
 function deleteComponent(componentEntry: ComponentEntry, entityId: EntityId): boolean {
     const success = componentEntry.components.delete(entityId);
 
     if (success) {
-        componentEntry.changeFlags.set(entityId, ChangeFlags.Deleted);
+        componentEntry.changeFlags.set(entityId, ChangeFlags.DELETED);
     }
 
     return success;
@@ -391,9 +391,9 @@ function updateComponent(componentEntry: ComponentEntry, entityId: EntityId): vo
     let changeFlag = componentEntry.changeFlags.get(entityId);
 
     if (changeFlag !== undefined) {
-        changeFlag |= ChangeFlags.Updated;
+        changeFlag |= ChangeFlags.UPDATED;
     } else {
-        changeFlag = ChangeFlags.Updated;
+        changeFlag = ChangeFlags.UPDATED;
     }
 
     componentEntry.changeFlags.set(entityId, changeFlag);

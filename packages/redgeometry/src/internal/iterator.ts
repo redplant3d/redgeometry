@@ -95,37 +95,37 @@ export class Path2CurveIterator implements IterableIterator<ReadonlyBezierCurve2
         while (this.cIdx < commands.length) {
             const command = commands[this.cIdx++];
             switch (command.type) {
-                case 0 /* Move */: {
+                case 0 /* MOVE */: {
                     this.ps = points[this.pIdx++];
                     this.p0 = this.ps;
 
                     break;
                 }
-                case 1 /* Linear */: {
+                case 1 /* LINEAR */: {
                     const c = new Bezier1Curve2(this.p0, points[this.pIdx++]);
                     this.p0 = c.p1;
 
                     return { done: false, value: c };
                 }
-                case 2 /* Quadratic */: {
+                case 2 /* QUADRATIC */: {
                     const c = new Bezier2Curve2(this.p0, points[this.pIdx++], points[this.pIdx++]);
                     this.p0 = c.p2;
 
                     return { done: false, value: c };
                 }
-                case 3 /* Cubic */: {
+                case 3 /* CUBIC */: {
                     const c = new Bezier3Curve2(this.p0, points[this.pIdx++], points[this.pIdx++], points[this.pIdx++]);
                     this.p0 = c.p3;
 
                     return { done: false, value: c };
                 }
-                case 4 /* Conic */: {
+                case 4 /* CONIC */: {
                     const c = new BezierRCurve2(this.p0, points[this.pIdx++], points[this.pIdx++], command.w);
                     this.p0 = c.p2;
 
                     return { done: false, value: c };
                 }
-                case 5 /* Close */: {
+                case 5 /* CLOSE */: {
                     const c = new Bezier1Curve2(this.p0, this.ps);
                     this.p0 = c.p1;
 

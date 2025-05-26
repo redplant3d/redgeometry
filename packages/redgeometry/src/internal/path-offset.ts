@@ -36,7 +36,7 @@ export function offsetQuadraticDegenerate(
     const n1 = p2.sub(p1).unit().normal();
 
     offsetQuadraticSimple(path, c1, d);
-    insertOuterJoin(path, p1, n0, n1, d, 0, JoinType.Round);
+    insertOuterJoin(path, p1, n0, n1, d, 0, JoinType.ROUND);
     offsetQuadraticSimple(path, c2, d);
 }
 
@@ -74,12 +74,12 @@ export function insertOuterJoin(
     const mld = ml * Math.abs(d);
 
     switch (join) {
-        case 0 /* Bevel */: {
+        case 0 /* BEVEL */: {
             path.lineTo(p.addMulS(n1, d));
 
             break;
         }
-        case 1 /* Miter */: {
+        case 1 /* MITER */: {
             let k = n0.add(n1);
 
             k = k.mulS(2 * d).divS(k.lenSq());
@@ -92,7 +92,7 @@ export function insertOuterJoin(
 
             break;
         }
-        case 2 /* MiterClip */: {
+        case 2 /* MITER_CLIP */: {
             let k = n0.add(n1);
 
             k = k.mulS(2 * d).divS(k.lenSq());
@@ -126,7 +126,7 @@ export function insertOuterJoin(
 
             break;
         }
-        case 3 /* Round */: {
+        case 3 /* ROUND */: {
             const pp0 = p.addMulS(n0, d);
             const pp2 = p.addMulS(n1, d);
 

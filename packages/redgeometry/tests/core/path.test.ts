@@ -2,8 +2,8 @@ import { expect, test } from "vitest";
 import { Path2, PathCommandType, type PathCommand } from "../../src/core/path.js";
 import { Vector2 } from "../../src/primitives/vector.js";
 
-const cmdMove: PathCommand = { type: PathCommandType.Move };
-const cmdLine: PathCommand = { type: PathCommandType.Linear };
+const cmdMove: PathCommand = { type: PathCommandType.MOVE };
+const cmdLine: PathCommand = { type: PathCommandType.LINEAR };
 
 test("addPathAppend", () => {
     const p1 = new Vector2(100, 100);

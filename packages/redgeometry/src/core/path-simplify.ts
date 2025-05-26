@@ -54,36 +54,36 @@ export class PathSimplifyIncremental2 implements PathSimplify2 {
         while (cIdx < commands.length) {
             const command = commands[cIdx++];
             switch (command.type) {
-                case 0 /* Move */: {
+                case 0 /* MOVE */: {
                     p0 = points[pIdx++];
                     output.moveTo(p0);
                     break;
                 }
-                case 1 /* Linear */: {
+                case 1 /* LINEAR */: {
                     const p1 = points[pIdx++];
                     output.lineTo(p1);
                     p0 = p1;
                     break;
                 }
-                case 2 /* Quadratic */: {
+                case 2 /* QUADRATIC */: {
                     const c = new Bezier2Curve2(p0, points[pIdx++], points[pIdx++]);
                     output.quadTo(c.p1, c.p2);
                     p0 = c.p2;
                     break;
                 }
-                case 3 /* Cubic */: {
+                case 3 /* CUBIC */: {
                     const c = new Bezier3Curve2(p0, points[pIdx++], points[pIdx++], points[pIdx++]);
                     this.simplifyCubic(output, c);
                     p0 = c.p3;
                     break;
                 }
-                case 4 /* Conic */: {
+                case 4 /* CONIC */: {
                     const c = new BezierRCurve2(p0, points[pIdx++], points[pIdx++], command.w);
                     this.simplifyConic(output, c);
                     p0 = c.p2;
                     break;
                 }
-                case 5 /* Close */: {
+                case 5 /* CLOSE */: {
                     output.close();
                     break;
                 }
@@ -168,36 +168,36 @@ export class PathSimplifyRecursive2 implements PathSimplify2 {
         while (cIdx < commands.length) {
             const command = commands[cIdx++];
             switch (command.type) {
-                case 0 /* Move */: {
+                case 0 /* MOVE */: {
                     p0 = points[pIdx++];
                     output.moveTo(p0);
                     break;
                 }
-                case 1 /* Linear */: {
+                case 1 /* LINEAR */: {
                     const p1 = points[pIdx++];
                     output.lineTo(p1);
                     p0 = p1;
                     break;
                 }
-                case 2 /* Quadratic */: {
+                case 2 /* QUADRATIC */: {
                     const c = new Bezier2Curve2(p0, points[pIdx++], points[pIdx++]);
                     output.quadTo(c.p1, c.p2);
                     p0 = c.p2;
                     break;
                 }
-                case 3 /* Cubic */: {
+                case 3 /* CUBIC */: {
                     const c = new Bezier3Curve2(p0, points[pIdx++], points[pIdx++], points[pIdx++]);
                     this.simplifyCubic(output, c);
                     p0 = c.p3;
                     break;
                 }
-                case 4 /* Conic */: {
+                case 4 /* CONIC */: {
                     const c = new BezierRCurve2(p0, points[pIdx++], points[pIdx++], command.w);
                     this.simplifyConic(output, c);
                     p0 = c.p2;
                     break;
                 }
-                case 5 /* Close */: {
+                case 5 /* CLOSE */: {
                     output.close();
                     break;
                 }

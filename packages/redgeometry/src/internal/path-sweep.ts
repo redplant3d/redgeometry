@@ -121,22 +121,22 @@ export function isInWinding(
     let in1 = false;
 
     switch (windingOperator) {
-        case 0 /* NonZero */: {
+        case 0 /* NON_ZERO */: {
             in0 = w0 !== 0;
             in1 = w1 !== 0;
             break;
         }
-        case 1 /* EvenOdd */: {
+        case 1 /* EVEN_ODD */: {
             in0 = (w0 & 1) !== 0;
             in1 = (w1 & 1) !== 0;
             break;
         }
-        case 2 /* Positive */: {
+        case 2 /* POSITIVE */: {
             in0 = w0 > 0;
             in1 = w1 > 0;
             break;
         }
-        case 3 /* Negative */: {
+        case 3 /* NEGATIVE */: {
             in0 = w0 < 0;
             in1 = w1 < 0;
             break;
@@ -184,27 +184,27 @@ export function isIncOutBoolean(
     let out = false;
 
     switch (booleanOperator) {
-        case 0 /* Union */: {
+        case 0 /* UNION */: {
             inc = !ina0 && !inb0 && (ina1 || inb1);
             out = !ina1 && !inb1 && (ina0 || inb0);
             break;
         }
-        case 1 /* Intersection */: {
+        case 1 /* INTERSECTION */: {
             inc = ina1 && inb1 && (!ina0 || !inb0);
             out = ina0 && inb0 && (!ina1 || !inb1);
             break;
         }
-        case 2 /* Exclusion */: {
+        case 2 /* EXCLUSION */: {
             inc = ina0 === inb0 && ina1 !== inb1;
             out = ina0 !== inb0 && ina1 === inb1;
             break;
         }
-        case 3 /* AWithoutB */: {
+        case 3 /* A_WITHOUT_B */: {
             inc = ina1 && !inb1 && (!ina0 || inb0);
             out = ina0 && !inb0 && (!ina1 || inb1);
             break;
         }
-        case 4 /* BWithoutA */: {
+        case 4 /* B_WITHOUT_A */: {
             inc = !ina1 && inb1 && (ina0 || !inb0);
             out = !ina0 && inb0 && (ina1 || !inb1);
             break;
