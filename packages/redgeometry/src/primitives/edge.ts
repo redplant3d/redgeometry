@@ -1,5 +1,5 @@
 import { clamp } from "../utility/scalar.js";
-import { RootType, solveQuadratic } from "../utility/solve.js";
+import { solveQuadratic } from "../utility/solve.js";
 import { Bezier1Curve2 } from "./bezier.js";
 import { MinMaxBox2, MinMaxBox3 } from "./box.js";
 import { Ray2, Ray3 } from "./ray.js";
@@ -140,7 +140,7 @@ export class Edge2 implements ReadonlyEdge2 {
 
         const roots = solveQuadratic(a, b, c);
 
-        if (roots.type === RootType.Two) {
+        if (roots.type === "two") {
             const t1 = roots.x1;
             const t2 = roots.x2;
 

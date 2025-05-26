@@ -1,28 +1,22 @@
-export const RootType = {
-    Zero: 0,
-    One: 1,
-    Two: 2,
-    Three: 3,
-} as const;
-export type RootType = (typeof RootType)[keyof typeof RootType];
+export type RootType = "zero" | "one" | "two" | "three";
 
 export type Root0 = {
-    type: typeof RootType.Zero;
+    type: "zero";
 };
 
 export type Root1 = {
-    type: typeof RootType.One;
+    type: "one";
     x: number;
 };
 
 export type Root2 = {
-    type: typeof RootType.Two;
+    type: "two";
     x1: number;
     x2: number;
 };
 
 export type Root3 = {
-    type: typeof RootType.Three;
+    type: "three";
     x1: number;
     x2: number;
     x3: number;
@@ -48,7 +42,7 @@ export function solveQuadratic(a: number, b: number, c: number): Root2 | Root0 {
 
     if (d < 0) {
         // No roots (ignore complex pair)
-        return { type: RootType.Zero };
+        return { type: "zero" };
     } else {
         // Two roots
         let x1: number | undefined;
@@ -72,7 +66,7 @@ export function solveQuadratic(a: number, b: number, c: number): Root2 | Root0 {
             x2 = c / d;
         }
 
-        return { type: RootType.Two, x1, x2 };
+        return { type: "two", x1, x2 };
     }
 }
 
@@ -116,7 +110,7 @@ export function solveCubic(a: number, b: number, c: number, d: number): Root3 | 
             x = -d / (x1 + c);
         }
 
-        return { type: RootType.One, x };
+        return { type: "one", x };
     } else {
         // Three roots
         const sqrtdt = Math.sqrt(dt);
@@ -144,6 +138,6 @@ export function solveCubic(a: number, b: number, c: number, d: number): Root3 | 
         const xm = c * f - b * g;
         const wm = c * e - b * f;
 
-        return { type: RootType.Three, x1: xl / wl, x2: xs / ws, x3: xm / wm };
+        return { type: "three", x1: xl / wl, x2: xs / ws, x3: xm / wm };
     }
 }

@@ -1,4 +1,4 @@
-import { CurveType, type ReadonlyBezierCurve2 } from "../primitives/bezier.js";
+import { type ReadonlyBezierCurve2 } from "../primitives/bezier.js";
 import { Edge2, type ReadonlyEdge2 } from "../primitives/edge.js";
 import { Vector2, type ReadonlyVector2 } from "../primitives/vector.js";
 import { ArrayMultiSet } from "../utility/array.js";
@@ -6,11 +6,7 @@ import { assertDebug, log } from "../utility/debug.js";
 import { Float128 } from "../utility/float128.js";
 import { solveLinear } from "../utility/solve.js";
 
-const PixelType = {
-    Magnet: 0,
-    Pin: 1,
-} as const;
-export type PixelType = (typeof PixelType)[keyof typeof PixelType];
+type PixelType = "magnet" | "pin";
 
 type Pixel2 = {
     type: PixelType;
@@ -28,7 +24,7 @@ class PixelSet2 {
         const key = p.toString();
 
         // Magnets may overwrite pins
-        this.pixel.set(key, { type: PixelType.Magnet, p });
+        this.pixel.set(key, { type: "magnet", p });
     }
 
     public addPin(p: ReadonlyVector2): void {
@@ -36,7 +32,7 @@ class PixelSet2 {
 
         // Pins must not overwrite magnets
         if (!this.pixel.has(key)) {
-            this.pixel.set(key, { type: PixelType.Pin, p });
+            this.pixel.set(key, { type: "pin", p });
         }
     }
 
@@ -48,7 +44,7 @@ class PixelSet2 {
         const result: ReadonlyVector2[] = [];
 
         for (const pixel of this.pixel.values()) {
-            if (pixel.type === PixelType.Magnet) {
+            if (pixel.type === "magnet") {
                 result.push(pixel.p);
             }
         }
@@ -60,7 +56,7 @@ class PixelSet2 {
         const result: ReadonlyVector2[] = [];
 
         for (const pixel of this.pixel.values()) {
-            if (pixel.type === PixelType.Pin) {
+            if (pixel.type === "pin") {
                 result.push(pixel.p);
             }
         }
@@ -162,7 +158,7 @@ export class SnapRound2 {
     public addSegment(c: ReadonlyBezierCurve2, set: number, weight: number, snap: boolean, data: unknown): void {
         log.assertFnDebug(() => c.isFinite(), "SnapRound2: BezierCurve2 is not finite");
 
-        if (c.type !== CurveType.Bezier1) {
+        if (c.type !== "bezier1") {
             log.warn("SnapRound2: Not implemented yet");
         }
 

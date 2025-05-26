@@ -10,7 +10,7 @@ import { AppMainModule, AppRemoteModule, type AppStateData } from "../ecs-module
 import type { WorldOptions } from "../ecs/app.js";
 import type { DefaultSystemStage, WorldModule } from "../ecs/types.js";
 import { WORLD_SCHEDULE_OPTIONS_DEFAULT, type World } from "../ecs/world.js";
-import { BPlusTree, NodeType, type Node } from "../utility/bplus-tree.js";
+import { BPlusTree, type Node } from "../utility/bplus-tree.js";
 
 type AppPartMainData = {
     dataId: "app-part-main";
@@ -124,7 +124,7 @@ function renderSystem(world: World): void {
 
     function printNode(node: Immutable<Node<number>>, x: number, y: number): number {
         let yNext = y;
-        if (node.type === NodeType.Internal) {
+        if (node.type === "internal") {
             drawValues(node.keys, x, yNext, "#FF8888");
             for (const child of node.children) {
                 yNext = printNode(child, x + 1, yNext + 1);

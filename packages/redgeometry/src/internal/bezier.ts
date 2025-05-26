@@ -10,7 +10,7 @@ import { Vector2, type ReadonlyVector2, type ReadonlyVector3 } from "../primitiv
 import { log } from "../utility/debug.js";
 import { Interval } from "../utility/interval.js";
 import { lerp } from "../utility/scalar.js";
-import { RootType, solveCubic, solveQuadratic } from "../utility/solve.js";
+import { solveCubic, solveQuadratic } from "../utility/solve.js";
 
 export function setEncloseCurveAt(c: ReadonlyBezierCurve2, box: MinMaxBox2, t: number): void {
     if (!isInParameterRange(t)) {
@@ -154,17 +154,17 @@ export function getIntersectionQuadQuad(
     const rmin = solveQuadratic(v2 - v1, v1, a0 - dmin);
     const rmax = solveQuadratic(v2 - v1, v1, a0 - dmax);
 
-    if (rmin.type === RootType.Two && rmax.type === RootType.Two) {
+    if (rmin.type === "two" && rmax.type === "two") {
         const ii1 = Interval.fromUnordered(rmin.x1, rmax.x1);
         const ii2 = Interval.fromUnordered(rmin.x2, rmax.x2);
 
         checkIntervalQuadQuad(c1, i1, c2, i2, ii1, output);
         checkIntervalQuadQuad(c1, i1, c2, i2, ii2, output);
-    } else if (rmin.type === RootType.Two) {
+    } else if (rmin.type === "two") {
         const ii = Interval.fromUnordered(rmin.x1, rmin.x2);
 
         checkIntervalQuadQuad(c1, i1, c2, i2, ii, output);
-    } else if (rmax.type === RootType.Two) {
+    } else if (rmax.type === "two") {
         const ii = Interval.fromUnordered(rmax.x1, rmax.x2);
 
         checkIntervalQuadQuad(c1, i1, c2, i2, ii, output);
@@ -227,7 +227,7 @@ export function getParameterAtArcLengthQuadratic(c: ReadonlyBezier2Curve2, d: nu
 
     const r = solveQuadratic(d2 - d1, d1, -d);
 
-    if (r.type === RootType.Two) {
+    if (r.type === "two") {
         return r.x1;
     }
 
@@ -242,7 +242,7 @@ export function getParameterAtArcLengthCubic(c: ReadonlyBezier3Curve2, d: number
 
     const r = solveCubic(d3 - 2 * d2 + d1, d2 - d1, d1, -d);
 
-    if (r.type === RootType.Three) {
+    if (r.type === "three") {
         return r.x1;
     }
 
@@ -256,7 +256,7 @@ export function getParameterAtArcLengthConic(c: ReadonlyBezierRCurve2, d: number
 
     const r = solveQuadratic(d2 - 2 * dw - d1, dw, -d);
 
-    if (r.type === RootType.Two) {
+    if (r.type === "two") {
         return r.x1;
     }
 

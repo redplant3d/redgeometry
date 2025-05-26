@@ -1,6 +1,6 @@
 import { Path2CurveIterator } from "../internal/iterator.js";
 import { copyCommandsReversed, isWindingInside } from "../internal/path.js";
-import { CurveType, type ReadonlyBezierCurve2 } from "../primitives/bezier.js";
+import { type ReadonlyBezierCurve2 } from "../primitives/bezier.js";
 import { MinMaxBox2 } from "../primitives/box.js";
 import { Matrix3A, type ReadonlyMatrix3, type ReadonlyMatrix3A } from "../primitives/matrix.js";
 import { Vector2, type ReadonlyVector2, type Vector2Like } from "../primitives/vector.js";
@@ -131,19 +131,19 @@ export class Path2 implements PathSink2 {
             const c = curves[i];
 
             switch (c.type) {
-                case CurveType.Bezier1: {
+                case "bezier1": {
                     this.lineTo(c.p1);
                     break;
                 }
-                case CurveType.Bezier2: {
+                case "bezier2": {
                     this.quadTo(c.p1, c.p2);
                     break;
                 }
-                case CurveType.Bezier3: {
+                case "bezier3": {
                     this.cubicTo(c.p1, c.p2, c.p3);
                     break;
                 }
-                case CurveType.BezierR: {
+                case "bezierr": {
                     this.conicTo(c.p1, c.p2, c.w);
                     break;
                 }

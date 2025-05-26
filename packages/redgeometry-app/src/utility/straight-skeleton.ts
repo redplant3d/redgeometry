@@ -2,7 +2,7 @@ import { MeshEdge2, type Mesh2, type MeshFace2 } from "redgeometry/src/core/mesh
 import { Edge2 } from "redgeometry/src/primitives/edge";
 import { Vector2, type ReadonlyVector2 } from "redgeometry/src/primitives/vector";
 import { assertDebug, log } from "redgeometry/src/utility/debug";
-import { RootType, solveLinear, solveQuadratic, type Root1, type Root2 } from "redgeometry/src/utility/solve";
+import { solveLinear, solveQuadratic, type Root1, type Root2 } from "redgeometry/src/utility/solve";
 
 export const KineticEventType = {
     EdgeEvent: 0,
@@ -345,11 +345,11 @@ export class StraightSkeleton {
         // Root may only be close (but not less or equal) to zero due to floating point issues
         const rt = solveQuadratic(a, 0.5 * b, c);
 
-        if (rt.type === RootType.Two) {
+        if (rt.type === "two") {
             return rt;
         } else {
             // Get the extremum/minimum of the triangle area instead
-            return { type: RootType.One, x: solveLinear(2 * a, b) };
+            return { type: "one", x: solveLinear(2 * a, b) };
         }
     }
 
@@ -436,7 +436,7 @@ export class StraightSkeleton {
 
         let t1: number | undefined;
 
-        if (rt.type === RootType.Two) {
+        if (rt.type === "two") {
             if (rt.x1 < rt.x2 || rt.x2 < 0) {
                 t1 = rt.x1;
             } else {

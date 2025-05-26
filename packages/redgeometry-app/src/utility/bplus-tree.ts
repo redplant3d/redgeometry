@@ -1,14 +1,14 @@
 import type { Immutable } from "redgeometry/src/utility/types";
 
 export type InternalNode<T> = {
-    type: typeof NodeType.Internal;
+    type: "internal";
     parent: InternalNode<T> | undefined;
     length: number;
     keys: T[];
     children: Node<T>[];
 };
 export type LeafNode<T> = {
-    type: typeof NodeType.Leaf;
+    type: "lead";
     parent: InternalNode<T> | undefined;
     length: number;
     values: T[];
@@ -16,11 +16,7 @@ export type LeafNode<T> = {
 };
 export type Node<T> = InternalNode<T> | LeafNode<T>;
 
-export const NodeType = {
-    Internal: 0,
-    Leaf: 1,
-} as const;
-export type NodeType = (typeof NodeType)[keyof typeof NodeType];
+export type NodeType = "internal" | "leaf";
 
 export class BPlusTree<T> {
     private branchSize: number;
@@ -107,7 +103,7 @@ export class BPlusTree<T> {
 
         function validateNode(node: Node<T>, branchSize: number, leafSize: number): boolean {
             let validate = true;
-            if (node.type === NodeType.Internal) {
+            if (node.type === "internal") {
                 validate &&= node.length <= branchSize;
                 for (const child of node.children) {
                     validate &&= validateNode(child, branchSize, leafSize);
@@ -121,7 +117,7 @@ export class BPlusTree<T> {
 
     private findLeafNode(node: Node<T>, key: T): LeafNode<T> {
         // Recursively search nodes
-        if (node.type === NodeType.Internal) {
+        if (node.type === "internal") {
             const idx = this.findNearestIndexEnd(node.keys, key);
             return this.findLeafNode(node.children[idx], key);
         } else {
@@ -150,7 +146,7 @@ export class BPlusTree<T> {
     private getFirstLeaf(): LeafNode<T> {
         let node = this.root;
 
-        while (node.type !== NodeType.Leaf) {
+        while (node.type !== "lead") {
             node = node.children[0];
         }
 
@@ -172,7 +168,7 @@ export class BPlusTree<T> {
         keys: T[],
         children: Node<T>[],
     ): InternalNode<T> {
-        return { type: NodeType.Internal, parent, length, keys, children };
+        return { type: "internal", parent, length, keys, children };
     }
 
     private internalNodeSplitAdd(node: InternalNode<T>, danglingNode: Node<T>, newKey: T): void {
@@ -226,7 +222,7 @@ export class BPlusTree<T> {
         values: T[],
         next: LeafNode<T> | undefined,
     ): LeafNode<T> {
-        return { type: NodeType.Leaf, parent, length, values, next };
+        return { type: "lead", parent, length, values, next };
     }
 
     private leafNodeSplitAdd(node: LeafNode<T>, value: T): void {

@@ -8,7 +8,7 @@ import {
     setEncloseCurveAt,
 } from "../internal/bezier.js";
 import { Interval } from "../utility/interval.js";
-import { RootType, solveCubic, solveLinear, solveQuadratic } from "../utility/solve.js";
+import { solveCubic, solveLinear, solveQuadratic } from "../utility/solve.js";
 import { MinMaxBox2 } from "./box.js";
 import { Edge2 } from "./edge.js";
 import { Vector2, Vector3, type ReadonlyVector2, type ReadonlyVector3, type Vector2Like } from "./vector.js";
@@ -40,11 +40,17 @@ export type BezierRCurve2Like = {
 
 export type BezierCurve2 = Bezier1Curve2 | Bezier2Curve2 | Bezier3Curve2 | BezierRCurve2;
 
+export type ReadonlyBezierCurve2 =
+    | ReadonlyBezier1Curve2
+    | ReadonlyBezier2Curve2
+    | ReadonlyBezier3Curve2
+    | ReadonlyBezierRCurve2;
+
 export interface ReadonlyBezier1Curve2 {
     readonly p0: ReadonlyVector2;
     readonly p1: ReadonlyVector2;
     readonly pn: ReadonlyVector2;
-    readonly type: typeof CurveType.Bezier1;
+    readonly type: "bezier1";
 
     clone(): Bezier1Curve2;
     getBounds(): MinMaxBox2;
@@ -73,7 +79,7 @@ export interface ReadonlyBezier2Curve2 {
     readonly p1: ReadonlyVector2;
     readonly p2: ReadonlyVector2;
     readonly pn: ReadonlyVector2;
-    readonly type: typeof CurveType.Bezier2;
+    readonly type: "bezier2";
 
     clone(): Bezier2Curve2;
     getBounds(): MinMaxBox2;
@@ -113,7 +119,7 @@ export interface ReadonlyBezier3Curve2 {
     readonly p2: ReadonlyVector2;
     readonly p3: ReadonlyVector2;
     readonly pn: ReadonlyVector2;
-    readonly type: typeof CurveType.Bezier3;
+    readonly type: "bezier3";
 
     clone(): Bezier3Curve2;
     getBounds(): MinMaxBox2;
@@ -148,7 +154,7 @@ export interface ReadonlyBezierRCurve2 {
     readonly p1: ReadonlyVector2;
     readonly p2: ReadonlyVector2;
     readonly pn: ReadonlyVector2;
-    readonly type: typeof CurveType.BezierR;
+    readonly type: "bezierr";
     readonly w: number;
 
     clone(): BezierRCurve2;
@@ -174,20 +180,6 @@ export interface ReadonlyBezierRCurve2 {
     toString(): string;
 }
 
-export type ReadonlyBezierCurve2 =
-    | ReadonlyBezier1Curve2
-    | ReadonlyBezier2Curve2
-    | ReadonlyBezier3Curve2
-    | ReadonlyBezierRCurve2;
-
-export const CurveType = {
-    Bezier1: 0,
-    Bezier2: 1,
-    Bezier3: 2,
-    BezierR: 3,
-} as const;
-export type CurveType = (typeof CurveType)[keyof typeof CurveType];
-
 export class Bezier1Curve2 implements ReadonlyBezier1Curve2 {
     public p0: ReadonlyVector2;
     public p1: ReadonlyVector2;
@@ -201,8 +193,8 @@ export class Bezier1Curve2 implements ReadonlyBezier1Curve2 {
         return this.p1;
     }
 
-    public get type(): typeof CurveType.Bezier1 {
-        return CurveType.Bezier1;
+    public get type(): "bezier1" {
+        return "bezier1";
     }
 
     public static fromArray(data: ArrayLike<number>, offset = 0): Bezier1Curve2 {
@@ -369,8 +361,8 @@ export class Bezier2Curve2 implements ReadonlyBezier2Curve2 {
         return this.p2;
     }
 
-    public get type(): typeof CurveType.Bezier2 {
-        return CurveType.Bezier2;
+    public get type(): "bezier2" {
+        return "bezier2";
     }
 
     public static fromArray(data: ArrayLike<number>, offset = 0): Bezier2Curve2 {
@@ -444,7 +436,7 @@ export class Bezier2Curve2 implements ReadonlyBezier2Curve2 {
 
         const min = distSq0 < distSq1 ? { param: 0, distSq: distSq0 } : { param: 1, distSq: distSq1 };
 
-        if (rt.type === RootType.Three) {
+        if (rt.type === "three") {
             minimizeCurveDistanceAt(this, p, rt.x1, min);
             minimizeCurveDistanceAt(this, p, rt.x2, min);
             minimizeCurveDistanceAt(this, p, rt.x3, min);
@@ -591,7 +583,7 @@ export class Bezier2Curve2 implements ReadonlyBezier2Curve2 {
 
         let wind = 0;
 
-        if (r.type === RootType.Two) {
+        if (r.type === "two") {
             wind += getWindingAtParameterQuadratic(this, r.x1, p.x);
             wind += getWindingAtParameterQuadratic(this, r.x2, p.x);
         }
@@ -622,7 +614,7 @@ export class Bezier2Curve2 implements ReadonlyBezier2Curve2 {
 
         const r = solveQuadratic(v2 - v1, v1, a0);
 
-        if (r.type === RootType.Two) {
+        if (r.type === "two") {
             if (r.x1 >= 0 && r.x1 <= 1) {
                 outParameters.push(r.x1);
             }
@@ -750,8 +742,8 @@ export class Bezier3Curve2 implements ReadonlyBezier3Curve2 {
         return this.p3;
     }
 
-    public get type(): typeof CurveType.Bezier3 {
-        return CurveType.Bezier3;
+    public get type(): "bezier3" {
+        return "bezier3";
     }
 
     public static fromArray(data: ArrayLike<number>, offset = 0): Bezier3Curve2 {
@@ -808,12 +800,12 @@ export class Bezier3Curve2 implements ReadonlyBezier3Curve2 {
         const r1 = solveQuadratic(qqa.x, 0.5 * qqb.x, qqc.x);
         const r2 = solveQuadratic(qqa.y, 0.5 * qqb.y, qqc.y);
 
-        if (r1.type === RootType.Two) {
+        if (r1.type === "two") {
             setEncloseCurveAt(this, box, r1.x1);
             setEncloseCurveAt(this, box, r1.x2);
         }
 
-        if (r2.type === RootType.Two) {
+        if (r2.type === "two") {
             setEncloseCurveAt(this, box, r2.x1);
             setEncloseCurveAt(this, box, r2.x2);
         }
@@ -981,7 +973,7 @@ export class Bezier3Curve2 implements ReadonlyBezier3Curve2 {
 
         let wind = 0;
 
-        if (r.type === RootType.Three) {
+        if (r.type === "three") {
             wind += getWindingAtParameterCubic(this, r.x1, p.x);
             wind += getWindingAtParameterCubic(this, r.x2, p.x);
             wind += getWindingAtParameterCubic(this, r.x3, p.x);
@@ -1153,8 +1145,8 @@ export class BezierRCurve2 implements ReadonlyBezierRCurve2 {
         return this.p2;
     }
 
-    public get type(): typeof CurveType.BezierR {
-        return CurveType.BezierR;
+    public get type(): "bezierr" {
+        return "bezierr";
     }
 
     public static fromArray(data: ArrayLike<number>, offset = 0): BezierRCurve2 {
@@ -1235,12 +1227,12 @@ export class BezierRCurve2 implements ReadonlyBezierRCurve2 {
         const r1 = solveQuadratic(qqa.x, 0.5 * qqb.x, qqc.x);
         const r2 = solveQuadratic(qqa.y, 0.5 * qqb.y, qqc.y);
 
-        if (r1.type === RootType.Two) {
+        if (r1.type === "two") {
             setEncloseCurveAt(this, box, r1.x1);
             setEncloseCurveAt(this, box, r1.x2);
         }
 
-        if (r2.type === RootType.Two) {
+        if (r2.type === "two") {
             setEncloseCurveAt(this, box, r2.x1);
             setEncloseCurveAt(this, box, r2.x2);
         }
@@ -1358,7 +1350,7 @@ export class BezierRCurve2 implements ReadonlyBezierRCurve2 {
 
         let wind = 0;
 
-        if (r.type === RootType.Two) {
+        if (r.type === "two") {
             wind += getWindingAtParameterConic(this, r.x1, p.x);
             wind += getWindingAtParameterConic(this, r.x2, p.x);
         }
