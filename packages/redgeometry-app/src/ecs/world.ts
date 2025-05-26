@@ -69,7 +69,7 @@ export const ChangeFlags = {
     UPDATED: 2,
     DELETED: 4,
 } as const;
-export type ChangeFlags = (typeof ChangeFlags)[keyof typeof ChangeFlags] | (number & {});
+export type ChangeFlags = number;
 
 export const WORLD_SCHEDULE_OPTIONS_DEFAULT: WorldScheduleOptions<DefaultWorldScheduleId, DefaultSystemStage>[] = [
     {

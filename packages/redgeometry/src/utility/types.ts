@@ -3,6 +3,7 @@ import type { FixedSizeArrayBuilder } from "../internal/types.js";
 export type Constructor<T> = {
     new (...args: never[]): T;
 };
+export type Enum<T> = T[keyof T];
 
 export type FixedSizeArray<T, N extends number> = FixedSizeArrayBuilder<T, N, []>;
 

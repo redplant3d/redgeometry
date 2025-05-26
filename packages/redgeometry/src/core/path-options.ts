@@ -1,4 +1,5 @@
 import type { ReadonlyVector2 } from "../primitives/vector.js";
+import type { Enum } from "../utility/types.js";
 import { PathDashIncremental2, PathDashRecursive2, type PathDash2 } from "./path-dash.js";
 import { PathFlattenIncremental2, PathFlattenRecursive2, type PathFlatten2 } from "./path-flatten.js";
 import { PathOffsetIncremental2, PathOffsetRecursive2, type PathOffset2 } from "./path-offset.js";
@@ -10,7 +11,7 @@ export const ApproximationMode = {
     INCREMENTAL: 0,
     RECURSIVE: 1,
 } as const;
-export type ApproximationMode = (typeof ApproximationMode)[keyof typeof ApproximationMode];
+export type ApproximationMode = Enum<typeof ApproximationMode>;
 
 export const JoinType = {
     BEVEL: 0,
@@ -18,14 +19,14 @@ export const JoinType = {
     MITER_CLIP: 2,
     ROUND: 3,
 } as const;
-export type JoinType = (typeof JoinType)[keyof typeof JoinType];
+export type JoinType = Enum<typeof JoinType>;
 
 export const CapType = {
     BUTT: 0,
     SQUARE: 1,
     ROUND: 2,
 } as const;
-export type CapType = (typeof CapType)[keyof typeof CapType];
+export type CapType = Enum<typeof CapType>;
 
 export const WindingOperator = {
     NON_ZERO: 0,
@@ -33,7 +34,7 @@ export const WindingOperator = {
     POSITIVE: 2,
     NEGATIVE: 3,
 } as const;
-export type WindingOperator = (typeof WindingOperator)[keyof typeof WindingOperator];
+export type WindingOperator = Enum<typeof WindingOperator>;
 
 export const BooleanOperator = {
     UNION: 0,
@@ -42,7 +43,7 @@ export const BooleanOperator = {
     A_WITHOUT_B: 3,
     B_WITHOUT_A: 4,
 } as const;
-export type BooleanOperator = (typeof BooleanOperator)[keyof typeof BooleanOperator];
+export type BooleanOperator = Enum<typeof BooleanOperator>;
 
 export type PathQualityOptions = {
     clipPrecision: number;

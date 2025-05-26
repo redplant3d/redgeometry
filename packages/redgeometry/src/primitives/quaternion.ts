@@ -1,5 +1,6 @@
 import { assertUnreachable } from "../utility/debug.js";
 import { eqApproxAbs, eqApproxRel, lerp } from "../utility/scalar.js";
+import type { Enum } from "../utility/types.js";
 import { Vector3, type ReadonlyVector3 } from "./vector.js";
 
 export type QuaternionLike = {
@@ -49,7 +50,7 @@ export const RotationOrder = {
     ZXY: 4,
     ZYX: 5,
 } as const;
-export type RotationOrder = (typeof RotationOrder)[keyof typeof RotationOrder];
+export type RotationOrder = Enum<typeof RotationOrder>;
 
 /**
  * A quaternion to be used for 3D rotations.

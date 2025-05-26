@@ -1,4 +1,5 @@
 import { assertUnreachable } from "redgeometry/src/utility/debug";
+import type { Enum } from "redgeometry/src/utility/types";
 import type { DefaultSystemStage, WorldId, WorldModule, WorldPlugin } from "../ecs/types.js";
 import type { World } from "../ecs/world.js";
 
@@ -106,7 +107,7 @@ export const KeyboardButtons = {
     SHIFT_LEFT: 35,
     SPACE: 36,
 } as const;
-export type KeyboardButtons = (typeof KeyboardButtons)[keyof typeof KeyboardButtons];
+export type KeyboardButtons = Enum<typeof KeyboardButtons>;
 
 export const MouseButtons = {
     MOUSE_1: 0,
@@ -115,7 +116,7 @@ export const MouseButtons = {
     MOUSE_4: 3,
     MOUSE_5: 4,
 } as const;
-export type MouseButtons = (typeof MouseButtons)[keyof typeof MouseButtons];
+export type MouseButtons = Enum<typeof MouseButtons>;
 
 const ButtonState = {
     None: 0,
@@ -123,7 +124,7 @@ const ButtonState = {
     Pressing: 2,
     Released: 3,
 } as const;
-type ButtonState = (typeof ButtonState)[keyof typeof ButtonState];
+type ButtonState = Enum<typeof ButtonState>;
 
 const MOUSE_BUTTONS_LOOKUP: Record<number, MouseButtons> = {
     0: MouseButtons.MOUSE_1,

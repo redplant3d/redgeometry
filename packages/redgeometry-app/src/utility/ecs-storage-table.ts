@@ -5,13 +5,13 @@ import type { Component, ComponentId, ComponentIdOf, ComponentIdsOf, EntityId } 
 import { ChangeFlags } from "../ecs/world.js";
 import { ObjectPool } from "./object.js";
 
-const EntityChangeFlags = {
+export const EntityChangeFlags = {
     NONE: 0,
     CREATED: 1,
     UPDATED: 2,
     DELETED: 4,
 } as const;
-export type EntityChangeFlags = (typeof EntityChangeFlags)[keyof typeof EntityChangeFlags] | (number & {});
+export type EntityChangeFlags = number;
 
 type ComponentRef = number;
 type EntityRef = number;

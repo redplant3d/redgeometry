@@ -6,6 +6,7 @@ import { Matrix3A, type ReadonlyMatrix3, type ReadonlyMatrix3A } from "../primit
 import { Vector2, type ReadonlyVector2, type Vector2Like } from "../primitives/vector.js";
 import { copyArray, copyArrayReversed } from "../utility/array.js";
 import { assertUnreachable } from "../utility/debug.js";
+import type { Enum } from "../utility/types.js";
 import { Mesh2 } from "./mesh.js";
 import { PathClip2 } from "./path-clip.js";
 import {
@@ -46,7 +47,7 @@ export const PathCommandType = {
     CONIC: 4,
     CLOSE: 5,
 } as const;
-export type PathCommandType = (typeof PathCommandType)[keyof typeof PathCommandType];
+export type PathCommandType = Enum<typeof PathCommandType>;
 
 export type Path2Like = {
     readonly points: Vector2Like[];
