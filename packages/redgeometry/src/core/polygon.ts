@@ -160,7 +160,7 @@ export class Polygon2 {
         this.addPoint(new Vector2(x, y));
     }
 
-    public centroid(): Vector2 {
+    public centroid(): Vector2 | undefined {
         let x = 0;
         let y = 0;
         let area = 0;
@@ -172,6 +172,10 @@ export class Polygon2 {
             x += a * (p0.x + p1.x);
             y += a * (p0.y + p1.y);
             area += a;
+        }
+
+        if (area === 0) {
+            return undefined;
         }
 
         area *= 3;
