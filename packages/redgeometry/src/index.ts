@@ -21,7 +21,6 @@ export * from "./primitives/vector.js";
 export * from "./utility/array.js";
 export * from "./utility/debug.js";
 export * from "./utility/float128.js";
-export * from "./utility/hash.js";
 export * from "./utility/interval.js";
 export * from "./utility/log.js";
 export * from "./utility/random.js";
