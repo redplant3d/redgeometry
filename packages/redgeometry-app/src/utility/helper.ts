@@ -1,14 +1,9 @@
 import { Mesh2 } from "redgeometry/src/core/mesh";
 import { Path2 } from "redgeometry/src/core/path";
 import { PathClip2 } from "redgeometry/src/core/path-clip";
-import {
-    BooleanOperator,
-    JoinType,
-    PATH_QUALITY_OPTIONS_DEFAULT,
-    WindingOperator,
-    type CustomWindingOperator,
-} from "redgeometry/src/core/path-options";
+import { BooleanOperator, JoinType, PATH_QUALITY_OPTIONS_DEFAULT } from "redgeometry/src/core/path-options";
 import { Polygon2 } from "redgeometry/src/core/polygon";
+import { WindingOperator, type CustomWindingOperator } from "redgeometry/src/core/winding";
 import type { ReadonlyMinMaxBox2 } from "redgeometry/src/primitives/box";
 import { Edge2 } from "redgeometry/src/primitives/edge";
 import { Vector2 } from "redgeometry/src/primitives/vector";

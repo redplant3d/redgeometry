@@ -1,5 +1,5 @@
 import { Path2CurveIterator } from "../internal/iterator.js";
-import { copyCommandsReversed, isWindingInside } from "../internal/path.js";
+import { copyCommandsReversed } from "../internal/path.js";
 import { type ReadonlyBezierCurve2 } from "../primitives/bezier.js";
 import { MinMaxBox2 } from "../primitives/box.js";
 import { Matrix3A, type ReadonlyMatrix3, type ReadonlyMatrix3A } from "../primitives/matrix.js";
@@ -20,15 +20,14 @@ import {
     PATH_OFFSET_OPTIONS_DEFAULT,
     PATH_QUALITY_OPTIONS_DEFAULT,
     PATH_STROKE_OPTIONS_DEFAULT,
-    type CustomWindingOperator,
     type PathClipOptions,
     type PathDashOptions,
     type PathOffsetOptions,
     type PathQualityOptions,
     type PathStrokeOptions,
-    type WindingOperator,
 } from "./path-options.js";
 import { Polygon2 } from "./polygon.js";
+import { isWindingInside, type CustomWindingOperator, type WindingOperator } from "./winding.js";
 
 export interface PathSink2 {
     close(): void;

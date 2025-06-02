@@ -1,4 +1,4 @@
-import { BooleanOperator, WindingOperator, type CustomWindingOperator } from "../core/path-options.js";
+import type { BooleanOperator } from "../core/path-options.js";
 import type { EdgeSegment2, SnapRound2 } from "../core/snapround.js";
 import { Vector2, type ReadonlyVector2 } from "../primitives/vector.js";
 import { log } from "../utility/debug.js";
@@ -112,101 +112,62 @@ export function createSweepEventQueue(snapRound: SnapRound2): PathSweepEvent2[] 
     return queue;
 }
 
-export function isInWinding(
-    w0: number,
-    w1: number,
-    windingOperator: WindingOperator | CustomWindingOperator,
-): [boolean, boolean] {
-    let in0 = false;
-    let in1 = false;
-
-    switch (windingOperator) {
-        case 0 /* NON_ZERO */: {
-            in0 = w0 !== 0;
-            in1 = w1 !== 0;
-            break;
-        }
-        case 1 /* EVEN_ODD */: {
-            in0 = (w0 & 1) !== 0;
-            in1 = (w1 & 1) !== 0;
-            break;
-        }
-        case 2 /* POSITIVE */: {
-            in0 = w0 > 0;
-            in1 = w1 > 0;
-            break;
-        }
-        case 3 /* NEGATIVE */: {
-            in0 = w0 < 0;
-            in1 = w1 < 0;
-            break;
-        }
-        default: {
-            in0 = windingOperator(w0);
-            in1 = windingOperator(w1);
-            break;
-        }
-    }
-
-    return [in0, in1];
-}
-
 export function isIncOutBoolean(
-    ina0: boolean,
-    ina1: boolean,
-    inb0: boolean,
-    inb1: boolean,
+    in1a: boolean,
+    in2a: boolean,
+    in1b: boolean,
+    in2b: boolean,
     booleanOperator: BooleanOperator,
 ): [boolean, boolean] {
     // Incoming & outgoing:
-    //      inca = !ina0 && ina1;
-    //      outa = ina0 && !ina1;
-    //      incb = !inb0 && inb1;
-    //      outb = inb0 && !inb1;
+    //      inca = !in1a && in2a;
+    //      outa = in1a && !in2a;
+    //      incb = !in1b && in2b;
+    //      outb = in1b && !in2b;
     // Union:
-    //      inc = (inca && !inb0) || (incb && !ina0);
-    //      out = (outa && !inb1) || (outb && !ina1);
+    //      inc = (inca && !in1b) || (incb && !in1a);
+    //      out = (outa && !in2b) || (outb && !in2a);
     // Intersection:
-    //      inc = (inca && inb1) || (incb && ina1);
-    //      out = (outa && inb0) || (outb && ina0);
+    //      inc = (inca && in2b) || (incb && in2a);
+    //      out = (outa && in1b) || (outb && in1a);
     // Exclusion:
-    //      inc = (inca && !inb0 && !inb1) || (outb && ina0 && ina1) ||
-    //          (incb && !ina0 && !ina1) || (outa && inb0 && inb1);
-    //      isOut = (outa && !inb0 && !inb1) || (incb && ina0 && ina1) ||
-    //          (outb && !ina0 && !ina1) || (inca && inb0 && inb1);
+    //      inc = (inca && !in1b && !in2b) || (outb && in1a && in2a) ||
+    //          (incb && !in1a && !in2a) || (outa && in1b && in2b);
+    //      isOut = (outa && !in1b && !in2b) || (incb && in1a && in2a) ||
+    //          (outb && !in1a && !in2a) || (inca && in1b && in2b);
     // AWithoutB:
-    //      inc = (inca && !inb1) || (outb && ina1);
-    //      out = (outa && !inb0) || (incb && ina0);
+    //      inc = (inca && !in2b) || (outb && in2a);
+    //      out = (outa && !in1b) || (incb && in1a);
     // BWithoutA:
-    //      inc = (incb && !ina1) || (outa && inb1);
-    //      out = (outb && !ina0) || (inca && inb0);
+    //      inc = (incb && !in2a) || (outa && in2b);
+    //      out = (outb && !in1a) || (inca && in1b);
     let inc = false;
     let out = false;
 
     switch (booleanOperator) {
         case 0 /* UNION */: {
-            inc = !ina0 && !inb0 && (ina1 || inb1);
-            out = !ina1 && !inb1 && (ina0 || inb0);
+            inc = !in1a && !in1b && (in2a || in2b);
+            out = !in2a && !in2b && (in1a || in1b);
             break;
         }
         case 1 /* INTERSECTION */: {
-            inc = ina1 && inb1 && (!ina0 || !inb0);
-            out = ina0 && inb0 && (!ina1 || !inb1);
+            inc = in2a && in2b && (!in1a || !in1b);
+            out = in1a && in1b && (!in2a || !in2b);
             break;
         }
         case 2 /* EXCLUSION */: {
-            inc = ina0 === inb0 && ina1 !== inb1;
-            out = ina0 !== inb0 && ina1 === inb1;
+            inc = in1a === in1b && in2a !== in2b;
+            out = in1a !== in1b && in2a === in2b;
             break;
         }
         case 3 /* A_WITHOUT_B */: {
-            inc = ina1 && !inb1 && (!ina0 || inb0);
-            out = ina0 && !inb0 && (!ina1 || inb1);
+            inc = in2a && !in2b && (!in1a || in1b);
+            out = in1a && !in1b && (!in2a || in2b);
             break;
         }
         case 4 /* B_WITHOUT_A */: {
-            inc = !ina1 && inb1 && (ina0 || !inb0);
-            out = !ina0 && inb0 && (ina1 || !inb1);
+            inc = !in2a && in2b && (in1a || !in1b);
+            out = !in1a && in1b && (in2a || !in2b);
             break;
         }
     }

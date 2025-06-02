@@ -1,4 +1,4 @@
-import { PathSweepEvent2, createSweepEventQueue, isInWinding, isIncOutBoolean } from "../internal/path-sweep.js";
+import { PathSweepEvent2, createSweepEventQueue, isIncOutBoolean } from "../internal/path-sweep.js";
 import { Bezier1Curve2, type ReadonlyBezierCurve2 } from "../primitives/bezier.js";
 import type { ReadonlyEdge2 } from "../primitives/edge.js";
 import { ArrayMultiSet } from "../utility/array.js";
@@ -8,13 +8,12 @@ import {
     ApproximationMode,
     PATH_CLIP_OPTIONS_DEFAULT,
     type BooleanOperator,
-    type CustomWindingOperator,
     type PathClipOptions,
     type PathQualityOptions,
-    type WindingOperator,
 } from "./path-options.js";
 import type { Path2 } from "./path.js";
 import { SnapRound2 } from "./snapround.js";
+import { isWindingInside2, type CustomWindingOperator, type WindingOperator } from "./winding.js";
 
 export class PathClip2 {
     private booleanOperator: BooleanOperator;
@@ -128,10 +127,10 @@ export class PathClip2 {
             return [false, false];
         }
 
-        let wa0 = 0;
-        let wa1 = 0;
-        let wb0 = 0;
-        let wb1 = 0;
+        let wind1a = 0;
+        let wind2a = 0;
+        let wind1b = 0;
+        let wind2b = 0;
 
         let isDone = false;
 
@@ -141,9 +140,9 @@ export class PathClip2 {
 
             if (status.eq(ev)) {
                 if (status.seg.ref.set === 0) {
-                    wa0 -= status.wind;
+                    wind1a -= status.wind;
                 } else {
-                    wb0 -= status.wind;
+                    wind1b -= status.wind;
                 }
 
                 status.wind = 0;
@@ -151,9 +150,9 @@ export class PathClip2 {
             } else if (!isDone) {
                 // Sum all previous windings
                 if (status.seg.ref.set === 0) {
-                    wa1 -= status.wind;
+                    wind2a -= status.wind;
                 } else {
-                    wb1 -= status.wind;
+                    wind2b -= status.wind;
                 }
             } else {
                 break;
@@ -161,12 +160,12 @@ export class PathClip2 {
         }
 
         // Add previous to current winding
-        wa0 += wa1;
-        wb0 += wb1;
+        wind1a += wind2a;
+        wind1b += wind2b;
 
-        const [ina0, ina1] = isInWinding(wa0, wa1, this.windingOperatorA);
-        const [inb0, inb1] = isInWinding(wb0, wb1, this.windingOperatorB);
+        const [in1a, in2a] = isWindingInside2(wind1a, wind2a, this.windingOperatorA);
+        const [in1b, in2b] = isWindingInside2(wind1b, wind2b, this.windingOperatorB);
 
-        return isIncOutBoolean(ina0, ina1, inb0, inb1, this.booleanOperator);
+        return isIncOutBoolean(in1a, in2a, in1b, in2b, this.booleanOperator);
     }
 }

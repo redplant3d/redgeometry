@@ -1,5 +1,5 @@
 import { Mesh2 } from "redgeometry/src/core/mesh";
-import { WindingOperator } from "redgeometry/src/core/path-options";
+import { WindingOperator } from "redgeometry/src/core/winding";
 import { MinMaxBox2 } from "redgeometry/src/primitives/box";
 import { RandomXSR128 } from "redgeometry/src/utility/random";
 import type { AppContextPlugin } from "../ecs-modules/app-context.js";

@@ -1,11 +1,10 @@
-import type { CustomWindingOperator, WindingOperator } from "../core/path-options.js";
 import type { PathOverlayData2 } from "../core/path-overlay.js";
 import type { EdgeSegmentRef2 } from "../core/snapround.js";
-import { isInWinding } from "./path-sweep.js";
+import { isWindingInside2, type CustomWindingOperator, type WindingOperator } from "../core/winding.js";
 
 export type PathOverlayEntry2 = {
-    w0: number;
-    w1: number;
+    wind1: number;
+    wind2: number;
     refs: EdgeSegmentRef2[];
 };
 
@@ -21,17 +20,17 @@ export class PathOverlayState2 {
         const data1: PathOverlayData2 = { tag: [], refs: [] };
 
         for (const [set, entry] of this.map.entries()) {
-            const w0 = entry.w0 + entry.w1;
-            const w1 = entry.w1;
+            const wind1 = entry.wind1 + entry.wind2;
+            const wind2 = entry.wind2;
 
-            const [in0, in1] = isInWinding(w0, w1, windingOperator);
+            const [in1, in2] = isWindingInside2(wind1, wind2, windingOperator);
 
-            if (in0) {
+            if (in1) {
                 data0.tag.push(set);
                 data0.refs.push(...entry.refs);
             }
 
-            if (in1) {
+            if (in2) {
                 data1.tag.push(set);
                 data1.refs.push(...entry.refs);
             }
@@ -49,7 +48,7 @@ export class PathOverlayState2 {
         if (entry !== undefined) {
             return entry;
         } else {
-            const entry: PathOverlayEntry2 = { w0: 0, w1: 0, refs: [] };
+            const entry: PathOverlayEntry2 = { wind1: 0, wind2: 0, refs: [] };
             this.map.set(set, entry);
             return entry;
         }

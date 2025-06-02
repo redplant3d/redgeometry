@@ -6,6 +6,7 @@ import { PathOffsetIncremental2, PathOffsetRecursive2, type PathOffset2 } from "
 import { PathSimplifyIncremental2, PathSimplifyRecursive2, type PathSimplify2 } from "./path-simplify.js";
 import { PathStrokeIncremental2, PathStrokeRecursive2, type PathStroke2 } from "./path-stroke.js";
 import type { PathSink2 } from "./path.js";
+import { WindingOperator, type CustomWindingOperator } from "./winding.js";
 
 export const ApproximationMode = {
     INCREMENTAL: 0,
@@ -27,14 +28,6 @@ export const CapType = {
     ROUND: 2,
 } as const;
 export type CapType = Enum<typeof CapType>;
-
-export const WindingOperator = {
-    NON_ZERO: 0,
-    EVEN_ODD: 1,
-    POSITIVE: 2,
-    NEGATIVE: 3,
-} as const;
-export type WindingOperator = Enum<typeof WindingOperator>;
 
 export const BooleanOperator = {
     UNION: 0,
@@ -90,7 +83,6 @@ export type StrokeCaps = {
 };
 
 export type CustomCap = (path: PathSink2, p0: ReadonlyVector2, p1: ReadonlyVector2) => void;
-export type CustomWindingOperator = (wind: number) => boolean;
 
 export const BUTT_CAPS: Readonly<StrokeCaps> = { start: CapType.BUTT, end: CapType.BUTT };
 export const ROUND_CAPS: Readonly<StrokeCaps> = { start: CapType.ROUND, end: CapType.ROUND };

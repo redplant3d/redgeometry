@@ -5,15 +5,10 @@ import type { ReadonlyEdge2 } from "../primitives/edge.js";
 import { ArrayMultiSet, arrayEquals } from "../utility/array.js";
 import { assertDebug, log } from "../utility/debug.js";
 import { MeshChain2, MeshEdge2, type Mesh2 } from "./mesh.js";
-import {
-    ApproximationMode,
-    PATH_CLIP_OPTIONS_DEFAULT,
-    type CustomWindingOperator,
-    type PathQualityOptions,
-    type WindingOperator,
-} from "./path-options.js";
+import { ApproximationMode, PATH_CLIP_OPTIONS_DEFAULT, type PathQualityOptions } from "./path-options.js";
 import type { Path2 } from "./path.js";
 import { SnapRound2, type EdgeSegmentRef2 } from "./snapround.js";
+import type { CustomWindingOperator, WindingOperator } from "./winding.js";
 
 export type PathOverlayData2 = {
     tag: number[];
@@ -260,13 +255,13 @@ export class PathOverlay2 {
             const entry = state.getEntry(ref.set);
 
             if (status.eq(ev)) {
-                entry.w0 -= status.wind;
+                entry.wind1 -= status.wind;
                 entry.refs.push(ref);
                 status.wind = 0;
                 isDone = true;
             } else if (!isDone) {
                 // Sum all previous windings
-                entry.w1 -= status.wind;
+                entry.wind2 -= status.wind;
             } else {
                 break;
             }

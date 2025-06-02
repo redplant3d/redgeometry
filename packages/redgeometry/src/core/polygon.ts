@@ -1,11 +1,10 @@
 import { Polygon2EdgeIterator } from "../internal/iterator.js";
-import { isWindingInside } from "../internal/path.js";
 import { MinMaxBox2 } from "../primitives/box.js";
 import { Edge2, type ReadonlyEdge2 } from "../primitives/edge.js";
 import type { ReadonlyMatrix3, ReadonlyMatrix3A } from "../primitives/matrix.js";
 import { Vector2, type ReadonlyVector2, type Vector2Like } from "../primitives/vector.js";
-import type { CustomWindingOperator, WindingOperator } from "./path-options.js";
 import { Path2 } from "./path.js";
+import { isWindingInside, WindingOperator, type CustomWindingOperator } from "./winding.js";
 
 export type Polygon2Like = {
     readonly points: Vector2Like[];

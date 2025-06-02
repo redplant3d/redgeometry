@@ -1,5 +1,5 @@
 import { Path2 } from "redgeometry/src/core/path";
-import { WindingOperator } from "redgeometry/src/core/path-options";
+import { WindingOperator } from "redgeometry/src/core/winding";
 import { MinMaxBox2, type ReadonlyMinMaxBox2 } from "redgeometry/src/primitives/box";
 import { Vector2 } from "redgeometry/src/primitives/vector";
 import { RandomXSR128 } from "redgeometry/src/utility/random";
