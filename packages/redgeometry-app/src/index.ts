@@ -1,5 +1,4 @@
 import { LocalAppContext, WebAppContext } from "./ecs/app.js";
-import { BPLUS_TREE_MAIN_WORLD, BPLUS_TREE_REMOTE_WORLD } from "./parts/bplus-tree.js";
 import { ECS_MAIN_WORLD, ECS_REMOTE_WORLD } from "./parts/ecs-bounce.js";
 import { MATRIX_MAIN_WORLD, MATRIX_REMOTE_WORLD } from "./parts/matrix.js";
 import { MESH_MAIN_WORLD, MESH_REMOTE_WORLD } from "./parts/mesh.js";
@@ -20,11 +19,6 @@ import { AppLauncher } from "./utility/launcher.js";
 const context: LocalAppContext | WebAppContext = new WebAppContext("index.js");
 
 const launcher = new AppLauncher(context);
-launcher.addPart(
-    { id: "bplus-tree", runWorldId: "main", runScheduleId: "start" },
-    { id: "bplus-tree-main", parent: undefined, worlds: [BPLUS_TREE_MAIN_WORLD] },
-    { id: "bplus-tree-remote", parent: "bplus-tree-main", worlds: [BPLUS_TREE_REMOTE_WORLD] },
-);
 launcher.addPart(
     { id: "ecs-bounce", runWorldId: "main", runScheduleId: "start" },
     { id: "ecs-bounce-main", parent: undefined, worlds: [ECS_MAIN_WORLD] },
