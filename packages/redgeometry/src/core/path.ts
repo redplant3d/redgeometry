@@ -1,5 +1,5 @@
 import { Path2CurveIterator } from "../internal/iterator.js";
-import { copyCommandsReversed, isWindingInside, PIAHelper } from "../internal/path.js";
+import { copyCommandsReversed, isWindingInside } from "../internal/path.js";
 import { type ReadonlyBezierCurve2 } from "../primitives/bezier.js";
 import { MinMaxBox2 } from "../primitives/box.js";
 import { Matrix3A, type ReadonlyMatrix3, type ReadonlyMatrix3A } from "../primitives/matrix.js";
@@ -571,61 +571,6 @@ export class Path2 implements PathSink2 {
         const pathOffset = createPathOffset({ ...PATH_QUALITY_OPTIONS_DEFAULT, ...qualityOptions });
         pathOffset.process(this, output, { ...PATH_OFFSET_OPTIONS_DEFAULT, ...offsetOptions });
         return output;
-    }
-
-    /**
-     * Returns the approximated pole of inaccessibility (POI/PIA) of the current path within `threshold`.
-     */
-    public poleOfInaccessibility(windingOperator: WindingOperator | CustomWindingOperator, threshold: number): Vector2 {
-        // Based on:
-        // - https://stackoverflow.com/a/4279633
-        // - https://github.com/mapbox/polylabel
-        const bounds = this.getBounds();
-        const boundsCenter = bounds.center();
-        const cellSize = Math.min(bounds.sizeX(), bounds.sizeY());
-
-        if (cellSize <= threshold) {
-            return boundsCenter;
-        }
-
-        const center = this.centroid() ?? boundsCenter;
-        const initialCell = PIAHelper.createCell(this, windingOperator, center, 0);
-        const helper = new PIAHelper(this, windingOperator, threshold, [], initialCell);
-
-        let halfCellSize = 0.5 * cellSize;
-
-        // Initial cell coverage
-        for (let x = bounds.minX; x < bounds.maxX; x += cellSize) {
-            for (let y = bounds.minY; y < bounds.maxY; y += cellSize) {
-                helper.addCellCandidate(x + halfCellSize, y + halfCellSize, halfCellSize);
-            }
-        }
-
-        let cell = helper.getNextCell();
-
-        while (cell !== undefined) {
-            if (!helper.isBetterCandidate(cell)) {
-                break;
-            }
-
-            // Subdivide cell
-            halfCellSize = 0.5 * cell.halfCellSize;
-
-            const x0 = cell.center.x - halfCellSize;
-            const x1 = cell.center.x + halfCellSize;
-            const y0 = cell.center.y - halfCellSize;
-            const y1 = cell.center.y + halfCellSize;
-
-            helper.addCellCandidate(x0, y0, halfCellSize);
-            helper.addCellCandidate(x1, y0, halfCellSize);
-            helper.addCellCandidate(x0, y1, halfCellSize);
-            helper.addCellCandidate(x1, y1, halfCellSize);
-
-            cell = helper.getNextCell();
-        }
-
-        // Best candidate
-        return helper.cellCandidate.center.clone();
     }
 
     public quadTo(p1: ReadonlyVector2, p2: ReadonlyVector2): void {
