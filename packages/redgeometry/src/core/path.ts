@@ -131,19 +131,19 @@ export class Path2 implements PathSink2 {
             const c = curves[i];
 
             switch (c.type) {
-                case "bezier1": {
+                case "bezier-1": {
                     this.lineTo(c.p1);
                     break;
                 }
-                case "bezier2": {
+                case "bezier-2": {
                     this.quadTo(c.p1, c.p2);
                     break;
                 }
-                case "bezier3": {
+                case "bezier-3": {
                     this.cubicTo(c.p1, c.p2, c.p3);
                     break;
                 }
-                case "bezierr": {
+                case "bezier-r": {
                     this.conicTo(c.p1, c.p2, c.w);
                     break;
                 }

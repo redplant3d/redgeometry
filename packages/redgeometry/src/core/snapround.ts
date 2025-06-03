@@ -158,7 +158,7 @@ export class SnapRound2 {
     public addSegment(c: ReadonlyBezierCurve2, set: number, weight: number, snap: boolean, data: unknown): void {
         log.assertFnDebug(() => c.isFinite(), "SnapRound2: BezierCurve2 is not finite");
 
-        if (c.type !== "bezier1") {
+        if (c.type !== "bezier-1") {
             log.warn("SnapRound2: Not implemented yet");
         }
 

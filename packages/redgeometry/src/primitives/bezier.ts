@@ -50,7 +50,7 @@ export interface ReadonlyBezier1Curve2 {
     readonly p0: ReadonlyVector2;
     readonly p1: ReadonlyVector2;
     readonly pn: ReadonlyVector2;
-    readonly type: "bezier1";
+    readonly type: "bezier-1";
 
     clone(): Bezier1Curve2;
     getBounds(): MinMaxBox2;
@@ -79,7 +79,7 @@ export interface ReadonlyBezier2Curve2 {
     readonly p1: ReadonlyVector2;
     readonly p2: ReadonlyVector2;
     readonly pn: ReadonlyVector2;
-    readonly type: "bezier2";
+    readonly type: "bezier-2";
 
     clone(): Bezier2Curve2;
     getBounds(): MinMaxBox2;
@@ -119,7 +119,7 @@ export interface ReadonlyBezier3Curve2 {
     readonly p2: ReadonlyVector2;
     readonly p3: ReadonlyVector2;
     readonly pn: ReadonlyVector2;
-    readonly type: "bezier3";
+    readonly type: "bezier-3";
 
     clone(): Bezier3Curve2;
     getBounds(): MinMaxBox2;
@@ -154,7 +154,7 @@ export interface ReadonlyBezierRCurve2 {
     readonly p1: ReadonlyVector2;
     readonly p2: ReadonlyVector2;
     readonly pn: ReadonlyVector2;
-    readonly type: "bezierr";
+    readonly type: "bezier-r";
     readonly w: number;
 
     clone(): BezierRCurve2;
@@ -193,8 +193,8 @@ export class Bezier1Curve2 implements ReadonlyBezier1Curve2 {
         return this.p1;
     }
 
-    public get type(): "bezier1" {
-        return "bezier1";
+    public get type(): "bezier-1" {
+        return "bezier-1";
     }
 
     public static fromArray(data: ArrayLike<number>, offset = 0): Bezier1Curve2 {
@@ -361,8 +361,8 @@ export class Bezier2Curve2 implements ReadonlyBezier2Curve2 {
         return this.p2;
     }
 
-    public get type(): "bezier2" {
-        return "bezier2";
+    public get type(): "bezier-2" {
+        return "bezier-2";
     }
 
     public static fromArray(data: ArrayLike<number>, offset = 0): Bezier2Curve2 {
@@ -742,8 +742,8 @@ export class Bezier3Curve2 implements ReadonlyBezier3Curve2 {
         return this.p3;
     }
 
-    public get type(): "bezier3" {
-        return "bezier3";
+    public get type(): "bezier-3" {
+        return "bezier-3";
     }
 
     public static fromArray(data: ArrayLike<number>, offset = 0): Bezier3Curve2 {
@@ -1145,8 +1145,8 @@ export class BezierRCurve2 implements ReadonlyBezierRCurve2 {
         return this.p2;
     }
 
-    public get type(): "bezierr" {
-        return "bezierr";
+    public get type(): "bezier-r" {
+        return "bezier-r";
     }
 
     public static fromArray(data: ArrayLike<number>, offset = 0): BezierRCurve2 {
