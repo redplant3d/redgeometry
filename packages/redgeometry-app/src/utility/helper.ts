@@ -126,11 +126,11 @@ export function createRandomPolygonPair(
             const count2 = random.nextIntBetween(from, to);
 
             for (let i = 0; i < count1; i++) {
-                polygonA.addPoint(new Vector2(width * random.nextFloat(), height * random.nextFloat()));
+                polygonA.addXY(width * random.nextFloat(), height * random.nextFloat());
             }
 
             for (let i = 0; i < count2; i++) {
-                polygonB.addPoint(new Vector2(width * random.nextFloat() + offset, height * random.nextFloat()));
+                polygonB.addXY(width * random.nextFloat() + offset, height * random.nextFloat());
             }
 
             break;

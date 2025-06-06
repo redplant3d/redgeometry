@@ -9,16 +9,16 @@ test("isConvex", () => {
     const p3 = new Vector2(1, 0);
 
     const polygon1 = Polygon2.createEmpty();
-    polygon1.addPoint(p0);
-    polygon1.addPoint(p1);
-    polygon1.addPoint(p2);
-    polygon1.addPoint(p3);
+    polygon1.add(p0);
+    polygon1.add(p1);
+    polygon1.add(p2);
+    polygon1.add(p3);
 
     const polygon2 = Polygon2.createEmpty();
-    polygon2.addPoint(p0);
-    polygon2.addPoint(p2);
-    polygon2.addPoint(p1);
-    polygon2.addPoint(p3);
+    polygon2.add(p0);
+    polygon2.add(p2);
+    polygon2.add(p1);
+    polygon2.add(p3);
 
     const isConvex1 = polygon1.isConvex();
     const isConvex2 = polygon2.isConvex();
@@ -34,16 +34,16 @@ test("isSimple", () => {
     const p3 = new Vector2(1, 0);
 
     const polygon1 = Polygon2.createEmpty();
-    polygon1.addPoint(p0);
-    polygon1.addPoint(p1);
-    polygon1.addPoint(p2);
-    polygon1.addPoint(p3);
+    polygon1.add(p0);
+    polygon1.add(p1);
+    polygon1.add(p2);
+    polygon1.add(p3);
 
     const polygon2 = Polygon2.createEmpty();
-    polygon2.addPoint(p0);
-    polygon2.addPoint(p2);
-    polygon2.addPoint(p1);
-    polygon2.addPoint(p3);
+    polygon2.add(p0);
+    polygon2.add(p2);
+    polygon2.add(p1);
+    polygon2.add(p3);
 
     const isSimple1 = polygon1.isSimple();
     const isSimple2 = polygon2.isSimple();

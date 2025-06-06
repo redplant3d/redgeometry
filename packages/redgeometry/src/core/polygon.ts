@@ -150,12 +150,13 @@ export class Polygon2 {
         return { points };
     }
 
-    public addPoint(p: ReadonlyVector2): void {
+    public add(p: ReadonlyVector2): void {
         this.points.push(p);
     }
 
     public addXY(x: number, y: number): void {
-        this.addPoint(new Vector2(x, y));
+        const p = new Vector2(x, y);
+        this.add(p);
     }
 
     public centroid(): Vector2 | undefined {
@@ -163,9 +164,9 @@ export class Polygon2 {
         let y = 0;
         let area = 0;
 
-        for (const edge of this.getEdges()) {
-            const p0 = edge.p0;
-            const p1 = edge.p1;
+        for (const e of this.getEdges()) {
+            const p0 = e.p0;
+            const p1 = e.p1;
             const a = p0.cross(p1);
             x += a * (p0.x + p1.x);
             y += a * (p0.y + p1.y);
@@ -195,12 +196,12 @@ export class Polygon2 {
         let closestEdge: ReadonlyEdge2 | undefined;
 
         // Find the edge with the closest point on it
-        for (const edge of this.getEdges()) {
-            const distSq = edge.getClosestPoint(p).sub(p).lenSq();
+        for (const e of this.getEdges()) {
+            const distSq = e.getClosestPoint(p).sub(p).lenSq();
 
             if (distSq < minDistSq) {
                 minDistSq = distSq;
-                closestEdge = edge;
+                closestEdge = e;
             }
         }
 
@@ -263,7 +264,7 @@ export class Polygon2 {
         const convexHull = Polygon2.createConvexHull(this.points);
 
         // Iterate all edges
-        for (const edge of convexHull.getEdges()) {
+        for (const e of convexHull.getEdges()) {
             let minParam = Number.POSITIVE_INFINITY;
             let maxParam = Number.NEGATIVE_INFINITY;
             let minDist = Number.POSITIVE_INFINITY;
@@ -272,8 +273,8 @@ export class Polygon2 {
             for (const p of convexHull.points) {
                 // The points of the convex hull are oriented to the inside
                 // of each edge so that `dist` is always negative
-                const param = edge.getParameterFromPoint(p);
-                const dist = edge.getSignedDistanceFromPoint(p);
+                const param = e.getParameterFromPoint(p);
+                const dist = e.getSignedDistanceFromPoint(p);
 
                 // Find the bounding values
                 minParam = Math.min(minParam, param);
@@ -282,8 +283,8 @@ export class Polygon2 {
             }
 
             // Calculate bounding box and area
-            const p0 = edge.getValueAt(minParam);
-            const p1 = edge.getValueAt(maxParam);
+            const p0 = e.getValueAt(minParam);
+            const p1 = e.getValueAt(maxParam);
 
             const v0 = p1.sub(p0);
             const v1 = v0.unit().normal().mulS(minDist);
@@ -362,8 +363,8 @@ export class Polygon2 {
     public signedArea(): number {
         let area = 0;
 
-        for (const edge of this.getEdges()) {
-            area += edge.p0.cross(edge.p1);
+        for (const e of this.getEdges()) {
+            area += e.p0.cross(e.p1);
         }
 
         return 0.5 * area;
