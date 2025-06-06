@@ -68,7 +68,7 @@ export class PathClip2 {
             flattenTolerance: this.flattenTolerance,
         });
 
-        for (const c of buffer.getCurveIterator()) {
+        for (const c of buffer.getCurves()) {
             this.snapRound.addSegment(c, set, weight, snap, undefined);
         }
     }

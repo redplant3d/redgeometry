@@ -1,6 +1,12 @@
-import { Path2CurveIterator } from "../internal/iterator.js";
 import { copyCommandsReversed } from "../internal/path.js";
-import { type ReadonlyBezierCurve2 } from "../primitives/bezier.js";
+import {
+    Bezier1Curve2,
+    Bezier2Curve2,
+    Bezier3Curve2,
+    BezierRCurve2,
+    type BezierCurve2,
+    type ReadonlyBezierCurve2,
+} from "../primitives/bezier.js";
 import { MinMaxBox2 } from "../primitives/box.js";
 import { Matrix3A, type ReadonlyMatrix3, type ReadonlyMatrix3A } from "../primitives/matrix.js";
 import { Vector2, type ReadonlyVector2, type Vector2Like } from "../primitives/vector.js";
@@ -310,7 +316,7 @@ export class Path2 implements PathSink2 {
         let y = 0;
         let area = 0;
 
-        for (const c of this.getCurveIterator()) {
+        for (const c of this.getCurves()) {
             const a = c.signedArea();
             x += a * (c.p0.x + c.pn.x);
             y += a * (c.p0.y + c.pn.y);
@@ -396,7 +402,7 @@ export class Path2 implements PathSink2 {
     public getBounds(): MinMaxBox2 {
         const bounds = MinMaxBox2.createEmpty();
 
-        for (const c of this.getCurveIterator()) {
+        for (const c of this.getCurves()) {
             bounds.setUnion(bounds, c.getBounds());
         }
 
@@ -407,8 +413,80 @@ export class Path2 implements PathSink2 {
         return this.commands;
     }
 
-    public getCurveIterator(): Path2CurveIterator {
-        return new Path2CurveIterator(this.commands, this.points);
+    public getCurves(): BezierCurve2[] {
+        const curves: BezierCurve2[] = [];
+
+        const commands = this.commands;
+        const points = this.points;
+
+        let cIdx = 0;
+        let pIdx = 0;
+
+        let ps = Vector2.ZERO;
+        let p0 = Vector2.ZERO;
+
+        while (cIdx < commands.length) {
+            const command = commands[cIdx];
+            cIdx += 1;
+
+            switch (command.type) {
+                case 0 /* MOVE */: {
+                    ps = points[pIdx];
+                    p0 = ps;
+                    pIdx += 1;
+                    break;
+                }
+                case 1 /* LINEAR */: {
+                    const p1 = points[pIdx];
+                    const c = new Bezier1Curve2(p0, p1);
+                    curves.push(c);
+                    p0 = p1;
+                    pIdx += 1;
+                    break;
+                }
+                case 2 /* QUADRATIC */: {
+                    const p1 = points[pIdx];
+                    const p2 = points[pIdx + 1];
+                    const c = new Bezier2Curve2(p0, p1, p2);
+                    curves.push(c);
+                    p0 = p2;
+                    pIdx += 2;
+                    break;
+                }
+                case 3 /* CUBIC */: {
+                    const p1 = points[pIdx];
+                    const p2 = points[pIdx + 1];
+                    const p3 = points[pIdx + 2];
+                    const c = new Bezier3Curve2(p0, p1, p2, p3);
+                    curves.push(c);
+                    p0 = p3;
+                    pIdx += 3;
+                    break;
+                }
+                case 4 /* CONIC */: {
+                    const p1 = points[pIdx];
+                    const p2 = points[pIdx + 1];
+                    const c = new BezierRCurve2(p0, p1, p2, command.w);
+                    curves.push(c);
+                    p0 = p2;
+                    pIdx += 2;
+                    break;
+                }
+                case 5 /* CLOSE */: {
+                    if (!p0.eq(ps)) {
+                        const c = new Bezier1Curve2(p0, ps);
+                        curves.push(c);
+                        p0 = ps;
+                    }
+                    break;
+                }
+                default: {
+                    assertUnreachable(command);
+                }
+            }
+        }
+
+        return curves;
     }
 
     public getFirstCommand(): PathCommand | undefined {
@@ -499,7 +577,7 @@ export class Path2 implements PathSink2 {
 
         let wind = 0;
 
-        for (const c of this.getCurveIterator()) {
+        for (const c of this.getCurves()) {
             const bounds = c.getControlBounds();
 
             // Quickly reject curves by their control bounds
@@ -526,7 +604,7 @@ export class Path2 implements PathSink2 {
 
         let wind = 0;
 
-        for (const c of this.getCurveIterator()) {
+        for (const c of this.getCurves()) {
             wind += c.getWindingFracAt(p, step);
         }
 
@@ -587,7 +665,7 @@ export class Path2 implements PathSink2 {
     public signedArea(): number {
         let area = 0;
 
-        for (const c of this.getCurveIterator()) {
+        for (const c of this.getCurves()) {
             area += c.signedArea();
         }
 
