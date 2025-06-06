@@ -1,4 +1,3 @@
-import { Polygon2EdgeIterator } from "../internal/iterator.js";
 import { MinMaxBox2 } from "../primitives/box.js";
 import { Edge2, type ReadonlyEdge2 } from "../primitives/edge.js";
 import type { ReadonlyMatrix3, ReadonlyMatrix3A } from "../primitives/matrix.js";
@@ -107,8 +106,8 @@ export class Polygon2 {
 
     public static isEdgeIntersection(poly1: Polygon2, poly2: Polygon2): boolean {
         // Test pairwise (naive)
-        for (const e1 of poly1.getEdgeIterator()) {
-            for (const e2 of poly2.getEdgeIterator()) {
+        for (const e1 of poly1.getEdges()) {
+            for (const e2 of poly2.getEdges()) {
                 if (Edge2.isIntersection(e1, e2)) {
                     return true;
                 }
@@ -125,7 +124,7 @@ export class Polygon2 {
     ): boolean {
         let wind = 0;
 
-        for (const e of poly.getEdgeIterator()) {
+        for (const e of poly.getEdges()) {
             wind += e.toBezier().getWindingAt(p);
         }
 
@@ -164,7 +163,7 @@ export class Polygon2 {
         let y = 0;
         let area = 0;
 
-        for (const edge of this.getEdgeIterator()) {
+        for (const edge of this.getEdges()) {
             const p0 = edge.p0;
             const p1 = edge.p1;
             const a = p0.cross(p1);
@@ -196,7 +195,7 @@ export class Polygon2 {
         let closestEdge: ReadonlyEdge2 | undefined;
 
         // Find the edge with the closest point on it
-        for (const edge of this.getEdgeIterator()) {
+        for (const edge of this.getEdges()) {
             const distSq = edge.getClosestPoint(p).sub(p).lenSq();
 
             if (distSq < minDistSq) {
@@ -224,17 +223,32 @@ export class Polygon2 {
         return new MinMaxBox2(x0, y0, x1, y1);
     }
 
-    /**
-     * Returns an iterator which traverses all edges of the polygon.
-     */
-    public getEdgeIterator(): Polygon2EdgeIterator {
-        return new Polygon2EdgeIterator(this.points);
-    }
+    public getEdges(): Edge2[] {
+        const edges: Edge2[] = [];
 
-    public getEdges(): ReadonlyEdge2[] {
-        const edges: ReadonlyEdge2[] = [];
+        const points = this.points;
 
-        for (const e of this.getEdgeIterator()) {
+        if (points.length < 2) {
+            return edges;
+        }
+
+        let p0 = points[0];
+
+        for (let i = 1; i < points.length; i++) {
+            const p1 = points[i];
+
+            if (!p0.eq(p1)) {
+                const e = new Edge2(p0, p1);
+                edges.push(e);
+            }
+
+            p0 = p1;
+        }
+
+        const ps = points[0];
+
+        if (!p0.eq(ps)) {
+            const e = new Edge2(p0, ps);
             edges.push(e);
         }
 
@@ -249,7 +263,7 @@ export class Polygon2 {
         const convexHull = Polygon2.createConvexHull(this.points);
 
         // Iterate all edges
-        for (const edge of convexHull.getEdgeIterator()) {
+        for (const edge of convexHull.getEdges()) {
             let minParam = Number.POSITIVE_INFINITY;
             let maxParam = Number.NEGATIVE_INFINITY;
             let minDist = Number.POSITIVE_INFINITY;
@@ -329,8 +343,8 @@ export class Polygon2 {
 
     public isSimple(): boolean {
         // A polygon is simple if no edges are self-intersecting
-        for (const e1 of this.getEdgeIterator()) {
-            for (const e2 of this.getEdgeIterator()) {
+        for (const e1 of this.getEdges()) {
+            for (const e2 of this.getEdges()) {
                 if (e1 !== e2 && !Edge2.isAdjacent(e1, e2) && Edge2.isIntersection(e1, e2)) {
                     // Edges intersect
                     return false;
@@ -348,7 +362,7 @@ export class Polygon2 {
     public signedArea(): number {
         let area = 0;
 
-        for (const edge of this.getEdgeIterator()) {
+        for (const edge of this.getEdges()) {
             area += edge.p0.cross(edge.p1);
         }
 
