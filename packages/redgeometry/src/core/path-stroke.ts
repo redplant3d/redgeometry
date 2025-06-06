@@ -19,7 +19,7 @@ import {
     type ReadonlyBezier3Curve2,
     type ReadonlyBezierRCurve2,
 } from "../primitives/bezier.js";
-import { Vector2, type ReadonlyVector2 } from "../primitives/vector.js";
+import { Vector2 } from "../primitives/vector.js";
 import { assertUnreachable } from "../utility/debug.js";
 import { MAX_PARAMETER, type PathQualityOptions, type PathStrokeOptions } from "./path-options.js";
 import { PathCommandType, type Path2 } from "./path.js";
@@ -66,9 +66,9 @@ export class PathStrokeIncremental2 implements PathStroke2 {
 
         let ct0: PathCommandType = PathCommandType.MOVE;
 
-        let ps: ReadonlyVector2 = Vector2.ZERO;
-        let p0: ReadonlyVector2 = Vector2.ZERO;
-        let m0: ReadonlyVector2 = Vector2.ZERO;
+        let ps = Vector2.ZERO;
+        let p0 = Vector2.ZERO;
+        let m0 = Vector2.ZERO;
 
         this.state.initialize(output, options);
 
@@ -322,9 +322,9 @@ export class PathStrokeRecursive2 implements PathStroke2 {
         let cIdx = 0;
         let pIdx = 0;
 
-        let ps: ReadonlyVector2 = Vector2.ZERO;
-        let p0: ReadonlyVector2 = Vector2.ZERO;
-        let m0: ReadonlyVector2 = Vector2.ZERO;
+        let ps = Vector2.ZERO;
+        let p0 = Vector2.ZERO;
+        let m0 = Vector2.ZERO;
 
         this.state.initialize(output, options);
 

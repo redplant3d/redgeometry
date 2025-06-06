@@ -13,7 +13,7 @@ import {
     type ReadonlyBezier3Curve2,
     type ReadonlyBezierRCurve2,
 } from "../primitives/bezier.js";
-import { Vector2, type ReadonlyVector2 } from "../primitives/vector.js";
+import { Vector2 } from "../primitives/vector.js";
 import { assertUnreachable } from "../utility/debug.js";
 import type { PathQualityOptions } from "./path-options.js";
 import { type Path2 } from "./path.js";
@@ -49,7 +49,7 @@ export class PathSimplifyIncremental2 implements PathSimplify2 {
         let cIdx = 0;
         let pIdx = 0;
 
-        let p0: ReadonlyVector2 = Vector2.ZERO;
+        let p0 = Vector2.ZERO;
 
         while (cIdx < commands.length) {
             const command = commands[cIdx++];
@@ -163,7 +163,7 @@ export class PathSimplifyRecursive2 implements PathSimplify2 {
         let cIdx = 0;
         let pIdx = 0;
 
-        let p0: ReadonlyVector2 = Vector2.ZERO;
+        let p0 = Vector2.ZERO;
 
         while (cIdx < commands.length) {
             const command = commands[cIdx++];
