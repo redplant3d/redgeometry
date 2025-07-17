@@ -1,4 +1,3 @@
-import { Mesh2LnextIterator, Mesh2OnextIterator } from "../internal/iterator.js";
 import { Bezier1Curve2, type ReadonlyBezierCurve2 } from "../primitives/bezier.js";
 import { Vector2, type ReadonlyVector2 } from "../primitives/vector.js";
 import { ArrayMultiMap } from "../utility/array.js";
@@ -10,549 +9,6 @@ type MeshStatus2 = {
     helper: MeshEdge2;
     face?: MeshFace2;
 };
-
-/**
- * Represents a half edge of a mesh.
- *
- * Based on the quad-edge data structure described by Leonidas Guibas and Jorge Stolfi.
- * It is only required to hold `p0`, `onext`, `lnext` and `sym` for each edge to build their relationships:
- * - `p0` defines the origin location (vertex) of the edge
- * - `onext` references the next edge in CCW direction around its origin
- * - `lnext` references the next edge within the face
- * - `sym` references the complementary half edge
- * - `face` references the inner face of the edge
- *
- * References:
- * - Leonidas Guibas, Jorge Stolfi.
- *   *Primitives for the Manipulation of General Subdivisions and the Computation of Voronoi Diagrams*.
- *   ACM Transactions on Graphics, Vol. 4, No. 2, April 1985, Pages 74-123.
- * - Paul Heckbert.
- *   *Quad-Edge Data Structure and Library*.
- *   https://www.cs.cmu.edu/afs/andrew/scs/cs/15-463/2001/pub/src/a2/quadedge.html
- */
-export class MeshEdge2 {
-    public chain: MeshChain2 | undefined;
-    public data: unknown;
-    public face: MeshFace2 | undefined;
-    public lnext: MeshEdge2;
-    public onext: MeshEdge2;
-    public p0: ReadonlyVector2;
-    public seg: ReadonlyBezierCurve2 | undefined;
-    public sym: MeshEdge2;
-
-    public constructor(p0: ReadonlyVector2, seg: ReadonlyBezierCurve2 | undefined, data: unknown) {
-        this.p0 = p0;
-        this.seg = seg;
-        this.data = data;
-
-        this.lnext = this;
-        this.onext = this;
-        this.sym = this;
-
-        this.chain = undefined;
-        this.face = undefined;
-    }
-
-    public get lprev(): MeshEdge2 {
-        return this.onext.sym;
-    }
-
-    public get oprev(): MeshEdge2 {
-        return this.sym.lnext;
-    }
-
-    public get p1(): ReadonlyVector2 {
-        return this.sym.p0;
-    }
-
-    /**
-     * Clears edge references.
-     *
-     * Note: Does not ensure valid mesh topology for adjacent edges.
-     */
-    public static clear(e: MeshEdge2): void {
-        e.lnext = e;
-        e.onext = e;
-        e.sym = e;
-
-        e.chain = undefined;
-        e.face = undefined;
-    }
-
-    public static compareQueue(e1: MeshEdge2, e2: MeshEdge2): number {
-        if (e1.p0.x !== e2.p0.x) {
-            // Sort by `x`
-            return e1.p0.x - e2.p0.x;
-        } else if (e1.p0.y !== e2.p0.y) {
-            // Same `x`, sort by `y`
-            return e1.p0.y - e2.p0.y;
-        } else if (e1.left() !== e2.left()) {
-            // Same `y`, sort `!left` before `left`
-            return e1.left() ? 1 : -1;
-        } else if (e1.left()) {
-            // Same left point
-            return Vector2.signedArea(e1.p1, e1.p0, e2.p1);
-        } else {
-            // Same right point
-            return Vector2.signedArea(e1.p0, e1.p1, e2.p1);
-        }
-    }
-
-    public static compareStatus(this: void, e1: MeshEdge2, e2: MeshEdge2): number {
-        if (e1.p0.eq(e2.p0)) {
-            if (e1.p1.eq(e2.p1)) {
-                // Edges are equal
-                return 0;
-            } else {
-                // Same `p0`
-                return Vector2.signedArea(e1.p0, e1.p1, e2.p1);
-            }
-        } else {
-            if (MeshEdge2.compareQueue(e1, e2) < 0) {
-                // `e1` left of `e2`
-                return Vector2.signedArea(e1.p0, e1.p1, e2.p0);
-            } else {
-                // `e2` left of `e1`
-                return Vector2.signedArea(e2.p1, e2.p0, e1.p0);
-            }
-        }
-    }
-
-    /**
-     * Creates a symmetric pair of half edges and returns the first one.
-     */
-    public static createPair(seg1: ReadonlyBezierCurve2, seg2?: ReadonlyBezierCurve2): MeshEdge2 {
-        const e1 = new MeshEdge2(seg1.p0, seg1, undefined);
-        const e2 = new MeshEdge2(seg1.p1, seg2, undefined);
-
-        e1.sym = e2;
-        e1.lnext = e2;
-        e2.sym = e1;
-        e2.lnext = e1;
-
-        return e1;
-    }
-
-    /**
-     * Disconnects symmetric pair `e` from the rest of the mesh.
-     */
-    public static detachPair(e: MeshEdge2): void {
-        MeshEdge2.splice(e, e.oprev);
-        MeshEdge2.splice(e.sym, e.sym.oprev);
-    }
-
-    /**
-     * Find the edge around `e` so that `v` lies between the found edge and its `onext`.
-     */
-    public static findConnectingEdge(e: MeshEdge2, v: ReadonlyVector2): MeshEdge2 {
-        // Check if `e` is the only edge around its origin
-        if (e === e.onext) {
-            return e;
-        }
-
-        // Iterate around origin
-        let curr = e;
-
-        do {
-            const next = curr.onext;
-
-            if (Vector2.isBetweenCcw(v, curr.vector(), next.vector())) {
-                return curr;
-            }
-
-            curr = next;
-        } while (curr !== e);
-
-        log.error("Mesh2: Cannot find connecting edge (Fallback)");
-
-        return e;
-    }
-
-    public static isJoin(e1: MeshEdge2, e2: MeshEdge2): boolean {
-        return e1.p1.eq(e2.p0);
-    }
-
-    /**
-     * Joins the head of `e1` to the tail of `e2`.
-     *
-     * Note: Will not create valid topology if `e1` or `e2` are part of edge fans.
-     */
-    public static join(e1: MeshEdge2, e2: MeshEdge2): void {
-        const e1sym = e1.sym;
-        const e2sym = e2.sym;
-
-        e1.lnext = e2;
-        e2.onext = e1sym;
-
-        e1sym.onext = e2;
-        e2sym.lnext = e1sym;
-    }
-
-    /**
-     * Splicing of the two mesh edges `e1` and `e2`.
-     *
-     * Note: For a valid mesh topology, `e2` needs to lie directly between `e1` and `e1.onext`.
-     */
-    public static splice(e1: MeshEdge2, e2: MeshEdge2): void {
-        // Splicing (see reference)
-        const e1onext = e1.onext;
-        const e2onext = e2.onext;
-
-        e1onext.sym.lnext = e2;
-        e2onext.sym.lnext = e1;
-
-        e1.onext = e2onext;
-        e2.onext = e1onext;
-    }
-
-    /**
-     * Swaps `e` between neighboring (triangulated) edges.
-     * ```
-     *        / \                /|\
-     *       /   \              / | \
-     *      /     \ b          /  |  \ b
-     *     /       \          /   |   \
-     *    /    e    \        /    |    \
-     *    -----------   ->      e | e.sym
-     *    \  e.sym  /        \    |    /
-     *     \       /          \   |   /
-     *    a \     /          a \  |  /
-     *       \   /              \ | /
-     *        \ /                \|/
-     * ```
-     * Note: Both faces are oriented CCW so that `a = e.oprev` and `b = e.lnext`.
-     */
-    public static swap(e: MeshEdge2): void {
-        const f1 = e.face;
-        const f2 = e.sym.face;
-
-        // Swapping requires faces on both sides of the edge
-        if (f1 === undefined || f2 === undefined) {
-            return;
-        }
-
-        // Swapping (see reference)
-        const a = e.oprev;
-        const b = e.lnext;
-
-        MeshEdge2.splice(e, a);
-        MeshEdge2.splice(e.sym, b);
-
-        MeshEdge2.splice(e, a.lnext);
-        MeshEdge2.splice(e.sym, b.lnext);
-
-        // Update segment
-        const seg = new Bezier1Curve2(a.p1, b.p1);
-
-        e.p0 = seg.p0;
-        e.seg = seg;
-        e.sym.p0 = seg.p1;
-        e.sym.seg = seg.reverse();
-
-        // Update faces
-        f1.start = e;
-        MeshFace2.updateEdgeFaces(f1, f1);
-
-        f2.start = e.sym;
-        MeshFace2.updateEdgeFaces(f2, f2);
-    }
-
-    /**
-     * Clones the mesh edge (unlinked).
-     *
-     * Note: The new mesh edge is not referenced by any mesh.
-     */
-    public clonePair(): MeshEdge2 {
-        const sym = this.sym;
-
-        const e1 = new MeshEdge2(this.p0, this.seg, this.data);
-        const e2 = new MeshEdge2(sym.p0, sym.seg, sym.data);
-
-        e1.sym = e2;
-        e1.lnext = e2;
-        e2.sym = e1;
-        e2.lnext = e1;
-
-        return e1;
-    }
-
-    /**
-     * Returns an iterator which traverses edges around `lnext` starting with `this`.
-     */
-    public getLnextIterator(): Mesh2LnextIterator {
-        return new Mesh2LnextIterator(this, this.lprev);
-    }
-
-    /**
-     * Returns an iterator which traverses edges around `onext` starting with `this`.
-     */
-    public getOnextIterator(): Mesh2OnextIterator {
-        return new Mesh2OnextIterator(this, this.oprev);
-    }
-
-    public left(): boolean {
-        // Orientation of the edge
-        if (this.p0.x !== this.p1.x) {
-            return this.p0.x < this.p1.x;
-        } else {
-            return this.p0.y < this.p1.y;
-        }
-    }
-
-    /**
-     * Checks if the edge needs swapping according to Delaunay criteria (incircle test).
-     */
-    public needsSwap(): boolean {
-        // Swapping requires faces on both sides of the edge
-        if (this.face === undefined || this.sym.face === undefined) {
-            return false;
-        }
-
-        // A, B and C are ordered CCW, D is the opposing point
-        const pa = this.p0;
-        const pb = this.sym.p0;
-        const pc = this.lnext.p1;
-        const pd = this.sym.lnext.p1;
-
-        // Incircle test (see reference)
-        const va = pa.sub(pd);
-        const vb = pb.sub(pd);
-        const vc = pc.sub(pd);
-
-        // | ax  ay  ax^2 + ay^2  1 |   | (ax - dx)  (ay - dy)  (ax^2 - dx^2) + (ay^2 - dy^2) |
-        // | bx  by  bx^2 + by^2  1 | = | (bx - dx)  (by - dy)  (bx^2 - dx^2) + (by^2 - dy^2) |
-        // | cx  cy  cx^2 + cy^2  1 |   | (cx - dx)  (cy - dy)  (cx^2 - dx^2) + (cy^2 - dy^2) |
-        // | dx  dy  dx^2 + dy^2  1 |
-        const a = va.lenSq() * vb.cross(vc);
-        const b = vb.lenSq() * va.cross(vc);
-        const c = vc.lenSq() * va.cross(vb);
-
-        // D lies inside the incircle of A, B and C if the determinant > 0
-        return a - b + c > 0;
-    }
-
-    public toString(): string {
-        return "{p0: " + this.p0.toString() + ", p1: " + this.p1.toString() + "}";
-    }
-
-    public validate(): void {
-        assertDebug(this.sym !== this);
-        assertDebug(this.sym.sym === this);
-
-        assertDebug(this.lnext.onext.sym === this);
-        assertDebug(this.onext.sym.lnext === this);
-
-        assertDebug((this.seg !== undefined) === (this.face !== undefined));
-
-        let curr = this.onext;
-
-        do {
-            const prev = curr.oprev;
-            const next = curr.onext;
-
-            if (prev !== next) {
-                assertDebug(curr.p0.eq(prev.p0) && curr.p0.eq(next.p0));
-                assertDebug(Vector2.isBetweenCcw(curr.vector(), prev.vector(), next.vector()));
-            }
-
-            curr = curr.onext;
-        } while (curr !== this.onext);
-    }
-
-    public vector(): Vector2 {
-        return this.p1.sub(this.p0);
-    }
-}
-
-/**
- * Represents a chain of a mesh.
- */
-export class MeshChain2 {
-    public data: unknown;
-    public head: MeshEdge2;
-    public tail: MeshEdge2;
-
-    public constructor(head: MeshEdge2, tail: MeshEdge2, data: unknown) {
-        this.head = head;
-        this.tail = tail;
-        this.data = data;
-    }
-
-    public static updateEdgeChains(ch: MeshChain2, target: MeshChain2 | undefined): void {
-        for (const e of ch.getEdgeIterator()) {
-            e.chain = target;
-        }
-    }
-
-    /**
-     * Returns an iterator which traverses all edges of the chain.
-     */
-    public getEdgeIterator(): Mesh2LnextIterator {
-        return new Mesh2LnextIterator(this.tail, this.head);
-    }
-
-    public isClosed(): boolean {
-        return MeshEdge2.isJoin(this.head, this.tail);
-    }
-
-    public printDebug(): void {
-        let message = "MeshChain2 {\n";
-        for (const e of this.getEdgeIterator()) {
-            message += "    MeshEdge2 " + e.toString() + "\n";
-        }
-        message += "}";
-
-        log.infoDebug("{}", message);
-    }
-
-    public writeToPath(path: Path2): void {
-        const iter = this.getEdgeIterator();
-
-        let next = iter.next();
-
-        if (next.done !== true) {
-            path.moveTo(next.value.p0);
-            next = iter.next();
-        }
-
-        while (next.done !== true) {
-            path.lineTo(next.value.p0);
-            next = iter.next();
-        }
-    }
-}
-
-/**
- * Represents a face of a mesh.
- */
-export class MeshFace2 {
-    public data: unknown;
-    public start: MeshEdge2;
-
-    public constructor(start: MeshEdge2, data: unknown) {
-        this.start = start;
-        this.data = data;
-    }
-
-    public static updateEdgeFaces(f: MeshFace2, target: MeshFace2 | undefined): void {
-        for (const edge of f.getEdgeIterator()) {
-            edge.face = target;
-        }
-    }
-
-    /**
-     * Returns an iterator which traverses all edges of the face.
-     */
-    public getEdgeIterator(): Mesh2LnextIterator {
-        return new Mesh2LnextIterator(this.start, this.start.lprev);
-    }
-
-    /**
-     * Returns an array containing the edges of the face.
-     */
-    public getEdges(): MeshEdge2[] {
-        const edges: MeshEdge2[] = [];
-
-        for (const e of this.getEdgeIterator()) {
-            edges.push(e);
-        }
-
-        return edges;
-    }
-
-    /**
-     * Returns an array containing the origin points of the face.
-     */
-    public getPoints(): ReadonlyVector2[] {
-        const points: ReadonlyVector2[] = [];
-
-        for (const e of this.getEdgeIterator()) {
-            points.push(e.p0);
-        }
-
-        return points;
-    }
-
-    /**
-     * Returns `true` if a point `p` is inside the face.
-     */
-    public hasPointInside(p: ReadonlyVector2): boolean {
-        let wind = 0;
-
-        for (const e of this.getEdgeIterator()) {
-            // If segment does not exist, use origin points as fallback
-            const seg = e.seg ?? new Bezier1Curve2(e.p0, e.p1);
-            wind += seg.getWindingAt(p);
-        }
-
-        // Non-zero rule suffices
-        return wind !== 0;
-    }
-
-    public isMonotoneInX(): boolean {
-        const last = this.start.lprev;
-
-        let turns = 0;
-        let d0 = last.p1.x - last.p0.x;
-
-        for (const edge of this.getEdgeIterator()) {
-            const d1 = edge.p1.x - edge.p0.x;
-
-            if ((d0 > 0 || d1 > 0) && (d0 < 0 || d1 < 0)) {
-                turns += 1;
-            }
-
-            d0 = d1;
-        }
-
-        return turns <= 2;
-    }
-
-    public printDebug(): void {
-        let message = "MeshFace2 {\n";
-
-        for (const e of this.getEdgeIterator()) {
-            message += "    MeshEdge2 " + e.toString() + "\n";
-        }
-
-        message += "}";
-
-        log.infoDebug("{}", message);
-    }
-
-    /**
-     * Returns the signed area of the face.
-     */
-    public signedArea(): number {
-        let area = 0;
-
-        for (const e of this.getEdgeIterator()) {
-            // If segment does not exist, use origin points as fallback
-            const seg = e.seg ?? new Bezier1Curve2(e.p0, e.p1);
-            area += seg.signedArea();
-        }
-
-        return area;
-    }
-
-    public writeToPath(path: Path2): void {
-        const iter = this.getEdgeIterator();
-
-        let next = iter.next();
-
-        if (next.done !== true) {
-            path.moveTo(next.value.p0);
-            next = iter.next();
-        }
-
-        while (next.done !== true) {
-            path.lineTo(next.value.p0);
-            next = iter.next();
-        }
-
-        path.close();
-    }
-}
 
 export class Mesh2 {
     private chains: MeshChain2[];
@@ -1342,5 +798,602 @@ export class Mesh2 {
             const e = stack[i];
             this.connectEdgePoints(q, e);
         }
+    }
+}
+
+/**
+ * Represents a half edge of a mesh.
+ *
+ * Based on the quad-edge data structure described by Leonidas Guibas and Jorge Stolfi.
+ * It is only required to hold `p0`, `onext`, `lnext` and `sym` for each edge to build their relationships:
+ * - `p0` defines the origin location (vertex) of the edge
+ * - `onext` references the next edge in CCW direction around its origin
+ * - `lnext` references the next edge within the face
+ * - `sym` references the complementary half edge
+ * - `face` references the inner face of the edge
+ *
+ * References:
+ * - Leonidas Guibas, Jorge Stolfi.
+ *   *Primitives for the Manipulation of General Subdivisions and the Computation of Voronoi Diagrams*.
+ *   ACM Transactions on Graphics, Vol. 4, No. 2, April 1985, Pages 74-123.
+ * - Paul Heckbert.
+ *   *Quad-Edge Data Structure and Library*.
+ *   https://www.cs.cmu.edu/afs/andrew/scs/cs/15-463/2001/pub/src/a2/quadedge.html
+ */
+export class MeshEdge2 {
+    public chain: MeshChain2 | undefined;
+    public data: unknown;
+    public face: MeshFace2 | undefined;
+    public lnext: MeshEdge2;
+    public onext: MeshEdge2;
+    public p0: ReadonlyVector2;
+    public seg: ReadonlyBezierCurve2 | undefined;
+    public sym: MeshEdge2;
+
+    public constructor(p0: ReadonlyVector2, seg: ReadonlyBezierCurve2 | undefined, data: unknown) {
+        this.p0 = p0;
+        this.seg = seg;
+        this.data = data;
+
+        this.lnext = this;
+        this.onext = this;
+        this.sym = this;
+
+        this.chain = undefined;
+        this.face = undefined;
+    }
+
+    public get lprev(): MeshEdge2 {
+        return this.onext.sym;
+    }
+
+    public get oprev(): MeshEdge2 {
+        return this.sym.lnext;
+    }
+
+    public get p1(): ReadonlyVector2 {
+        return this.sym.p0;
+    }
+
+    /**
+     * Clears edge references.
+     *
+     * Note: Does not ensure valid mesh topology for adjacent edges.
+     */
+    public static clear(e: MeshEdge2): void {
+        e.lnext = e;
+        e.onext = e;
+        e.sym = e;
+
+        e.chain = undefined;
+        e.face = undefined;
+    }
+
+    public static compareQueue(e1: MeshEdge2, e2: MeshEdge2): number {
+        if (e1.p0.x !== e2.p0.x) {
+            // Sort by `x`
+            return e1.p0.x - e2.p0.x;
+        } else if (e1.p0.y !== e2.p0.y) {
+            // Same `x`, sort by `y`
+            return e1.p0.y - e2.p0.y;
+        } else if (e1.left() !== e2.left()) {
+            // Same `y`, sort `!left` before `left`
+            return e1.left() ? 1 : -1;
+        } else if (e1.left()) {
+            // Same left point
+            return Vector2.signedArea(e1.p1, e1.p0, e2.p1);
+        } else {
+            // Same right point
+            return Vector2.signedArea(e1.p0, e1.p1, e2.p1);
+        }
+    }
+
+    public static compareStatus(this: void, e1: MeshEdge2, e2: MeshEdge2): number {
+        if (e1.p0.eq(e2.p0)) {
+            if (e1.p1.eq(e2.p1)) {
+                // Edges are equal
+                return 0;
+            } else {
+                // Same `p0`
+                return Vector2.signedArea(e1.p0, e1.p1, e2.p1);
+            }
+        } else {
+            if (MeshEdge2.compareQueue(e1, e2) < 0) {
+                // `e1` left of `e2`
+                return Vector2.signedArea(e1.p0, e1.p1, e2.p0);
+            } else {
+                // `e2` left of `e1`
+                return Vector2.signedArea(e2.p1, e2.p0, e1.p0);
+            }
+        }
+    }
+
+    /**
+     * Creates a symmetric pair of half edges and returns the first one.
+     */
+    public static createPair(seg1: ReadonlyBezierCurve2, seg2?: ReadonlyBezierCurve2): MeshEdge2 {
+        const e1 = new MeshEdge2(seg1.p0, seg1, undefined);
+        const e2 = new MeshEdge2(seg1.p1, seg2, undefined);
+
+        e1.sym = e2;
+        e1.lnext = e2;
+        e2.sym = e1;
+        e2.lnext = e1;
+
+        return e1;
+    }
+
+    /**
+     * Disconnects symmetric pair `e` from the rest of the mesh.
+     */
+    public static detachPair(e: MeshEdge2): void {
+        MeshEdge2.splice(e, e.oprev);
+        MeshEdge2.splice(e.sym, e.sym.oprev);
+    }
+
+    /**
+     * Find the edge around `e` so that `v` lies between the found edge and its `onext`.
+     */
+    public static findConnectingEdge(e: MeshEdge2, v: ReadonlyVector2): MeshEdge2 {
+        // Check if `e` is the only edge around its origin
+        if (e === e.onext) {
+            return e;
+        }
+
+        // Iterate around origin
+        let curr = e;
+
+        do {
+            const next = curr.onext;
+
+            if (Vector2.isBetweenCcw(v, curr.vector(), next.vector())) {
+                return curr;
+            }
+
+            curr = next;
+        } while (curr !== e);
+
+        log.error("Mesh2: Cannot find connecting edge (Fallback)");
+
+        return e;
+    }
+
+    public static isJoin(e1: MeshEdge2, e2: MeshEdge2): boolean {
+        return e1.p1.eq(e2.p0);
+    }
+
+    /**
+     * Joins the head of `e1` to the tail of `e2`.
+     *
+     * Note: Will not create valid topology if `e1` or `e2` are part of edge fans.
+     */
+    public static join(e1: MeshEdge2, e2: MeshEdge2): void {
+        const e1sym = e1.sym;
+        const e2sym = e2.sym;
+
+        e1.lnext = e2;
+        e2.onext = e1sym;
+
+        e1sym.onext = e2;
+        e2sym.lnext = e1sym;
+    }
+
+    /**
+     * Splicing of the two mesh edges `e1` and `e2`.
+     *
+     * Note: For a valid mesh topology, `e2` needs to lie directly between `e1` and `e1.onext`.
+     */
+    public static splice(e1: MeshEdge2, e2: MeshEdge2): void {
+        // Splicing (see reference)
+        const e1onext = e1.onext;
+        const e2onext = e2.onext;
+
+        e1onext.sym.lnext = e2;
+        e2onext.sym.lnext = e1;
+
+        e1.onext = e2onext;
+        e2.onext = e1onext;
+    }
+
+    /**
+     * Swaps `e` between neighboring (triangulated) edges.
+     * ```
+     *        / \                /|\
+     *       /   \              / | \
+     *      /     \ b          /  |  \ b
+     *     /       \          /   |   \
+     *    /    e    \        /    |    \
+     *    -----------   ->      e | e.sym
+     *    \  e.sym  /        \    |    /
+     *     \       /          \   |   /
+     *    a \     /          a \  |  /
+     *       \   /              \ | /
+     *        \ /                \|/
+     * ```
+     * Note: Both faces are oriented CCW so that `a = e.oprev` and `b = e.lnext`.
+     */
+    public static swap(e: MeshEdge2): void {
+        const f1 = e.face;
+        const f2 = e.sym.face;
+
+        // Swapping requires faces on both sides of the edge
+        if (f1 === undefined || f2 === undefined) {
+            return;
+        }
+
+        // Swapping (see reference)
+        const a = e.oprev;
+        const b = e.lnext;
+
+        MeshEdge2.splice(e, a);
+        MeshEdge2.splice(e.sym, b);
+
+        MeshEdge2.splice(e, a.lnext);
+        MeshEdge2.splice(e.sym, b.lnext);
+
+        // Update segment
+        const seg = new Bezier1Curve2(a.p1, b.p1);
+
+        e.p0 = seg.p0;
+        e.seg = seg;
+        e.sym.p0 = seg.p1;
+        e.sym.seg = seg.reverse();
+
+        // Update faces
+        f1.start = e;
+        MeshFace2.updateEdgeFaces(f1, f1);
+
+        f2.start = e.sym;
+        MeshFace2.updateEdgeFaces(f2, f2);
+    }
+
+    /**
+     * Clones the mesh edge (unlinked).
+     *
+     * Note: The new mesh edge is not referenced by any mesh.
+     */
+    public clonePair(): MeshEdge2 {
+        const sym = this.sym;
+
+        const e1 = new MeshEdge2(this.p0, this.seg, this.data);
+        const e2 = new MeshEdge2(sym.p0, sym.seg, sym.data);
+
+        e1.sym = e2;
+        e1.lnext = e2;
+        e2.sym = e1;
+        e2.lnext = e1;
+
+        return e1;
+    }
+
+    /**
+     * Returns an iterator which traverses edges around `lnext` starting with `this`.
+     */
+    public getLnextIterator(): Mesh2LnextIterator {
+        return new Mesh2LnextIterator(this, this.lprev);
+    }
+
+    /**
+     * Returns an iterator which traverses edges around `onext` starting with `this`.
+     */
+    public getOnextIterator(): Mesh2OnextIterator {
+        return new Mesh2OnextIterator(this, this.oprev);
+    }
+
+    public left(): boolean {
+        // Orientation of the edge
+        if (this.p0.x !== this.p1.x) {
+            return this.p0.x < this.p1.x;
+        } else {
+            return this.p0.y < this.p1.y;
+        }
+    }
+
+    /**
+     * Checks if the edge needs swapping according to Delaunay criteria (incircle test).
+     */
+    public needsSwap(): boolean {
+        // Swapping requires faces on both sides of the edge
+        if (this.face === undefined || this.sym.face === undefined) {
+            return false;
+        }
+
+        // A, B and C are ordered CCW, D is the opposing point
+        const pa = this.p0;
+        const pb = this.sym.p0;
+        const pc = this.lnext.p1;
+        const pd = this.sym.lnext.p1;
+
+        // Incircle test (see reference)
+        const va = pa.sub(pd);
+        const vb = pb.sub(pd);
+        const vc = pc.sub(pd);
+
+        // | ax  ay  ax^2 + ay^2  1 |   | (ax - dx)  (ay - dy)  (ax^2 - dx^2) + (ay^2 - dy^2) |
+        // | bx  by  bx^2 + by^2  1 | = | (bx - dx)  (by - dy)  (bx^2 - dx^2) + (by^2 - dy^2) |
+        // | cx  cy  cx^2 + cy^2  1 |   | (cx - dx)  (cy - dy)  (cx^2 - dx^2) + (cy^2 - dy^2) |
+        // | dx  dy  dx^2 + dy^2  1 |
+        const a = va.lenSq() * vb.cross(vc);
+        const b = vb.lenSq() * va.cross(vc);
+        const c = vc.lenSq() * va.cross(vb);
+
+        // D lies inside the incircle of A, B and C if the determinant > 0
+        return a - b + c > 0;
+    }
+
+    public toString(): string {
+        return "{p0: " + this.p0.toString() + ", p1: " + this.p1.toString() + "}";
+    }
+
+    public validate(): void {
+        assertDebug(this.sym !== this);
+        assertDebug(this.sym.sym === this);
+
+        assertDebug(this.lnext.onext.sym === this);
+        assertDebug(this.onext.sym.lnext === this);
+
+        assertDebug((this.seg !== undefined) === (this.face !== undefined));
+
+        let curr = this.onext;
+
+        do {
+            const prev = curr.oprev;
+            const next = curr.onext;
+
+            if (prev !== next) {
+                assertDebug(curr.p0.eq(prev.p0) && curr.p0.eq(next.p0));
+                assertDebug(Vector2.isBetweenCcw(curr.vector(), prev.vector(), next.vector()));
+            }
+
+            curr = curr.onext;
+        } while (curr !== this.onext);
+    }
+
+    public vector(): Vector2 {
+        return this.p1.sub(this.p0);
+    }
+}
+
+/**
+ * Represents a chain of a mesh.
+ */
+export class MeshChain2 {
+    public data: unknown;
+    public head: MeshEdge2;
+    public tail: MeshEdge2;
+
+    public constructor(head: MeshEdge2, tail: MeshEdge2, data: unknown) {
+        this.head = head;
+        this.tail = tail;
+        this.data = data;
+    }
+
+    public static updateEdgeChains(ch: MeshChain2, target: MeshChain2 | undefined): void {
+        for (const e of ch.getEdgeIterator()) {
+            e.chain = target;
+        }
+    }
+
+    /**
+     * Returns an iterator which traverses all edges of the chain.
+     */
+    public getEdgeIterator(): Mesh2LnextIterator {
+        return new Mesh2LnextIterator(this.tail, this.head);
+    }
+
+    public isClosed(): boolean {
+        return MeshEdge2.isJoin(this.head, this.tail);
+    }
+
+    public printDebug(): void {
+        let message = "MeshChain2 {\n";
+        for (const e of this.getEdgeIterator()) {
+            message += "    MeshEdge2 " + e.toString() + "\n";
+        }
+        message += "}";
+
+        log.infoDebug("{}", message);
+    }
+
+    public writeToPath(path: Path2): void {
+        const iter = this.getEdgeIterator();
+
+        let next = iter.next();
+
+        if (next.done !== true) {
+            path.moveTo(next.value.p0);
+            next = iter.next();
+        }
+
+        while (next.done !== true) {
+            path.lineTo(next.value.p0);
+            next = iter.next();
+        }
+    }
+}
+
+/**
+ * Represents a face of a mesh.
+ */
+export class MeshFace2 {
+    public data: unknown;
+    public start: MeshEdge2;
+
+    public constructor(start: MeshEdge2, data: unknown) {
+        this.start = start;
+        this.data = data;
+    }
+
+    public static updateEdgeFaces(f: MeshFace2, target: MeshFace2 | undefined): void {
+        for (const edge of f.getEdgeIterator()) {
+            edge.face = target;
+        }
+    }
+
+    /**
+     * Returns an iterator which traverses all edges of the face.
+     */
+    public getEdgeIterator(): Mesh2LnextIterator {
+        return new Mesh2LnextIterator(this.start, this.start.lprev);
+    }
+
+    /**
+     * Returns an array containing the edges of the face.
+     */
+    public getEdges(): MeshEdge2[] {
+        const edges: MeshEdge2[] = [];
+
+        for (const e of this.getEdgeIterator()) {
+            edges.push(e);
+        }
+
+        return edges;
+    }
+
+    /**
+     * Returns an array containing the origin points of the face.
+     */
+    public getPoints(): ReadonlyVector2[] {
+        const points: ReadonlyVector2[] = [];
+
+        for (const e of this.getEdgeIterator()) {
+            points.push(e.p0);
+        }
+
+        return points;
+    }
+
+    /**
+     * Returns `true` if a point `p` is inside the face.
+     */
+    public hasPointInside(p: ReadonlyVector2): boolean {
+        let wind = 0;
+
+        for (const e of this.getEdgeIterator()) {
+            // If segment does not exist, use origin points as fallback
+            const seg = e.seg ?? new Bezier1Curve2(e.p0, e.p1);
+            wind += seg.getWindingAt(p);
+        }
+
+        // Non-zero rule suffices
+        return wind !== 0;
+    }
+
+    public isMonotoneInX(): boolean {
+        const last = this.start.lprev;
+
+        let turns = 0;
+        let d0 = last.p1.x - last.p0.x;
+
+        for (const edge of this.getEdgeIterator()) {
+            const d1 = edge.p1.x - edge.p0.x;
+
+            if ((d0 > 0 || d1 > 0) && (d0 < 0 || d1 < 0)) {
+                turns += 1;
+            }
+
+            d0 = d1;
+        }
+
+        return turns <= 2;
+    }
+
+    public printDebug(): void {
+        let message = "MeshFace2 {\n";
+
+        for (const e of this.getEdgeIterator()) {
+            message += "    MeshEdge2 " + e.toString() + "\n";
+        }
+
+        message += "}";
+
+        log.infoDebug("{}", message);
+    }
+
+    /**
+     * Returns the signed area of the face.
+     */
+    public signedArea(): number {
+        let area = 0;
+
+        for (const e of this.getEdgeIterator()) {
+            // If segment does not exist, use origin points as fallback
+            const seg = e.seg ?? new Bezier1Curve2(e.p0, e.p1);
+            area += seg.signedArea();
+        }
+
+        return area;
+    }
+
+    public writeToPath(path: Path2): void {
+        const iter = this.getEdgeIterator();
+
+        let next = iter.next();
+
+        if (next.done !== true) {
+            path.moveTo(next.value.p0);
+            next = iter.next();
+        }
+
+        while (next.done !== true) {
+            path.lineTo(next.value.p0);
+            next = iter.next();
+        }
+
+        path.close();
+    }
+}
+
+export class Mesh2LnextIterator implements IterableIterator<MeshEdge2> {
+    public curr: MeshEdge2;
+    public last: MeshEdge2;
+    public wasLast: boolean;
+
+    public constructor(first: MeshEdge2, last: MeshEdge2) {
+        this.curr = first;
+        this.last = last;
+
+        this.wasLast = false;
+    }
+
+    public [Symbol.iterator](): IterableIterator<MeshEdge2> {
+        return this;
+    }
+
+    public next(): IteratorResult<MeshEdge2> {
+        const done = this.wasLast;
+        const value = this.curr;
+
+        this.wasLast = this.last === value || done;
+        this.curr = value.lnext;
+
+        return { done, value };
+    }
+}
+
+export class Mesh2OnextIterator implements IterableIterator<MeshEdge2> {
+    public curr: MeshEdge2;
+    public last: MeshEdge2;
+    public wasLast: boolean;
+
+    public constructor(first: MeshEdge2, last: MeshEdge2) {
+        this.curr = first;
+        this.last = last;
+
+        this.wasLast = false;
+    }
+
+    public [Symbol.iterator](): IterableIterator<MeshEdge2> {
+        return this;
+    }
+
+    public next(): IteratorResult<MeshEdge2> {
+        const done = this.wasLast;
+        const value = this.curr;
+
+        this.wasLast = this.last === value || done;
+        this.curr = value.onext;
+
+        return { done, value };
     }
 }
