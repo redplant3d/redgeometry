@@ -1337,6 +1337,25 @@ export class Matrix3 implements ReadonlyMatrix3 {
         e[8] = ea[2] * tx + ea[5] * ty + ea[8];
     }
 
+    public setTranspose(mat: ReadonlyMatrix3): void {
+        const ea = mat.elements;
+
+        // | e0  e3  e6 |   | ea0  ea1  ea2 |
+        // | e1  e4  e7 | = | ea3  ea4  ea5 |
+        // | e2  e5  e8 |   | ea6  ea7  ea8 |
+        const e0 = ea[0];
+        const e1 = ea[3];
+        const e2 = ea[6];
+        const e3 = ea[1];
+        const e4 = ea[4];
+        const e5 = ea[7];
+        const e6 = ea[2];
+        const e7 = ea[5];
+        const e8 = ea[8];
+
+        this.set(e0, e1, e2, e3, e4, e5, e6, e7, e8);
+    }
+
     /**
      * ```
      * | ea0  ea3  ea6 |   | eb0  eb3  eb6 |
@@ -3529,6 +3548,33 @@ export class Matrix4 implements ReadonlyMatrix4 {
         e[13] = ea[1] * tx + ea[5] * ty + ea[9] * tz + ea[13];
         e[14] = ea[2] * tx + ea[6] * ty + ea[10] * tz + ea[14];
         e[15] = ea[3] * tx + ea[7] * ty + ea[11] * tz + ea[15];
+    }
+
+    public setTranspose(mat: ReadonlyMatrix4): void {
+        const ea = mat.elements;
+
+        // | e0  e4   e8  e12 |   |  ea0   ea1   ea2   ea3 |
+        // | e1  e5   e9  e13 | = |  ea4   ea5   ea6   ea7 |
+        // | e2  e6  e10  e14 |   |  ea8   ea9  ea10  ea11 |
+        // | e3  e7  e11  e15 |   | ea12  ea13  ea14  ea15 |
+        const e0 = ea[0];
+        const e1 = ea[4];
+        const e2 = ea[8];
+        const e3 = ea[12];
+        const e4 = ea[1];
+        const e5 = ea[5];
+        const e6 = ea[9];
+        const e7 = ea[13];
+        const e8 = ea[2];
+        const e9 = ea[6];
+        const e10 = ea[10];
+        const e11 = ea[14];
+        const e12 = ea[3];
+        const e13 = ea[7];
+        const e14 = ea[11];
+        const e15 = ea[15];
+
+        this.set(e0, e1, e2, e3, e4, e5, e6, e7, e8, e9, e10, e11, e12, e13, e14, e15);
     }
 
     /**
