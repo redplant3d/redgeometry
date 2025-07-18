@@ -354,6 +354,24 @@ export class Matrix3A implements ReadonlyMatrix3A {
     /**
      * Sets values from `mat` to this matrix.
      */
+    public setFrom(mat: ReadonlyMatrix3A): void {
+        const ea = mat.elements;
+        const e = this.elements;
+
+        //  | e0  e2  e4 |   | ea0  ea2  ea4 |
+        //  | e1  e3  e5 | = | ea1  ea3  ea5 |
+        //  |  0   0   1 |   |   0    0    1 |
+        e[0] = ea[0];
+        e[1] = ea[1];
+        e[2] = ea[2];
+        e[3] = ea[3];
+        e[4] = ea[4];
+        e[5] = ea[5];
+    }
+
+    /**
+     * Sets values from `mat` to this matrix.
+     */
     public setFromMatrix3(mat: ReadonlyMatrix3): void {
         const ea = mat.elements;
         const e = this.elements;
@@ -373,8 +391,8 @@ export class Matrix3A implements ReadonlyMatrix3A {
      * Sets values from `mat` to this matrix.
      */
     public setFromMatrix4(mat: ReadonlyMatrix4): void {
-        const e = this.elements;
         const ea = mat.elements;
+        const e = this.elements;
 
         //  | e0  e2  e4  x |   | ea0  ea4   ea8  ea12 |
         //  | e1  e3  e5  x | = | ea1  ea5   ea9  ea13 |
@@ -1043,6 +1061,27 @@ export class Matrix3 implements ReadonlyMatrix3 {
     /**
      * Sets values from `mat` to this matrix.
      */
+    public setFrom(mat: ReadonlyMatrix3): void {
+        const ea = mat.elements;
+        const e = this.elements;
+
+        //  | e0  e3  e6  |   | ea0  ea3  ea6 |
+        //  | e1  e4  e7  | = | ea1  ea4  ea7 |
+        //  | e2  e5  e8  |   | ea2  ea5  ea8 |
+        e[0] = ea[0];
+        e[1] = ea[1];
+        e[2] = ea[2];
+        e[3] = ea[3];
+        e[4] = ea[4];
+        e[5] = ea[5];
+        e[6] = ea[6];
+        e[7] = ea[7];
+        e[8] = ea[8];
+    }
+
+    /**
+     * Sets values from `mat` to this matrix.
+     */
     public setFromMatrix3A(mat: ReadonlyMatrix3A): void {
         const ea = mat.elements;
         const e = this.elements;
@@ -1065,8 +1104,8 @@ export class Matrix3 implements ReadonlyMatrix3 {
      * Sets values from `mat` to this matrix.
      */
     public setFromMatrix4(mat: ReadonlyMatrix4): void {
-        const e = this.elements;
         const ea = mat.elements;
+        const e = this.elements;
 
         //  | e0  e3  e6  x |   | ea0  ea4   ea8  ea12 |
         //  | e1  e4  e7  x | = | ea1  ea5   ea9  ea13 |
@@ -1854,9 +1893,34 @@ export class Matrix4A implements ReadonlyMatrix4A {
     /**
      * Sets values from `mat` to this matrix.
      */
-    public setFromMatrix3(mat: ReadonlyMatrix3): void {
-        const e = this.elements;
+    public setFrom(mat: ReadonlyMatrix4A): void {
         const ea = mat.elements;
+        const e = this.elements;
+
+        //  | e0  e3  e6   e9 |   | ea0  ea3  ea6   ea9 |
+        //  | e1  e4  e7  e10 | = | ea1  ea4  ea7  ea10 |
+        //  | e2  e5  e8  e11 |   | ea2  ea5  ea8  ea11 |
+        //  |  0   0   0    1 |   |   0    0    0     1 |
+        e[0] = ea[0];
+        e[1] = ea[1];
+        e[2] = ea[2];
+        e[3] = ea[3];
+        e[4] = ea[4];
+        e[5] = ea[5];
+        e[6] = ea[6];
+        e[7] = ea[7];
+        e[8] = ea[8];
+        e[9] = ea[9];
+        e[10] = ea[10];
+        e[11] = ea[11];
+    }
+
+    /**
+     * Sets values from `mat` to this matrix.
+     */
+    public setFromMatrix3(mat: ReadonlyMatrix3): void {
+        const ea = mat.elements;
+        const e = this.elements;
 
         //  | e0  e3  e6   e9 |   | ea0  ea3  ea6  0 |
         //  | e1  e4  e7  e10 | = | ea1  ea4  ea7  0 |
@@ -1905,8 +1969,8 @@ export class Matrix4A implements ReadonlyMatrix4A {
      * Sets values from `mat` to this matrix.
      */
     public setFromMatrix4(mat: ReadonlyMatrix4): void {
-        const e = this.elements;
         const ea = mat.elements;
+        const e = this.elements;
 
         //  | e0  e3  e6   e9 |   | ea0  ea4   ea8  ea12 |
         //  | e1  e4  e7  e10 | = | ea1  ea5   ea9  ea13 |
@@ -2899,9 +2963,38 @@ export class Matrix4 implements ReadonlyMatrix4 {
     /**
      * Sets values from `mat` to this matrix.
      */
-    public setFromMatrix3(mat: ReadonlyMatrix3): void {
-        const e = this.elements;
+    public setFrom(mat: ReadonlyMatrix4): void {
         const ea = mat.elements;
+        const e = this.elements;
+
+        //  | e0  e4   e8  e12 |   | ea0  ea4   ea8  ea12 |
+        //  | e1  e5   e9  e13 | = | ea1  ea5   ea9  ea13 |
+        //  | e2  e6  e10  e14 |   | ea2  ea6  ea10  ea14 |
+        //  | e3  e7  e11  e15 |   | ea3  ea7  ea11  ea15 |
+        e[0] = ea[0];
+        e[1] = ea[1];
+        e[2] = ea[2];
+        e[3] = ea[3];
+        e[4] = ea[4];
+        e[5] = ea[5];
+        e[6] = ea[6];
+        e[7] = ea[7];
+        e[8] = ea[8];
+        e[9] = ea[9];
+        e[10] = ea[10];
+        e[11] = ea[11];
+        e[12] = ea[12];
+        e[13] = ea[13];
+        e[14] = ea[14];
+        e[15] = ea[15];
+    }
+
+    /**
+     * Sets values from `mat` to this matrix.
+     */
+    public setFromMatrix3(mat: ReadonlyMatrix3): void {
+        const ea = mat.elements;
+        const e = this.elements;
 
         //  | e0  e4   e8  e12 |   | ea0  ea3  ea6  0 |
         //  | e1  e5   e9  e13 | = | ea1  ea4  ea7  0 |

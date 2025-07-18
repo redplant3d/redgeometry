@@ -291,6 +291,11 @@ export class Bezier1Curve2 implements ReadonlyBezier1Curve2 {
         this.p1 = p1;
     }
 
+    public setFrom(c: ReadonlyBezier1Curve2): void {
+        this.p0 = c.p0;
+        this.p1 = c.p1;
+    }
+
     public setXY(x0: number, y0: number, x1: number, y1: number): void {
         this.p0 = new Vector2(x0, y0);
         this.p1 = new Vector2(x1, y1);
@@ -652,6 +657,12 @@ export class Bezier2Curve2 implements ReadonlyBezier2Curve2 {
         this.p0 = p0;
         this.p1 = p1;
         this.p2 = p2;
+    }
+
+    public setFrom(c: ReadonlyBezier2Curve2): void {
+        this.p0 = c.p0;
+        this.p1 = c.p1;
+        this.p2 = c.p2;
     }
 
     public setXY(x0: number, y0: number, x1: number, y1: number, x2: number, y2: number): void {
@@ -1018,6 +1029,13 @@ export class Bezier3Curve2 implements ReadonlyBezier3Curve2 {
         this.p1 = p1;
         this.p2 = p2;
         this.p3 = p3;
+    }
+
+    public setFrom(c: ReadonlyBezier3Curve2): void {
+        this.p0 = c.p0;
+        this.p1 = c.p1;
+        this.p2 = c.p2;
+        this.p3 = c.p3;
     }
 
     public setXY(x0: number, y0: number, x1: number, y1: number, x2: number, y2: number, x3: number, y3: number): void {
@@ -1388,6 +1406,13 @@ export class BezierRCurve2 implements ReadonlyBezierRCurve2 {
         this.p1 = p1;
         this.p2 = p2;
         this.w = w;
+    }
+
+    public setFrom(c: ReadonlyBezierRCurve2): void {
+        this.p0 = c.p0;
+        this.p1 = c.p1;
+        this.p2 = c.p2;
+        this.w = c.w;
     }
 
     public setXY(x0: number, y0: number, x1: number, y1: number, x2: number, y2: number, w: number): void {

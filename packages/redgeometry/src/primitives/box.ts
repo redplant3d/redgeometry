@@ -379,6 +379,13 @@ export class MinMaxBox2 implements ReadonlyMinMaxBox2 {
         this.maxY = maxY;
     }
 
+    public setFrom(box: ReadonlyMinMaxBox2): void {
+        this.minX = box.minX;
+        this.minY = box.minY;
+        this.maxX = box.maxX;
+        this.maxY = box.maxY;
+    }
+
     public setEnclosePoint(box: ReadonlyMinMaxBox2, p: ReadonlyVector2): void {
         this.minX = Math.min(box.minX, p.x);
         this.minY = Math.min(box.minY, p.y);
@@ -668,6 +675,15 @@ export class MinMaxBox3 implements ReadonlyMinMaxBox3 {
         this.maxZ = maxZ;
     }
 
+    public setFrom(box: ReadonlyMinMaxBox3): void {
+        this.minX = box.minX;
+        this.minY = box.minY;
+        this.minZ = box.minZ;
+        this.maxX = box.maxX;
+        this.maxY = box.maxY;
+        this.maxZ = box.maxZ;
+    }
+
     public setEnclosePoint(box: ReadonlyMinMaxBox3, p: ReadonlyVector3): void {
         this.minX = Math.min(box.minX, p.x);
         this.minY = Math.min(box.minY, p.y);
@@ -902,6 +918,11 @@ export class AxisAlignedBox2 implements ReadonlyAxisAlignedBox2 {
         this.extents = extents;
     }
 
+    public setFrom(box: ReadonlyAxisAlignedBox2): void {
+        this.center = box.center;
+        this.extents = box.extents;
+    }
+
     public setEnclosePoint(box: ReadonlyAxisAlignedBox2, p: ReadonlyVector2): void {
         const pc = box.center;
         const ve = box.extents;
@@ -1127,6 +1148,11 @@ export class AxisAlignedBox3 implements ReadonlyAxisAlignedBox3 {
     public set(center: ReadonlyVector3, extents: ReadonlyVector3): void {
         this.center = center;
         this.extents = extents;
+    }
+
+    public setFrom(box: ReadonlyAxisAlignedBox3): void {
+        this.center = box.center;
+        this.extents = box.extents;
     }
 
     public setEnclosePoint(box: ReadonlyAxisAlignedBox3, p: ReadonlyVector3): void {
@@ -1362,6 +1388,12 @@ export class OrientedBox2 implements ReadonlyOrientedBox2 {
         this.rotation = rotation;
     }
 
+    public setFrom(box: ReadonlyOrientedBox2): void {
+        this.center = box.center;
+        this.extents = box.extents;
+        this.rotation = box.rotation;
+    }
+
     public setToEmpty(): void {
         this.center = Vector2.createZero();
         this.extents = new Vector2(Number.NEGATIVE_INFINITY, Number.NEGATIVE_INFINITY);
@@ -1592,6 +1624,12 @@ export class OrientedBox3 implements ReadonlyOrientedBox3 {
         this.center = center;
         this.extents = extents;
         this.rotation = rotation;
+    }
+
+    public setFrom(box: ReadonlyOrientedBox3): void {
+        this.center = box.center;
+        this.extents = box.extents;
+        this.rotation = box.rotation;
     }
 
     public setToEmpty(): void {

@@ -501,6 +501,13 @@ export class Quaternion implements ReadonlyQuaternion {
         this.d = q1.d + q2.d;
     }
 
+    public setFrom(q: ReadonlyQuaternion): void {
+        this.a = q.a;
+        this.b = q.b;
+        this.c = q.c;
+        this.d = q.d;
+    }
+
     public setFromRotationX(angle: number): void {
         const sin = Math.sin(0.5 * angle);
         const cos = Math.cos(0.5 * angle);

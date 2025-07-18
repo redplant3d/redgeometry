@@ -176,6 +176,11 @@ export class Complex implements ReadonlyComplex {
         this.b = z1.b + z2.b;
     }
 
+    public setFrom(z: ReadonlyComplex): void {
+        this.a = z.a;
+        this.b = z.b;
+    }
+
     public setFromRotationAngle(angle: number): void {
         const sin = Math.sin(angle);
         const cos = Math.cos(angle);

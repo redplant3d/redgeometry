@@ -436,6 +436,11 @@ export class Edge2 implements ReadonlyEdge2 {
         this.p1 = p1;
     }
 
+    public setFrom(e: ReadonlyEdge2): void {
+        this.p0 = e.p0;
+        this.p1 = e.p1;
+    }
+
     public setXY(x0: number, y0: number, x1: number, y1: number): void {
         this.p0 = new Vector2(x0, y0);
         this.p1 = new Vector2(x1, y1);
@@ -601,6 +606,11 @@ export class Edge3 implements ReadonlyEdge3 {
     public set(p0: Vector3, p1: Vector3): void {
         this.p0 = p0;
         this.p1 = p1;
+    }
+
+    public setFrom(e: ReadonlyEdge3): void {
+        this.p0 = e.p0;
+        this.p1 = e.p1;
     }
 
     public setXYZ(x0: number, y0: number, z0: number, x1: number, y1: number, z1: number): void {

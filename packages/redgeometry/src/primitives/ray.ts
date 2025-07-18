@@ -165,6 +165,11 @@ export class Ray2 implements ReadonlyRay2 {
         this.direction = direction;
     }
 
+    public setFrom(ray: ReadonlyRay2): void {
+        this.origin = ray.origin;
+        this.direction = ray.direction;
+    }
+
     public setXY(px: number, py: number, vx: number, vy: number): void {
         this.origin = new Vector2(px, py);
         this.direction = new Vector2(vx, vy);
@@ -309,6 +314,11 @@ export class Ray3 implements ReadonlyRay3 {
     public set(origin: Vector3, direction: Vector3): void {
         this.origin = origin;
         this.direction = direction;
+    }
+
+    public setFrom(ray: ReadonlyRay3): void {
+        this.origin = ray.origin;
+        this.direction = ray.direction;
     }
 
     public setXYZ(px: number, py: number, pz: number, vx: number, vy: number, vz: number): void {
