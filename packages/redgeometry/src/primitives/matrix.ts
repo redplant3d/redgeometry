@@ -44,7 +44,6 @@ export interface ReadonlyMatrix3A {
     determinant(): number;
     eq(mat: ReadonlyMatrix3A): boolean;
     extractSRT(): { s: Vector2; r: Complex; t: Vector2 };
-    inverse(): Matrix3A;
     mul(mat: ReadonlyMatrix3A): Matrix3A;
     mulV(v: ReadonlyVector2): Vector2;
     toArray(): MatrixElements3A;
@@ -65,7 +64,6 @@ export interface ReadonlyMatrix3 {
     determinant(): number;
     eq(mat: ReadonlyMatrix3): boolean;
     extractSRT(): { s: Vector2; r: Complex; t: Vector2 };
-    inverse(): Matrix3;
     mul(mat: ReadonlyMatrix3): Matrix3;
     mulV(v: ReadonlyVector3): Vector3;
     toArray(): MatrixElements3;
@@ -85,7 +83,6 @@ export interface ReadonlyMatrix4A {
     determinant(): number;
     eq(mat: ReadonlyMatrix4A): boolean;
     extractSRT(): { s: Vector3; r: Quaternion; t: Vector3 };
-    inverse(): Matrix4A;
     mul(mat: ReadonlyMatrix4A): Matrix4A;
     mulV(v: ReadonlyVector3): Vector3;
     toArray(): MatrixElements4A;
@@ -106,7 +103,6 @@ export interface ReadonlyMatrix4 {
     determinant(): number;
     eq(mat: ReadonlyMatrix4): boolean;
     extractSRT(): { s: Vector3; r: Quaternion; t: Vector3 };
-    inverse(): Matrix4;
     mul(mat: ReadonlyMatrix4): Matrix4;
     mulV(v: ReadonlyVector4): Vector4;
     sub(mat: ReadonlyMatrix4): Matrix4;
@@ -296,16 +292,6 @@ export class Matrix3A implements ReadonlyMatrix3A {
         const t = new Vector2(e[4], e[5]);
 
         return { s, r, t };
-    }
-
-    /**
-     * Returns the inverse of the matrix.
-     */
-    public inverse(): Matrix3A {
-        const mat = new Matrix3A([0, 0, 0, 0, 0, 0]);
-        mat.setInverse(this);
-
-        return mat;
     }
 
     /**
@@ -955,16 +941,6 @@ export class Matrix3 implements ReadonlyMatrix3 {
         const t = new Vector2(e[6], e[7]);
 
         return { s, r, t };
-    }
-
-    /**
-     * Returns the inverse of the matrix.
-     */
-    public inverse(): Matrix3 {
-        const mat = new Matrix3([0, 0, 0, 0, 0, 0, 0, 0, 0]);
-        mat.setInverse(this);
-
-        return mat;
     }
 
     /**
@@ -1786,16 +1762,6 @@ export class Matrix4A implements ReadonlyMatrix4A {
         const t = new Vector3(e[9], e[10], e[11]);
 
         return { s, r, t };
-    }
-
-    /**
-     * Returns the inverse of the matrix.
-     */
-    public inverse(): Matrix4A {
-        const mat = new Matrix4A([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
-        mat.setInverse(this);
-
-        return mat;
     }
 
     /**
@@ -2797,16 +2763,6 @@ export class Matrix4 implements ReadonlyMatrix4 {
         const t = new Vector3(e[12], e[13], e[14]);
 
         return { s, r, t };
-    }
-
-    /**
-     * Returns the inverse of the matrix.
-     */
-    public inverse(): Matrix4 {
-        const mat = new Matrix4([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
-        mat.setInverse(this);
-
-        return mat;
     }
 
     /**

@@ -34,7 +34,9 @@ test("Matrix3A - inverse", () => {
     mat.setScale(mat, 4, 4);
     mat.setRotate(mat, z.a, z.b);
 
-    const matInv = mat.inverse();
+    const matInv = Matrix3A.createIdentity();
+    matInv.setInverse(mat);
+
     const mat1 = mat.mul(matInv);
     const mat2 = matInv.mul(mat);
 
@@ -124,7 +126,9 @@ test("Matrix3 - inverse", () => {
     mat.setScale(mat, 4, 4);
     mat.setRotate(mat, z.a, z.b);
 
-    const matInv = mat.inverse();
+    const matInv = Matrix3.createIdentity();
+    matInv.setInverse(mat);
+
     const mat1 = mat.mul(matInv);
     const mat2 = matInv.mul(mat);
 
@@ -214,7 +218,9 @@ test("Matrix4A - inverse", () => {
     mat.setScale(mat, 4, 4, 4);
     mat.setRotate(mat, q.a, q.b, q.c, q.d);
 
-    const matInv = mat.inverse();
+    const matInv = Matrix4A.createIdentity();
+    matInv.setInverse(mat);
+
     const mat1 = mat.mul(matInv);
     const mat2 = matInv.mul(mat);
 
@@ -342,7 +348,9 @@ test("Matrix4 - inverse", () => {
     mat.setScale(mat, 4, 4, 4);
     mat.setRotate(mat, q.a, q.b, q.c, q.d);
 
-    const matInv = mat.inverse();
+    const matInv = Matrix4.createIdentity();
+    matInv.setInverse(mat);
+
     const mat1 = mat.mul(matInv);
     const mat2 = matInv.mul(mat);
 
