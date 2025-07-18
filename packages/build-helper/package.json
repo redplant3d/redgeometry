@@ -5,12 +5,12 @@
     "private": true,
     "dependencies": {
         "dts-bundle-generator": "^9.5.1",
-        "esbuild": "^0.25.5"
+        "esbuild": "^0.25.6"
     },
     "peerDependencies": {
         "typescript": ">=5.8"
     },
     "devDependencies": {
-        "@types/node": "^22.15.23"
+        "@types/node": "^22.16.4"
     }
 }
