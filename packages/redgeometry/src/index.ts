@@ -10,6 +10,7 @@ export * from "./core/path-stroke.js";
 export * from "./core/path.js";
 export * from "./core/polygon.js";
 export * from "./core/snapround.js";
+export * from "./core/winding.js";
 export * from "./primitives/bezier.js";
 export * from "./primitives/box.js";
 export * from "./primitives/complex.js";
