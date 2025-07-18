@@ -1652,25 +1652,25 @@ export class Matrix4A implements ReadonlyMatrix4A {
         return new Matrix4A([e0, e1, 0, e3, e4, 0, e6, e7, 1, 0, 0, 0]);
     }
 
-    public static fromMatrix4A(mat: ReadonlyMatrix4A): Matrix4A {
+    public static fromMatrix4(mat: ReadonlyMatrix4): Matrix4A {
         const ea = mat.elements;
 
-        //  | e0  e3  e6   e9 |   | ea0  ea3  ea6   ea9 |
-        //  | e1  e4  e7  e10 | = | ea1  ea4  ea7  ea10 |
-        //  | e2  e5  e8  e11 |   | ea2  ea5  ea8  ea11 |
-        //  |  0   0   0    1 |   |   0    0    0     1 |
+        //  | e0  e3  e6   e9 |   | ea0  ea4   ea8  ea12 |
+        //  | e1  e4  e7  e10 | = | ea1  ea5   ea9  ea13 |
+        //  | e2  e5  e8  e11 |   | ea2  ea6  ea10  ea14 |
+        //  |  0   0   0    1 |   | ea3  ea7  ea11  ea15 |
         const e0 = ea[0];
         const e1 = ea[1];
         const e2 = ea[2];
-        const e3 = ea[3];
-        const e4 = ea[4];
-        const e5 = ea[5];
-        const e6 = ea[6];
-        const e7 = ea[7];
-        const e8 = ea[8];
-        const e9 = ea[9];
-        const e10 = ea[10];
-        const e11 = ea[11];
+        const e3 = ea[4];
+        const e4 = ea[5];
+        const e5 = ea[6];
+        const e6 = ea[8];
+        const e7 = ea[9];
+        const e8 = ea[10];
+        const e9 = ea[12];
+        const e10 = ea[13];
+        const e11 = ea[14];
 
         return new Matrix4A([e0, e1, e2, e3, e4, e5, e6, e7, e8, e9, e10, e11]);
     }
