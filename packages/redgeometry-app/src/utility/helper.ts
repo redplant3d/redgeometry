@@ -32,11 +32,11 @@ export function createRandomMesh(
 
     const clip = new PathClip2(PATH_QUALITY_OPTIONS_DEFAULT);
 
-    for (const edge of polygonA.getEdges()) {
+    for (const edge of polygonA.toEdges()) {
         clip.addEdge(edge, 0);
     }
 
-    for (const edge of polygonB.getEdges()) {
+    for (const edge of polygonB.toEdges()) {
         clip.addEdge(edge, 1);
     }
 

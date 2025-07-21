@@ -91,7 +91,7 @@ export class PathStrokeIncremental2 implements PathStroke2 {
                 }
                 case 1 /* CLOSE */: {
                     const c = new Bezier1Curve2(p0, points[pIdx++]);
-                    const m = c.getDerivative();
+                    const m = c.derivative();
 
                     if (!m.isZero()) {
                         this.state.strokeFirstOrJoin(p0, m0, m);
@@ -105,49 +105,49 @@ export class PathStrokeIncremental2 implements PathStroke2 {
                 }
                 case 2 /* CLOSE */: {
                     const c = new Bezier2Curve2(p0, points[pIdx++], points[pIdx++]);
-                    const m = c.getTangentStart();
+                    const m = c.tangentStart();
 
                     if (!m.isZero()) {
                         this.state.strokeFirstOrJoin(p0, m0, m);
                         this.strokeQuadratic(c);
 
                         p0 = c.p2;
-                        m0 = c.getTangentEnd();
+                        m0 = c.tangentEnd();
                     }
 
                     break;
                 }
                 case 3 /* CLOSE */: {
                     const c = new Bezier3Curve2(p0, points[pIdx++], points[pIdx++], points[pIdx++]);
-                    const m = c.getTangentStart();
+                    const m = c.tangentStart();
 
                     if (!m.isZero()) {
                         this.state.strokeFirstOrJoin(p0, m0, m);
                         this.strokeCubic(c);
 
                         p0 = c.p3;
-                        m0 = c.getTangentEnd();
+                        m0 = c.tangentEnd();
                     }
 
                     break;
                 }
                 case 4 /* CLOSE */: {
                     const c = new BezierRCurve2(p0, points[pIdx++], points[pIdx++], cmd.w);
-                    const m = c.getTangentStart();
+                    const m = c.tangentStart();
 
                     if (!m.isZero()) {
                         this.state.strokeFirstOrJoin(p0, m0, m);
                         this.strokeConic(c);
 
                         p0 = c.p2;
-                        m0 = c.getTangentEnd();
+                        m0 = c.tangentEnd();
                     }
 
                     break;
                 }
                 case 5 /* CLOSE */: {
                     const c = new Bezier1Curve2(p0, ps);
-                    const m = c.getDerivative();
+                    const m = c.derivative();
 
                     if (!m.isZero()) {
                         this.state.strokeFirstOrJoin(p0, m0, m);
@@ -227,7 +227,7 @@ export class PathStrokeIncremental2 implements PathStroke2 {
     }
 
     private strokeQuadratic(c0: ReadonlyBezier2Curve2): void {
-        const [tc, td] = c0.getOffsetCuspParameter(this.state.distance);
+        const [tc, td] = c0.offsetCuspParameter(this.state.distance);
 
         const t1 = tc - td;
         const t2 = tc + td;
@@ -236,7 +236,7 @@ export class PathStrokeIncremental2 implements PathStroke2 {
         if (t1 < 1 && t2 > 0) {
             if (isDegenerateQuad(c0)) {
                 // Degenerate case
-                this.state.strokeQuadraticDegenerate(c0.p0, c0.getValueAt(tc), c0.p2);
+                this.state.strokeQuadraticDegenerate(c0.p0, c0.valueAt(tc), c0.p2);
             } else {
                 // Generic case
                 let t0 = 0;
@@ -347,7 +347,7 @@ export class PathStrokeRecursive2 implements PathStroke2 {
                 }
                 case 1 /* LINEAR */: {
                     const c = new Bezier1Curve2(p0, points[pIdx++]);
-                    const m = c.getDerivative();
+                    const m = c.derivative();
 
                     if (!m.isZero()) {
                         this.state.strokeFirstOrJoin(p0, m0, m);
@@ -361,49 +361,49 @@ export class PathStrokeRecursive2 implements PathStroke2 {
                 }
                 case 2 /* QUADRATIC */: {
                     const c = new Bezier2Curve2(p0, points[pIdx++], points[pIdx++]);
-                    const m = c.getTangentStart();
+                    const m = c.tangentStart();
 
                     if (!m.isZero()) {
                         this.state.strokeFirstOrJoin(p0, m0, m);
                         this.strokeQuadratic(c);
 
                         p0 = c.p2;
-                        m0 = c.getTangentEnd();
+                        m0 = c.tangentEnd();
                     }
 
                     break;
                 }
                 case 3 /* CUBIC */: {
                     const c = new Bezier3Curve2(p0, points[pIdx++], points[pIdx++], points[pIdx++]);
-                    const m = c.getTangentStart();
+                    const m = c.tangentStart();
 
                     if (!m.isZero()) {
                         this.state.strokeFirstOrJoin(p0, m0, m);
                         this.strokeCubic(c);
 
                         p0 = c.p3;
-                        m0 = c.getTangentEnd();
+                        m0 = c.tangentEnd();
                     }
 
                     break;
                 }
                 case 4 /* CONIC */: {
                     const c = new BezierRCurve2(p0, points[pIdx++], points[pIdx++], cmd.w);
-                    const m = c.getTangentStart();
+                    const m = c.tangentStart();
 
                     if (!m.isZero()) {
                         this.state.strokeFirstOrJoin(p0, m0, m);
                         this.strokeConic(c);
 
                         p0 = c.p2;
-                        m0 = c.getTangentEnd();
+                        m0 = c.tangentEnd();
                     }
 
                     break;
                 }
                 case 5 /* CLOSE */: {
                     const c = new Bezier1Curve2(p0, ps);
-                    const m = c.getDerivative();
+                    const m = c.derivative();
 
                     if (!m.isZero()) {
                         this.state.strokeFirstOrJoin(p0, m0, m);
@@ -481,7 +481,7 @@ export class PathStrokeRecursive2 implements PathStroke2 {
     }
 
     private strokeQuadratic(c0: ReadonlyBezier2Curve2): void {
-        const [tc, td] = c0.getOffsetCuspParameter(this.state.distance);
+        const [tc, td] = c0.offsetCuspParameter(this.state.distance);
 
         const t1 = tc - td;
         const t2 = tc + td;
@@ -490,7 +490,7 @@ export class PathStrokeRecursive2 implements PathStroke2 {
         if (t1 < 1 && t2 > 0) {
             if (isDegenerateQuad(c0)) {
                 // Degenerate case
-                this.state.strokeQuadraticDegenerate(c0.p0, c0.getValueAt(tc), c0.p2);
+                this.state.strokeQuadraticDegenerate(c0.p0, c0.valueAt(tc), c0.p2);
             } else {
                 // Generic case
                 let t0 = 0;

@@ -152,12 +152,12 @@ test("Quaternion - getEulerAngles", () => {
     const q5 = Quaternion.fromRotationEuler(eul.x, eul.y, eul.z, RotationOrder.ZXY);
     const q6 = Quaternion.fromRotationEuler(eul.x, eul.y, eul.z, RotationOrder.ZYX);
 
-    const eul1 = q1.getEulerAngles(RotationOrder.XYZ);
-    const eul2 = q2.getEulerAngles(RotationOrder.XZY);
-    const eul3 = q3.getEulerAngles(RotationOrder.YXZ);
-    const eul4 = q4.getEulerAngles(RotationOrder.YZX);
-    const eul5 = q5.getEulerAngles(RotationOrder.ZXY);
-    const eul6 = q6.getEulerAngles(RotationOrder.ZYX);
+    const eul1 = q1.eulerAngles(RotationOrder.XYZ);
+    const eul2 = q2.eulerAngles(RotationOrder.XZY);
+    const eul3 = q3.eulerAngles(RotationOrder.YXZ);
+    const eul4 = q4.eulerAngles(RotationOrder.YZX);
+    const eul5 = q5.eulerAngles(RotationOrder.ZXY);
+    const eul6 = q6.eulerAngles(RotationOrder.ZYX);
 
     expectToBeCloseEuler(eul, eul1);
     expectToBeCloseEuler(eul, eul2);

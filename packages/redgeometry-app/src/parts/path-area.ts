@@ -85,7 +85,7 @@ function updateSystem(world: World): void {
     world.writeData<AppPartRemoteData>({
         dataId: "app-part-remote",
         input: path,
-        bounds: path.getBounds(),
+        bounds: path.bounds(),
         isInside: path.hasPointInside(p, WindingOperator.EVEN_ODD),
     });
 

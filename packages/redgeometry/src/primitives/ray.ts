@@ -22,14 +22,14 @@ export interface ReadonlyRay2 {
     readonly origin: ReadonlyVector2;
 
     clone(): Ray2;
-    getParameterFromPoint(p: ReadonlyVector2): number;
-    getSignedDistanceFromPoint(p: ReadonlyVector2): number;
-    getValueAt(t: number): Vector2;
     normal(): Ray2;
+    parameterFromPoint(p: ReadonlyVector2): number;
     reverse(): Ray2;
+    signedDistanceFromPoint(p: ReadonlyVector2): number;
     toArray(): [number, number, number, number];
     toString(): string;
     translate(v: ReadonlyVector2): Ray2;
+    valueAt(t: number): Vector2;
 }
 
 export interface ReadonlyRay3 {
@@ -37,15 +37,15 @@ export interface ReadonlyRay3 {
     readonly origin: ReadonlyVector3;
 
     clone(): Ray3;
-    getDistanceFromPoint(p: ReadonlyVector3): number;
-    getNormalAround(v: ReadonlyVector3): Ray3;
-    getParameterFromPoint(p: ReadonlyVector3): number;
-    getValueAt(t: number): Vector3;
+    distanceFromPoint(p: ReadonlyVector3): number;
     isFinite(): boolean;
+    normalAround(v: ReadonlyVector3): Ray3;
+    parameterFromPoint(p: ReadonlyVector3): number;
     reverse(): Ray3;
     toArray(): [number, number, number, number, number, number];
     toString(): string;
     translate(v: ReadonlyVector3): Ray3;
+    valueAt(t: number): Vector3;
 }
 
 export class Ray2 implements ReadonlyRay2 {
@@ -95,7 +95,7 @@ export class Ray2 implements ReadonlyRay2 {
         const v = ray2.origin.sub(ray1.origin);
         const t = v.cross(ray2.direction) / den;
 
-        return ray1.getValueAt(t);
+        return ray1.valueAt(t);
     }
 
     public static getIntersectionParameter(ray1: ReadonlyRay2, ray2: ReadonlyRay2): [number, number] {
@@ -127,33 +127,17 @@ export class Ray2 implements ReadonlyRay2 {
         return new Ray2(this.origin, this.direction);
     }
 
+    public normal(): Ray2 {
+        return new Ray2(this.origin, this.direction.normal());
+    }
+
     /**
      * Returns the parameterized value where a point `p` is orthogonal on the ray.
      */
-    public getParameterFromPoint(p: ReadonlyVector2): number {
+    public parameterFromPoint(p: ReadonlyVector2): number {
         const v1 = this.direction;
         const v2 = p.sub(this.origin);
         return v1.dot(v2) / v1.lengthSq();
-    }
-
-    /**
-     * Returns the signed distance to where a point `p` is orthogonal to the ray.
-     */
-    public getSignedDistanceFromPoint(p: ReadonlyVector2): number {
-        const v1 = this.direction;
-        const v2 = this.origin.sub(p);
-        return v1.cross(v2) / v1.length();
-    }
-
-    /**
-     * Returns the parameterized point on the ray along its direction.
-     */
-    public getValueAt(t: number): Vector2 {
-        return this.origin.addMulS(this.direction, t);
-    }
-
-    public normal(): Ray2 {
-        return new Ray2(this.origin, this.direction.normal());
     }
 
     public reverse(): Ray2 {
@@ -175,6 +159,15 @@ export class Ray2 implements ReadonlyRay2 {
         this.direction = new Vector2(vx, vy);
     }
 
+    /**
+     * Returns the signed distance to where a point `p` is orthogonal to the ray.
+     */
+    public signedDistanceFromPoint(p: ReadonlyVector2): number {
+        const v1 = this.direction;
+        const v2 = this.origin.sub(p);
+        return v1.cross(v2) / v1.length();
+    }
+
     public toArray(): [number, number, number, number] {
         return [this.origin.x, this.origin.y, this.direction.x, this.direction.y];
     }
@@ -187,6 +180,13 @@ export class Ray2 implements ReadonlyRay2 {
         const origin = this.origin.add(v);
         return new Ray2(origin, this.direction);
     }
+
+    /**
+     * Returns the parameterized point on the ray along its direction.
+     */
+    public valueAt(t: number): Vector2 {
+        return this.origin.addMulS(this.direction, t);
+    }
 }
 
 export class Ray3 implements ReadonlyRay3 {
@@ -198,35 +198,11 @@ export class Ray3 implements ReadonlyRay3 {
         this.direction = direction;
     }
 
-    public static fromArray(data: ArrayLike<number>, offset = 0): Ray3 {
-        const origin = Vector3.fromArray(data, offset);
-        const direction = Vector3.fromArray(data, offset + 3);
-
-        return new Ray3(origin, direction);
-    }
-
-    public static fromObject(obj: Ray3Like): Ray3 {
-        const origin = Vector3.fromObject(obj.origin);
-        const direction = Vector3.fromObject(obj.direction);
-        return new Ray3(origin, direction);
-    }
-
-    public static fromPoints(p0: Vector3, p1: Vector3): Ray3 {
-        const direction = p1.sub(p0);
-        return new Ray3(p0, direction);
-    }
-
-    public static fromXYZ(px: number, py: number, pz: number, vx: number, vy: number, vz: number): Ray3 {
-        const origin = new Vector3(px, py, pz);
-        const direction = new Vector3(vx, vy, vz);
-        return new Ray3(origin, direction);
-    }
-
     /**
      * Returns the parameters of the closest points which lie on the rays `ray1` and `ray2`
      * or `undefined` if the rays are parallel.
      */
-    public static getClosestParameter(ray1: ReadonlyRay3, ray2: ReadonlyRay3): [number, number] | undefined {
+    public static closestParameter(ray1: ReadonlyRay3, ray2: ReadonlyRay3): [number, number] | undefined {
         // Reference: https://math.stackexchange.com/a/4764188
         // ```
         // p1 + t1 * v1 = p2 + t2 * v2
@@ -264,6 +240,30 @@ export class Ray3 implements ReadonlyRay3 {
         return [t1, t2];
     }
 
+    public static fromArray(data: ArrayLike<number>, offset = 0): Ray3 {
+        const origin = Vector3.fromArray(data, offset);
+        const direction = Vector3.fromArray(data, offset + 3);
+
+        return new Ray3(origin, direction);
+    }
+
+    public static fromObject(obj: Ray3Like): Ray3 {
+        const origin = Vector3.fromObject(obj.origin);
+        const direction = Vector3.fromObject(obj.direction);
+        return new Ray3(origin, direction);
+    }
+
+    public static fromPoints(p0: Vector3, p1: Vector3): Ray3 {
+        const direction = p1.sub(p0);
+        return new Ray3(p0, direction);
+    }
+
+    public static fromXYZ(px: number, py: number, pz: number, vx: number, vy: number, vz: number): Ray3 {
+        const origin = new Vector3(px, py, pz);
+        const direction = new Vector3(vx, vy, vz);
+        return new Ray3(origin, direction);
+    }
+
     public static toObject(ray: ReadonlyRay3): Ray3Like {
         const origin = Vector3.toObject(ray.origin);
         const direction = Vector3.toObject(ray.direction);
@@ -277,34 +277,27 @@ export class Ray3 implements ReadonlyRay3 {
     /**
      * Returns the distance to where a point `p` is orthogonal to the ray.
      */
-    public getDistanceFromPoint(p: ReadonlyVector3): number {
+    public distanceFromPoint(p: ReadonlyVector3): number {
         const v1 = this.direction;
         const v2 = this.origin.sub(p);
         return v1.cross(v2).length() / v1.length();
     }
 
-    public getNormalAround(v: ReadonlyVector3): Ray3 {
+    public isFinite(): boolean {
+        return this.origin.isFinite() && this.direction.isFinite();
+    }
+
+    public normalAround(v: ReadonlyVector3): Ray3 {
         return new Ray3(this.origin, this.direction.cross(v));
     }
 
     /**
      * Returns the parameterized value where a point `p` is orthogonal on the ray.
      */
-    public getParameterFromPoint(p: ReadonlyVector3): number {
+    public parameterFromPoint(p: ReadonlyVector3): number {
         const v1 = this.direction;
         const v2 = p.sub(this.origin);
         return v1.dot(v2) / v1.lengthSq();
-    }
-
-    /**
-     * Returns the parameterized point on the ray along its direction.
-     */
-    public getValueAt(t: number): Vector3 {
-        return this.origin.addMulS(this.direction, t);
-    }
-
-    public isFinite(): boolean {
-        return this.origin.isFinite() && this.direction.isFinite();
     }
 
     public reverse(): Ray3 {
@@ -337,5 +330,12 @@ export class Ray3 implements ReadonlyRay3 {
     public translate(v: ReadonlyVector3): Ray3 {
         const origin = this.origin.add(v);
         return new Ray3(origin, this.direction);
+    }
+
+    /**
+     * Returns the parameterized point on the ray along its direction.
+     */
+    public valueAt(t: number): Vector3 {
+        return this.origin.addMulS(this.direction, t);
     }
 }

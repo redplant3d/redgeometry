@@ -63,12 +63,12 @@ export class PathClip2 {
 
     public addPath(path: Path2, set = 0, weight = 1, snap = false): void {
         // Workaround: Flatten whole path
-        const buffer = path.flatten(false, {
+        const bufferPath = path.flatten(false, {
             flattenMode: ApproximationMode.RECURSIVE,
             flattenTolerance: this.flattenTolerance,
         });
 
-        for (const c of buffer.getCurves()) {
+        for (const c of bufferPath.toCurves()) {
             this.snapRound.addSegment(c, set, weight, snap, undefined);
         }
     }

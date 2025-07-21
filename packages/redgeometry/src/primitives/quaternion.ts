@@ -25,7 +25,7 @@ export interface ReadonlyQuaternion {
     eq(q: ReadonlyQuaternion): boolean;
     eqApproxAbs(q: ReadonlyQuaternion, eps: number): boolean;
     eqApproxRel(q: ReadonlyQuaternion, eps: number): boolean;
-    getEulerAngles(order: RotationOrder): { x: number; y: number; z: number };
+    eulerAngles(order: RotationOrder): { x: number; y: number; z: number };
     inverse(): Quaternion;
     isIdentity(): boolean;
     length(): number;
@@ -323,7 +323,7 @@ export class Quaternion implements ReadonlyQuaternion {
      * References:
      * - https://en.wikipedia.org/wiki/Euler_angles#Conversion_to_other_orientation_representations
      */
-    public getEulerAngles(order: RotationOrder): { x: number; y: number; z: number } {
+    public eulerAngles(order: RotationOrder): { x: number; y: number; z: number } {
         const qaa = this.a * this.a;
         const qbb = this.b * this.b;
         const qcc = this.c * this.c;

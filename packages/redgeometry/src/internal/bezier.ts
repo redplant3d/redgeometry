@@ -17,7 +17,7 @@ export function setEncloseCurveAt(c: ReadonlyBezierCurve2, box: MinMaxBox2, t: n
         return;
     }
 
-    const p = c.getValueAt(t);
+    const p = c.valueAt(t);
     box.setEnclosePoint(box, p);
 }
 
@@ -31,7 +31,7 @@ export function minimizeCurveDistanceAt(
         return;
     }
 
-    const distSq = c.getValueAt(t).sub(p).lengthSq();
+    const distSq = c.valueAt(t).sub(p).lengthSq();
 
     if (distSq < min.distSq) {
         min.param = t;
@@ -87,7 +87,7 @@ export function getWindingAtParameterConic(c: ReadonlyBezierRCurve2, t: number, 
         return 0;
     }
 
-    const [p0, p1, p2] = c.getProjectivePoints();
+    const [p0, p1, p2] = c.projectivePoints();
 
     const p01 = p0.lerp(p1, t);
     const p12 = p1.lerp(p2, t);
@@ -123,7 +123,7 @@ export function checkIntervalQuadQuad(
     if (iiNext.diameter() < eps) {
         log.infoDebug("Intersection found at t = {} (Diam: {})", iiNext.mid(), iiNext.diameter());
 
-        output.push(c1.getValueAt(iiNext.mid()));
+        output.push(c1.valueAt(iiNext.mid()));
     } else {
         getIntersectionQuadQuad(c2, i2, c1, iiNext, output);
     }
@@ -174,7 +174,7 @@ export function getIntersectionQuadQuad(
 export function getArcLengthQuadratic(c: ReadonlyBezier2Curve2): number {
     let sum = 0;
 
-    const [qqa, qqb] = c.getDerivativeCoefficients();
+    const [qqa, qqb] = c.derivativeCoefficients();
 
     // Weights and abscissae for `n = 4`
     sum += sampleArcLengthQuadratic(0.1739274225687269, 0.06943184420297371, qqa, qqb);
@@ -188,7 +188,7 @@ export function getArcLengthQuadratic(c: ReadonlyBezier2Curve2): number {
 export function getArcLengthCubic(c: ReadonlyBezier3Curve2): number {
     let sum = 0;
 
-    const [qqa, qqb, qqc] = c.getDerivativeCoefficients();
+    const [qqa, qqb, qqc] = c.derivativeCoefficients();
 
     // Weights and abscissae for `n = 8`
     sum += sampleArcLengthCubic(0.05061426814518813, 0.01985507175123188, qqa, qqb, qqc);
@@ -206,7 +206,7 @@ export function getArcLengthCubic(c: ReadonlyBezier3Curve2): number {
 export function getArcLengthConic(c: ReadonlyBezierRCurve2): number {
     let sum = 0;
 
-    const [qqa, qqb, qqc] = c.getDerivativeCoefficients();
+    const [qqa, qqb, qqc] = c.derivativeCoefficients();
 
     // Weights and abscissae for `n = 8`
     sum += sampleArcLengthConic(0.05061426814518813, 0.01985507175123188, qqa, qqb, qqc);

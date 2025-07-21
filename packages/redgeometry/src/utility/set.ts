@@ -6,7 +6,7 @@ export class Bitset {
     }
 
     public static from(b: Bitset): Bitset {
-        const len = b.getMinDataLength();
+        const len = b.minDataLength();
         const data = new Uint32Array(len);
 
         for (let i = 0; i < len; i++) {
@@ -101,31 +101,6 @@ export class Bitset {
         return true;
     }
 
-    public getDataString(): string {
-        let str = "";
-
-        // LSB to MSB
-        for (let i = 0; i < this.data.length; i++) {
-            str += this.data[i].toString(2).padStart(32, "0") + "\n";
-        }
-
-        return str;
-    }
-
-    public getMinDataLength(): number {
-        let idx = this.data.length - 1;
-
-        while (idx >= 0) {
-            if (this.data[idx] === 0) {
-                idx--;
-            } else {
-                break;
-            }
-        }
-
-        return idx + 1;
-    }
-
     public has(x: number): boolean {
         const idx = x >>> 5;
         const val = 1 << (x & 0x1f);
@@ -165,6 +140,20 @@ export class Bitset {
         return true;
     }
 
+    public minDataLength(): number {
+        let idx = this.data.length - 1;
+
+        while (idx >= 0) {
+            if (this.data[idx] === 0) {
+                idx--;
+            } else {
+                break;
+            }
+        }
+
+        return idx + 1;
+    }
+
     public reset(): void {
         for (let i = 0; i < this.data.length; i++) {
             this.data[i] = 0;
@@ -180,11 +169,22 @@ export class Bitset {
     }
 
     public shrink(): void {
-        const lenNext = this.getMinDataLength();
+        const lenNext = this.minDataLength();
 
         if (this.data.length > lenNext) {
             this.data = this.data.slice(0, lenNext);
         }
+    }
+
+    public toDataString(): string {
+        let str = "";
+
+        // LSB to MSB
+        for (let i = 0; i < this.data.length; i++) {
+            str += this.data[i].toString(2).padStart(32, "0") + "\n";
+        }
+
+        return str;
     }
 
     public toggle(x: number): void {

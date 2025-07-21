@@ -6,8 +6,8 @@ import { assertUnreachable } from "../utility/debug.js";
 
 export function offsetQuadraticSimple(path: Path2, c: ReadonlyBezier2Curve2, d: number): void {
     // Possible null vector (curve is a point)
-    let v1 = c.getTangentStart();
-    let v2 = c.getTangentEnd();
+    let v1 = c.tangentStart();
+    let v2 = c.tangentEnd();
 
     if (!v1.isZero()) {
         v1 = v1.unit().normal();

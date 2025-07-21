@@ -106,8 +106,8 @@ export class Polygon2 {
 
     public static isEdgeIntersection(poly1: Polygon2, poly2: Polygon2): boolean {
         // Test pairwise (naive)
-        for (const e1 of poly1.getEdges()) {
-            for (const e2 of poly2.getEdges()) {
+        for (const e1 of poly1.toEdges()) {
+            for (const e2 of poly2.toEdges()) {
                 if (Edge2.isIntersection(e1, e2)) {
                     return true;
                 }
@@ -124,8 +124,8 @@ export class Polygon2 {
     ): boolean {
         let wind = 0;
 
-        for (const e of poly.getEdges()) {
-            wind += e.toBezier().getWindingAt(p);
+        for (const e of poly.toEdges()) {
+            wind += e.toBezier().windingAt(p);
         }
 
         return isWindingInside(wind, windingOperator);
@@ -159,12 +159,28 @@ export class Polygon2 {
         this.add(p);
     }
 
+    public bounds(): MinMaxBox2 {
+        let x0 = Number.POSITIVE_INFINITY;
+        let y0 = Number.POSITIVE_INFINITY;
+        let x1 = Number.NEGATIVE_INFINITY;
+        let y1 = Number.NEGATIVE_INFINITY;
+
+        for (const p of this.points) {
+            x0 = Math.min(x0, p.x);
+            y0 = Math.min(y0, p.y);
+            x1 = Math.max(x1, p.x);
+            y1 = Math.max(y1, p.y);
+        }
+
+        return new MinMaxBox2(x0, y0, x1, y1);
+    }
+
     public centroid(): Vector2 | undefined {
         let x = 0;
         let y = 0;
         let area = 0;
 
-        for (const e of this.getEdges()) {
+        for (const e of this.toEdges()) {
             const p0 = e.p0;
             const p1 = e.p1;
             const a = p0.cross(p1);
@@ -196,8 +212,8 @@ export class Polygon2 {
         let closestEdge: ReadonlyEdge2 | undefined;
 
         // Find the edge with the closest point on it
-        for (const e of this.getEdges()) {
-            const distSq = e.getClosestPoint(p).sub(p).lengthSq();
+        for (const e of this.toEdges()) {
+            const distSq = e.closestPoint(p).sub(p).lengthSq();
 
             if (distSq < minDistSq) {
                 minDistSq = distSq;
@@ -206,102 +222,6 @@ export class Polygon2 {
         }
 
         return closestEdge;
-    }
-
-    public getBounds(): MinMaxBox2 {
-        let x0 = Number.POSITIVE_INFINITY;
-        let y0 = Number.POSITIVE_INFINITY;
-        let x1 = Number.NEGATIVE_INFINITY;
-        let y1 = Number.NEGATIVE_INFINITY;
-
-        for (const p of this.points) {
-            x0 = Math.min(x0, p.x);
-            y0 = Math.min(y0, p.y);
-            x1 = Math.max(x1, p.x);
-            y1 = Math.max(y1, p.y);
-        }
-
-        return new MinMaxBox2(x0, y0, x1, y1);
-    }
-
-    public getEdges(): Edge2[] {
-        const edges: Edge2[] = [];
-
-        const points = this.points;
-
-        if (points.length < 2) {
-            return edges;
-        }
-
-        let p0 = points[0];
-
-        for (let i = 1; i < points.length; i++) {
-            const p1 = points[i];
-
-            if (!p0.eq(p1)) {
-                const e = new Edge2(p0, p1);
-                edges.push(e);
-            }
-
-            p0 = p1;
-        }
-
-        const ps = points[0];
-
-        if (!p0.eq(ps)) {
-            const e = new Edge2(p0, ps);
-            edges.push(e);
-        }
-
-        return edges;
-    }
-
-    public getOrientedBoundingBox(): Polygon2 {
-        // Find the oriented bounding box with the smallest area
-        let minArea = Number.POSITIVE_INFINITY;
-
-        const points = [Vector2.ZERO, Vector2.ZERO, Vector2.ZERO, Vector2.ZERO];
-        const convexHull = Polygon2.createConvexHull(this.points);
-
-        // Iterate all edges
-        for (const e of convexHull.getEdges()) {
-            let minParam = Number.POSITIVE_INFINITY;
-            let maxParam = Number.NEGATIVE_INFINITY;
-            let minDist = Number.POSITIVE_INFINITY;
-
-            // For every edge iterate all points
-            for (const p of convexHull.points) {
-                // The points of the convex hull are oriented to the inside
-                // of each edge so that `dist` is always negative
-                const param = e.getParameterFromPoint(p);
-                const dist = e.getSignedDistanceFromPoint(p);
-
-                // Find the bounding values
-                minParam = Math.min(minParam, param);
-                maxParam = Math.max(maxParam, param);
-                minDist = Math.min(minDist, dist);
-            }
-
-            // Calculate bounding box and area
-            const p0 = e.getValueAt(minParam);
-            const p1 = e.getValueAt(maxParam);
-
-            const v0 = p1.sub(p0);
-            const v1 = v0.unit().normal().mulS(minDist);
-
-            const area = v0.cross(v1);
-
-            if (area < minArea) {
-                // Update bounding box
-                points[0] = p0;
-                points[1] = p0.add(v1);
-                points[2] = p1.add(v1);
-                points[3] = p1;
-                minArea = area;
-            }
-        }
-
-        return new Polygon2(points);
     }
 
     public hasPoints(): boolean {
@@ -344,8 +264,8 @@ export class Polygon2 {
 
     public isSimple(): boolean {
         // A polygon is simple if no edges are self-intersecting
-        for (const e1 of this.getEdges()) {
-            for (const e2 of this.getEdges()) {
+        for (const e1 of this.toEdges()) {
+            for (const e2 of this.toEdges()) {
                 if (e1 !== e2 && !Edge2.isAdjacent(e1, e2) && Edge2.isIntersection(e1, e2)) {
                     // Edges intersect
                     return false;
@@ -363,11 +283,91 @@ export class Polygon2 {
     public signedArea(): number {
         let area = 0;
 
-        for (const e of this.getEdges()) {
+        for (const e of this.toEdges()) {
             area += e.p0.cross(e.p1);
         }
 
         return 0.5 * area;
+    }
+
+    public toEdges(): Edge2[] {
+        const edges: Edge2[] = [];
+
+        const points = this.points;
+
+        if (points.length < 2) {
+            return edges;
+        }
+
+        let p0 = points[0];
+
+        for (let i = 1; i < points.length; i++) {
+            const p1 = points[i];
+
+            if (!p0.eq(p1)) {
+                const e = new Edge2(p0, p1);
+                edges.push(e);
+            }
+
+            p0 = p1;
+        }
+
+        const ps = points[0];
+
+        if (!p0.eq(ps)) {
+            const e = new Edge2(p0, ps);
+            edges.push(e);
+        }
+
+        return edges;
+    }
+
+    public toOrientedBoundingBox(): Polygon2 {
+        // Find the oriented bounding box with the smallest area
+        let minArea = Number.POSITIVE_INFINITY;
+
+        const points = [Vector2.ZERO, Vector2.ZERO, Vector2.ZERO, Vector2.ZERO];
+        const convexHull = Polygon2.createConvexHull(this.points);
+
+        // Iterate all edges
+        for (const e of convexHull.toEdges()) {
+            let minParam = Number.POSITIVE_INFINITY;
+            let maxParam = Number.NEGATIVE_INFINITY;
+            let minDist = Number.POSITIVE_INFINITY;
+
+            // For every edge iterate all points
+            for (const p of convexHull.points) {
+                // The points of the convex hull are oriented to the inside
+                // of each edge so that `dist` is always negative
+                const param = e.parameterFromPoint(p);
+                const dist = e.signedDistanceFromPoint(p);
+
+                // Find the bounding values
+                minParam = Math.min(minParam, param);
+                maxParam = Math.max(maxParam, param);
+                minDist = Math.min(minDist, dist);
+            }
+
+            // Calculate bounding box and area
+            const p0 = e.valueAt(minParam);
+            const p1 = e.valueAt(maxParam);
+
+            const v0 = p1.sub(p0);
+            const v1 = v0.unit().normal().mulS(minDist);
+
+            const area = v0.cross(v1);
+
+            if (area < minArea) {
+                // Update bounding box
+                points[0] = p0;
+                points[1] = p0.add(v1);
+                points[2] = p1.add(v1);
+                points[3] = p1;
+                minArea = area;
+            }
+        }
+
+        return new Polygon2(points);
     }
 
     public toPath(): Path2 {

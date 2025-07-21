@@ -147,7 +147,7 @@ export class PathFlattenIncremental2 implements PathFlatten2 {
     }
 
     private flattenQuadratic(c0: ReadonlyBezier2Curve2, output: Path2): void {
-        const [qa, qb, qc] = c0.getCoefficients();
+        const [qa, qb, qc] = c0.coefficients();
 
         // Smallest parameter step to satisfy tolerance condition
         const step = Math.sqrt((4 * this.tolerance) / qa.length());

@@ -268,7 +268,7 @@ export class StrokeState {
         while (lenRem < len) {
             const t = getDashParameterLinear(c, lenRem);
             const c2 = c.splitAfter(t);
-            const m = c2.getDerivative();
+            const m = c2.derivative();
 
             if (this.currentPhase) {
                 this.insertLinearStroke(c2.p0, m);
@@ -286,7 +286,7 @@ export class StrokeState {
         this.currentLength += len;
 
         if (this.currentPhase) {
-            const m = c.getTangentStart();
+            const m = c.tangentStart();
             this.insertLinearStroke(c.p1, m);
         }
     }
@@ -349,7 +349,7 @@ export class StrokeState {
             if (this.currentPhase) {
                 this.insertQuadraticSimpleStroke(c1);
             } else {
-                const m = c2.getTangentStart();
+                const m = c2.tangentStart();
                 this.insertMoveStroke(c2.p0, m);
             }
 
@@ -369,8 +369,8 @@ export class StrokeState {
 
     private insertQuadraticSimpleStroke(c: ReadonlyBezier2Curve2): void {
         // Check for possible null vector (curve is a point)
-        let v1 = c.getTangentStart();
-        let v2 = c.getTangentEnd();
+        let v1 = c.tangentStart();
+        let v2 = c.tangentEnd();
 
         if (!v1.isZero()) {
             const d = this.distance;
@@ -448,7 +448,7 @@ export function insertStrokeCap(path: Path2, p1: ReadonlyVector2, cap: CapType |
             break;
         }
         case 1 /* SQUARE */: {
-            const p0 = path.getLastPoint();
+            const p0 = path.lastPoint();
 
             if (p0 === undefined) {
                 break;
@@ -462,7 +462,7 @@ export function insertStrokeCap(path: Path2, p1: ReadonlyVector2, cap: CapType |
             break;
         }
         case 2 /* ROUND */: {
-            const p0 = path.getLastPoint();
+            const p0 = path.lastPoint();
 
             if (p0 === undefined) {
                 break;
@@ -476,7 +476,7 @@ export function insertStrokeCap(path: Path2, p1: ReadonlyVector2, cap: CapType |
             break;
         }
         default: {
-            const p0 = path.getLastPoint();
+            const p0 = path.lastPoint();
 
             if (p0 === undefined) {
                 break;
@@ -485,7 +485,7 @@ export function insertStrokeCap(path: Path2, p1: ReadonlyVector2, cap: CapType |
             cap(path, p0, p1);
 
             // Check if last point is set by the callback
-            if (path.getLastPoint()?.eq(p1) === true) {
+            if (path.lastPoint()?.eq(p1) === true) {
                 break;
             }
 
@@ -502,8 +502,8 @@ export function combineStroke(
     startCap: CapType | CustomCap,
     endCap: CapType | CustomCap,
 ): void {
-    const p1 = right.getLastPoint();
-    const p2 = left.getFirstPoint();
+    const p1 = right.lastPoint();
+    const p2 = left.firstPoint();
 
     if (p1 !== undefined && p2 !== undefined) {
         output.addPath(left, false);

@@ -311,12 +311,22 @@ export class Path2 implements PathSink2 {
         this.arcTo(p1, p2);
     }
 
+    public bounds(): MinMaxBox2 {
+        const bounds = MinMaxBox2.createEmpty();
+
+        for (const c of this.toCurves()) {
+            bounds.setUnion(bounds, c.bounds());
+        }
+
+        return bounds;
+    }
+
     public centroid(): Vector2 | undefined {
         let x = 0;
         let y = 0;
         let area = 0;
 
-        for (const c of this.getCurves()) {
+        for (const c of this.toCurves()) {
             const a = c.signedArea();
             x += a * (c.p0.x + c.pn.x);
             y += a * (c.p0.y + c.pn.y);
@@ -392,6 +402,14 @@ export class Path2 implements PathSink2 {
         return output;
     }
 
+    public firstCommand(): PathCommand | undefined {
+        return this.commands[0];
+    }
+
+    public firstPoint(): ReadonlyVector2 | undefined {
+        return this.points[0];
+    }
+
     public flatten(forceClose = false, qualityOptions?: Partial<PathQualityOptions>): Path2 {
         const output = Path2.createEmpty();
         const pathFlatten = createPathFlatten({ ...PATH_QUALITY_OPTIONS_DEFAULT, ...qualityOptions });
@@ -399,175 +417,12 @@ export class Path2 implements PathSink2 {
         return output;
     }
 
-    public getBounds(): MinMaxBox2 {
-        const bounds = MinMaxBox2.createEmpty();
-
-        for (const c of this.getCurves()) {
-            bounds.setUnion(bounds, c.getBounds());
-        }
-
-        return bounds;
-    }
-
     public getCommands(): readonly PathCommand[] {
         return this.commands;
     }
 
-    public getCurves(): BezierCurve2[] {
-        const curves: BezierCurve2[] = [];
-
-        const commands = this.commands;
-        const points = this.points;
-
-        let cIdx = 0;
-        let pIdx = 0;
-
-        let ps = Vector2.ZERO;
-        let p0 = Vector2.ZERO;
-
-        while (cIdx < commands.length) {
-            const command = commands[cIdx];
-            cIdx += 1;
-
-            switch (command.type) {
-                case 0 /* MOVE */: {
-                    ps = points[pIdx];
-                    p0 = ps;
-                    pIdx += 1;
-                    break;
-                }
-                case 1 /* LINEAR */: {
-                    const p1 = points[pIdx];
-                    const c = new Bezier1Curve2(p0, p1);
-                    curves.push(c);
-                    p0 = p1;
-                    pIdx += 1;
-                    break;
-                }
-                case 2 /* QUADRATIC */: {
-                    const p1 = points[pIdx];
-                    const p2 = points[pIdx + 1];
-                    const c = new Bezier2Curve2(p0, p1, p2);
-                    curves.push(c);
-                    p0 = p2;
-                    pIdx += 2;
-                    break;
-                }
-                case 3 /* CUBIC */: {
-                    const p1 = points[pIdx];
-                    const p2 = points[pIdx + 1];
-                    const p3 = points[pIdx + 2];
-                    const c = new Bezier3Curve2(p0, p1, p2, p3);
-                    curves.push(c);
-                    p0 = p3;
-                    pIdx += 3;
-                    break;
-                }
-                case 4 /* CONIC */: {
-                    const p1 = points[pIdx];
-                    const p2 = points[pIdx + 1];
-                    const c = new BezierRCurve2(p0, p1, p2, command.w);
-                    curves.push(c);
-                    p0 = p2;
-                    pIdx += 2;
-                    break;
-                }
-                case 5 /* CLOSE */: {
-                    if (!p0.eq(ps)) {
-                        const c = new Bezier1Curve2(p0, ps);
-                        curves.push(c);
-                        p0 = ps;
-                    }
-                    break;
-                }
-                default: {
-                    assertUnreachable(command);
-                }
-            }
-        }
-
-        return curves;
-    }
-
-    public getFirstCommand(): PathCommand | undefined {
-        return this.commands[0];
-    }
-
-    public getFirstPoint(): ReadonlyVector2 | undefined {
-        return this.points[0];
-    }
-
-    public getLastCommand(): PathCommand | undefined {
-        return this.commands[this.commands.length - 1];
-    }
-
-    public getLastPoint(): ReadonlyVector2 | undefined {
-        return this.points[this.points.length - 1];
-    }
-
     public getPoints(): readonly ReadonlyVector2[] {
         return this.points;
-    }
-
-    public getSvgData(): string {
-        const commands = this.getCommands();
-        const points = this.getPoints();
-
-        let cIdx = 0;
-        let pIdx = 0;
-
-        let svgData = "";
-
-        while (cIdx < commands.length) {
-            const command = commands[cIdx++];
-            switch (command.type) {
-                case 0 /* MOVE */: {
-                    const p0 = points[pIdx++];
-                    svgData += "M" + p0.x + " " + p0.y;
-
-                    break;
-                }
-                case 1 /* LINEAR */: {
-                    const p1 = points[pIdx++];
-                    svgData += "L" + p1.x + " " + p1.y;
-
-                    break;
-                }
-                case 2 /* QUADRATIC */: {
-                    const p1 = points[pIdx++];
-                    const p2 = points[pIdx++];
-                    svgData += "Q" + p1.x + " " + p1.y + " " + p2.x + " " + p2.y;
-
-                    break;
-                }
-                case 3 /* CUBIC */: {
-                    const p1 = points[pIdx++];
-                    const p2 = points[pIdx++];
-                    const p3 = points[pIdx++];
-                    svgData += "C" + p1.x + " " + p1.y + " " + p2.x + " " + p2.y + " " + p3.x + " " + p3.y;
-
-                    break;
-                }
-                case 4 /* CONIC */: {
-                    // Workaround (conics not supported by HTML canvas)
-                    const p1 = points[pIdx++];
-                    const p2 = points[pIdx++];
-                    svgData += "L" + p1.x + " " + p1.y + " L" + p2.x + " " + p2.y;
-
-                    break;
-                }
-                case 5 /* CLOSE */: {
-                    svgData += "Z";
-
-                    break;
-                }
-                default: {
-                    assertUnreachable(command);
-                }
-            }
-        }
-
-        return svgData;
     }
 
     public hasPointInside(p: ReadonlyVector2, windingOperator: WindingOperator | CustomWindingOperator): boolean {
@@ -577,15 +432,15 @@ export class Path2 implements PathSink2 {
 
         let wind = 0;
 
-        for (const c of this.getCurves()) {
-            const bounds = c.getControlBounds();
+        for (const c of this.toCurves()) {
+            const bounds = c.controlBounds();
 
             // Quickly reject curves by their control bounds
             if (p.y < bounds.minY || p.y > bounds.maxY || p.x < bounds.minX) {
                 continue;
             }
 
-            wind += c.getWindingAt(p);
+            wind += c.windingAt(p);
         }
 
         return isWindingInside(wind, windingOperator);
@@ -604,8 +459,8 @@ export class Path2 implements PathSink2 {
 
         let wind = 0;
 
-        for (const c of this.getCurves()) {
-            wind += c.getWindingFracAt(p, step);
+        for (const c of this.toCurves()) {
+            wind += c.windingAtFrac(p, step);
         }
 
         // TODO: Improve snapping
@@ -616,11 +471,19 @@ export class Path2 implements PathSink2 {
     }
 
     public isClosed(): boolean {
-        return this.getLastCommand()?.type === PathCommandType.CLOSE;
+        return this.lastCommand()?.type === PathCommandType.CLOSE;
     }
 
     public isValid(): boolean {
-        return this.getFirstCommand()?.type === PathCommandType.MOVE;
+        return this.firstCommand()?.type === PathCommandType.MOVE;
+    }
+
+    public lastCommand(): PathCommand | undefined {
+        return this.commands[this.commands.length - 1];
+    }
+
+    public lastPoint(): ReadonlyVector2 | undefined {
+        return this.points[this.points.length - 1];
     }
 
     public lineTo(p1: ReadonlyVector2): void {
@@ -665,7 +528,7 @@ export class Path2 implements PathSink2 {
     public signedArea(): number {
         let area = 0;
 
-        for (const c of this.getCurves()) {
+        for (const c of this.toCurves()) {
             area += c.signedArea();
         }
 
@@ -694,7 +557,7 @@ export class Path2 implements PathSink2 {
         largeArc: boolean,
         sweep: boolean,
     ): void {
-        const p0 = this.getLastPoint();
+        const p0 = this.lastPoint();
 
         // Special cases (see https://www.w3.org/TR/SVG/paths.html#ArcOutOfRangeParameters)
         if (p0 === undefined || p0 === p1 || rx === 0 || ry === 0) {
@@ -837,6 +700,82 @@ export class Path2 implements PathSink2 {
         this.conicTo(pp0, pp1, cos);
     }
 
+    public toCurves(): BezierCurve2[] {
+        const curves: BezierCurve2[] = [];
+
+        const commands = this.commands;
+        const points = this.points;
+
+        let cIdx = 0;
+        let pIdx = 0;
+
+        let ps = Vector2.ZERO;
+        let p0 = Vector2.ZERO;
+
+        while (cIdx < commands.length) {
+            const command = commands[cIdx];
+            cIdx += 1;
+
+            switch (command.type) {
+                case 0 /* MOVE */: {
+                    ps = points[pIdx];
+                    p0 = ps;
+                    pIdx += 1;
+                    break;
+                }
+                case 1 /* LINEAR */: {
+                    const p1 = points[pIdx];
+                    const c = new Bezier1Curve2(p0, p1);
+                    curves.push(c);
+                    p0 = p1;
+                    pIdx += 1;
+                    break;
+                }
+                case 2 /* QUADRATIC */: {
+                    const p1 = points[pIdx];
+                    const p2 = points[pIdx + 1];
+                    const c = new Bezier2Curve2(p0, p1, p2);
+                    curves.push(c);
+                    p0 = p2;
+                    pIdx += 2;
+                    break;
+                }
+                case 3 /* CUBIC */: {
+                    const p1 = points[pIdx];
+                    const p2 = points[pIdx + 1];
+                    const p3 = points[pIdx + 2];
+                    const c = new Bezier3Curve2(p0, p1, p2, p3);
+                    curves.push(c);
+                    p0 = p3;
+                    pIdx += 3;
+                    break;
+                }
+                case 4 /* CONIC */: {
+                    const p1 = points[pIdx];
+                    const p2 = points[pIdx + 1];
+                    const c = new BezierRCurve2(p0, p1, p2, command.w);
+                    curves.push(c);
+                    p0 = p2;
+                    pIdx += 2;
+                    break;
+                }
+                case 5 /* CLOSE */: {
+                    if (!p0.eq(ps)) {
+                        const c = new Bezier1Curve2(p0, ps);
+                        curves.push(c);
+                        p0 = ps;
+                    }
+                    break;
+                }
+                default: {
+                    assertUnreachable(command);
+                }
+            }
+        }
+
+        return curves;
+    }
+
     public toMesh(
         winding: WindingOperator | CustomWindingOperator,
         qualityOptions?: Partial<PathQualityOptions>,
@@ -854,6 +793,67 @@ export class Path2 implements PathSink2 {
     ): Polygon2[] {
         const mesh = this.toMesh(winding, qualityOptions);
         return mesh.getFaces().map((f) => new Polygon2(f.getPoints()));
+    }
+
+    public toSvgData(): string {
+        const commands = this.getCommands();
+        const points = this.getPoints();
+
+        let cIdx = 0;
+        let pIdx = 0;
+
+        let svgData = "";
+
+        while (cIdx < commands.length) {
+            const command = commands[cIdx++];
+            switch (command.type) {
+                case 0 /* MOVE */: {
+                    const p0 = points[pIdx++];
+                    svgData += "M" + p0.x + " " + p0.y;
+
+                    break;
+                }
+                case 1 /* LINEAR */: {
+                    const p1 = points[pIdx++];
+                    svgData += "L" + p1.x + " " + p1.y;
+
+                    break;
+                }
+                case 2 /* QUADRATIC */: {
+                    const p1 = points[pIdx++];
+                    const p2 = points[pIdx++];
+                    svgData += "Q" + p1.x + " " + p1.y + " " + p2.x + " " + p2.y;
+
+                    break;
+                }
+                case 3 /* CUBIC */: {
+                    const p1 = points[pIdx++];
+                    const p2 = points[pIdx++];
+                    const p3 = points[pIdx++];
+                    svgData += "C" + p1.x + " " + p1.y + " " + p2.x + " " + p2.y + " " + p3.x + " " + p3.y;
+
+                    break;
+                }
+                case 4 /* CONIC */: {
+                    // Workaround (conics not supported by HTML canvas)
+                    const p1 = points[pIdx++];
+                    const p2 = points[pIdx++];
+                    svgData += "L" + p1.x + " " + p1.y + " L" + p2.x + " " + p2.y;
+
+                    break;
+                }
+                case 5 /* CLOSE */: {
+                    svgData += "Z";
+
+                    break;
+                }
+                default: {
+                    assertUnreachable(command);
+                }
+            }
+        }
+
+        return svgData;
     }
 
     public transform(mat: ReadonlyMatrix3 | ReadonlyMatrix3A): void {

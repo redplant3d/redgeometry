@@ -52,15 +52,10 @@ export interface ReadonlyBezier1Curve2 {
     readonly pn: ReadonlyVector2;
     readonly type: "bezier-1";
 
+    bounds(): MinMaxBox2;
     clone(): Bezier1Curve2;
-    getBounds(): MinMaxBox2;
-    getControlBounds(): MinMaxBox2;
-    getDerivative(): Vector2;
-    getTangentEnd(): Vector2;
-    getTangentStart(): Vector2;
-    getValueAt(t: number): Vector2;
-    getWindingAt(p: ReadonlyVector2): number;
-    getWindingFracAt(p: ReadonlyVector2, step: number): number;
+    controlBounds(): MinMaxBox2;
+    derivative(): Vector2;
     isFinite(): boolean;
     isPoint(): boolean;
     reverse(): Bezier1Curve2;
@@ -69,9 +64,14 @@ export interface ReadonlyBezier1Curve2 {
     splitAt(t: number): [Bezier1Curve2, Bezier1Curve2];
     splitBefore(t: number): Bezier1Curve2;
     splitBetween(t0: number, t1: number): Bezier1Curve2;
+    tangentEnd(): Vector2;
+    tangentStart(): Vector2;
     toArray(): [number, number, number, number];
     toEdge(): Edge2;
     toString(): string;
+    valueAt(t: number): Vector2;
+    windingAt(p: ReadonlyVector2): number;
+    windingAtFrac(p: ReadonlyVector2, step: number): number;
 }
 
 export interface ReadonlyBezier2Curve2 {
@@ -81,36 +81,36 @@ export interface ReadonlyBezier2Curve2 {
     readonly pn: ReadonlyVector2;
     readonly type: "bezier-2";
 
+    bounds(): MinMaxBox2;
     clone(): Bezier2Curve2;
-    getBounds(): MinMaxBox2;
-    getClosestParameter(p: ReadonlyVector2): number;
-    getCoefficients(): [Vector2, Vector2, Vector2];
-    getControlBounds(): MinMaxBox2;
-    getCurvatureAt(t: number): number;
-    getCurvatureMetric(): number;
-    getDerivativeAt(t: number): Vector2;
-    getDerivativeCoefficients(): [Vector2, Vector2];
-    getEvoluteAt(t: number): Vector2;
-    getOffsetCuspParameter(rad: number): [number, number];
-    getTangentEnd(): Vector2;
-    getTangentStart(): Vector2;
-    getValueAt(t: number): Vector2;
-    getVertexParameter(): number;
-    getWindingAt(p: ReadonlyVector2): number;
-    getWindingFracAt(p: ReadonlyVector2, step: number): number;
+    closestParameter(p: ReadonlyVector2): number;
+    coefficients(): [Vector2, Vector2, Vector2];
+    controlBounds(): MinMaxBox2;
+    curvatureAt(t: number): number;
+    curvatureMetric(): number;
+    derivativeAt(t: number): Vector2;
+    derivativeCoefficients(): [Vector2, Vector2];
+    evoluteAt(t: number): Vector2;
     intersectLine(c: ReadonlyBezier1Curve2, outParameters: number[]): void;
     intersectQuad(c: ReadonlyBezier2Curve2, outParameters: Vector2[]): void;
     isCollinear(): boolean;
     isFinite(): boolean;
     isPoint(): boolean;
+    offsetCuspParameter(rad: number): [number, number];
     reverse(): Bezier2Curve2;
     signedArea(): number;
     splitAfter(t: number): Bezier2Curve2;
     splitAt(t: number): [Bezier2Curve2, Bezier2Curve2];
     splitBefore(t: number): Bezier2Curve2;
     splitBetween(t0: number, t1: number): Bezier2Curve2;
+    tangentEnd(): Vector2;
+    tangentStart(): Vector2;
     toArray(): [number, number, number, number, number, number];
     toString(): string;
+    valueAt(t: number): Vector2;
+    vertexParameter(): number;
+    windingAt(p: ReadonlyVector2): number;
+    windingAtFrac(p: ReadonlyVector2, step: number): number;
 }
 
 export interface ReadonlyBezier3Curve2 {
@@ -121,21 +121,16 @@ export interface ReadonlyBezier3Curve2 {
     readonly pn: ReadonlyVector2;
     readonly type: "bezier-3";
 
+    bounds(): MinMaxBox2;
     clone(): Bezier3Curve2;
-    getBounds(): MinMaxBox2;
-    getCoefficients(): [Vector2, Vector2, Vector2, Vector2];
-    getControlBounds(): MinMaxBox2;
-    getCurvatureAt(t: number): number;
-    getCurvatureMetric(): number;
-    getDerivativeAt(t: number): Vector2;
-    getDerivativeCoefficients(): [Vector2, Vector2, Vector2];
-    getEvoluteAt(t: number): Vector2;
-    getInflectionParameter(): [number, number];
-    getTangentEnd(): Vector2;
-    getTangentStart(): Vector2;
-    getValueAt(t: number): Vector2;
-    getWindingAt(p: ReadonlyVector2): number;
-    getWindingFracAt(p: ReadonlyVector2, step: number): number;
+    coefficients(): [Vector2, Vector2, Vector2, Vector2];
+    controlBounds(): MinMaxBox2;
+    curvatureAt(t: number): number;
+    curvatureMetric(): number;
+    derivativeAt(t: number): Vector2;
+    derivativeCoefficients(): [Vector2, Vector2, Vector2];
+    evoluteAt(t: number): Vector2;
+    inflectionParameter(): [number, number];
     isCollinear(): boolean;
     isFinite(): boolean;
     isPoint(): boolean;
@@ -145,8 +140,13 @@ export interface ReadonlyBezier3Curve2 {
     splitAt(t: number): [Bezier3Curve2, Bezier3Curve2];
     splitBefore(t: number): Bezier3Curve2;
     splitBetween(t0: number, t1: number): Bezier3Curve2;
+    tangentEnd(): Vector2;
+    tangentStart(): Vector2;
     toArray(): [number, number, number, number, number, number, number, number];
     toString(): string;
+    valueAt(t: number): Vector2;
+    windingAt(p: ReadonlyVector2): number;
+    windingAtFrac(p: ReadonlyVector2, step: number): number;
 }
 
 export interface ReadonlyBezierRCurve2 {
@@ -157,27 +157,27 @@ export interface ReadonlyBezierRCurve2 {
     readonly type: "bezier-r";
     readonly w: number;
 
+    bounds(): MinMaxBox2;
     clone(): BezierRCurve2;
-    getBounds(): MinMaxBox2;
-    getControlBounds(): MinMaxBox2;
-    getDerivativeAt(t: number): Vector2;
-    getDerivativeCoefficients(): [Vector3, Vector3, Vector3];
-    getProjectivePoints(): [Vector3, Vector3, Vector3];
-    getTangentEnd(): Vector2;
-    getTangentStart(): Vector2;
-    getValueAt(t: number): Vector2;
-    getWindingAt(p: ReadonlyVector2): number;
-    getWindingFracAt(p: ReadonlyVector2, step: number): number;
+    controlBounds(): MinMaxBox2;
+    derivativeAt(t: number): Vector2;
+    derivativeCoefficients(): [Vector3, Vector3, Vector3];
     isFinite(): boolean;
     isPoint(): boolean;
+    projectivePoints(): [Vector3, Vector3, Vector3];
     reverse(): BezierRCurve2;
     signedArea(): number;
     splitAfter(t: number): BezierRCurve2;
     splitAt(t: number): [BezierRCurve2, BezierRCurve2];
     splitBefore(t: number): BezierRCurve2;
     splitBetween(t0: number, t1: number): BezierRCurve2;
+    tangentEnd(): Vector2;
+    tangentStart(): Vector2;
     toArray(): [number, number, number, number, number, number, number];
     toString(): string;
+    valueAt(t: number): Vector2;
+    windingAt(p: ReadonlyVector2): number;
+    windingAtFrac(p: ReadonlyVector2, step: number): number;
 }
 
 export class Bezier1Curve2 implements ReadonlyBezier1Curve2 {
@@ -223,55 +223,20 @@ export class Bezier1Curve2 implements ReadonlyBezier1Curve2 {
         return { p0, p1 };
     }
 
+    public bounds(): MinMaxBox2 {
+        return MinMaxBox2.fromPoints(this.p0, this.p1);
+    }
+
     public clone(): Bezier1Curve2 {
         return new Bezier1Curve2(this.p0, this.p1);
     }
 
-    public getBounds(): MinMaxBox2 {
+    public controlBounds(): MinMaxBox2 {
         return MinMaxBox2.fromPoints(this.p0, this.p1);
     }
 
-    public getControlBounds(): MinMaxBox2 {
-        return MinMaxBox2.fromPoints(this.p0, this.p1);
-    }
-
-    public getDerivative(): Vector2 {
+    public derivative(): Vector2 {
         return this.p1.sub(this.p0);
-    }
-
-    public getTangentEnd(): Vector2 {
-        return this.getDerivative();
-    }
-
-    public getTangentStart(): Vector2 {
-        return this.getDerivative();
-    }
-
-    public getValueAt(t: number): Vector2 {
-        return this.p0.lerp(this.p1, t);
-    }
-
-    public getWindingAt(p: ReadonlyVector2): number {
-        const v0 = this.p0.y - p.y;
-        const v1 = this.p1.y - this.p0.y;
-
-        const x = solveLinear(v1, v0);
-
-        return getWindingAtParameterLinear(this, x, p.x);
-    }
-
-    public getWindingFracAt(p: ReadonlyVector2, step: number): number {
-        const vv = this.getDerivative();
-
-        let sum = 0;
-
-        for (let t = 0; t < 1; t += step) {
-            const v = this.getValueAt(t).sub(p);
-
-            sum += v.cross(vv) / v.dot(v);
-        }
-
-        return step * sum;
     }
 
     public isFinite(): boolean {
@@ -338,6 +303,14 @@ export class Bezier1Curve2 implements ReadonlyBezier1Curve2 {
         return new Bezier1Curve2(tp0, tp1);
     }
 
+    public tangentEnd(): Vector2 {
+        return this.derivative();
+    }
+
+    public tangentStart(): Vector2 {
+        return this.derivative();
+    }
+
     public toArray(): [number, number, number, number] {
         return [this.p0.x, this.p0.y, this.p1.x, this.p1.y];
     }
@@ -348,6 +321,33 @@ export class Bezier1Curve2 implements ReadonlyBezier1Curve2 {
 
     public toString(): string {
         return "{p0: " + this.p0.toString() + ", p1: " + this.p1.toString() + "}";
+    }
+
+    public valueAt(t: number): Vector2 {
+        return this.p0.lerp(this.p1, t);
+    }
+
+    public windingAt(p: ReadonlyVector2): number {
+        const v0 = this.p0.y - p.y;
+        const v1 = this.p1.y - this.p0.y;
+
+        const x = solveLinear(v1, v0);
+
+        return getWindingAtParameterLinear(this, x, p.x);
+    }
+
+    public windingAtFrac(p: ReadonlyVector2, step: number): number {
+        const vv = this.derivative();
+
+        let sum = 0;
+
+        for (let t = 0; t < 1; t += step) {
+            const v = this.valueAt(t).sub(p);
+
+            sum += v.cross(vv) / v.dot(v);
+        }
+
+        return step * sum;
     }
 }
 
@@ -400,13 +400,9 @@ export class Bezier2Curve2 implements ReadonlyBezier2Curve2 {
         return { p0, p1, p2 };
     }
 
-    public clone(): Bezier2Curve2 {
-        return new Bezier2Curve2(this.p0, this.p1, this.p2);
-    }
-
-    public getBounds(): MinMaxBox2 {
+    public bounds(): MinMaxBox2 {
         const box = MinMaxBox2.fromPoints(this.p0, this.p2);
-        const [qqa, qqb] = this.getDerivativeCoefficients();
+        const [qqa, qqb] = this.derivativeCoefficients();
 
         const tx = solveLinear(qqa.x, qqb.x);
         const ty = solveLinear(qqa.y, qqb.y);
@@ -417,7 +413,11 @@ export class Bezier2Curve2 implements ReadonlyBezier2Curve2 {
         return box;
     }
 
-    public getClosestParameter(p: ReadonlyVector2): number {
+    public clone(): Bezier2Curve2 {
+        return new Bezier2Curve2(this.p0, this.p1, this.p2);
+    }
+
+    public closestParameter(p: ReadonlyVector2): number {
         // Solve `(C(t) - P) dot C'(t) = 0` for `t`
         const v0 = this.p0.sub(p);
         const v1 = this.p1.sub(this.p0);
@@ -452,7 +452,7 @@ export class Bezier2Curve2 implements ReadonlyBezier2Curve2 {
         return min.param;
     }
 
-    public getCoefficients(): [Vector2, Vector2, Vector2] {
+    public coefficients(): [Vector2, Vector2, Vector2] {
         const v1 = this.p1.sub(this.p0);
         const v2 = this.p2.sub(this.p1);
 
@@ -465,15 +465,15 @@ export class Bezier2Curve2 implements ReadonlyBezier2Curve2 {
         return [qa, qb, qc];
     }
 
-    public getControlBounds(): MinMaxBox2 {
+    public controlBounds(): MinMaxBox2 {
         const box = MinMaxBox2.fromPoints(this.p0, this.p2);
         box.setEnclosePoint(box, this.p1);
 
         return box;
     }
 
-    public getCurvatureAt(t: number): number {
-        const [qqa, qqb] = this.getDerivativeCoefficients();
+    public curvatureAt(t: number): number {
+        const [qqa, qqb] = this.derivativeCoefficients();
 
         // vv = qqa * t + qbb
         // vvv = qqa
@@ -485,20 +485,20 @@ export class Bezier2Curve2 implements ReadonlyBezier2Curve2 {
         return vv.cross(vvv) / (len * len * len);
     }
 
-    public getCurvatureMetric(): number {
-        const [qqa, qqb] = this.getDerivativeCoefficients();
+    public curvatureMetric(): number {
+        const [qqa, qqb] = this.derivativeCoefficients();
 
         return qqa.cross(qqb);
     }
 
-    public getDerivativeAt(t: number): Vector2 {
+    public derivativeAt(t: number): Vector2 {
         const p01 = this.p0.lerp(this.p1, t);
         const p12 = this.p1.lerp(this.p2, t);
 
         return p12.sub(p01).mulS(2);
     }
 
-    public getDerivativeCoefficients(): [Vector2, Vector2] {
+    public derivativeCoefficients(): [Vector2, Vector2] {
         const v1 = this.p1.sub(this.p0);
         const v2 = this.p2.sub(this.p1);
 
@@ -510,8 +510,8 @@ export class Bezier2Curve2 implements ReadonlyBezier2Curve2 {
         return [qqa, qqb];
     }
 
-    public getEvoluteAt(t: number): Vector2 {
-        const [qa, qb, qc] = this.getCoefficients();
+    public evoluteAt(t: number): Vector2 {
+        const [qa, qb, qc] = this.coefficients();
 
         // p = qa * t^2 + qb * t + qc
         // pp = 2 * qa * t + qb
@@ -524,89 +524,6 @@ export class Bezier2Curve2 implements ReadonlyBezier2Curve2 {
         const f = pp.lengthSq() / pp.cross(ppp);
 
         return p.addMulS(v, f);
-    }
-
-    public getOffsetCuspParameter(rad: number): [number, number] {
-        const [qqa, qqb] = this.getDerivativeCoefficients();
-
-        const alen2 = qqa.lengthSq();
-        const blen2 = qqb.lengthSq();
-        const axb = qqa.cross(qqb);
-        const aob = qqa.dot(qqb);
-        const fac = 1 / alen2;
-
-        const tc = fac * -aob;
-
-        let td = 0;
-
-        if (axb !== 0) {
-            const cbrt = Math.cbrt(rad * rad * axb * axb);
-            const sqrt = Math.sqrt(aob * aob - alen2 * (blen2 - cbrt));
-
-            td = fac * sqrt;
-        }
-
-        return [tc, td];
-    }
-
-    public getTangentEnd(): Vector2 {
-        if (!this.p2.eq(this.p1)) {
-            return this.p2.sub(this.p1);
-        } else {
-            return this.p1.sub(this.p0);
-        }
-    }
-
-    public getTangentStart(): Vector2 {
-        if (!this.p1.eq(this.p0)) {
-            return this.p1.sub(this.p0);
-        } else {
-            return this.p2.sub(this.p1);
-        }
-    }
-
-    public getValueAt(t: number): Vector2 {
-        const p01 = this.p0.lerp(this.p1, t);
-        const p12 = this.p1.lerp(this.p2, t);
-
-        return p01.lerp(p12, t);
-    }
-
-    public getVertexParameter(): number {
-        const [qqa, qqb] = this.getDerivativeCoefficients();
-
-        // The vertex is at the minimum of the curvature (only one solution)
-        return qqa.dot(qqb.neg()) / qqa.lengthSq();
-    }
-
-    public getWindingAt(p: ReadonlyVector2): number {
-        const v0 = this.p0.y - p.y;
-        const v1 = this.p1.y - this.p0.y;
-        const v2 = this.p2.y - this.p1.y;
-
-        const r = solveQuadratic(v2 - v1, v1, v0);
-
-        let wind = 0;
-
-        if (r.type === "two") {
-            wind += getWindingAtParameterQuadratic(this, r.x1, p.x);
-            wind += getWindingAtParameterQuadratic(this, r.x2, p.x);
-        }
-
-        return wind;
-    }
-
-    public getWindingFracAt(p: ReadonlyVector2, step: number): number {
-        let sum = 0;
-
-        for (let t = 0; t < 1; t += step) {
-            const v = this.getValueAt(t).sub(p);
-            const vv = this.getDerivativeAt(t);
-
-            sum += v.cross(vv) / v.dot(v);
-        }
-
-        return step * sum;
     }
 
     public intersectLine(c: ReadonlyBezier1Curve2, outParameters: number[]): void {
@@ -638,7 +555,7 @@ export class Bezier2Curve2 implements ReadonlyBezier2Curve2 {
     }
 
     public isCollinear(): boolean {
-        return this.getCurvatureMetric() === 0;
+        return this.curvatureMetric() === 0;
     }
 
     public isFinite(): boolean {
@@ -647,6 +564,29 @@ export class Bezier2Curve2 implements ReadonlyBezier2Curve2 {
 
     public isPoint(): boolean {
         return this.p0.eq(this.p1) && this.p1.eq(this.p2);
+    }
+
+    public offsetCuspParameter(rad: number): [number, number] {
+        const [qqa, qqb] = this.derivativeCoefficients();
+
+        const alen2 = qqa.lengthSq();
+        const blen2 = qqb.lengthSq();
+        const axb = qqa.cross(qqb);
+        const aob = qqa.dot(qqb);
+        const fac = 1 / alen2;
+
+        const tc = fac * -aob;
+
+        let td = 0;
+
+        if (axb !== 0) {
+            const cbrt = Math.cbrt(rad * rad * axb * axb);
+            const sqrt = Math.sqrt(aob * aob - alen2 * (blen2 - cbrt));
+
+            td = fac * sqrt;
+        }
+
+        return [tc, td];
     }
 
     public reverse(): Bezier2Curve2 {
@@ -727,12 +667,72 @@ export class Bezier2Curve2 implements ReadonlyBezier2Curve2 {
         return new Bezier2Curve2(tp0, tp1, tp2);
     }
 
+    public tangentEnd(): Vector2 {
+        if (!this.p2.eq(this.p1)) {
+            return this.p2.sub(this.p1);
+        } else {
+            return this.p1.sub(this.p0);
+        }
+    }
+
+    public tangentStart(): Vector2 {
+        if (!this.p1.eq(this.p0)) {
+            return this.p1.sub(this.p0);
+        } else {
+            return this.p2.sub(this.p1);
+        }
+    }
+
     public toArray(): [number, number, number, number, number, number] {
         return [this.p0.x, this.p0.y, this.p1.x, this.p1.y, this.p2.x, this.p2.y];
     }
 
     public toString(): string {
         return "{p0: " + this.p0.toString() + ", p1: " + this.p1.toString() + ", p2: " + this.p2.toString() + "}";
+    }
+
+    public valueAt(t: number): Vector2 {
+        const p01 = this.p0.lerp(this.p1, t);
+        const p12 = this.p1.lerp(this.p2, t);
+
+        return p01.lerp(p12, t);
+    }
+
+    public vertexParameter(): number {
+        const [qqa, qqb] = this.derivativeCoefficients();
+
+        // The vertex is at the minimum of the curvature (only one solution)
+        return qqa.dot(qqb.neg()) / qqa.lengthSq();
+    }
+
+    public windingAt(p: ReadonlyVector2): number {
+        const v0 = this.p0.y - p.y;
+        const v1 = this.p1.y - this.p0.y;
+        const v2 = this.p2.y - this.p1.y;
+
+        const r = solveQuadratic(v2 - v1, v1, v0);
+
+        let wind = 0;
+
+        if (r.type === "two") {
+            wind += getWindingAtParameterQuadratic(this, r.x1, p.x);
+            wind += getWindingAtParameterQuadratic(this, r.x2, p.x);
+        }
+
+        return wind;
+    }
+
+    public windingAtFrac(p: ReadonlyVector2, step: number): number {
+        let sum = 0;
+
+        for (let t = 0; t < 1; t += step) {
+            const v = this.valueAt(t).sub(p);
+            const vv = this.derivativeAt(t);
+
+            sum += v.cross(vv) / v.dot(v);
+        }
+
+        return step * sum;
     }
 }
 
@@ -800,13 +800,9 @@ export class Bezier3Curve2 implements ReadonlyBezier3Curve2 {
         return { p0, p1, p2, p3 };
     }
 
-    public clone(): Bezier3Curve2 {
-        return new Bezier3Curve2(this.p0, this.p1, this.p2, this.p3);
-    }
-
-    public getBounds(): MinMaxBox2 {
+    public bounds(): MinMaxBox2 {
         const box = MinMaxBox2.fromPoints(this.p0, this.p3);
-        const [qqa, qqb, qqc] = this.getDerivativeCoefficients();
+        const [qqa, qqb, qqc] = this.derivativeCoefficients();
 
         const r1 = solveQuadratic(qqa.x, 0.5 * qqb.x, qqc.x);
         const r2 = solveQuadratic(qqa.y, 0.5 * qqb.y, qqc.y);
@@ -824,7 +820,11 @@ export class Bezier3Curve2 implements ReadonlyBezier3Curve2 {
         return box;
     }
 
-    public getCoefficients(): [Vector2, Vector2, Vector2, Vector2] {
+    public clone(): Bezier3Curve2 {
+        return new Bezier3Curve2(this.p0, this.p1, this.p2, this.p3);
+    }
+
+    public coefficients(): [Vector2, Vector2, Vector2, Vector2] {
         const v1 = this.p1.sub(this.p0);
         const v2 = this.p2.sub(this.p1);
         const v3 = this.p3.sub(this.p2);
@@ -840,7 +840,7 @@ export class Bezier3Curve2 implements ReadonlyBezier3Curve2 {
         return [qa, qb, qc, qd];
     }
 
-    public getControlBounds(): MinMaxBox2 {
+    public controlBounds(): MinMaxBox2 {
         const box = MinMaxBox2.fromPoints(this.p0, this.p3);
         box.setEnclosePoint(box, this.p1);
         box.setEnclosePoint(box, this.p2);
@@ -848,8 +848,8 @@ export class Bezier3Curve2 implements ReadonlyBezier3Curve2 {
         return box;
     }
 
-    public getCurvatureAt(t: number): number {
-        const [qqa, qqb, qqc] = this.getDerivativeCoefficients();
+    public curvatureAt(t: number): number {
+        const [qqa, qqb, qqc] = this.derivativeCoefficients();
 
         // vv = qqa * t^2 + qqb * t + qqc
         // vvv = 2 * qqa * t + qqb
@@ -861,13 +861,13 @@ export class Bezier3Curve2 implements ReadonlyBezier3Curve2 {
         return vv.cross(vvv) / (len * len * len);
     }
 
-    public getCurvatureMetric(): number {
-        const [qqa, qqb] = this.getDerivativeCoefficients();
+    public curvatureMetric(): number {
+        const [qqa, qqb] = this.derivativeCoefficients();
 
         return qqa.cross(qqb);
     }
 
-    public getDerivativeAt(t: number): Vector2 {
+    public derivativeAt(t: number): Vector2 {
         const p01 = this.p0.lerp(this.p1, t);
         const p12 = this.p1.lerp(this.p2, t);
         const p23 = this.p2.lerp(this.p3, t);
@@ -878,7 +878,7 @@ export class Bezier3Curve2 implements ReadonlyBezier3Curve2 {
         return p123.sub(p012).mulS(3);
     }
 
-    public getDerivativeCoefficients(): [Vector2, Vector2, Vector2] {
+    public derivativeCoefficients(): [Vector2, Vector2, Vector2] {
         const v1 = this.p1.sub(this.p0);
         const v2 = this.p2.sub(this.p1);
         const v3 = this.p3.sub(this.p2);
@@ -893,8 +893,8 @@ export class Bezier3Curve2 implements ReadonlyBezier3Curve2 {
         return [qqa, qqb, qqc];
     }
 
-    public getEvoluteAt(t: number): Vector2 {
-        const [qa, qb, qc, qd] = this.getCoefficients();
+    public evoluteAt(t: number): Vector2 {
+        const [qa, qb, qc, qd] = this.coefficients();
 
         // p = qa * t^3 + qb * t^2 + qc * t + qd
         // pp = 3 * qa * t^2 + 2 * qb * t + qc
@@ -913,9 +913,9 @@ export class Bezier3Curve2 implements ReadonlyBezier3Curve2 {
         return p.addMulS(v, f);
     }
 
-    public getInflectionParameter(): [number, number] {
+    public inflectionParameter(): [number, number] {
         // To get the inflections C'(t) cross C''(t) = at^2 + bt + c = 0 needs to be solved for 't'
-        const [qqa, qqb, qqc] = this.getDerivativeCoefficients();
+        const [qqa, qqb, qqc] = this.derivativeCoefficients();
 
         let tc: number | undefined;
         let td: number | undefined;
@@ -943,73 +943,8 @@ export class Bezier3Curve2 implements ReadonlyBezier3Curve2 {
         return [tc, td];
     }
 
-    public getTangentEnd(): Vector2 {
-        if (!this.p3.eq(this.p2)) {
-            return this.p3.sub(this.p2);
-        } else if (!this.p2.eq(this.p1)) {
-            return this.p2.sub(this.p1);
-        } else {
-            return this.p1.sub(this.p0);
-        }
-    }
-
-    public getTangentStart(): Vector2 {
-        if (!this.p1.eq(this.p0)) {
-            return this.p1.sub(this.p0);
-        } else if (!this.p2.eq(this.p1)) {
-            return this.p2.sub(this.p1);
-        } else {
-            return this.p3.sub(this.p2);
-        }
-    }
-
-    public getValueAt(t: number): Vector2 {
-        const p01 = this.p0.lerp(this.p1, t);
-        const p12 = this.p1.lerp(this.p2, t);
-        const p23 = this.p2.lerp(this.p3, t);
-
-        const p012 = p01.lerp(p12, t);
-        const p123 = p12.lerp(p23, t);
-
-        return p012.lerp(p123, t);
-    }
-
-    public getWindingAt(p: ReadonlyVector2): number {
-        const v0 = this.p0.y - p.y;
-        const v1 = this.p1.y - this.p0.y;
-        const v2 = this.p2.y - this.p1.y;
-        const v3 = this.p3.y - this.p2.y;
-
-        const r = solveCubic(v3 - v2 - v2 + v1, v2 - v1, v1, v0);
-
-        let wind = 0;
-
-        if (r.type === "three") {
-            wind += getWindingAtParameterCubic(this, r.x1, p.x);
-            wind += getWindingAtParameterCubic(this, r.x2, p.x);
-            wind += getWindingAtParameterCubic(this, r.x3, p.x);
-        } else {
-            wind += getWindingAtParameterCubic(this, r.x, p.x);
-        }
-
-        return wind;
-    }
-
-    public getWindingFracAt(p: ReadonlyVector2, step: number): number {
-        let sum = 0;
-
-        for (let t = 0; t < 1; t += step) {
-            const v = this.getValueAt(t).sub(p);
-            const vv = this.getDerivativeAt(t);
-
-            sum += v.cross(vv) / v.dot(v);
-        }
-
-        return step * sum;
-    }
-
     public isCollinear(): boolean {
-        return this.getCurvatureMetric() === 0;
+        return this.curvatureMetric() === 0;
     }
 
     public isFinite(): boolean {
@@ -1127,6 +1062,26 @@ export class Bezier3Curve2 implements ReadonlyBezier3Curve2 {
         return new Bezier3Curve2(t0p0, t1p1, t0p2, t1p3);
     }
 
+    public tangentEnd(): Vector2 {
+        if (!this.p3.eq(this.p2)) {
+            return this.p3.sub(this.p2);
+        } else if (!this.p2.eq(this.p1)) {
+            return this.p2.sub(this.p1);
+        } else {
+            return this.p1.sub(this.p0);
+        }
+    }
+
+    public tangentStart(): Vector2 {
+        if (!this.p1.eq(this.p0)) {
+            return this.p1.sub(this.p0);
+        } else if (!this.p2.eq(this.p1)) {
+            return this.p2.sub(this.p1);
+        } else {
+            return this.p3.sub(this.p2);
+        }
+    }
+
     public toArray(): [number, number, number, number, number, number, number, number] {
         return [this.p0.x, this.p0.y, this.p1.x, this.p1.y, this.p2.x, this.p2.y, this.p3.x, this.p3.y];
     }
@@ -1143,6 +1098,51 @@ export class Bezier3Curve2 implements ReadonlyBezier3Curve2 {
             this.p3.toString() +
             "}"
         );
+    }
+
+    public valueAt(t: number): Vector2 {
+        const p01 = this.p0.lerp(this.p1, t);
+        const p12 = this.p1.lerp(this.p2, t);
+        const p23 = this.p2.lerp(this.p3, t);
+
+        const p012 = p01.lerp(p12, t);
+        const p123 = p12.lerp(p23, t);
+
+        return p012.lerp(p123, t);
+    }
+
+    public windingAt(p: ReadonlyVector2): number {
+        const v0 = this.p0.y - p.y;
+        const v1 = this.p1.y - this.p0.y;
+        const v2 = this.p2.y - this.p1.y;
+        const v3 = this.p3.y - this.p2.y;
+
+        const r = solveCubic(v3 - v2 - v2 + v1, v2 - v1, v1, v0);
+
+        let wind = 0;
+
+        if (r.type === "three") {
+            wind += getWindingAtParameterCubic(this, r.x1, p.x);
+            wind += getWindingAtParameterCubic(this, r.x2, p.x);
+            wind += getWindingAtParameterCubic(this, r.x3, p.x);
+        } else {
+            wind += getWindingAtParameterCubic(this, r.x, p.x);
+        }
+
+        return wind;
+    }
+
+    public windingAtFrac(p: ReadonlyVector2, step: number): number {
+        let sum = 0;
+
+        for (let t = 0; t < 1; t += step) {
+            const v = this.valueAt(t).sub(p);
+            const vv = this.derivativeAt(t);
+
+            sum += v.cross(vv) / v.dot(v);
+        }
+
+        return step * sum;
     }
 }
 
@@ -1234,13 +1234,9 @@ export class BezierRCurve2 implements ReadonlyBezierRCurve2 {
         return { p0, p1, p2, w: c.w };
     }
 
-    public clone(): BezierRCurve2 {
-        return new BezierRCurve2(this.p0, this.p1, this.p2, this.w);
-    }
-
-    public getBounds(): MinMaxBox2 {
+    public bounds(): MinMaxBox2 {
         const box = MinMaxBox2.fromPoints(this.p0, this.p2);
-        const [qqa, qqb, qqc] = this.getDerivativeCoefficients();
+        const [qqa, qqb, qqc] = this.derivativeCoefficients();
 
         const r1 = solveQuadratic(qqa.x, 0.5 * qqb.x, qqc.x);
         const r2 = solveQuadratic(qqa.y, 0.5 * qqb.y, qqc.y);
@@ -1258,15 +1254,19 @@ export class BezierRCurve2 implements ReadonlyBezierRCurve2 {
         return box;
     }
 
-    public getControlBounds(): MinMaxBox2 {
+    public clone(): BezierRCurve2 {
+        return new BezierRCurve2(this.p0, this.p1, this.p2, this.w);
+    }
+
+    public controlBounds(): MinMaxBox2 {
         const box = MinMaxBox2.fromPoints(this.p0, this.p2);
         box.setEnclosePoint(box, this.p1);
 
         return box;
     }
 
-    public getDerivativeAt(t: number): Vector2 {
-        const [p0, p1, p2] = this.getProjectivePoints();
+    public derivativeAt(t: number): Vector2 {
+        const [p0, p1, p2] = this.projectivePoints();
 
         const p01 = p0.lerp(p1, t);
         const p12 = p1.lerp(p2, t);
@@ -1291,14 +1291,14 @@ export class BezierRCurve2 implements ReadonlyBezierRCurve2 {
      * # Example:
      * ```
      * const c = BezierRCurve2.fromXY(0, 0, 0, 1, 1, 1, 2);
-     * const [qqa, qqb, qqc] = c.getDerivativeCoefficients();
+     * const [qqa, qqb, qqc] = c.derivativeCoefficients();
      * const t = 0.5;
      * const vv = qqa.mul(t).add(qqb).mul(t).add(qqc);
      * const v = Vector2.fromXYW(vv.x, vv.y, vv.z * vv.z);
      * ```
      */
-    public getDerivativeCoefficients(): [Vector3, Vector3, Vector3] {
-        const [p0, p1, p2] = this.getProjectivePoints();
+    public derivativeCoefficients(): [Vector3, Vector3, Vector3] {
+        const [p0, p1, p2] = this.projectivePoints();
 
         const pp2x = p2.x * p1.z - p1.x * p2.z;
         const pp2y = p2.y * p1.z - p1.y * p2.z;
@@ -1322,79 +1322,20 @@ export class BezierRCurve2 implements ReadonlyBezierRCurve2 {
         return [qqa, qqb, qqc];
     }
 
-    public getProjectivePoints(): [Vector3, Vector3, Vector3] {
-        const p0 = Vector3.fromXYW(this.p0.x, this.p0.y, 1);
-        const p1 = Vector3.fromXYW(this.p1.x, this.p1.y, this.w);
-        const p2 = Vector3.fromXYW(this.p2.x, this.p2.y, 1);
-
-        return [p0, p1, p2];
-    }
-
-    public getTangentEnd(): Vector2 {
-        if (!this.p2.eq(this.p1)) {
-            return this.p2.sub(this.p1);
-        } else {
-            return this.p1.sub(this.p0);
-        }
-    }
-
-    public getTangentStart(): Vector2 {
-        if (!this.p1.eq(this.p0)) {
-            return this.p1.sub(this.p0);
-        } else {
-            return this.p2.sub(this.p1);
-        }
-    }
-
-    public getValueAt(t: number): Vector2 {
-        const [p0, p1, p2] = this.getProjectivePoints();
-
-        const p01 = p0.lerp(p1, t);
-        const p12 = p1.lerp(p2, t);
-
-        const p = p01.lerp(p12, t);
-
-        return Vector2.fromXYW(p.x, p.y, p.z);
-    }
-
-    public getWindingAt(p: ReadonlyVector2): number {
-        const y1 = this.w * this.p1.y - this.w * p.y + p.y;
-
-        const v0 = this.p0.y - p.y;
-        const v1 = y1 - this.p0.y;
-        const v2 = this.p2.y - y1;
-
-        const r = solveQuadratic(v2 - v1, v1, v0);
-
-        let wind = 0;
-
-        if (r.type === "two") {
-            wind += getWindingAtParameterConic(this, r.x1, p.x);
-            wind += getWindingAtParameterConic(this, r.x2, p.x);
-        }
-
-        return wind;
-    }
-
-    public getWindingFracAt(p: ReadonlyVector2, step: number): number {
-        let sum = 0;
-
-        for (let t = 0; t < 1; t += step) {
-            const v = this.getValueAt(t).sub(p);
-            const vv = this.getDerivativeAt(t);
-
-            sum += v.cross(vv) / v.dot(v);
-        }
-
-        return step * sum;
-    }
-
     public isFinite(): boolean {
         return this.p0.isFinite() && this.p1.isFinite() && this.p2.isFinite() && Number.isFinite(this.w);
     }
 
     public isPoint(): boolean {
         return this.p0.eq(this.p1) && this.p1.eq(this.p2);
+    }
+
+    public projectivePoints(): [Vector3, Vector3, Vector3] {
+        const p0 = Vector3.fromXYW(this.p0.x, this.p0.y, 1);
+        const p1 = Vector3.fromXYW(this.p1.x, this.p1.y, this.w);
+        const p2 = Vector3.fromXYW(this.p2.x, this.p2.y, 1);
+
+        return [p0, p1, p2];
     }
 
     public reverse(): BezierRCurve2 {
@@ -1473,7 +1414,7 @@ export class BezierRCurve2 implements ReadonlyBezierRCurve2 {
     }
 
     public splitAfter(t: number): BezierRCurve2 {
-        const [p0, p1, p2] = this.getProjectivePoints();
+        const [p0, p1, p2] = this.projectivePoints();
 
         const p01 = p0.lerp(p1, t);
         const p12 = p1.lerp(p2, t);
@@ -1484,7 +1425,7 @@ export class BezierRCurve2 implements ReadonlyBezierRCurve2 {
     }
 
     public splitAt(t: number): [BezierRCurve2, BezierRCurve2] {
-        const [p0, p1, p2] = this.getProjectivePoints();
+        const [p0, p1, p2] = this.projectivePoints();
 
         const p01 = p0.lerp(p1, t);
         const p12 = p1.lerp(p2, t);
@@ -1498,7 +1439,7 @@ export class BezierRCurve2 implements ReadonlyBezierRCurve2 {
     }
 
     public splitBefore(t: number): BezierRCurve2 {
-        const [p0, p1, p2] = this.getProjectivePoints();
+        const [p0, p1, p2] = this.projectivePoints();
 
         const p12 = p1.lerp(p2, t);
         const p01 = p0.lerp(p1, t);
@@ -1509,7 +1450,7 @@ export class BezierRCurve2 implements ReadonlyBezierRCurve2 {
     }
 
     public splitBetween(t0: number, t1: number): BezierRCurve2 {
-        const [p0, p1, p2] = this.getProjectivePoints();
+        const [p0, p1, p2] = this.projectivePoints();
 
         // See blossoming (Curves and Surfaces for CAGD by Gerald Farin)
         const t0p0 = p0.lerp(p1, t0);
@@ -1522,6 +1463,22 @@ export class BezierRCurve2 implements ReadonlyBezierRCurve2 {
         const tp2 = t1p1.lerp(t1p2, t1);
 
         return BezierRCurve2.fromProjectivePoints(tp0, tp1, tp2);
+    }
+
+    public tangentEnd(): Vector2 {
+        if (!this.p2.eq(this.p1)) {
+            return this.p2.sub(this.p1);
+        } else {
+            return this.p1.sub(this.p0);
+        }
+    }
+
+    public tangentStart(): Vector2 {
+        if (!this.p1.eq(this.p0)) {
+            return this.p1.sub(this.p0);
+        } else {
+            return this.p2.sub(this.p1);
+        }
     }
 
     public toArray(): [number, number, number, number, number, number, number] {
@@ -1540,5 +1497,48 @@ export class BezierRCurve2 implements ReadonlyBezierRCurve2 {
             this.w +
             "}"
         );
+    }
+
+    public valueAt(t: number): Vector2 {
+        const [p0, p1, p2] = this.projectivePoints();
+
+        const p01 = p0.lerp(p1, t);
+        const p12 = p1.lerp(p2, t);
+
+        const p = p01.lerp(p12, t);
+
+        return Vector2.fromXYW(p.x, p.y, p.z);
+    }
+
+    public windingAt(p: ReadonlyVector2): number {
+        const y1 = this.w * this.p1.y - this.w * p.y + p.y;
+
+        const v0 = this.p0.y - p.y;
+        const v1 = y1 - this.p0.y;
+        const v2 = this.p2.y - y1;
+
+        const r = solveQuadratic(v2 - v1, v1, v0);
+
+        let wind = 0;
+
+        if (r.type === "two") {
+            wind += getWindingAtParameterConic(this, r.x1, p.x);
+            wind += getWindingAtParameterConic(this, r.x2, p.x);
+        }
+
+        return wind;
+    }
+
+    public windingAtFrac(p: ReadonlyVector2, step: number): number {
+        let sum = 0;
+
+        for (let t = 0; t < 1; t += step) {
+            const v = this.valueAt(t).sub(p);
+            const vv = this.derivativeAt(t);
+
+            sum += v.cross(vv) / v.dot(v);
+        }
+
+        return step * sum;
     }
 }

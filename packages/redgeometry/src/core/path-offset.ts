@@ -102,7 +102,7 @@ export class PathOffsetIncremental2 implements PathOffset2 {
                 }
                 case 1 /* LINEAR */: {
                     const c = new Bezier1Curve2(p0, points[pIdx++]);
-                    const m = c.getDerivative();
+                    const m = c.derivative();
 
                     if (!m.isZero()) {
                         this.offsetFirstOrJoin(p0, m0, m);
@@ -116,49 +116,49 @@ export class PathOffsetIncremental2 implements PathOffset2 {
                 }
                 case 2 /* QUADRATIC */: {
                     const c = new Bezier2Curve2(p0, points[pIdx++], points[pIdx++]);
-                    const m = c.getTangentStart();
+                    const m = c.tangentStart();
 
                     if (!m.isZero()) {
                         this.offsetFirstOrJoin(p0, m0, m);
                         this.offsetQuadratic(c);
 
                         p0 = c.p2;
-                        m0 = c.getTangentEnd();
+                        m0 = c.tangentEnd();
                     }
 
                     break;
                 }
                 case 3 /* CUBIC */: {
                     const c = new Bezier3Curve2(p0, points[pIdx++], points[pIdx++], points[pIdx++]);
-                    const m = c.getTangentStart();
+                    const m = c.tangentStart();
 
                     if (!m.isZero()) {
                         this.offsetFirstOrJoin(p0, m0, m);
                         this.offsetCubic(c);
 
                         p0 = c.p3;
-                        m0 = c.getTangentEnd();
+                        m0 = c.tangentEnd();
                     }
 
                     break;
                 }
                 case 4 /* CONIC */: {
                     const c = new BezierRCurve2(p0, points[pIdx++], points[pIdx++], command.w);
-                    const m = c.getTangentStart();
+                    const m = c.tangentStart();
 
                     if (!m.isZero()) {
                         this.offsetFirstOrJoin(p0, m0, m);
                         this.offsetConic(c);
 
                         p0 = c.p2;
-                        m0 = c.getTangentEnd();
+                        m0 = c.tangentEnd();
                     }
 
                     break;
                 }
                 case 5 /* CLOSE */: {
                     const c = new Bezier1Curve2(p0, this.ps);
-                    const m = c.getDerivative();
+                    const m = c.derivative();
 
                     if (!m.isZero()) {
                         this.offsetFirstOrJoin(c.p0, m0, m);
@@ -265,7 +265,7 @@ export class PathOffsetIncremental2 implements PathOffset2 {
     }
 
     private offsetQuadratic(c0: ReadonlyBezier2Curve2): void {
-        const [tc, td] = c0.getOffsetCuspParameter(this.d);
+        const [tc, td] = c0.offsetCuspParameter(this.d);
 
         const t1 = tc - td;
         const t2 = tc + td;
@@ -274,7 +274,7 @@ export class PathOffsetIncremental2 implements PathOffset2 {
         if (t1 < 1 && t2 > 0) {
             if (isDegenerateQuad(c0)) {
                 // Degenerate case
-                offsetQuadraticDegenerate(this.buffer, c0.p0, c0.getValueAt(tc), c0.p2, this.d);
+                offsetQuadraticDegenerate(this.buffer, c0.p0, c0.valueAt(tc), c0.p2, this.d);
             } else {
                 // Generic case
                 let t0 = 0;
@@ -394,7 +394,7 @@ export class PathOffsetRecursive2 implements PathOffset2 {
                 }
                 case 1 /* LINEAR */: {
                     const c = new Bezier1Curve2(p0, points[pIdx++]);
-                    const m = c.getDerivative();
+                    const m = c.derivative();
 
                     if (!m.isZero()) {
                         this.offsetFirstOrJoin(p0, m0, m);
@@ -408,49 +408,49 @@ export class PathOffsetRecursive2 implements PathOffset2 {
                 }
                 case 2 /* QUADRATIC */: {
                     const c = new Bezier2Curve2(p0, points[pIdx++], points[pIdx++]);
-                    const m = c.getTangentStart();
+                    const m = c.tangentStart();
 
                     if (!m.isZero()) {
                         this.offsetFirstOrJoin(p0, m0, m);
                         this.offsetQuadratic(c);
 
                         p0 = c.p2;
-                        m0 = c.getTangentEnd();
+                        m0 = c.tangentEnd();
                     }
 
                     break;
                 }
                 case 3 /* CUBIC */: {
                     const c = new Bezier3Curve2(p0, points[pIdx++], points[pIdx++], points[pIdx++]);
-                    const m = c.getTangentStart();
+                    const m = c.tangentStart();
 
                     if (!m.isZero()) {
                         this.offsetFirstOrJoin(p0, m0, m);
                         this.offsetCubic(c);
 
                         p0 = c.p3;
-                        m0 = c.getTangentEnd();
+                        m0 = c.tangentEnd();
                     }
 
                     break;
                 }
                 case 4 /* CONIC */: {
                     const c = new BezierRCurve2(p0, points[pIdx++], points[pIdx++], command.w);
-                    const m = c.getTangentStart();
+                    const m = c.tangentStart();
 
                     if (!m.isZero()) {
                         this.offsetFirstOrJoin(p0, m0, m);
                         this.offsetConic(c);
 
                         p0 = c.p2;
-                        m0 = c.getTangentEnd();
+                        m0 = c.tangentEnd();
                     }
 
                     break;
                 }
                 case 5 /* CLOSE */: {
                     const c = new Bezier1Curve2(p0, this.ps);
-                    const m = c.getDerivative();
+                    const m = c.derivative();
 
                     if (!m.isZero()) {
                         this.offsetFirstOrJoin(c.p0, m0, m);
@@ -555,7 +555,7 @@ export class PathOffsetRecursive2 implements PathOffset2 {
     }
 
     private offsetQuadratic(c0: ReadonlyBezier2Curve2): void {
-        const [tc, td] = c0.getOffsetCuspParameter(this.d);
+        const [tc, td] = c0.offsetCuspParameter(this.d);
 
         const t1 = tc - td;
         const t2 = tc + td;
@@ -564,7 +564,7 @@ export class PathOffsetRecursive2 implements PathOffset2 {
         if (t1 < 1 && t2 > 0) {
             if (isDegenerateQuad(c0)) {
                 // Degenerate case
-                offsetQuadraticDegenerate(this.buffer, c0.p0, c0.getValueAt(tc), c0.p2, this.d);
+                offsetQuadraticDegenerate(this.buffer, c0.p0, c0.valueAt(tc), c0.p2, this.d);
             } else {
                 // Generic case
                 let t0 = 0;

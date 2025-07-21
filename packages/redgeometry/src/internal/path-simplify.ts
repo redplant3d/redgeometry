@@ -17,7 +17,7 @@ export function isSimpleQuad(c: ReadonlyBezier2Curve2, cosTolerance: number): bo
 }
 
 export function simplifyParameterStepQuad(c: ReadonlyBezier2Curve2, m: number): number {
-    const [qqa, qqb] = c.getDerivativeCoefficients();
+    const [qqa, qqb] = c.derivativeCoefficients();
 
     // m * (bx * bx + by * by) / (|ax * by - ay * bx| - m * (ax * bx + ay * by));
     return (m * qqb.lengthSq()) / (Math.abs(qqa.cross(qqb)) - m * qqa.dot(qqb));

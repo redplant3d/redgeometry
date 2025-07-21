@@ -1272,7 +1272,7 @@ export class MeshFace2 {
         for (const e of this.getEdgeIterator()) {
             // If segment does not exist, use origin points as fallback
             const seg = e.seg ?? new Bezier1Curve2(e.p0, e.p1);
-            wind += seg.getWindingAt(p);
+            wind += seg.windingAt(p);
         }
 
         // Non-zero rule suffices

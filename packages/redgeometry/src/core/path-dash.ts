@@ -75,7 +75,7 @@ export class PathDashIncremental2 implements PathDash2 {
                 }
                 case 1 /* LINEAR */: {
                     const c = new Bezier1Curve2(p0, points[pIdx++]);
-                    const m = c.getDerivative();
+                    const m = c.derivative();
 
                     if (!m.isZero()) {
                         this.state.dashFirst(p0, m0);
@@ -89,49 +89,49 @@ export class PathDashIncremental2 implements PathDash2 {
                 }
                 case 2 /* QUADRATIC */: {
                     const c = new Bezier2Curve2(p0, points[pIdx++], points[pIdx++]);
-                    const m = c.getTangentStart();
+                    const m = c.tangentStart();
 
                     if (!m.isZero()) {
                         this.state.dashFirst(p0, m0);
                         this.dashQuadratic(c);
 
                         p0 = c.p2;
-                        m0 = c.getTangentEnd();
+                        m0 = c.tangentEnd();
                     }
 
                     break;
                 }
                 case 3 /* CUBIC */: {
                     const c = new Bezier3Curve2(p0, points[pIdx++], points[pIdx++], points[pIdx++]);
-                    const m = c.getTangentStart();
+                    const m = c.tangentStart();
 
                     if (!m.isZero()) {
                         this.state.dashFirst(p0, m0);
                         this.dashCubic(c);
 
                         p0 = c.p3;
-                        m0 = c.getTangentEnd();
+                        m0 = c.tangentEnd();
                     }
 
                     break;
                 }
                 case 4 /* CONIC */: {
                     const c = new BezierRCurve2(p0, points[pIdx++], points[pIdx++], command.w);
-                    const m = c.getTangentStart();
+                    const m = c.tangentStart();
 
                     if (!m.isZero()) {
                         this.state.dashFirst(p0, m0);
                         this.dashConic(c);
 
                         p0 = c.p2;
-                        m0 = c.getTangentEnd();
+                        m0 = c.tangentEnd();
                     }
 
                     break;
                 }
                 case 5 /* CLOSE */: {
                     const c = new Bezier1Curve2(p0, ps);
-                    const m = c.getDerivative();
+                    const m = c.derivative();
 
                     if (!m.isZero()) {
                         this.state.dashLinear(c);
@@ -202,12 +202,12 @@ export class PathDashIncremental2 implements PathDash2 {
     }
 
     private dashQuadratic(c0: ReadonlyBezier2Curve2): void {
-        const tc = c0.getVertexParameter();
+        const tc = c0.vertexParameter();
 
         // Considers `NaN` parameters to be outside
         if (tc > 0 && tc < 1 && isDegenerateQuad(c0)) {
             // Degenerate case
-            this.state.dashDegenerateQuad(c0.p0, c0.getValueAt(tc), c0.p2);
+            this.state.dashDegenerateQuad(c0.p0, c0.valueAt(tc), c0.p2);
         } else {
             // Default case
             this.dashQuadraticSimplify(c0);
@@ -281,7 +281,7 @@ export class PathDashRecursive2 implements PathDash2 {
                 }
                 case 1 /* LINEAR */: {
                     const c = new Bezier1Curve2(p0, points[pIdx++]);
-                    const m = c.getDerivative();
+                    const m = c.derivative();
 
                     if (!m.isZero()) {
                         this.state.dashFirst(p0, m0);
@@ -295,49 +295,49 @@ export class PathDashRecursive2 implements PathDash2 {
                 }
                 case 2 /* QUADRATIC */: {
                     const c = new Bezier2Curve2(p0, points[pIdx++], points[pIdx++]);
-                    const m = c.getTangentStart();
+                    const m = c.tangentStart();
 
                     if (!m.isZero()) {
                         this.state.dashFirst(p0, m0);
                         this.dashQuadratic(c);
 
                         p0 = c.p2;
-                        m0 = c.getTangentEnd();
+                        m0 = c.tangentEnd();
                     }
 
                     break;
                 }
                 case 3 /* CUBIC */: {
                     const c = new Bezier3Curve2(p0, points[pIdx++], points[pIdx++], points[pIdx++]);
-                    const m = c.getTangentStart();
+                    const m = c.tangentStart();
 
                     if (!m.isZero()) {
                         this.state.dashFirst(p0, m0);
                         this.dashCubic(c);
 
                         p0 = c.p3;
-                        m0 = c.getTangentEnd();
+                        m0 = c.tangentEnd();
                     }
 
                     break;
                 }
                 case 4 /* CONIC */: {
                     const c = new BezierRCurve2(p0, points[pIdx++], points[pIdx++], command.w);
-                    const m = c.getTangentStart();
+                    const m = c.tangentStart();
 
                     if (!m.isZero()) {
                         this.state.dashFirst(p0, m0);
                         this.dashConic(c);
 
                         p0 = c.p2;
-                        m0 = c.getTangentEnd();
+                        m0 = c.tangentEnd();
                     }
 
                     break;
                 }
                 case 5 /* CLOSE */: {
                     const c = new Bezier1Curve2(p0, ps);
-                    const m = c.getDerivative();
+                    const m = c.derivative();
 
                     if (!m.isZero()) {
                         this.state.dashLinear(c);
@@ -406,12 +406,12 @@ export class PathDashRecursive2 implements PathDash2 {
     }
 
     private dashQuadratic(c0: ReadonlyBezier2Curve2): void {
-        const tc = c0.getVertexParameter();
+        const tc = c0.vertexParameter();
 
         // Considers `NaN` parameters to be outside
         if (tc > 0 && tc < 1 && isDegenerateQuad(c0)) {
             // Degenerate case
-            this.state.dashDegenerateQuad(c0.p0, c0.getValueAt(tc), c0.p2);
+            this.state.dashDegenerateQuad(c0.p0, c0.valueAt(tc), c0.p2);
         } else {
             // Default case
             this.dashQuadraticSimplify(c0);
