@@ -44,7 +44,7 @@ export class KineticVertex {
 
     public static getVelocity(n1: ReadonlyVector2, n2: ReadonlyVector2): Vector2 {
         const k = n1.add(n2);
-        return k.mulS(2).divS(k.lengthSquared());
+        return k.mulS(2).divS(k.lengthSq());
     }
 
     public static getWavefrontEdgeCcw(e: MeshEdge2): MeshEdge2 {
@@ -451,9 +451,9 @@ export class StraightSkeleton {
         const p1 = vtx1.getPositionAt(t1);
         const p2 = vtx2.getPositionAt(t1);
 
-        const d0 = p1.sub(p0).lengthSquared();
-        const d1 = p2.sub(p1).lengthSquared();
-        const d2 = p0.sub(p2).lengthSquared();
+        const d0 = p1.sub(p0).lengthSq();
+        const d1 = p2.sub(p1).lengthSq();
+        const d2 = p0.sub(p2).lengthSq();
 
         let d = d0;
         let e = e0;
@@ -495,9 +495,9 @@ export class StraightSkeleton {
         const p1 = vtx1.getPositionAt(tv);
         const p2 = vtx2.getPositionAt(tv);
 
-        const d0 = p1.sub(p0).lengthSquared();
-        const d1 = p2.sub(p1).lengthSquared();
-        const d2 = p0.sub(p2).lengthSquared();
+        const d0 = p1.sub(p0).lengthSq();
+        const d1 = p2.sub(p1).lengthSq();
+        const d2 = p0.sub(p2).lengthSq();
 
         let d = d0;
         let e = e0;

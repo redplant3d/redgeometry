@@ -29,7 +29,7 @@ export interface ReadonlyQuaternion {
     inverse(): Quaternion;
     isIdentity(): boolean;
     length(): number;
-    lengthSquared(): number;
+    lengthSq(): number;
     lerp(q: ReadonlyQuaternion, t: number): Quaternion;
     mul(q: ReadonlyQuaternion): Quaternion;
     mulV(v: ReadonlyVector3): Vector3;
@@ -252,7 +252,7 @@ export class Quaternion implements ReadonlyQuaternion {
     public angle(q: ReadonlyQuaternion): number {
         // Glenn Davis formula (referenced by Ken Shoemake)
         const dot = this.a * q.a + this.b * q.b + this.c * q.c + this.d * q.d;
-        const lenSq2 = this.lengthSquared() * q.lengthSquared();
+        const lenSq2 = this.lengthSq() * q.lengthSq();
         const sqrt = Math.sqrt(lenSq2);
 
         if (sqrt <= dot) {
@@ -386,7 +386,7 @@ export class Quaternion implements ReadonlyQuaternion {
     }
 
     public inverse(): Quaternion {
-        const s = this.lengthSquared();
+        const s = this.lengthSq();
         return new Quaternion(this.a / s, -this.b / s, -this.c / s, -this.d / s);
     }
 
@@ -395,10 +395,10 @@ export class Quaternion implements ReadonlyQuaternion {
     }
 
     public length(): number {
-        return Math.sqrt(this.lengthSquared());
+        return Math.sqrt(this.lengthSq());
     }
 
-    public lengthSquared(): number {
+    public lengthSq(): number {
         return this.a * this.a + this.b * this.b + this.c * this.c + this.d * this.d;
     }
 
@@ -647,7 +647,7 @@ export class Quaternion implements ReadonlyQuaternion {
     public slerp(q: ReadonlyQuaternion, t: number): Quaternion {
         // Glenn Davis formula (referenced by Ken Shoemake)
         const dot = this.a * q.a + this.b * q.b + this.c * q.c + this.d * q.d;
-        const lenSq2 = this.lengthSquared() * q.lengthSquared();
+        const lenSq2 = this.lengthSq() * q.lengthSq();
 
         if (dot * dot >= lenSq2) {
             // Fallback (angle either undefined, very close or equal to zero)

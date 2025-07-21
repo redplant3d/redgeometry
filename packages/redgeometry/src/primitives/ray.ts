@@ -133,7 +133,7 @@ export class Ray2 implements ReadonlyRay2 {
     public getParameterFromPoint(p: ReadonlyVector2): number {
         const v1 = this.direction;
         const v2 = p.sub(this.origin);
-        return v1.dot(v2) / v1.lengthSquared();
+        return v1.dot(v2) / v1.lengthSq();
     }
 
     /**
@@ -233,7 +233,7 @@ export class Ray3 implements ReadonlyRay3 {
         // t1 * v1 - t2 * v2 = p2 - p1
         // ```
         const vc = ray1.direction.cross(ray2.direction);
-        const den = vc.lengthSquared();
+        const den = vc.lengthSq();
 
         if (den === 0) {
             // Rays are parallel
@@ -293,7 +293,7 @@ export class Ray3 implements ReadonlyRay3 {
     public getParameterFromPoint(p: ReadonlyVector3): number {
         const v1 = this.direction;
         const v2 = p.sub(this.origin);
-        return v1.dot(v2) / v1.lengthSquared();
+        return v1.dot(v2) / v1.lengthSq();
     }
 
     /**

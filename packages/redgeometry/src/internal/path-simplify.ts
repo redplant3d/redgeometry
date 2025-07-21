@@ -13,14 +13,14 @@ export function isSimpleQuad(c: ReadonlyBezier2Curve2, cosTolerance: number): bo
     const v1 = c.p1.sub(c.p0);
     const v2 = c.p2.sub(c.p1);
 
-    return v1.dot(v2) > cosTolerance * Math.sqrt(v1.lengthSquared() * v2.lengthSquared());
+    return v1.dot(v2) > cosTolerance * Math.sqrt(v1.lengthSq() * v2.lengthSq());
 }
 
 export function simplifyParameterStepQuad(c: ReadonlyBezier2Curve2, m: number): number {
     const [qqa, qqb] = c.getDerivativeCoefficients();
 
     // m * (bx * bx + by * by) / (|ax * by - ay * bx| - m * (ax * bx + ay * by));
-    return (m * qqb.lengthSquared()) / (Math.abs(qqa.cross(qqb)) - m * qqa.dot(qqb));
+    return (m * qqb.lengthSq()) / (Math.abs(qqa.cross(qqb)) - m * qqa.dot(qqb));
 }
 
 export function simplifyDistanceCubic(c: ReadonlyBezier3Curve2): number {
@@ -42,7 +42,7 @@ export function simplifyParameterStepCubic(c: ReadonlyBezier3Curve2, k: number, 
     const tol = k * tolerance;
 
     // Smallest parameter step to satisfy tolerance condition
-    return Math.pow((tol * tol) / v.lengthSquared(), 1 / 6);
+    return Math.pow((tol * tol) / v.lengthSq(), 1 / 6);
 }
 
 /**
@@ -98,5 +98,5 @@ export function isDegenerateQuad(c0: ReadonlyBezier2Curve2): boolean {
     const v2 = c0.p2.sub(c0.p1);
 
     // Check if angle is too sharp
-    return v1.dot(v2) < COS_ACUTE * Math.sqrt(v1.lengthSquared() * v2.lengthSquared());
+    return v1.dot(v2) < COS_ACUTE * Math.sqrt(v1.lengthSq() * v2.lengthSq());
 }

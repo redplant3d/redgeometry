@@ -15,7 +15,7 @@ export function offsetQuadraticSimple(path: Path2, c: ReadonlyBezier2Curve2, d: 
 
         v1 = v1.add(v2);
 
-        v1 = v1.mulS(2 * d).divS(v1.lengthSquared());
+        v1 = v1.mulS(2 * d).divS(v1.lengthSq());
         v2 = v2.mulS(d);
 
         path.quadTo(c.p1.add(v1), c.p2.add(v2));
@@ -82,9 +82,9 @@ export function insertOuterJoin(
         case 1 /* MITER */: {
             let k = n0.add(n1);
 
-            k = k.mulS(2 * d).divS(k.lengthSquared());
+            k = k.mulS(2 * d).divS(k.lengthSq());
 
-            if (k.lengthSquared() <= mld * mld) {
+            if (k.lengthSq() <= mld * mld) {
                 path.lineTo(p.add(k));
             }
 
@@ -95,12 +95,12 @@ export function insertOuterJoin(
         case 2 /* MITER_CLIP */: {
             let k = n0.add(n1);
 
-            k = k.mulS(2 * d).divS(k.lengthSquared());
+            k = k.mulS(2 * d).divS(k.lengthSq());
 
             const pp0 = p.addMulS(n0, d);
             const pp2 = p.addMulS(n1, d);
 
-            if (k.lengthSquared() <= mld * mld) {
+            if (k.lengthSq() <= mld * mld) {
                 // Same as miter join
                 path.lineTo(p.add(k));
             } else if (n0.dot(n1) <= COS_ACUTE) {
@@ -136,7 +136,7 @@ export function insertOuterJoin(
 
                 let k = n0.add(nm);
 
-                k = k.mulS(2 * d).divS(k.lengthSquared());
+                k = k.mulS(2 * d).divS(k.lengthSq());
 
                 const pc1 = p.add(k);
                 const pp1 = p.addMulS(nm, d);
@@ -150,7 +150,7 @@ export function insertOuterJoin(
                 // Acute angle (1 segment)
                 let k = n0.add(n1);
 
-                k = k.mulS(2 * d).divS(k.lengthSquared());
+                k = k.mulS(2 * d).divS(k.lengthSq());
 
                 const pc = p.add(k);
 

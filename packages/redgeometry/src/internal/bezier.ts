@@ -31,7 +31,7 @@ export function minimizeCurveDistanceAt(
         return;
     }
 
-    const distSq = c.getValueAt(t).sub(p).lengthSquared();
+    const distSq = c.getValueAt(t).sub(p).lengthSq();
 
     if (distSq < min.distSq) {
         min.param = t;

@@ -386,7 +386,7 @@ export class Edge2 implements ReadonlyEdge2 {
         const v1 = this.direction();
         const v2 = p.sub(this.p0);
 
-        return v1.dot(v2) / v1.lengthSquared();
+        return v1.dot(v2) / v1.lengthSq();
     }
 
     /**
@@ -576,7 +576,7 @@ export class Edge3 implements ReadonlyEdge3 {
         const v1 = this.direction();
         const v2 = p.sub(this.p0);
 
-        return v1.dot(v2) / v1.lengthSquared();
+        return v1.dot(v2) / v1.lengthSq();
     }
 
     public getProjectedEdge(p0: ReadonlyVector2, p1: ReadonlyVector2): Edge3 {
