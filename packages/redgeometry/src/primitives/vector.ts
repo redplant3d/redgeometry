@@ -39,7 +39,6 @@ export interface ReadonlyVector2 {
     eqApproxAbs(v: ReadonlyVector2, eps: number): boolean;
     eqApproxRel(v: ReadonlyVector2, eps: number): boolean;
     isFinite(): boolean;
-    isOne(): boolean;
     isZero(): boolean;
     length(): number;
     lengthSquared(): number;
@@ -83,7 +82,6 @@ export interface ReadonlyVector3 {
     eqApproxAbs(v: ReadonlyVector3, eps: number): boolean;
     eqApproxRel(v: ReadonlyVector3, eps: number): boolean;
     isFinite(): boolean;
-    isOne(): boolean;
     isZero(): boolean;
     length(): number;
     lengthSquared(): number;
@@ -132,7 +130,6 @@ export interface ReadonlyVector4 {
     eqApproxAbs(v: ReadonlyVector4, eps: number): boolean;
     eqApproxRel(v: ReadonlyVector4, eps: number): boolean;
     isFinite(): boolean;
-    isOne(): boolean;
     isZero(): boolean;
     length(): number;
     lengthSquared(): number;
@@ -392,10 +389,6 @@ export class Vector2 implements ReadonlyVector2 {
 
     public isFinite(): boolean {
         return Number.isFinite(this.x) && Number.isFinite(this.y);
-    }
-
-    public isOne(): boolean {
-        return this.x === 1 && this.y === 1;
     }
 
     public isZero(): boolean {
@@ -797,10 +790,6 @@ export class Vector3 implements ReadonlyVector3 {
 
     public isFinite(): boolean {
         return Number.isFinite(this.x) && Number.isFinite(this.y) && Number.isFinite(this.z);
-    }
-
-    public isOne(): boolean {
-        return this.x === 1 && this.y === 1 && this.z === 1;
     }
 
     public isZero(): boolean {
@@ -1280,10 +1269,6 @@ export class Vector4 implements ReadonlyVector4 {
 
     public isFinite(): boolean {
         return Number.isFinite(this.x) && Number.isFinite(this.y) && Number.isFinite(this.z) && Number.isFinite(this.w);
-    }
-
-    public isOne(): boolean {
-        return this.x === 1 && this.y === 1 && this.z === 1 && this.w === 1;
     }
 
     public isZero(): boolean {
