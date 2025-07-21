@@ -1,4 +1,4 @@
-import { lerp } from "../utility/scalar.js";
+import { eqApproxAbs, eqApproxRel, lerp } from "../utility/scalar.js";
 import type { FixedSizeArray } from "../utility/types.js";
 import { Complex, type ComplexLike, type ReadonlyComplex } from "./complex.js";
 import type { ReadonlyMatrix3, ReadonlyMatrix3A, ReadonlyMatrix4, ReadonlyMatrix4A } from "./matrix.js";
@@ -62,6 +62,9 @@ export interface ReadonlyMinMaxBox2 {
     center(): Vector2;
     clone(): MinMaxBox2;
     containsPoint(p: ReadonlyVector2, eps: number): boolean;
+    eq(box: ReadonlyMinMaxBox2): boolean;
+    eqApproxAbs(box: ReadonlyMinMaxBox2, eps: number): boolean;
+    eqApproxRel(box: ReadonlyMinMaxBox2, eps: number): boolean;
     extents(): Vector2;
     getCorner(index: number): Vector2;
     intersects(b: ReadonlyMinMaxBox2, eps: number): boolean;
@@ -93,6 +96,9 @@ export interface ReadonlyMinMaxBox3 {
     center(): Vector3;
     clone(): MinMaxBox3;
     containsPoint(p: ReadonlyVector3, eps: number): boolean;
+    eq(box: ReadonlyMinMaxBox3): boolean;
+    eqApproxAbs(box: ReadonlyMinMaxBox3, eps: number): boolean;
+    eqApproxRel(box: ReadonlyMinMaxBox3, eps: number): boolean;
     extents(): Vector3;
     getCorner(index: number): Vector3;
     intersects(b: ReadonlyMinMaxBox3, eps: number): boolean;
@@ -119,6 +125,9 @@ export interface ReadonlyAxisAlignedBox2 {
     axisY(): Vector2;
     clone(): AxisAlignedBox2;
     containsPoint(p: ReadonlyVector2, eps: number): boolean;
+    eq(box: ReadonlyAxisAlignedBox2): boolean;
+    eqApproxAbs(box: ReadonlyAxisAlignedBox2, eps: number): boolean;
+    eqApproxRel(box: ReadonlyAxisAlignedBox2, eps: number): boolean;
     getCorner(index: number): Vector2;
     intersects(box: AxisAlignedBox2, eps: number): boolean;
     isEmpty(): boolean;
@@ -146,6 +155,9 @@ export interface ReadonlyAxisAlignedBox3 {
     axisZ(): Vector3;
     clone(): AxisAlignedBox3;
     containsPoint(p: ReadonlyVector3, eps: number): boolean;
+    eq(box: ReadonlyAxisAlignedBox3): boolean;
+    eqApproxAbs(box: ReadonlyAxisAlignedBox3, eps: number): boolean;
+    eqApproxRel(box: ReadonlyAxisAlignedBox3, eps: number): boolean;
     getCorner(index: number): Vector3;
     intersects(box: AxisAlignedBox3, eps: number): boolean;
     isEmpty(): boolean;
@@ -176,6 +188,9 @@ export interface ReadonlyOrientedBox2 {
     axisY(): Vector2;
     clone(): OrientedBox2;
     containsPoint(p: ReadonlyVector2, eps: number): boolean;
+    eq(box: ReadonlyOrientedBox2): boolean;
+    eqApproxAbs(box: ReadonlyOrientedBox2, eps: number): boolean;
+    eqApproxRel(box: ReadonlyOrientedBox2, eps: number): boolean;
     getCorner(index: number): Vector2;
     intersects(box: OrientedBox2, eps: number): boolean;
     isEmpty(): boolean;
@@ -199,6 +214,9 @@ export interface ReadonlyOrientedBox3 {
     axisZ(): Vector3;
     clone(): OrientedBox3;
     containsPoint(p: ReadonlyVector3, eps: number): boolean;
+    eq(box: ReadonlyOrientedBox3): boolean;
+    eqApproxAbs(box: ReadonlyOrientedBox3, eps: number): boolean;
+    eqApproxRel(box: ReadonlyOrientedBox3, eps: number): boolean;
     getCorner(index: number): Vector3;
     intersects(box: OrientedBox3, eps: number): boolean;
     isEmpty(): boolean;
@@ -299,6 +317,28 @@ export class MinMaxBox2 implements ReadonlyMinMaxBox2 {
         const y1 = p.y - this.maxY;
 
         return x0 <= eps && x1 <= eps && y0 <= eps && y1 <= eps;
+    }
+
+    public eq(box: ReadonlyMinMaxBox2): boolean {
+        return this.minX === box.minX && this.minY === box.minY && this.maxX === box.maxX && this.maxY === box.maxY;
+    }
+
+    public eqApproxAbs(box: ReadonlyMinMaxBox2, eps: number): boolean {
+        return (
+            eqApproxAbs(this.minX, box.minX, eps) &&
+            eqApproxAbs(this.minY, box.minY, eps) &&
+            eqApproxAbs(this.maxX, box.maxX, eps) &&
+            eqApproxAbs(this.maxY, box.maxY, eps)
+        );
+    }
+
+    public eqApproxRel(box: ReadonlyMinMaxBox2, eps: number): boolean {
+        return (
+            eqApproxRel(this.minX, box.minX, eps) &&
+            eqApproxRel(this.minY, box.minY, eps) &&
+            eqApproxRel(this.maxX, box.maxX, eps) &&
+            eqApproxRel(this.maxY, box.maxY, eps)
+        );
     }
 
     public extents(): Vector2 {
@@ -558,6 +598,39 @@ export class MinMaxBox3 implements ReadonlyMinMaxBox3 {
         const z1 = p.z - this.maxZ;
 
         return x0 <= eps && x1 <= eps && y0 <= eps && y1 <= eps && z0 <= eps && z1 <= eps;
+    }
+
+    public eq(box: ReadonlyMinMaxBox3): boolean {
+        return (
+            this.minX === box.minX &&
+            this.minY === box.minY &&
+            this.minZ === box.minZ &&
+            this.maxX === box.maxX &&
+            this.maxY === box.maxY &&
+            this.maxZ === box.maxZ
+        );
+    }
+
+    public eqApproxAbs(box: ReadonlyMinMaxBox3, eps: number): boolean {
+        return (
+            eqApproxAbs(this.minX, box.minX, eps) &&
+            eqApproxAbs(this.minY, box.minY, eps) &&
+            eqApproxAbs(this.minZ, box.minZ, eps) &&
+            eqApproxAbs(this.maxX, box.maxX, eps) &&
+            eqApproxAbs(this.maxY, box.maxY, eps) &&
+            eqApproxAbs(this.maxZ, box.maxZ, eps)
+        );
+    }
+
+    public eqApproxRel(box: ReadonlyMinMaxBox3, eps: number): boolean {
+        return (
+            eqApproxRel(this.minX, box.minX, eps) &&
+            eqApproxRel(this.minY, box.minY, eps) &&
+            eqApproxRel(this.minZ, box.minZ, eps) &&
+            eqApproxRel(this.maxX, box.maxX, eps) &&
+            eqApproxRel(this.maxY, box.maxY, eps) &&
+            eqApproxRel(this.maxZ, box.maxZ, eps)
+        );
     }
 
     public extents(): Vector3 {
@@ -836,6 +909,18 @@ export class AxisAlignedBox2 implements ReadonlyAxisAlignedBox2 {
         return cx <= ex && cx >= -ex && cy <= ey && cy >= -ey;
     }
 
+    public eq(box: ReadonlyAxisAlignedBox2): boolean {
+        return this.center.eq(box.center) && this.extents.eq(box.extents);
+    }
+
+    public eqApproxAbs(box: ReadonlyAxisAlignedBox2, eps: number): boolean {
+        return this.center.eqApproxAbs(box.center, eps) && this.extents.eqApproxAbs(box.extents, eps);
+    }
+
+    public eqApproxRel(box: ReadonlyAxisAlignedBox2, eps: number): boolean {
+        return this.center.eqApproxRel(box.center, eps) && this.extents.eqApproxRel(box.extents, eps);
+    }
+
     public getCorner(index: number): Vector2 {
         const x = ((index & 1) << 1) - 1;
         const y = ((index & 2) >> 0) - 1;
@@ -1050,6 +1135,18 @@ export class AxisAlignedBox3 implements ReadonlyAxisAlignedBox3 {
         const ez = this.extents.z + eps;
 
         return cx <= ex && cx >= -ex && cy <= ey && cy >= -ey && cz <= ez && cz >= -ez;
+    }
+
+    public eq(box: ReadonlyAxisAlignedBox3): boolean {
+        return this.center.eq(box.center) && this.extents.eq(box.extents);
+    }
+
+    public eqApproxAbs(box: ReadonlyAxisAlignedBox3, eps: number): boolean {
+        return this.center.eqApproxAbs(box.center, eps) && this.extents.eqApproxAbs(box.extents, eps);
+    }
+
+    public eqApproxRel(box: ReadonlyAxisAlignedBox3, eps: number): boolean {
+        return this.center.eqApproxRel(box.center, eps) && this.extents.eqApproxRel(box.extents, eps);
     }
 
     public getCorner(index: number): Vector3 {
@@ -1288,6 +1385,26 @@ export class OrientedBox2 implements ReadonlyOrientedBox2 {
         return vc.x <= ex && vc.x >= -ex && vc.y <= ey && vc.y >= -ey;
     }
 
+    public eq(box: ReadonlyOrientedBox2): boolean {
+        return this.center.eq(box.center) && this.extents.eq(box.extents) && this.rotation.eq(box.rotation);
+    }
+
+    public eqApproxAbs(box: ReadonlyOrientedBox2, eps: number): boolean {
+        return (
+            this.center.eqApproxAbs(box.center, eps) &&
+            this.extents.eqApproxAbs(box.extents, eps) &&
+            this.rotation.eqApproxAbs(box.rotation, eps)
+        );
+    }
+
+    public eqApproxRel(box: ReadonlyOrientedBox2, eps: number): boolean {
+        return (
+            this.center.eqApproxRel(box.center, eps) &&
+            this.extents.eqApproxRel(box.extents, eps) &&
+            this.rotation.eqApproxRel(box.rotation, eps)
+        );
+    }
+
     public getCorner(index: number): Vector2 {
         const x = ((index & 1) << 1) - 1;
         const y = ((index & 2) >> 0) - 1;
@@ -1513,6 +1630,26 @@ export class OrientedBox3 implements ReadonlyOrientedBox3 {
         const ez = this.extents.z + eps;
 
         return vc.x <= ex && vc.x >= -ex && vc.y <= ey && vc.y >= -ey && vc.z <= ez && vc.z >= -ez;
+    }
+
+    public eq(box: ReadonlyOrientedBox3): boolean {
+        return this.center.eq(box.center) && this.extents.eq(box.extents) && this.rotation.eq(box.rotation);
+    }
+
+    public eqApproxAbs(box: ReadonlyOrientedBox3, eps: number): boolean {
+        return (
+            this.center.eqApproxAbs(box.center, eps) &&
+            this.extents.eqApproxAbs(box.extents, eps) &&
+            this.rotation.eqApproxAbs(box.rotation, eps)
+        );
+    }
+
+    public eqApproxRel(box: ReadonlyOrientedBox3, eps: number): boolean {
+        return (
+            this.center.eqApproxRel(box.center, eps) &&
+            this.extents.eqApproxRel(box.extents, eps) &&
+            this.rotation.eqApproxRel(box.rotation, eps)
+        );
     }
 
     public getCorner(index: number): Vector3 {
