@@ -10,7 +10,7 @@ export interface ReadonlyComplex {
     readonly a: number;
     readonly b: number;
 
-    angleTo(z: ReadonlyComplex): number;
+    angle(z: ReadonlyComplex): number;
     clone(): Complex;
     conjugate(): Complex;
     eq(z: ReadonlyComplex): boolean;
@@ -74,7 +74,7 @@ export class Complex implements ReadonlyComplex {
      *
      * Note: The returned value is unsigned and less than or equal to `PI`.
      */
-    public angleTo(z: ReadonlyComplex): number {
+    public angle(z: ReadonlyComplex): number {
         // Formula adapted from `Quaternion`
         const dot = this.a * z.a + this.b * z.b;
         const lenSq2 = this.lengthSquared() * z.lengthSquared();

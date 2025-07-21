@@ -26,8 +26,7 @@ export interface ReadonlyVector2 {
     add(v: ReadonlyVector2): Vector2;
     addMulS(v: ReadonlyVector2, s: number): Vector2;
     addS(s: number): Vector2;
-    angle(): number;
-    angleTo(v: ReadonlyVector2): number;
+    angle(v: ReadonlyVector2): number;
     clamp(vmin: ReadonlyVector2, vmax: ReadonlyVector2): Vector2;
     clone(): Vector2;
     cross(v: ReadonlyVector2): number;
@@ -52,6 +51,7 @@ export interface ReadonlyVector2 {
     neg(): Vector2;
     nlerp(v: ReadonlyVector2, t: number): Vector2;
     normal(): Vector2;
+    polarAngle(): number;
     slerp(v: ReadonlyVector2, t: number): Vector2;
     sub(v: ReadonlyVector2): Vector2;
     subS(s: number): Vector2;
@@ -70,7 +70,7 @@ export interface ReadonlyVector3 {
     add(v: ReadonlyVector3): Vector3;
     addMulS(v: ReadonlyVector3, s: number): Vector3;
     addS(s: number): Vector3;
-    angleTo(v: ReadonlyVector3): number;
+    angle(v: ReadonlyVector3): number;
     clamp(vmin: ReadonlyVector3, vmax: ReadonlyVector3): Vector3;
     clone(): Vector3;
     cross(v: ReadonlyVector3): Vector3;
@@ -299,18 +299,11 @@ export class Vector2 implements ReadonlyVector2 {
     }
 
     /**
-     * Returns the angle of the vector from polar coordinates in radians.
-     */
-    public angle(): number {
-        return Math.atan2(this.y, this.x);
-    }
-
-    /**
      * Returns the angle between the current vector and `v` in radians.
      *
      * Note: The returned value is unsigned and less than or equal to `PI`.
      */
-    public angleTo(v: ReadonlyVector2): number {
+    public angle(v: ReadonlyVector2): number {
         const dot = this.dot(v);
         const lenSq2 = this.lengthSquared() * v.lengthSquared();
         const sqrt = Math.sqrt(lenSq2);
@@ -479,6 +472,13 @@ export class Vector2 implements ReadonlyVector2 {
      */
     public normal(): Vector2 {
         return new Vector2(this.y, -this.x);
+    }
+
+    /**
+     * Returns the angle of the vector from polar coordinates in radians.
+     */
+    public polarAngle(): number {
+        return Math.atan2(this.y, this.x);
     }
 
     public set(x: number, y: number): void {
@@ -717,7 +717,7 @@ export class Vector3 implements ReadonlyVector3 {
      *
      * Note: The returned value is unsigned and less than or equal to `PI`.
      */
-    public angleTo(v: ReadonlyVector3): number {
+    public angle(v: ReadonlyVector3): number {
         const dot = this.dot(v);
         const lenSq2 = this.lengthSquared() * v.lengthSquared();
         const sqrt = Math.sqrt(lenSq2);

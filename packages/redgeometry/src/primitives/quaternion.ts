@@ -17,7 +17,7 @@ export interface ReadonlyQuaternion {
     readonly d: number;
 
     add(q: ReadonlyQuaternion): Quaternion;
-    angleTo(q: ReadonlyQuaternion): number;
+    angle(q: ReadonlyQuaternion): number;
     axis(): Vector3;
     axisAngle(): number;
     clone(): Quaternion;
@@ -249,7 +249,7 @@ export class Quaternion implements ReadonlyQuaternion {
      *
      * Note: The returned value is unsigned and less than or equal to `2 * PI`.
      */
-    public angleTo(q: ReadonlyQuaternion): number {
+    public angle(q: ReadonlyQuaternion): number {
         // Glenn Davis formula (referenced by Ken Shoemake)
         const dot = this.a * q.a + this.b * q.b + this.c * q.c + this.d * q.d;
         const lenSq2 = this.lengthSquared() * q.lengthSquared();

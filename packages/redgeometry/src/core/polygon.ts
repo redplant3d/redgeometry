@@ -33,8 +33,8 @@ export class Polygon2 {
             const v1 = pa.sub(p0);
             const v2 = pb.sub(p0);
 
-            const a1 = v1.angle();
-            const a2 = v2.angle();
+            const a1 = v1.polarAngle();
+            const a2 = v2.polarAngle();
 
             if (a1 !== a2) {
                 // Sort by polar angle around p0

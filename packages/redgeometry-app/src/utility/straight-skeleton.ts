@@ -572,7 +572,7 @@ export class StraightSkeleton {
         for (const e of edge.getOnextIterator()) {
             log.infoDebug("  [{}] p0: {}", i, e.p0);
             log.infoDebug("      p1: {}", e.p1);
-            log.infoDebug("      angle: {}", (e.p1.sub(e.p0).angle() * 180) / Math.PI);
+            log.infoDebug("      angle: {}", (e.p1.sub(e.p0).polarAngle() * 180) / Math.PI);
 
             if (validate) {
                 assertDebug(e.data === edge.data);
