@@ -1,3 +1,4 @@
+import { eqApproxAbs, eqApproxRel } from "../utility/scalar.js";
 import type { FixedSizeArray } from "../utility/types.js";
 import { Complex } from "./complex.js";
 import { Quaternion } from "./quaternion.js";
@@ -43,6 +44,8 @@ export interface ReadonlyMatrix3A {
     clone(): Matrix3A;
     determinant(): number;
     eq(mat: ReadonlyMatrix3A): boolean;
+    eqApproxAbs(mat: ReadonlyMatrix3A, eps: number): boolean;
+    eqApproxRel(mat: ReadonlyMatrix3A, eps: number): boolean;
     extractSRT(): { s: Vector2; r: Complex; t: Vector2 };
     mul(mat: ReadonlyMatrix3A): Matrix3A;
     mulV(v: ReadonlyVector2): Vector2;
@@ -63,6 +66,8 @@ export interface ReadonlyMatrix3 {
     clone(): Matrix3;
     determinant(): number;
     eq(mat: ReadonlyMatrix3): boolean;
+    eqApproxAbs(mat: ReadonlyMatrix3, eps: number): boolean;
+    eqApproxRel(mat: ReadonlyMatrix3, eps: number): boolean;
     extractSRT(): { s: Vector2; r: Complex; t: Vector2 };
     mul(mat: ReadonlyMatrix3): Matrix3;
     mulV(v: ReadonlyVector3): Vector3;
@@ -82,6 +87,8 @@ export interface ReadonlyMatrix4A {
     clone(): Matrix4A;
     determinant(): number;
     eq(mat: ReadonlyMatrix4A): boolean;
+    eqApproxAbs(mat: ReadonlyMatrix4A, eps: number): boolean;
+    eqApproxRel(mat: ReadonlyMatrix4A, eps: number): boolean;
     extractSRT(): { s: Vector3; r: Quaternion; t: Vector3 };
     mul(mat: ReadonlyMatrix4A): Matrix4A;
     mulV(v: ReadonlyVector3): Vector3;
@@ -102,6 +109,8 @@ export interface ReadonlyMatrix4 {
     clone(): Matrix4;
     determinant(): number;
     eq(mat: ReadonlyMatrix4): boolean;
+    eqApproxAbs(mat: ReadonlyMatrix4, eps: number): boolean;
+    eqApproxRel(mat: ReadonlyMatrix4, eps: number): boolean;
     extractSRT(): { s: Vector3; r: Quaternion; t: Vector3 };
     mul(mat: ReadonlyMatrix4): Matrix4;
     mulV(v: ReadonlyVector4): Vector4;
@@ -293,6 +302,34 @@ export class Matrix3A implements ReadonlyMatrix3A {
             ea[3] === eb[3] &&
             ea[4] === eb[4] &&
             ea[5] === eb[5]
+        );
+    }
+
+    public eqApproxAbs(mat: ReadonlyMatrix3A, eps: number): boolean {
+        const ea = this.elements;
+        const eb = mat.elements;
+
+        return (
+            eqApproxAbs(ea[0], eb[0], eps) &&
+            eqApproxAbs(ea[1], eb[1], eps) &&
+            eqApproxAbs(ea[2], eb[2], eps) &&
+            eqApproxAbs(ea[3], eb[3], eps) &&
+            eqApproxAbs(ea[4], eb[4], eps) &&
+            eqApproxAbs(ea[5], eb[5], eps)
+        );
+    }
+
+    public eqApproxRel(mat: ReadonlyMatrix3A, eps: number): boolean {
+        const ea = this.elements;
+        const eb = mat.elements;
+
+        return (
+            eqApproxRel(ea[0], eb[0], eps) &&
+            eqApproxRel(ea[1], eb[1], eps) &&
+            eqApproxRel(ea[2], eb[2], eps) &&
+            eqApproxRel(ea[3], eb[3], eps) &&
+            eqApproxRel(ea[4], eb[4], eps) &&
+            eqApproxRel(ea[5], eb[5], eps)
         );
     }
 
@@ -995,6 +1032,40 @@ export class Matrix3 implements ReadonlyMatrix3 {
             ea[6] === eb[6] &&
             ea[7] === eb[7] &&
             ea[8] === eb[8]
+        );
+    }
+
+    public eqApproxAbs(mat: ReadonlyMatrix3, eps: number): boolean {
+        const ea = this.elements;
+        const eb = mat.elements;
+
+        return (
+            eqApproxAbs(ea[0], eb[0], eps) &&
+            eqApproxAbs(ea[1], eb[1], eps) &&
+            eqApproxAbs(ea[2], eb[2], eps) &&
+            eqApproxAbs(ea[3], eb[3], eps) &&
+            eqApproxAbs(ea[4], eb[4], eps) &&
+            eqApproxAbs(ea[5], eb[5], eps) &&
+            eqApproxAbs(ea[6], eb[6], eps) &&
+            eqApproxAbs(ea[7], eb[7], eps) &&
+            eqApproxAbs(ea[8], eb[8], eps)
+        );
+    }
+
+    public eqApproxRel(mat: ReadonlyMatrix3, eps: number): boolean {
+        const ea = this.elements;
+        const eb = mat.elements;
+
+        return (
+            eqApproxRel(ea[0], eb[0], eps) &&
+            eqApproxRel(ea[1], eb[1], eps) &&
+            eqApproxRel(ea[2], eb[2], eps) &&
+            eqApproxRel(ea[3], eb[3], eps) &&
+            eqApproxRel(ea[4], eb[4], eps) &&
+            eqApproxRel(ea[5], eb[5], eps) &&
+            eqApproxRel(ea[6], eb[6], eps) &&
+            eqApproxRel(ea[7], eb[7], eps) &&
+            eqApproxRel(ea[8], eb[8], eps)
         );
     }
 
@@ -1859,6 +1930,46 @@ export class Matrix4A implements ReadonlyMatrix4A {
             ea[9] === eb[9] &&
             ea[10] === eb[10] &&
             ea[11] === eb[11]
+        );
+    }
+
+    public eqApproxAbs(mat: ReadonlyMatrix4A, eps: number): boolean {
+        const ea = this.elements;
+        const eb = mat.elements;
+
+        return (
+            eqApproxAbs(ea[0], eb[0], eps) &&
+            eqApproxAbs(ea[1], eb[1], eps) &&
+            eqApproxAbs(ea[2], eb[2], eps) &&
+            eqApproxAbs(ea[3], eb[3], eps) &&
+            eqApproxAbs(ea[4], eb[4], eps) &&
+            eqApproxAbs(ea[5], eb[5], eps) &&
+            eqApproxAbs(ea[6], eb[6], eps) &&
+            eqApproxAbs(ea[7], eb[7], eps) &&
+            eqApproxAbs(ea[8], eb[8], eps) &&
+            eqApproxAbs(ea[9], eb[9], eps) &&
+            eqApproxAbs(ea[10], eb[10], eps) &&
+            eqApproxAbs(ea[11], eb[11], eps)
+        );
+    }
+
+    public eqApproxRel(mat: ReadonlyMatrix4A, eps: number): boolean {
+        const ea = this.elements;
+        const eb = mat.elements;
+
+        return (
+            eqApproxRel(ea[0], eb[0], eps) &&
+            eqApproxRel(ea[1], eb[1], eps) &&
+            eqApproxRel(ea[2], eb[2], eps) &&
+            eqApproxRel(ea[3], eb[3], eps) &&
+            eqApproxRel(ea[4], eb[4], eps) &&
+            eqApproxRel(ea[5], eb[5], eps) &&
+            eqApproxRel(ea[6], eb[6], eps) &&
+            eqApproxRel(ea[7], eb[7], eps) &&
+            eqApproxRel(ea[8], eb[8], eps) &&
+            eqApproxRel(ea[9], eb[9], eps) &&
+            eqApproxRel(ea[10], eb[10], eps) &&
+            eqApproxRel(ea[11], eb[11], eps)
         );
     }
 
@@ -2927,6 +3038,54 @@ export class Matrix4 implements ReadonlyMatrix4 {
             ea[13] === eb[13] &&
             ea[14] === eb[14] &&
             ea[15] === eb[15]
+        );
+    }
+
+    public eqApproxAbs(mat: ReadonlyMatrix4, eps: number): boolean {
+        const ea = this.elements;
+        const eb = mat.elements;
+
+        return (
+            eqApproxAbs(ea[0], eb[0], eps) &&
+            eqApproxAbs(ea[1], eb[1], eps) &&
+            eqApproxAbs(ea[2], eb[2], eps) &&
+            eqApproxAbs(ea[3], eb[3], eps) &&
+            eqApproxAbs(ea[4], eb[4], eps) &&
+            eqApproxAbs(ea[5], eb[5], eps) &&
+            eqApproxAbs(ea[6], eb[6], eps) &&
+            eqApproxAbs(ea[7], eb[7], eps) &&
+            eqApproxAbs(ea[8], eb[8], eps) &&
+            eqApproxAbs(ea[9], eb[9], eps) &&
+            eqApproxAbs(ea[10], eb[10], eps) &&
+            eqApproxAbs(ea[11], eb[11], eps) &&
+            eqApproxAbs(ea[12], eb[12], eps) &&
+            eqApproxAbs(ea[13], eb[13], eps) &&
+            eqApproxAbs(ea[14], eb[14], eps) &&
+            eqApproxAbs(ea[15], eb[15], eps)
+        );
+    }
+
+    public eqApproxRel(mat: ReadonlyMatrix4, eps: number): boolean {
+        const ea = this.elements;
+        const eb = mat.elements;
+
+        return (
+            eqApproxRel(ea[0], eb[0], eps) &&
+            eqApproxRel(ea[1], eb[1], eps) &&
+            eqApproxRel(ea[2], eb[2], eps) &&
+            eqApproxRel(ea[3], eb[3], eps) &&
+            eqApproxRel(ea[4], eb[4], eps) &&
+            eqApproxRel(ea[5], eb[5], eps) &&
+            eqApproxRel(ea[6], eb[6], eps) &&
+            eqApproxRel(ea[7], eb[7], eps) &&
+            eqApproxRel(ea[8], eb[8], eps) &&
+            eqApproxRel(ea[9], eb[9], eps) &&
+            eqApproxRel(ea[10], eb[10], eps) &&
+            eqApproxRel(ea[11], eb[11], eps) &&
+            eqApproxRel(ea[12], eb[12], eps) &&
+            eqApproxRel(ea[13], eb[13], eps) &&
+            eqApproxRel(ea[14], eb[14], eps) &&
+            eqApproxRel(ea[15], eb[15], eps)
         );
     }
 
