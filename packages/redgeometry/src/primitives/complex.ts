@@ -210,10 +210,6 @@ export class Complex implements ReadonlyComplex {
         this.b = z1.b - z2.b;
     }
 
-    public setToIdentity(): void {
-        this.set(1, 0);
-    }
-
     public sub(z: ReadonlyComplex): Complex {
         return new Complex(this.a - z.a, this.b - z.b);
     }

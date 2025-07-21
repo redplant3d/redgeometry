@@ -641,10 +641,6 @@ export class Quaternion implements ReadonlyQuaternion {
         this.d = q1.d - q2.d;
     }
 
-    public setToIdentity(): void {
-        this.set(1, 0, 0, 0);
-    }
-
     /**
      * Returns the spherical linear interpolation of the current quaternion and `q`.
      */

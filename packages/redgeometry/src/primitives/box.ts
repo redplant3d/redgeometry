@@ -402,15 +402,6 @@ export class MinMaxBox2 implements ReadonlyMinMaxBox2 {
         this.setEnclosePoint(box, pp);
     }
 
-    public setToEmpty(): void {
-        this.set(
-            Number.POSITIVE_INFINITY,
-            Number.POSITIVE_INFINITY,
-            Number.NEGATIVE_INFINITY,
-            Number.NEGATIVE_INFINITY,
-        );
-    }
-
     public setUnion(box1: ReadonlyMinMaxBox2, box2: ReadonlyMinMaxBox2): void {
         this.minX = Math.min(box1.minX, box2.minX);
         this.minY = Math.min(box1.minY, box2.minY);
@@ -702,17 +693,6 @@ export class MinMaxBox3 implements ReadonlyMinMaxBox3 {
         this.setEnclosePoint(box, pp);
     }
 
-    public setToEmpty(): void {
-        this.set(
-            Number.POSITIVE_INFINITY,
-            Number.POSITIVE_INFINITY,
-            Number.POSITIVE_INFINITY,
-            Number.NEGATIVE_INFINITY,
-            Number.NEGATIVE_INFINITY,
-            Number.NEGATIVE_INFINITY,
-        );
-    }
-
     public setUnion(box1: ReadonlyMinMaxBox3, box2: ReadonlyMinMaxBox3): void {
         this.minX = Math.min(box1.minX, box2.minX);
         this.minY = Math.min(box1.minY, box2.minY);
@@ -948,11 +928,6 @@ export class AxisAlignedBox2 implements ReadonlyAxisAlignedBox2 {
         this.extents = new Vector2(0.5 * w, 0.5 * h);
     }
 
-    public setToEmpty(): void {
-        this.center = Vector2.createZero();
-        this.extents = new Vector2(Number.NEGATIVE_INFINITY, Number.NEGATIVE_INFINITY);
-    }
-
     public setUnion(box1: ReadonlyAxisAlignedBox2, box2: ReadonlyAxisAlignedBox2): void {
         const pc1 = box1.center;
         const ve1 = box1.extents;
@@ -1183,11 +1158,6 @@ export class AxisAlignedBox3 implements ReadonlyAxisAlignedBox3 {
         this.extents = new Vector3(0.5 * w, 0.5 * h, 0.5 * d);
     }
 
-    public setToEmpty(): void {
-        this.center = Vector3.createZero();
-        this.extents = new Vector3(Number.NEGATIVE_INFINITY, Number.NEGATIVE_INFINITY, Number.NEGATIVE_INFINITY);
-    }
-
     public setUnion(box1: ReadonlyAxisAlignedBox3, box2: ReadonlyAxisAlignedBox3): void {
         const pc1 = box1.center;
         const ve1 = box1.extents;
@@ -1392,12 +1362,6 @@ export class OrientedBox2 implements ReadonlyOrientedBox2 {
         this.center = box.center;
         this.extents = box.extents;
         this.rotation = box.rotation;
-    }
-
-    public setToEmpty(): void {
-        this.center = Vector2.createZero();
-        this.extents = new Vector2(Number.NEGATIVE_INFINITY, Number.NEGATIVE_INFINITY);
-        this.rotation = Complex.createIdentity();
     }
 
     public sizeX(): number {
@@ -1630,12 +1594,6 @@ export class OrientedBox3 implements ReadonlyOrientedBox3 {
         this.center = box.center;
         this.extents = box.extents;
         this.rotation = box.rotation;
-    }
-
-    public setToEmpty(): void {
-        this.center = Vector3.createZero();
-        this.extents = new Vector3(Number.NEGATIVE_INFINITY, Number.NEGATIVE_INFINITY, Number.NEGATIVE_INFINITY);
-        this.rotation = Quaternion.createIdentity();
     }
 
     public sizeX(): number {
