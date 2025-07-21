@@ -150,7 +150,7 @@ export class PathFlattenIncremental2 implements PathFlatten2 {
         const [qa, qb, qc] = c0.getCoefficients();
 
         // Smallest parameter step to satisfy tolerance condition
-        const step = Math.sqrt((4 * this.tolerance) / qa.len());
+        const step = Math.sqrt((4 * this.tolerance) / qa.length());
 
         for (let t = step; t < 1; t += step) {
             // Evaluate points (Horner's method)
@@ -261,7 +261,7 @@ export class PathFlattenRecursive2 implements PathFlatten2 {
             const a = k * v.cross(c.p1.sub(c.p0));
 
             // Compare area `a` with the expected area
-            if (a * a > tol2 * v.lenSq()) {
+            if (a * a > tol2 * v.lengthSquared()) {
                 const [c1, c2] = c.splitAt(0.5);
 
                 flattenConicRecursive(c1);
@@ -297,7 +297,7 @@ export class PathFlattenRecursive2 implements PathFlatten2 {
             const a2 = v.cross(c.p2.sub(c.p0));
 
             // Compare the bigger area of the two with the expected area
-            if (Math.max(a1 * a1, a2 * a2) > tol2 * v.lenSq()) {
+            if (Math.max(a1 * a1, a2 * a2) > tol2 * v.lengthSquared()) {
                 const [c1, c2] = c.splitAt(0.5);
 
                 flattenCubicRecursive(c1);
@@ -326,7 +326,7 @@ export class PathFlattenRecursive2 implements PathFlatten2 {
             const a = v.cross(c.p1.sub(c.p0));
 
             // Compare area `a` with the expected area
-            if (a * a > tol2 * v.lenSq()) {
+            if (a * a > tol2 * v.lengthSquared()) {
                 const [c1, c2] = c.splitAt(0.5);
 
                 flattenQuadraticRecursive(c1);

@@ -13,14 +13,14 @@ export function isSimpleQuad(c: ReadonlyBezier2Curve2, cosTolerance: number): bo
     const v1 = c.p1.sub(c.p0);
     const v2 = c.p2.sub(c.p1);
 
-    return v1.dot(v2) > cosTolerance * Math.sqrt(v1.lenSq() * v2.lenSq());
+    return v1.dot(v2) > cosTolerance * Math.sqrt(v1.lengthSquared() * v2.lengthSquared());
 }
 
 export function simplifyParameterStepQuad(c: ReadonlyBezier2Curve2, m: number): number {
     const [qqa, qqb] = c.getDerivativeCoefficients();
 
     // m * (bx * bx + by * by) / (|ax * by - ay * bx| - m * (ax * bx + ay * by));
-    return (m * qqb.lenSq()) / (Math.abs(qqa.cross(qqb)) - m * qqa.dot(qqb));
+    return (m * qqb.lengthSquared()) / (Math.abs(qqa.cross(qqb)) - m * qqa.dot(qqb));
 }
 
 export function simplifyDistanceCubic(c: ReadonlyBezier3Curve2): number {
@@ -30,7 +30,7 @@ export function simplifyDistanceCubic(c: ReadonlyBezier3Curve2): number {
 
     const v = v3.sub(v2).sub(v2).add(v1);
 
-    return v.len();
+    return v.length();
 }
 
 export function simplifyParameterStepCubic(c: ReadonlyBezier3Curve2, k: number, tolerance: number): number {
@@ -42,7 +42,7 @@ export function simplifyParameterStepCubic(c: ReadonlyBezier3Curve2, k: number, 
     const tol = k * tolerance;
 
     // Smallest parameter step to satisfy tolerance condition
-    return Math.pow((tol * tol) / v.lenSq(), 1 / 6);
+    return Math.pow((tol * tol) / v.lengthSquared(), 1 / 6);
 }
 
 /**
@@ -54,7 +54,7 @@ export function isSimpleConic(c: ReadonlyBezierRCurve2, simplifyTolerance: numbe
     const v1 = c.p1.sub(c.p0);
     const v2 = c.p2.sub(c.p1);
 
-    return Math.abs(c.w - 1) * v2.sub(v1).len() < simplifyTolerance * (c.w + 1);
+    return Math.abs(c.w - 1) * v2.sub(v1).length() < simplifyTolerance * (c.w + 1);
 }
 
 export function simplifyParameterStepConic(c: ReadonlyBezierRCurve2, k: number, tolerance: number): number {
@@ -65,7 +65,7 @@ export function simplifyParameterStepConic(c: ReadonlyBezierRCurve2, k: number, 
     const tol = k * tolerance * (c.w + 1);
 
     // Smallest parameter step to satisfy tolerance condition
-    return Math.pow(tol / (Math.abs(c.w - 1) * v.len()), 1 / 4);
+    return Math.pow(tol / (Math.abs(c.w - 1) * v.length()), 1 / 4);
 }
 
 export function simplifyCubicMidpoint(c: ReadonlyBezier3Curve2): ReadonlyBezier2Curve2 {
@@ -98,5 +98,5 @@ export function isDegenerateQuad(c0: ReadonlyBezier2Curve2): boolean {
     const v2 = c0.p2.sub(c0.p1);
 
     // Check if angle is too sharp
-    return v1.dot(v2) < COS_ACUTE * Math.sqrt(v1.lenSq() * v2.lenSq());
+    return v1.dot(v2) < COS_ACUTE * Math.sqrt(v1.lengthSquared() * v2.lengthSquared());
 }

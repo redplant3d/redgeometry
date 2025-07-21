@@ -31,7 +31,7 @@ export function minimizeCurveDistanceAt(
         return;
     }
 
-    const distSq = c.getValueAt(t).sub(p).lenSq();
+    const distSq = c.getValueAt(t).sub(p).lengthSquared();
 
     if (distSq < min.distSq) {
         min.param = t;
@@ -291,7 +291,7 @@ function getWinding(t: number, px: number, x: number, yy: number): number {
 
 function sampleArcLengthQuadratic(wz: number, xz: number, qqa: ReadonlyVector2, qqb: ReadonlyVector2): number {
     const v = qqa.mulS(xz).add(qqb);
-    return wz * v.len();
+    return wz * v.length();
 }
 
 function sampleArcLengthCubic(
@@ -302,7 +302,7 @@ function sampleArcLengthCubic(
     qqc: ReadonlyVector2,
 ): number {
     const v = qqa.mulS(xz).add(qqb).mulS(xz).add(qqc);
-    return wz * v.len();
+    return wz * v.length();
 }
 
 function sampleArcLengthConic(
@@ -314,5 +314,5 @@ function sampleArcLengthConic(
 ): number {
     const vv = qqa.mulS(xz).add(qqb).mulS(xz).add(qqc);
     const v = Vector2.fromXYW(vv.x, vv.y, vv.z * vv.z);
-    return wz * v.len();
+    return wz * v.length();
 }

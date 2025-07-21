@@ -742,7 +742,7 @@ export class Path2 implements PathSink2 {
         let pc = pp0.add(v);
 
         // If `lenght^2 >= 1` the point is already the center
-        const len2 = v.lenSq();
+        const len2 = v.lengthSquared();
 
         if (len2 < 1) {
             const f = Math.sqrt(1 / len2 - 1);

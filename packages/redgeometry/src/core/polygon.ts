@@ -42,7 +42,7 @@ export class Polygon2 {
             }
 
             // Sort by distance
-            return v1.lenSq() - v2.lenSq();
+            return v1.lengthSquared() - v2.lengthSquared();
         });
 
         // Compute the convex hull (graham scan)
@@ -197,7 +197,7 @@ export class Polygon2 {
 
         // Find the edge with the closest point on it
         for (const e of this.getEdges()) {
-            const distSq = e.getClosestPoint(p).sub(p).lenSq();
+            const distSq = e.getClosestPoint(p).sub(p).lengthSquared();
 
             if (distSq < minDistSq) {
                 minDistSq = distSq;

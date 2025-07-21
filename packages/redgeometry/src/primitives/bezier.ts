@@ -436,8 +436,8 @@ export class Bezier2Curve2 implements ReadonlyBezier2Curve2 {
 
         const rt = solveCubic(a, b, c, d);
 
-        const distSq0 = this.p0.sub(p).lenSq();
-        const distSq1 = this.p2.sub(p).lenSq();
+        const distSq0 = this.p0.sub(p).lengthSquared();
+        const distSq1 = this.p2.sub(p).lengthSquared();
 
         const min = distSq0 < distSq1 ? { param: 0, distSq: distSq0 } : { param: 1, distSq: distSq1 };
 
@@ -480,7 +480,7 @@ export class Bezier2Curve2 implements ReadonlyBezier2Curve2 {
         const vv = qqa.mulS(t).add(qqb);
         const vvv = qqa;
 
-        const len = vv.len();
+        const len = vv.length();
 
         return vv.cross(vvv) / (len * len * len);
     }
@@ -521,7 +521,7 @@ export class Bezier2Curve2 implements ReadonlyBezier2Curve2 {
         const ppp = qa.mulS(2);
 
         const v = pp.normal();
-        const f = pp.lenSq() / pp.cross(ppp);
+        const f = pp.lengthSquared() / pp.cross(ppp);
 
         return p.addMulS(v, f);
     }
@@ -529,8 +529,8 @@ export class Bezier2Curve2 implements ReadonlyBezier2Curve2 {
     public getOffsetCuspParameter(rad: number): [number, number] {
         const [qqa, qqb] = this.getDerivativeCoefficients();
 
-        const alen2 = qqa.lenSq();
-        const blen2 = qqb.lenSq();
+        const alen2 = qqa.lengthSquared();
+        const blen2 = qqb.lengthSquared();
         const axb = qqa.cross(qqb);
         const aob = qqa.dot(qqb);
         const fac = 1 / alen2;
@@ -576,7 +576,7 @@ export class Bezier2Curve2 implements ReadonlyBezier2Curve2 {
         const [qqa, qqb] = this.getDerivativeCoefficients();
 
         // The vertex is at the minimum of the curvature (only one solution)
-        return qqa.dot(qqb.neg()) / qqa.lenSq();
+        return qqa.dot(qqb.neg()) / qqa.lengthSquared();
     }
 
     public getWindingAt(p: ReadonlyVector2): number {
@@ -856,7 +856,7 @@ export class Bezier3Curve2 implements ReadonlyBezier3Curve2 {
         const vv = qqa.mulS(t).add(qqb).mulS(t).add(qqc);
         const vvv = qqa.mulS(2 * t).add(qqb);
 
-        const len = vv.len();
+        const len = vv.length();
 
         return vv.cross(vvv) / (len * len * len);
     }
@@ -908,7 +908,7 @@ export class Bezier3Curve2 implements ReadonlyBezier3Curve2 {
         const ppp = qa.mulS(6 * t).addMulS(qb, 2);
 
         const v = pp.normal();
-        const f = pp.lenSq() / pp.cross(ppp);
+        const f = pp.lengthSquared() / pp.cross(ppp);
 
         return p.addMulS(v, f);
     }
@@ -1224,7 +1224,7 @@ export class BezierRCurve2 implements ReadonlyBezierRCurve2 {
         const v1 = p1.sub(pc);
         const v2 = p2.sub(pc);
 
-        return v1.dot(v2) / Math.sqrt(v1.lenSq() * v2.lenSq());
+        return v1.dot(v2) / Math.sqrt(v1.lengthSquared() * v2.lengthSquared());
     }
 
     public static toObject(c: ReadonlyBezierRCurve2): BezierRCurve2Like {

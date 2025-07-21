@@ -133,7 +133,7 @@ export class Ray2 implements ReadonlyRay2 {
     public getParameterFromPoint(p: ReadonlyVector2): number {
         const v1 = this.direction;
         const v2 = p.sub(this.origin);
-        return v1.dot(v2) / v1.lenSq();
+        return v1.dot(v2) / v1.lengthSquared();
     }
 
     /**
@@ -142,7 +142,7 @@ export class Ray2 implements ReadonlyRay2 {
     public getSignedDistanceFromPoint(p: ReadonlyVector2): number {
         const v1 = this.direction;
         const v2 = this.origin.sub(p);
-        return v1.cross(v2) / v1.len();
+        return v1.cross(v2) / v1.length();
     }
 
     /**
@@ -233,7 +233,7 @@ export class Ray3 implements ReadonlyRay3 {
         // t1 * v1 - t2 * v2 = p2 - p1
         // ```
         const vc = ray1.direction.cross(ray2.direction);
-        const den = vc.lenSq();
+        const den = vc.lengthSquared();
 
         if (den === 0) {
             // Rays are parallel
@@ -280,7 +280,7 @@ export class Ray3 implements ReadonlyRay3 {
     public getDistanceFromPoint(p: ReadonlyVector3): number {
         const v1 = this.direction;
         const v2 = this.origin.sub(p);
-        return v1.cross(v2).len() / v1.len();
+        return v1.cross(v2).length() / v1.length();
     }
 
     public getNormalAround(v: ReadonlyVector3): Ray3 {
@@ -293,7 +293,7 @@ export class Ray3 implements ReadonlyRay3 {
     public getParameterFromPoint(p: ReadonlyVector3): number {
         const v1 = this.direction;
         const v2 = p.sub(this.origin);
-        return v1.dot(v2) / v1.lenSq();
+        return v1.dot(v2) / v1.lengthSquared();
     }
 
     /**

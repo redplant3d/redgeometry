@@ -18,8 +18,8 @@ export interface ReadonlyComplex {
     eqApproxRel(z: ReadonlyComplex, eps: number): boolean;
     inverse(): Complex;
     isIdentity(): boolean;
-    len(): number;
-    lenSq(): number;
+    length(): number;
+    lengthSquared(): number;
     mul(z: ReadonlyComplex): Complex;
     mulV(v: ReadonlyVector2): Vector2;
     nlerp(v: ReadonlyComplex, t: number): Complex;
@@ -77,7 +77,7 @@ export class Complex implements ReadonlyComplex {
     public angleTo(z: ReadonlyComplex): number {
         // Formula adapted from `Quaternion`
         const dot = this.a * z.a + this.b * z.b;
-        const lenSq2 = this.lenSq() * z.lenSq();
+        const lenSq2 = this.lengthSquared() * z.lengthSquared();
         const sqrt = Math.sqrt(lenSq2);
 
         if (sqrt <= dot) {
@@ -114,7 +114,7 @@ export class Complex implements ReadonlyComplex {
     }
 
     public inverse(): Complex {
-        const s = this.lenSq();
+        const s = this.lengthSquared();
         return new Complex(this.a / s, -this.b / s);
     }
 
@@ -122,11 +122,11 @@ export class Complex implements ReadonlyComplex {
         return this.a === 1 && this.b === 0;
     }
 
-    public len(): number {
-        return Math.sqrt(this.lenSq());
+    public length(): number {
+        return Math.sqrt(this.lengthSquared());
     }
 
-    public lenSq(): number {
+    public lengthSquared(): number {
         return this.a * this.a + this.b * this.b;
     }
 
@@ -223,7 +223,7 @@ export class Complex implements ReadonlyComplex {
     }
 
     public unit(): Complex {
-        const s = this.len();
+        const s = this.length();
         return new Complex(this.a / s, this.b / s);
     }
 }

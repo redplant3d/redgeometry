@@ -42,8 +42,8 @@ export interface ReadonlyVector2 {
     isFinite(): boolean;
     isOne(): boolean;
     isZero(): boolean;
-    len(): number;
-    lenSq(): number;
+    length(): number;
+    lengthSquared(): number;
     lerp(v: ReadonlyVector2, t: number): Vector2;
     max(v: ReadonlyVector2): Vector2;
     min(v: ReadonlyVector2): Vector2;
@@ -85,8 +85,8 @@ export interface ReadonlyVector3 {
     isFinite(): boolean;
     isOne(): boolean;
     isZero(): boolean;
-    len(): number;
-    lenSq(): number;
+    length(): number;
+    lengthSquared(): number;
     lerp(v: ReadonlyVector3, t: number): Vector3;
     max(v: ReadonlyVector3): Vector3;
     min(v: ReadonlyVector3): Vector3;
@@ -134,8 +134,8 @@ export interface ReadonlyVector4 {
     isFinite(): boolean;
     isOne(): boolean;
     isZero(): boolean;
-    len(): number;
-    lenSq(): number;
+    length(): number;
+    lengthSquared(): number;
     lerp(v: ReadonlyVector4, t: number): Vector4;
     max(v: ReadonlyVector4): Vector4;
     min(v: ReadonlyVector4): Vector4;
@@ -312,7 +312,7 @@ export class Vector2 implements ReadonlyVector2 {
      */
     public angleTo(v: ReadonlyVector2): number {
         const dot = this.dot(v);
-        const lenSq2 = this.lenSq() * v.lenSq();
+        const lenSq2 = this.lengthSquared() * v.lengthSquared();
         const sqrt = Math.sqrt(lenSq2);
 
         if (sqrt <= dot) {
@@ -409,11 +409,11 @@ export class Vector2 implements ReadonlyVector2 {
         return this.x === 0 && this.y === 0;
     }
 
-    public len(): number {
-        return Math.sqrt(this.lenSq());
+    public length(): number {
+        return Math.sqrt(this.lengthSquared());
     }
 
-    public lenSq(): number {
+    public lengthSquared(): number {
         return this.x * this.x + this.y * this.y;
     }
 
@@ -541,7 +541,7 @@ export class Vector2 implements ReadonlyVector2 {
      */
     public slerp(v: ReadonlyVector2, t: number): Vector2 {
         const dot = this.dot(v);
-        const lenSq2 = this.lenSq() * v.lenSq();
+        const lenSq2 = this.lengthSquared() * v.lengthSquared();
 
         if (dot * dot >= lenSq2) {
             // Fallback (angle either undefined, very close or equal to zero)
@@ -586,12 +586,12 @@ export class Vector2 implements ReadonlyVector2 {
     }
 
     public unit(): Vector2 {
-        const s = this.len();
+        const s = this.length();
         return this.divS(s);
     }
 
     public unitOrZero(): Vector2 {
-        const s = this.len();
+        const s = this.length();
 
         if (s === 0) {
             return Vector2.createZero();
@@ -719,7 +719,7 @@ export class Vector3 implements ReadonlyVector3 {
      */
     public angleTo(v: ReadonlyVector3): number {
         const dot = this.dot(v);
-        const lenSq2 = this.lenSq() * v.lenSq();
+        const lenSq2 = this.lengthSquared() * v.lengthSquared();
         const sqrt = Math.sqrt(lenSq2);
 
         if (sqrt <= dot) {
@@ -807,11 +807,11 @@ export class Vector3 implements ReadonlyVector3 {
         return this.x === 0 && this.y === 0 && this.z === 0;
     }
 
-    public len(): number {
-        return Math.sqrt(this.lenSq());
+    public length(): number {
+        return Math.sqrt(this.lengthSquared());
     }
 
-    public lenSq(): number {
+    public lengthSquared(): number {
         return this.x * this.x + this.y * this.y + this.z * this.z;
     }
 
@@ -1029,7 +1029,7 @@ export class Vector3 implements ReadonlyVector3 {
      */
     public slerp(v: ReadonlyVector3, t: number): Vector3 {
         const dot = this.dot(v);
-        const lenSq2 = this.lenSq() * v.lenSq();
+        const lenSq2 = this.lengthSquared() * v.lengthSquared();
 
         if (dot * dot >= lenSq2) {
             // Fallback (angle either undefined, very close or equal to zero)
@@ -1075,12 +1075,12 @@ export class Vector3 implements ReadonlyVector3 {
     }
 
     public unit(): Vector3 {
-        const s = this.len();
+        const s = this.length();
         return this.divS(s);
     }
 
     public unitOrZero(): Vector3 {
-        const s = this.len();
+        const s = this.length();
 
         if (s === 0) {
             return Vector3.createZero();
@@ -1290,11 +1290,11 @@ export class Vector4 implements ReadonlyVector4 {
         return this.x === 0 && this.y === 0 && this.z === 0 && this.w === 0;
     }
 
-    public len(): number {
-        return Math.sqrt(this.lenSq());
+    public length(): number {
+        return Math.sqrt(this.lengthSquared());
     }
 
-    public lenSq(): number {
+    public lengthSquared(): number {
         return this.x * this.x + this.y * this.y + this.z * this.z + this.w * this.w;
     }
 
@@ -1457,12 +1457,12 @@ export class Vector4 implements ReadonlyVector4 {
     }
 
     public unit(): Vector4 {
-        const s = this.len();
+        const s = this.length();
         return this.divS(s);
     }
 
     public unitOrZero(): Vector4 {
-        const s = this.len();
+        const s = this.length();
 
         if (s === 0) {
             return Vector4.createZero();

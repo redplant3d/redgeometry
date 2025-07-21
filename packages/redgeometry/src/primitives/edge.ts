@@ -386,7 +386,7 @@ export class Edge2 implements ReadonlyEdge2 {
         const v1 = this.direction();
         const v2 = p.sub(this.p0);
 
-        return v1.dot(v2) / v1.lenSq();
+        return v1.dot(v2) / v1.lengthSquared();
     }
 
     /**
@@ -396,7 +396,7 @@ export class Edge2 implements ReadonlyEdge2 {
         const v1 = this.direction();
         const v2 = this.p0.sub(p);
 
-        return v1.cross(v2) / v1.len();
+        return v1.cross(v2) / v1.length();
     }
 
     /**
@@ -560,7 +560,7 @@ export class Edge3 implements ReadonlyEdge3 {
         const v1 = this.direction();
         const v2 = this.p0.sub(p);
 
-        return v1.cross(v2).len() / v1.len();
+        return v1.cross(v2).length() / v1.length();
     }
 
     public getNormalAround(v: ReadonlyVector3): Edge3 {
@@ -576,7 +576,7 @@ export class Edge3 implements ReadonlyEdge3 {
         const v1 = this.direction();
         const v2 = p.sub(this.p0);
 
-        return v1.dot(v2) / v1.lenSq();
+        return v1.dot(v2) / v1.lengthSquared();
     }
 
     public getProjectedEdge(p0: ReadonlyVector2, p1: ReadonlyVector2): Edge3 {

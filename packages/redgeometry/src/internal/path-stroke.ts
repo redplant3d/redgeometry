@@ -380,7 +380,7 @@ export class StrokeState {
 
             v1 = v1.add(v2);
 
-            v1 = v1.mulS(2 * d).divS(v1.lenSq());
+            v1 = v1.mulS(2 * d).divS(v1.lengthSquared());
             v2 = v2.mulS(d);
 
             this.left.quadTo(c.p1.add(v1), c.p2.add(v2));

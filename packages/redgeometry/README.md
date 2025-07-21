@@ -10,7 +10,7 @@ This package provides optimized bundles for CJS and ESM via `redgeometry` import
 import { Vector2, log } from "redgeometry";
 
 const v = new Vector2(1, 2);
-log.infoDebug("len = {}", v.len());
+log.infoDebug("length = {}", v.length());
 ```
 
 ## Advanced
@@ -23,7 +23,7 @@ import { Vector2 } from "redgeometry/src/primitives/vector";
 import { log } from "redgeometry/src/utility/debug";
 
 const v = new Vector2(1, 2);
-log.infoDebug("len = {}", v.len());
+log.infoDebug("length = {}", v.length());
 ```
 
 The behavior is controlled by global environment variables, which can be replaced at compile time, e.g. by esbuild with [defines](https://esbuild.github.io/api/#define):

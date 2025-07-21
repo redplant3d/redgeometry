@@ -28,8 +28,8 @@ export interface ReadonlyQuaternion {
     getEulerAngles(order: RotationOrder): { x: number; y: number; z: number };
     inverse(): Quaternion;
     isIdentity(): boolean;
-    len(): number;
-    lenSq(): number;
+    length(): number;
+    lengthSquared(): number;
     lerp(q: ReadonlyQuaternion, t: number): Quaternion;
     mul(q: ReadonlyQuaternion): Quaternion;
     mulV(v: ReadonlyVector3): Vector3;
@@ -108,8 +108,8 @@ export class Quaternion implements ReadonlyQuaternion {
         const sin = Math.sin(0.5 * angle);
         const cos = Math.cos(0.5 * angle);
 
-        // `cos * v.len()` ensures correct scaling
-        return new Quaternion(cos * v.len(), sin * v.x, sin * v.y, sin * v.z);
+        // `cos * v.length()` ensures correct scaling
+        return new Quaternion(cos * v.length(), sin * v.x, sin * v.y, sin * v.z);
     }
 
     /**
@@ -252,7 +252,7 @@ export class Quaternion implements ReadonlyQuaternion {
     public angleTo(q: ReadonlyQuaternion): number {
         // Glenn Davis formula (referenced by Ken Shoemake)
         const dot = this.a * q.a + this.b * q.b + this.c * q.c + this.d * q.d;
-        const lenSq2 = this.lenSq() * q.lenSq();
+        const lenSq2 = this.lengthSquared() * q.lengthSquared();
         const sqrt = Math.sqrt(lenSq2);
 
         if (sqrt <= dot) {
@@ -283,7 +283,7 @@ export class Quaternion implements ReadonlyQuaternion {
      * Note: The angle is also depending on the direction of the rotation axis.
      */
     public axisAngle(): number {
-        const qa = this.a / this.len();
+        const qa = this.a / this.length();
         return 2 * Math.acos(qa);
     }
 
@@ -386,7 +386,7 @@ export class Quaternion implements ReadonlyQuaternion {
     }
 
     public inverse(): Quaternion {
-        const s = this.lenSq();
+        const s = this.lengthSquared();
         return new Quaternion(this.a / s, -this.b / s, -this.c / s, -this.d / s);
     }
 
@@ -394,11 +394,11 @@ export class Quaternion implements ReadonlyQuaternion {
         return this.a === 1 && this.b === 0 && this.c === 0 && this.d === 0;
     }
 
-    public len(): number {
-        return Math.sqrt(this.lenSq());
+    public length(): number {
+        return Math.sqrt(this.lengthSquared());
     }
 
-    public lenSq(): number {
+    public lengthSquared(): number {
         return this.a * this.a + this.b * this.b + this.c * this.c + this.d * this.d;
     }
 
@@ -478,7 +478,7 @@ export class Quaternion implements ReadonlyQuaternion {
      * - https://en.wikipedia.org/wiki/Quaternion#Exponential,_logarithm,_and_power_functions
      */
     public pow(x: number): Quaternion {
-        const len = this.len();
+        const len = this.length();
         const r = Math.pow(len, x);
         const angle = x * Math.acos(this.a / len);
         const rsin = r * Math.sin(angle);
@@ -647,7 +647,7 @@ export class Quaternion implements ReadonlyQuaternion {
     public slerp(q: ReadonlyQuaternion, t: number): Quaternion {
         // Glenn Davis formula (referenced by Ken Shoemake)
         const dot = this.a * q.a + this.b * q.b + this.c * q.c + this.d * q.d;
-        const lenSq2 = this.lenSq() * q.lenSq();
+        const lenSq2 = this.lengthSquared() * q.lengthSquared();
 
         if (dot * dot >= lenSq2) {
             // Fallback (angle either undefined, very close or equal to zero)
@@ -685,7 +685,7 @@ export class Quaternion implements ReadonlyQuaternion {
     }
 
     public unit(): Quaternion {
-        const s = this.len();
+        const s = this.length();
         return new Quaternion(this.a / s, this.b / s, this.c / s, this.d / s);
     }
 }

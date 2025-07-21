@@ -1113,9 +1113,9 @@ export class MeshEdge2 {
         // | bx  by  bx^2 + by^2  1 | = | (bx - dx)  (by - dy)  (bx^2 - dx^2) + (by^2 - dy^2) |
         // | cx  cy  cx^2 + cy^2  1 |   | (cx - dx)  (cy - dy)  (cx^2 - dx^2) + (cy^2 - dy^2) |
         // | dx  dy  dx^2 + dy^2  1 |
-        const a = va.lenSq() * vb.cross(vc);
-        const b = vb.lenSq() * va.cross(vc);
-        const c = vc.lenSq() * va.cross(vb);
+        const a = va.lengthSquared() * vb.cross(vc);
+        const b = vb.lengthSquared() * va.cross(vc);
+        const c = vc.lengthSquared() * va.cross(vb);
 
         // D lies inside the incircle of A, B and C if the determinant > 0
         return a - b + c > 0;
