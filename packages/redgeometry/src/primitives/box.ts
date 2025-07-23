@@ -715,9 +715,9 @@ export class MinMaxBox3 implements ReadonlyMinMaxBox3 {
         return new MinMaxBox3(
             this.minX - sx,
             this.minY - sy,
+            this.minZ - sz,
             this.maxX + sx,
             this.maxY + sy,
-            this.maxZ + sz,
             this.maxZ + sz,
         );
     }
