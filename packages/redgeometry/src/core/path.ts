@@ -446,30 +446,6 @@ export class Path2 implements PathSink2 {
         return isWindingInside(wind, windingOperator);
     }
 
-    public hasPointInsideFrac(
-        p: ReadonlyVector2,
-        windingOperator: WindingOperator | CustomWindingOperator,
-        stepSize?: number,
-    ): boolean {
-        if (!this.isValid()) {
-            return false;
-        }
-
-        const step = stepSize ?? 2 ** -8;
-
-        let wind = 0;
-
-        for (const c of this.toCurves()) {
-            wind += c.windingAtFrac(p, step);
-        }
-
-        // TODO: Improve snapping
-        wind = wind / (2 * Math.PI);
-        wind = Math.round(wind);
-
-        return isWindingInside(wind, windingOperator);
-    }
-
     public isClosed(): boolean {
         return this.lastCommand()?.type === PathCommandType.CLOSE;
     }

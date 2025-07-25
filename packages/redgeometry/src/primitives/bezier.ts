@@ -71,7 +71,6 @@ export interface ReadonlyBezier1Curve2 {
     toString(): string;
     valueAt(t: number): Vector2;
     windingAt(p: ReadonlyVector2): number;
-    windingAtFrac(p: ReadonlyVector2, step: number): number;
 }
 
 export interface ReadonlyBezier2Curve2 {
@@ -110,7 +109,6 @@ export interface ReadonlyBezier2Curve2 {
     valueAt(t: number): Vector2;
     vertexParameter(): number;
     windingAt(p: ReadonlyVector2): number;
-    windingAtFrac(p: ReadonlyVector2, step: number): number;
 }
 
 export interface ReadonlyBezier3Curve2 {
@@ -146,7 +144,6 @@ export interface ReadonlyBezier3Curve2 {
     toString(): string;
     valueAt(t: number): Vector2;
     windingAt(p: ReadonlyVector2): number;
-    windingAtFrac(p: ReadonlyVector2, step: number): number;
 }
 
 export interface ReadonlyBezierRCurve2 {
@@ -177,7 +174,6 @@ export interface ReadonlyBezierRCurve2 {
     toString(): string;
     valueAt(t: number): Vector2;
     windingAt(p: ReadonlyVector2): number;
-    windingAtFrac(p: ReadonlyVector2, step: number): number;
 }
 
 export class Bezier1Curve2 implements ReadonlyBezier1Curve2 {
@@ -334,20 +330,6 @@ export class Bezier1Curve2 implements ReadonlyBezier1Curve2 {
         const x = solveLinear(v1, v0);
 
         return getWindingAtParameterLinear(this, x, p.x);
-    }
-
-    public windingAtFrac(p: ReadonlyVector2, step: number): number {
-        const vv = this.derivative();
-
-        let sum = 0;
-
-        for (let t = 0; t < 1; t += step) {
-            const v = this.valueAt(t).sub(p);
-
-            sum += v.cross(vv) / v.dot(v);
-        }
-
-        return step * sum;
     }
 }
 
@@ -720,19 +702,6 @@ export class Bezier2Curve2 implements ReadonlyBezier2Curve2 {
         }
 
         return wind;
-    }
-
-    public windingAtFrac(p: ReadonlyVector2, step: number): number {
-        let sum = 0;
-
-        for (let t = 0; t < 1; t += step) {
-            const v = this.valueAt(t).sub(p);
-            const vv = this.derivativeAt(t);
-
-            sum += v.cross(vv) / v.dot(v);
-        }
-
-        return step * sum;
     }
 }
 
@@ -1131,19 +1100,6 @@ export class Bezier3Curve2 implements ReadonlyBezier3Curve2 {
 
         return wind;
     }
-
-    public windingAtFrac(p: ReadonlyVector2, step: number): number {
-        let sum = 0;
-
-        for (let t = 0; t < 1; t += step) {
-            const v = this.valueAt(t).sub(p);
-            const vv = this.derivativeAt(t);
-
-            sum += v.cross(vv) / v.dot(v);
-        }
-
-        return step * sum;
-    }
 }
 
 export class BezierRCurve2 implements ReadonlyBezierRCurve2 {
@@ -1527,18 +1483,5 @@ export class BezierRCurve2 implements ReadonlyBezierRCurve2 {
         }
 
         return wind;
-    }
-
-    public windingAtFrac(p: ReadonlyVector2, step: number): number {
-        let sum = 0;
-
-        for (let t = 0; t < 1; t += step) {
-            const v = this.valueAt(t).sub(p);
-            const vv = this.derivativeAt(t);
-
-            sum += v.cross(vv) / v.dot(v);
-        }
-
-        return step * sum;
     }
 }
