@@ -1,5 +1,5 @@
-import { log } from "../utility/debug.js";
-import type { Constructor } from "../utility/types.js";
+import { log } from "redgeometry/src/utility/debug";
+import type { Constructor } from "redgeometry/src/utility/types";
 
 export type SerializationMapping<T = unknown, U = unknown> = {
     classType: Constructor<T>;
