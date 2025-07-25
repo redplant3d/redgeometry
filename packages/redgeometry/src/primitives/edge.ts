@@ -83,11 +83,11 @@ export class Edge2 implements ReadonlyEdge2 {
         let clipped = e;
 
         for (const clipEdge of clipEdges) {
-            const [t] = Edge2.getIntersectionParameter(clipped, clipEdge);
+            const result = Edge2.getIntersectionParameter(clipped, clipEdge);
             const a = Vector2.signedArea(clipEdge.p0, clipEdge.p1, clipped.p0);
 
-            if (t > 0 && t < 1) {
-                const p = clipped.valueAt(t);
+            if (result !== undefined && result.t1 > 0 && result.t1 < 1) {
+                const p = clipped.valueAt(result.t1);
                 if (a <= 0) {
                     clipped = new Edge2(p, clipped.p1);
                 } else {
@@ -268,23 +268,26 @@ export class Edge2 implements ReadonlyEdge2 {
         return e1.valueAt(t);
     }
 
-    public static getIntersectionParameter(e1: ReadonlyEdge2, e2: ReadonlyEdge2): [number, number] {
+    public static getIntersectionParameter(
+        e1: ReadonlyEdge2,
+        e2: ReadonlyEdge2,
+    ): { t1: number; t2: number } | undefined {
         const v1 = e1.direction();
         const v2 = e2.direction();
         const den = v1.cross(v2);
 
         if (den === 0) {
-            // Edges are collinear (TODO: Maybe return undefined)
-            return [Number.NaN, Number.NaN];
+            // Edges are collinear
+            return undefined;
         }
 
-        // `t = (p2 − p1) cross v2 / (v1 cross v2)`
-        // `u = (p2 − p1) cross v1 / (v1 cross v2)`
+        // `t1 = (p2 − p1) cross v2 / (v1 cross v2)`
+        // `t2 = (p2 − p1) cross v1 / (v1 cross v2)`
         const v = e2.p0.sub(e1.p0);
-        const t = v.cross(v2) / den;
-        const u = v.cross(v1) / den;
+        const t1 = v.cross(v2) / den;
+        const t2 = v.cross(v1) / den;
 
-        return [t, u];
+        return { t1, t2 };
     }
 
     public static isAdjacent(e1: ReadonlyEdge2, e2: ReadonlyEdge2): boolean {

@@ -98,23 +98,26 @@ export class Ray2 implements ReadonlyRay2 {
         return ray1.valueAt(t);
     }
 
-    public static getIntersectionParameter(ray1: ReadonlyRay2, ray2: ReadonlyRay2): [number, number] {
+    public static getIntersectionParameter(
+        ray1: ReadonlyRay2,
+        ray2: ReadonlyRay2,
+    ): { t1: number; t2: number } | undefined {
         const v1 = ray1.direction;
         const v2 = ray2.direction;
         const den = v1.cross(v2);
 
         if (den === 0) {
-            // Rays are collinear (TODO: Maybe return undefined)
-            return [Number.NaN, Number.NaN];
+            // Edges are collinear
+            return undefined;
         }
 
-        // `t = (p2 − p1) cross v2 / (v1 cross v2)`
-        // `u = (p2 − p1) cross v1 / (v1 cross v2)`
+        // `t1 = (p2 − p1) cross v2 / (v1 cross v2)`
+        // `t2 = (p2 − p1) cross v1 / (v1 cross v2)`
         const v = ray2.origin.sub(ray1.origin);
-        const t = v.cross(v2) / den;
-        const u = v.cross(v1) / den;
+        const t1 = v.cross(v2) / den;
+        const t2 = v.cross(v1) / den;
 
-        return [t, u];
+        return { t1, t2 };
     }
 
     public static toObject(ray: ReadonlyRay2): Ray2Like {
