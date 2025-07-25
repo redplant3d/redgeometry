@@ -1,13 +1,13 @@
 export class Bitset {
-    public data: Uint32Array;
+    public data: Int32Array;
 
-    public constructor(data: Uint32Array) {
+    public constructor(data: Int32Array) {
         this.data = data;
     }
 
     public static from(b: Bitset): Bitset {
         const len = b.minDataLength();
-        const data = new Uint32Array(len);
+        const data = new Int32Array(len);
 
         for (let i = 0; i < len; i++) {
             data[i] = b.data[i];
@@ -18,7 +18,7 @@ export class Bitset {
 
     public static fromBits(bits: ReadonlyArray<number>): Bitset {
         const maxIdx = Math.max(...bits) >>> 5;
-        const data = new Uint32Array(maxIdx + 1);
+        const data = new Int32Array(maxIdx + 1);
 
         for (const bit of bits) {
             const idx = bit >>> 5;
@@ -32,13 +32,13 @@ export class Bitset {
 
     public static fromCapacity(minBitCapacity: number): Bitset {
         const len = Math.max(minBitCapacity >>> 5, 1);
-        const data = new Uint32Array(len);
+        const data = new Int32Array(len);
 
         return new Bitset(data);
     }
 
     public static fromElements(elements: Iterable<number>): Bitset {
-        const data = new Uint32Array(elements);
+        const data = new Int32Array(elements);
         return new Bitset(data);
     }
 
@@ -62,7 +62,7 @@ export class Bitset {
     public ensureCapacity(len: number): void {
         if (this.data.length < len) {
             // Grow
-            const data = new Uint32Array(len);
+            const data = new Int32Array(len);
             data.set(this.data);
             this.data = data;
         }
@@ -120,10 +120,8 @@ export class Bitset {
 
         // Intersection
         for (let i = 0; i < len; i++) {
-            // Both values are signed integers because of bitwise operators
-            // (TODO: Is it better to use `Int32Array` for the data?)
             const a = data1[i] & data2[i];
-            const b = data1[i] | 0;
+            const b = data1[i];
 
             if (a !== b) {
                 return false;
@@ -181,7 +179,10 @@ export class Bitset {
 
         // LSB to MSB
         for (let i = 0; i < this.data.length; i++) {
-            str += this.data[i].toString(2).padStart(32, "0") + "\n";
+            // Convert to unsigned integer
+            const n = this.data[i] >>> 0;
+            str += n.toString(2).padStart(32, "0");
+            str += "\n";
         }
 
         return str;
