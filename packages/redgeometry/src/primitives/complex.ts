@@ -210,6 +210,12 @@ export class Complex implements ReadonlyComplex {
         this.b = z1.b - z2.b;
     }
 
+    public setUnit(z: ReadonlyComplex): void {
+        const s = z.length();
+        this.a = z.a / s;
+        this.b = z.b / s;
+    }
+
     public sub(z: ReadonlyComplex): Complex {
         return new Complex(this.a - z.a, this.b - z.b);
     }

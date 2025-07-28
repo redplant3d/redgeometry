@@ -528,6 +528,12 @@ export class Vector2 implements ReadonlyVector2 {
         this.y = v.y - s;
     }
 
+    public setUnit(v: ReadonlyVector2): void {
+        const s = v.length();
+        this.x = v.x / s;
+        this.y = v.y / s;
+    }
+
     /**
      * Returns the spherical linear interpolation of the current vector and `v`.
      */
@@ -993,6 +999,13 @@ export class Vector3 implements ReadonlyVector3 {
         this.z = v.z - s;
     }
 
+    public setUnit(v: ReadonlyVector3): void {
+        const s = v.length();
+        this.x = v.x / s;
+        this.y = v.y / s;
+        this.z = v.z / s;
+    }
+
     /**
      * Returns the spherical linear interpolation of the current vector and `v`.
      */
@@ -1404,6 +1417,14 @@ export class Vector4 implements ReadonlyVector4 {
         this.y = v.y - s;
         this.z = v.z - s;
         this.w = v.w - s;
+    }
+
+    public setUnit(v: ReadonlyVector4): void {
+        const s = v.length();
+        this.x = v.x / s;
+        this.y = v.y / s;
+        this.z = v.z / s;
+        this.w = v.w / s;
     }
 
     public sub(v: ReadonlyVector4): Vector4 {
