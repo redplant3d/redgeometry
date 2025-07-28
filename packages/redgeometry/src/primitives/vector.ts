@@ -95,8 +95,7 @@ export interface ReadonlyVector3 {
     neg(): Vector3;
     nlerp(v: ReadonlyVector3, t: number): Vector3;
     orthonormalBasis(): { v1: Vector3; v2: Vector3; v3: Vector3 };
-    perpTo(v: ReadonlyVector3): Vector3;
-    perpToAny(): Vector3;
+    perp(): Vector3;
     slerp(v: ReadonlyVector3, t: number): Vector3;
     sub(v: ReadonlyVector3): Vector3;
     subS(s: number): Vector3;
@@ -460,7 +459,7 @@ export class Vector2 implements ReadonlyVector2 {
     /**
      * Returns a vector that is perpendicular to the current vector.
      *
-     * The result is defined by the 3D cross product: \
+     * The result is defined by the cross product in 3D: \
      * `(x, y, 0) cross (0, 0, 1) == (y, -x, 0)`
      */
     public perp(): Vector2 {
@@ -867,16 +866,14 @@ export class Vector3 implements ReadonlyVector3 {
     }
 
     /**
-     * Returns a vector that is perpendicular to the current vector and `v`.
+     * Returns a vector that is perpendicular to the current vector.
+     *
+     * The result is defined by the cross product:
+     * - `(x, y, z) cross (1, 0, 0) == (0, z, -y)` if x is the absolute minimum
+     * - `(x, y, z) cross (0, 1, 0) == (-z, 0, x)` if y is the absolute minimum
+     * - `(x, y, z) cross (0, 0, 1) == (y, -x, 0)` if z is the absolute minimum
      */
-    public perpTo(v: ReadonlyVector3): Vector3 {
-        return this.cross(v);
-    }
-
-    /**
-     * Returns a vector that is perpendicular to the current vector and the most appropriate axis.
-     */
-    public perpToAny(): Vector3 {
+    public perp(): Vector3 {
         const absX = Math.abs(this.x);
         const absY = Math.abs(this.y);
         const absZ = Math.abs(this.z);

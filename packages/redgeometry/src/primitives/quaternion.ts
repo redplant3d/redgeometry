@@ -124,7 +124,9 @@ export class Quaternion implements ReadonlyQuaternion {
 
         // If `vu` is zero then `vd = 0` and `vn` just needs to be perpendicular to `v1`
         const vd = v1u.dot(vu);
-        const vn = vu.isZero() ? v1u.perpToAny() : v1u.perpTo(vu);
+
+        // TODO: Check for `vd === 0` instead?
+        const vn = vu.isZero() ? v1u.perp() : v1u.cross(vu);
 
         return new Quaternion(vd, vn.x, vn.y, vn.z);
     }
