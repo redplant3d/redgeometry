@@ -122,9 +122,9 @@ export class Quaternion implements ReadonlyQuaternion {
         // Vector halfway between `v1` and `v2`
         const vu = v1u.add(v2u).unitOrZero();
 
-        // If `vu` is zero then `vd = 0` and `vn` just needs to be any normal of `v1`
+        // If `vu` is zero then `vd = 0` and `vn` just needs to be perpendicular to `v1`
         const vd = v1u.dot(vu);
-        const vn = vu.isZero() ? v1u.normalAroundAny() : v1u.normalAround(vu);
+        const vn = vu.isZero() ? v1u.perpToAny() : v1u.perpTo(vu);
 
         return new Quaternion(vd, vn.x, vn.y, vn.z);
     }

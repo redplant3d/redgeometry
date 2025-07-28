@@ -10,8 +10,8 @@ export function offsetQuadraticSimple(path: Path2, c: ReadonlyBezier2Curve2, d: 
     let v2 = c.tangentEnd();
 
     if (!v1.isZero()) {
-        v1 = v1.unit().normal();
-        v2 = v2.unit().normal();
+        v1 = v1.unit().perp();
+        v2 = v2.unit().perp();
 
         v1 = v1.add(v2);
 
@@ -32,8 +32,8 @@ export function offsetQuadraticDegenerate(
     const c1 = new Bezier2Curve2(p0, p1, p1);
     const c2 = new Bezier2Curve2(p1, p1, p2);
 
-    const n0 = p1.sub(p0).unit().normal();
-    const n1 = p2.sub(p1).unit().normal();
+    const n0 = p1.sub(p0).unit().perp();
+    const n1 = p2.sub(p1).unit().perp();
 
     offsetQuadraticSimple(path, c1, d);
     insertOuterJoin(path, p1, n0, n1, d, 0, JoinType.ROUND);
@@ -49,8 +49,8 @@ export function insertOffsetJoin(
     ml: number,
     join: JoinType,
 ): void {
-    const n0 = m0.unit().normal();
-    const n1 = m1.unit().normal();
+    const n0 = m0.unit().perp();
+    const n1 = m1.unit().perp();
 
     // Check if join is not too flat
     if (n0.dot(n1) < COS_OBTUSE) {
@@ -105,8 +105,8 @@ export function insertOuterJoin(
                 path.lineTo(p.add(k));
             } else if (n0.dot(n1) <= COS_ACUTE) {
                 // Join is too sharp ('k' is approaching infinity)
-                path.lineTo(pp0.addMulS(n0.normal(), -mld));
-                path.lineTo(pp2.addMulS(n1.normal(), mld));
+                path.lineTo(pp0.addMulS(n0.perp(), -mld));
+                path.lineTo(pp2.addMulS(n1.perp(), mld));
             } else {
                 const kov = k.dot(p.sub(pp0));
                 const kok = k.dot(k);
@@ -132,7 +132,7 @@ export function insertOuterJoin(
 
             if (n0.dot(n1) < 0) {
                 // Obtuse angle (2 segments)
-                const nm = pp2.sub(pp0).unitOrZero().normal();
+                const nm = pp2.sub(pp0).unitOrZero().perp();
 
                 let k = n0.add(nm);
 

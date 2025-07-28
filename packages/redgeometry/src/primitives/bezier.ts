@@ -502,7 +502,7 @@ export class Bezier2Curve2 implements ReadonlyBezier2Curve2 {
         const pp = qa.mulS(2 * t).add(qb);
         const ppp = qa.mulS(2);
 
-        const v = pp.normal();
+        const v = pp.perp();
         const f = pp.lengthSq() / pp.cross(ppp);
 
         return p.addMulS(v, f);
@@ -876,7 +876,7 @@ export class Bezier3Curve2 implements ReadonlyBezier3Curve2 {
             .add(qc);
         const ppp = qa.mulS(6 * t).addMulS(qb, 2);
 
-        const v = pp.normal();
+        const v = pp.perp();
         const f = pp.lengthSq() / pp.cross(ppp);
 
         return p.addMulS(v, f);

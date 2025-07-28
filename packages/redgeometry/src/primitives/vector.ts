@@ -50,7 +50,7 @@ export interface ReadonlyVector2 {
     mulS(s: number): Vector2;
     neg(): Vector2;
     nlerp(v: ReadonlyVector2, t: number): Vector2;
-    normal(): Vector2;
+    perp(): Vector2;
     polarAngle(): number;
     slerp(v: ReadonlyVector2, t: number): Vector2;
     sub(v: ReadonlyVector2): Vector2;
@@ -94,12 +94,9 @@ export interface ReadonlyVector3 {
     mulS(s: number): Vector3;
     neg(): Vector3;
     nlerp(v: ReadonlyVector3, t: number): Vector3;
-    normalAround(v: ReadonlyVector3): Vector3;
-    normalAroundAny(): Vector3;
-    normalAroundX(): Vector3;
-    normalAroundY(): Vector3;
-    normalAroundZ(): Vector3;
-    orthonormalBasis(): { n1: Vector3; n2: Vector3 };
+    orthonormalBasis(): { v1: Vector3; v2: Vector3; v3: Vector3 };
+    perpTo(v: ReadonlyVector3): Vector3;
+    perpToAny(): Vector3;
     slerp(v: ReadonlyVector3, t: number): Vector3;
     sub(v: ReadonlyVector3): Vector3;
     subS(s: number): Vector3;
@@ -336,8 +333,6 @@ export class Vector2 implements ReadonlyVector2 {
      *
      * The 2D cross product is defined by the magnitude of the 3D cross product: \
      * `(x1, y1, 0) cross (x2, y2, 0) == (0, 0, x1 * y2 - y1 * x2)`
-     *
-     * Identity relating to the dot product: `v1 cross v2 === v1 dot normal(v2)`
      */
     public cross(v: ReadonlyVector2): number {
         return this.x * v.y - this.y * v.x;
@@ -371,8 +366,6 @@ export class Vector2 implements ReadonlyVector2 {
     /**
      * Returns the dot product of the current vector and `v` as a scalar value: \
      * `(x1, y1) dot (x2, y2) == x1 * x2 + y1 * y2`
-     *
-     * Identity relating to the cross product: `v1 dot v2 === normal(v1) cross v2`
      */
     public dot(v: ReadonlyVector2): number {
         return this.x * v.x + this.y * v.y;
@@ -465,12 +458,12 @@ export class Vector2 implements ReadonlyVector2 {
     }
 
     /**
-     * Returns the normal vector.
+     * Returns a vector that is perpendicular to the current vector.
      *
-     * The normal is defined by the 3D cross product: \
+     * The result is defined by the 3D cross product: \
      * `(x, y, 0) cross (0, 0, 1) == (y, -x, 0)`
      */
-    public normal(): Vector2 {
+    public perp(): Vector2 {
         return new Vector2(this.y, -this.x);
     }
 
@@ -873,81 +866,60 @@ export class Vector3 implements ReadonlyVector3 {
         return new Vector3(x / len, y / len, z / len);
     }
 
-    public normalAround(v: ReadonlyVector3): Vector3 {
+    /**
+     * Returns a vector that is perpendicular to the current vector and `v`.
+     */
+    public perpTo(v: ReadonlyVector3): Vector3 {
         return this.cross(v);
     }
 
     /**
-     * Returns the normal vector around the most appropriate axis.
+     * Returns a vector that is perpendicular to the current vector and the most appropriate axis.
      */
-    public normalAroundAny(): Vector3 {
+    public perpToAny(): Vector3 {
         const absX = Math.abs(this.x);
         const absY = Math.abs(this.y);
         const absZ = Math.abs(this.z);
 
         // Use the two biggest absolute values
         if (absX <= absY) {
-            return absX <= absZ ? this.normalAroundX() : this.normalAroundZ();
+            if (absX <= absZ) {
+                // `(x, y, z) cross (1, 0, 0) == (0, z, -y)`
+                return new Vector3(0, this.z, -this.y);
+            } else {
+                // `(x, y, z) cross (0, 0, 1) == (y, -x, 0)`
+                return new Vector3(this.y, -this.x, 0);
+            }
         } else {
-            return absY <= absZ ? this.normalAroundY() : this.normalAroundZ();
+            if (absY <= absZ) {
+                // `(x, y, z) cross (0, 1, 0) == (-z, 0, x)`
+                return new Vector3(-this.z, 0, this.x);
+            } else {
+                // `(x, y, z) cross (0, 0, 1) == (y, -x, 0)`
+                return new Vector3(this.y, -this.x, 0);
+            }
         }
     }
 
     /**
-     * Returns the normal vector around the x-axis.
-     *
-     * The normal is defined by the cross product: \
-     * `(x, y, z) cross (1, 0, 0) == (0, z, -y)`
-     *
-     * Note: Might return a zero vector.
-     */
-    public normalAroundX(): Vector3 {
-        return new Vector3(0, this.z, -this.y);
-    }
-
-    /**
-     * Returns the normal vector around the y-axis.
-     *
-     * The normal is defined by the cross product: \
-     * `(x, y, z) cross (0, 1, 0) == (-z, 0, x)`
-     *
-     * Note: Might return a zero vector.
-     */
-    public normalAroundY(): Vector3 {
-        return new Vector3(-this.z, 0, this.x);
-    }
-
-    /**
-     * Returns the normal vector around the z-axis.
-     *
-     * The normal is defined by the cross product: \
-     * `(x, y, z) cross (0, 0, 1) == (y, -x, 0)`
-     *
-     * Note: Might return a zero vector.
-     */
-    public normalAroundZ(): Vector3 {
-        return new Vector3(this.y, -this.x, 0);
-    }
-
-    /**
-     * Returns the orthonormal basis of the current (unit) vector.
+     * Returns the orthonormal basis of the current vector.
      *
      * References:
      * - Tom Duff, James Burgess, Per Christensen, Christophe Hery, Andrew Kensler, Max Liani and Ryusuke Villemin.
      *   *Building an Orthonormal Basis, Revisited*.
      *   Journal of Computer Graphics Techniques Vol. 6, No. 1, 2017.
      */
-    public orthonormalBasis(): { n1: Vector3; n2: Vector3 } {
-        const { x, y, z } = this;
+    public orthonormalBasis(): { v1: Vector3; v2: Vector3; v3: Vector3 } {
+        const v1 = this.unit();
 
-        // This implementation will only work for unit vectors.
-        const sign = z >= 0 ? 1 : -1;
-        const a = -1 / (sign + z);
-        const b = x * y * a;
-        const n1 = new Vector3(1 + sign * x * x * a, sign * b, -sign * x);
-        const n2 = new Vector3(b, sign + y * y * a, -y);
+        const sign = v1.z >= 0 ? 1 : -1;
+        const a = -1 / (sign + v1.z);
+        const b = v1.x * v1.y * a;
 
-        return { n1, n2 };
+        const v2 = new Vector3(1 + sign * v1.x * v1.x * a, sign * b, -sign * v1.x);
+        const v3 = new Vector3(b, sign + v1.y * v1.y * a, -v1.y);
+
+        return { v1, v2, v3 };
     }
 
     public set(x: number, y: number, z: number): void {

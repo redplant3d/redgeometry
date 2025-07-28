@@ -353,7 +353,7 @@ export class Polygon2 {
             const p1 = e.valueAt(maxParam);
 
             const v0 = p1.sub(p0);
-            const v1 = v0.unit().normal().mulS(minDist);
+            const v1 = v0.unit().perp().mulS(minDist);
 
             const area = v0.cross(v1);
 

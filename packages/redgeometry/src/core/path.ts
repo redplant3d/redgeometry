@@ -241,14 +241,14 @@ export class Path2 implements PathSink2 {
 
         // Iteratively process 90 degree segments
         while (a > 0.5 * Math.PI + 0.005) {
-            // TODO: Investigate correctness of `normal.neg`
-            v1 = v1.normal().neg();
-
+            // Rotate vector CCW
+            v1 = new Vector2(-v1.y, v1.x);
             const p1 = mat.mulV(vc);
             const p2 = mat.mulV(v1);
             this.arcTo(p1, p2);
 
-            vc = vc.normal().neg();
+            // Rotate control point CCW
+            vc = new Vector2(-vc.y, vc.x);
 
             a -= 0.5 * Math.PI;
         }
@@ -586,8 +586,8 @@ export class Path2 implements PathSink2 {
         if (len2 < 1) {
             const f = Math.sqrt(1 / len2 - 1);
 
-            // TODO: Investigate correctness of `normal.neg`
-            v = v.normal().neg().mulS(f);
+            // Rotate vector CCW multiplied by `f`
+            v = new Vector2(-f * v.y, f * v.x);
 
             if (largeArc !== sweep) {
                 pc = pc.add(v);
@@ -647,8 +647,8 @@ export class Path2 implements PathSink2 {
 
         // Iteratively process 90 degree segments
         while (sweepAngle > 0.5 * Math.PI + 0.005) {
-            // TODO: Investigate correctness of `normal.neg`
-            v1 = v1.normal().neg();
+            // Rotate start point CCW
+            v1 = new Vector2(-v1.y, v1.x);
 
             // Transformed points of the arc segment
             pp0 = mat.mulV(v);
@@ -656,7 +656,8 @@ export class Path2 implements PathSink2 {
 
             this.arcTo(pp0, pp1);
 
-            v = v.normal().neg();
+            // Rotate control point CCW
+            v = new Vector2(-v.y, v.x);
 
             sweepAngle -= 0.5 * Math.PI;
         }

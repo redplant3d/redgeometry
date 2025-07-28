@@ -292,14 +292,14 @@ export class StrokeState {
     }
 
     private insertLinearStroke(p: ReadonlyVector2, m: ReadonlyVector2): void {
-        const v = m.unit().normal().mulS(this.distance);
+        const v = m.unit().perp().mulS(this.distance);
 
         this.left.lineTo(p.add(v));
         this.right.lineTo(p.sub(v));
     }
 
     private insertMoveStroke(p0: ReadonlyVector2, m: ReadonlyVector2): void {
-        const v = m.unit().normal().mulS(this.distance);
+        const v = m.unit().perp().mulS(this.distance);
 
         this.left.moveTo(p0.add(v));
         this.right.moveTo(p0.sub(v));
@@ -309,8 +309,8 @@ export class StrokeState {
         const c1 = new Bezier2Curve2(p0, p1, p1);
         const c2 = new Bezier2Curve2(p1, p1, p2);
 
-        const n0 = p1.sub(p0).unit().normal();
-        const n1 = p2.sub(p1).unit().normal();
+        const n0 = p1.sub(p0).unit().perp();
+        const n1 = p2.sub(p1).unit().perp();
 
         this.insertQuadraticSimpleStroke(c1);
 
@@ -326,8 +326,8 @@ export class StrokeState {
         const c1 = new Bezier2Curve2(p0, p1, p1);
         const c2 = new Bezier2Curve2(p1, p1, p2);
 
-        const n0 = p1.sub(p0).unit().normal();
-        const n1 = p2.sub(p1).unit().normal();
+        const n0 = p1.sub(p0).unit().perp();
+        const n1 = p2.sub(p1).unit().perp();
 
         this.insertQuadraticSimpleStroke(c1);
 
@@ -375,8 +375,8 @@ export class StrokeState {
         if (!v1.isZero()) {
             const d = this.distance;
 
-            v1 = v1.unit().normal();
-            v2 = v2.unit().normal();
+            v1 = v1.unit().perp();
+            v2 = v2.unit().perp();
 
             v1 = v1.add(v2);
 
@@ -426,8 +426,8 @@ export function insertStrokeJoin(
     ml: number,
     join: JoinType,
 ): void {
-    const n0 = m0.unit().normal();
-    const n1 = m1.unit().normal();
+    const n0 = m0.unit().perp();
+    const n1 = m1.unit().perp();
 
     // Check if join is not too flat
     if (n0.dot(n1) < COS_OBTUSE) {
@@ -454,7 +454,7 @@ export function insertStrokeCap(path: Path2, p1: ReadonlyVector2, cap: CapType |
                 break;
             }
 
-            const v = p1.sub(p0).mulS(0.5).normal();
+            const v = p1.sub(p0).mulS(0.5).perp();
             path.lineTo(p0.add(v));
             path.lineTo(p1.add(v));
             path.lineTo(p1);
@@ -468,8 +468,8 @@ export function insertStrokeCap(path: Path2, p1: ReadonlyVector2, cap: CapType |
                 break;
             }
 
-            const v0 = p1.sub(p0).mulS(0.5).normal();
-            const v1 = v0.sub(v0.normal());
+            const v0 = p1.sub(p0).mulS(0.5).perp();
+            const v1 = v0.sub(v0.perp());
             path.arcTo(p0.add(v0), p0.add(v1));
             path.arcTo(p1.add(v0), p1);
 

@@ -22,8 +22,8 @@ export interface ReadonlyRay2 {
     readonly origin: ReadonlyVector2;
 
     clone(): Ray2;
-    normal(): Ray2;
     parameterFromPoint(p: ReadonlyVector2): number;
+    perp(): Ray2;
     reverse(): Ray2;
     signedDistanceFromPoint(p: ReadonlyVector2): number;
     toArray(): [number, number, number, number];
@@ -39,8 +39,8 @@ export interface ReadonlyRay3 {
     clone(): Ray3;
     distanceFromPoint(p: ReadonlyVector3): number;
     isFinite(): boolean;
-    normalAround(v: ReadonlyVector3): Ray3;
     parameterFromPoint(p: ReadonlyVector3): number;
+    perpTo(v: ReadonlyVector3): Ray3;
     reverse(): Ray3;
     toArray(): [number, number, number, number, number, number];
     toString(): string;
@@ -130,10 +130,6 @@ export class Ray2 implements ReadonlyRay2 {
         return new Ray2(this.origin, this.direction);
     }
 
-    public normal(): Ray2 {
-        return new Ray2(this.origin, this.direction.normal());
-    }
-
     /**
      * Returns the parameterized value where a point `p` is orthogonal on the ray.
      */
@@ -160,6 +156,11 @@ export class Ray2 implements ReadonlyRay2 {
     public setXY(px: number, py: number, vx: number, vy: number): void {
         this.origin = new Vector2(px, py);
         this.direction = new Vector2(vx, vy);
+    }
+
+    public perp(): Ray2 {
+        const vp = this.direction.perp();
+        return new Ray2(this.origin, vp);
     }
 
     /**
@@ -290,10 +291,6 @@ export class Ray3 implements ReadonlyRay3 {
         return this.origin.isFinite() && this.direction.isFinite();
     }
 
-    public normalAround(v: ReadonlyVector3): Ray3 {
-        return new Ray3(this.origin, this.direction.cross(v));
-    }
-
     /**
      * Returns the parameterized value where a point `p` is orthogonal on the ray.
      */
@@ -301,6 +298,11 @@ export class Ray3 implements ReadonlyRay3 {
         const v1 = this.direction;
         const v2 = p.sub(this.origin);
         return v1.dot(v2) / v1.lengthSq();
+    }
+
+    public perpTo(v: ReadonlyVector3): Ray3 {
+        const vp = this.direction.perpTo(v);
+        return new Ray3(this.origin, vp);
     }
 
     public reverse(): Ray3 {

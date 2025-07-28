@@ -1419,14 +1419,12 @@ export class OrientedBox2 implements ReadonlyOrientedBox2 {
     }
 
     public intersects(box: OrientedBox2, eps: number): boolean {
-        const va1 = this.axisX();
-        const va2 = box.axisX();
-
+        // TODO: More efficient method (maybe get axis from rotation matrix)?
         return (
-            this.intersectsOnAxis(box, va1, eps) &&
-            this.intersectsOnAxis(box, va2, eps) &&
-            this.intersectsOnAxis(box, va1.normal(), eps) &&
-            this.intersectsOnAxis(box, va2.normal(), eps)
+            this.intersectsOnAxis(box, this.axisX(), eps) &&
+            this.intersectsOnAxis(box, this.axisY(), eps) &&
+            this.intersectsOnAxis(box, box.axisX(), eps) &&
+            this.intersectsOnAxis(box, box.axisY(), eps)
         );
     }
 
@@ -1667,16 +1665,14 @@ export class OrientedBox3 implements ReadonlyOrientedBox3 {
     }
 
     public intersects(box: OrientedBox3, eps: number): boolean {
-        const va1 = this.axisX();
-        const va2 = box.axisX();
-
+        // TODO: More efficient method (maybe get axis from rotation matrix)?
         return (
-            this.intersectsOnAxis(box, va1, eps) &&
-            this.intersectsOnAxis(box, va2, eps) &&
-            this.intersectsOnAxis(box, va1.normalAroundY(), eps) &&
-            this.intersectsOnAxis(box, va2.normalAroundY(), eps) &&
-            this.intersectsOnAxis(box, va1.normalAroundZ(), eps) &&
-            this.intersectsOnAxis(box, va2.normalAroundZ(), eps)
+            this.intersectsOnAxis(box, this.axisX(), eps) &&
+            this.intersectsOnAxis(box, this.axisY(), eps) &&
+            this.intersectsOnAxis(box, this.axisZ(), eps) &&
+            this.intersectsOnAxis(box, box.axisX(), eps) &&
+            this.intersectsOnAxis(box, box.axisY(), eps) &&
+            this.intersectsOnAxis(box, box.axisZ(), eps)
         );
     }
 

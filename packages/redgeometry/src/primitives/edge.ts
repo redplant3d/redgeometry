@@ -35,8 +35,8 @@ export interface ReadonlyEdge2 {
     isFinite(): boolean;
     isPoint(): boolean;
     isPointInside(p: ReadonlyVector2): boolean;
-    normal(): Edge2;
     parameterFromPoint(p: ReadonlyVector2): number;
+    perp(): Edge2;
     reverse(): Edge2;
     signedDistanceFromPoint(p: ReadonlyVector2): number;
     toArray(): [number, number, number, number];
@@ -59,8 +59,8 @@ export interface ReadonlyEdge3 {
     distanceFromPoint(p: ReadonlyVector3): number;
     eq(e: ReadonlyEdge3): boolean;
     isFinite(): boolean;
-    normalAround(v: ReadonlyVector3): Edge3;
     parameterFromPoint(p: ReadonlyVector3): number;
+    perpTo(v: ReadonlyVector3): Edge3;
     projectedEdge(p0: ReadonlyVector2, p1: ReadonlyVector2): Edge3;
     reverse(): Edge3;
     toArray(): [number, number, number, number, number, number];
@@ -397,12 +397,6 @@ export class Edge2 implements ReadonlyEdge2 {
         return t >= 0 && t <= 1;
     }
 
-    public normal(): Edge2 {
-        const vn = this.direction().normal();
-        const p1 = this.p0.add(vn);
-        return new Edge2(this.p0, p1);
-    }
-
     /**
      * Returns the parameterized value where a point `p` is orthogonal on the edge.
      */
@@ -411,6 +405,12 @@ export class Edge2 implements ReadonlyEdge2 {
         const v2 = p.sub(this.p0);
 
         return v1.dot(v2) / v1.lengthSq();
+    }
+
+    public perp(): Edge2 {
+        const vp = this.direction().perp();
+        const p1 = this.p0.add(vp);
+        return new Edge2(this.p0, p1);
     }
 
     public reverse(): Edge2 {
@@ -570,9 +570,9 @@ export class Edge3 implements ReadonlyEdge3 {
         return this.p0.isFinite() && this.p1.isFinite();
     }
 
-    public normalAround(v: ReadonlyVector3): Edge3 {
-        const vn = this.direction().cross(v);
-        const p1 = this.p0.add(vn);
+    public perpTo(v: ReadonlyVector3): Edge3 {
+        const vp = this.direction().perpTo(v);
+        const p1 = this.p0.add(vp);
         return new Edge3(this.p0, p1);
     }
 
