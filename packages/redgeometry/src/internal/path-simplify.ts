@@ -1,4 +1,4 @@
-import { COS_ACUTE } from "../core/path-options.js";
+import { COS_ACUTE } from "../core/consts.js";
 import {
     Bezier2Curve2,
     type ReadonlyBezier2Curve2,

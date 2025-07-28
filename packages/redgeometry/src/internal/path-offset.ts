@@ -1,4 +1,5 @@
-import { COS_ACUTE, COS_OBTUSE, JoinType } from "../core/path-options.js";
+import { COS_ACUTE, COS_OBTUSE } from "../core/consts.js";
+import { JoinType } from "../core/path-options.js";
 import type { Path2 } from "../core/path.js";
 import { Bezier2Curve2, BezierRCurve2, type ReadonlyBezier2Curve2 } from "../primitives/bezier.js";
 import type { ReadonlyVector2 } from "../primitives/vector.js";

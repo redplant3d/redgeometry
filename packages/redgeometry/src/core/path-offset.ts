@@ -21,7 +21,8 @@ import {
 } from "../primitives/bezier.js";
 import { Vector2, type ReadonlyVector2 } from "../primitives/vector.js";
 import { assertUnreachable } from "../utility/debug.js";
-import { JoinType, MAX_PARAMETER, type PathOffsetOptions, type PathQualityOptions } from "./path-options.js";
+import { MAX_PARAMETER } from "./consts.js";
+import { JoinType, type PathOffsetOptions, type PathQualityOptions } from "./path-options.js";
 import { Path2 } from "./path.js";
 
 export interface PathOffset2 {

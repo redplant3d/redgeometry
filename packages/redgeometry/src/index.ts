@@ -1,3 +1,4 @@
+export * from "./core/consts.js";
 export * from "./core/mesh.js";
 export * from "./core/path-clip.js";
 export * from "./core/path-dash.js";

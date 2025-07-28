@@ -1,5 +1,5 @@
+import { COS_OBTUSE } from "../core/consts.js";
 import {
-    COS_OBTUSE,
     CapType,
     JoinType,
     PATH_STROKE_OPTIONS_DEFAULT,

@@ -21,7 +21,8 @@ import {
 } from "../primitives/bezier.js";
 import { Vector2 } from "../primitives/vector.js";
 import { assertUnreachable } from "../utility/debug.js";
-import { MAX_PARAMETER, type PathDashOptions, type PathQualityOptions } from "./path-options.js";
+import { MAX_PARAMETER } from "./consts.js";
+import { type PathDashOptions, type PathQualityOptions } from "./path-options.js";
 import { type Path2 } from "./path.js";
 
 export interface PathDash2 {
