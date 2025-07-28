@@ -89,7 +89,6 @@ export interface ReadonlyBezier2Curve2 {
     curvatureMetric(): number;
     derivativeAt(t: number): Vector2;
     derivativeCoefficients(): [Vector2, Vector2];
-    evoluteAt(t: number): Vector2;
     intersectLine(c: ReadonlyBezier1Curve2, outParameters: number[]): void;
     intersectQuad(c: ReadonlyBezier2Curve2, outParameters: Vector2[]): void;
     isCollinear(): boolean;
@@ -127,7 +126,6 @@ export interface ReadonlyBezier3Curve2 {
     curvatureMetric(): number;
     derivativeAt(t: number): Vector2;
     derivativeCoefficients(): [Vector2, Vector2, Vector2];
-    evoluteAt(t: number): Vector2;
     inflectionParameter(): [number, number];
     isCollinear(): boolean;
     isFinite(): boolean;
@@ -492,22 +490,6 @@ export class Bezier2Curve2 implements ReadonlyBezier2Curve2 {
         return [qqa, qqb];
     }
 
-    public evoluteAt(t: number): Vector2 {
-        const [qa, qb, qc] = this.coefficients();
-
-        // p = qa * t^2 + qb * t + qc
-        // pp = 2 * qa * t + qb
-        // ppp = 2 * qa
-        const p = qa.mulS(t).add(qb).mulS(t).add(qc);
-        const pp = qa.mulS(2 * t).add(qb);
-        const ppp = qa.mulS(2);
-
-        const v = pp.perp();
-        const f = pp.lengthSq() / pp.cross(ppp);
-
-        return p.addMulS(v, f);
-    }
-
     public intersectLine(c: ReadonlyBezier1Curve2, outParameters: number[]): void {
         const a0 = Vector2.signedArea(c.p0, c.p1, this.p0);
         const a1 = Vector2.signedArea(c.p0, c.p1, this.p1);
@@ -860,26 +842,6 @@ export class Bezier3Curve2 implements ReadonlyBezier3Curve2 {
         const qqc = v1.mulS(3);
 
         return [qqa, qqb, qqc];
-    }
-
-    public evoluteAt(t: number): Vector2 {
-        const [qa, qb, qc, qd] = this.coefficients();
-
-        // p = qa * t^3 + qb * t^2 + qc * t + qd
-        // pp = 3 * qa * t^2 + 2 * qb * t + qc
-        // ppp = 6 * qa * t + 2 * qb
-        const p = qa.mulS(t).add(qb).mulS(t).add(qc).mulS(t).add(qd);
-        const pp = qa
-            .mulS(3 * t)
-            .addMulS(qb, 2)
-            .mulS(t)
-            .add(qc);
-        const ppp = qa.mulS(6 * t).addMulS(qb, 2);
-
-        const v = pp.perp();
-        const f = pp.lengthSq() / pp.cross(ppp);
-
-        return p.addMulS(v, f);
     }
 
     public inflectionParameter(): [number, number] {
