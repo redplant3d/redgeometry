@@ -36,7 +36,6 @@ export interface ReadonlyEdge2 {
     isPoint(): boolean;
     isPointInside(p: ReadonlyVector2): boolean;
     parameterFromPoint(p: ReadonlyVector2): number;
-    perp(): Edge2;
     reverse(): Edge2;
     signedDistanceFromPoint(p: ReadonlyVector2): number;
     toArray(): [number, number, number, number];
@@ -60,7 +59,6 @@ export interface ReadonlyEdge3 {
     eq(e: ReadonlyEdge3): boolean;
     isFinite(): boolean;
     parameterFromPoint(p: ReadonlyVector3): number;
-    perpTo(v: ReadonlyVector3): Edge3;
     projectedEdge(p0: ReadonlyVector2, p1: ReadonlyVector2): Edge3;
     reverse(): Edge3;
     toArray(): [number, number, number, number, number, number];
@@ -407,12 +405,6 @@ export class Edge2 implements ReadonlyEdge2 {
         return v1.dot(v2) / v1.lengthSq();
     }
 
-    public perp(): Edge2 {
-        const vp = this.direction().perp();
-        const p1 = this.p0.add(vp);
-        return new Edge2(this.p0, p1);
-    }
-
     public reverse(): Edge2 {
         return new Edge2(this.p1, this.p0);
     }
@@ -568,12 +560,6 @@ export class Edge3 implements ReadonlyEdge3 {
 
     public isFinite(): boolean {
         return this.p0.isFinite() && this.p1.isFinite();
-    }
-
-    public perpTo(v: ReadonlyVector3): Edge3 {
-        const vp = this.direction().perpTo(v);
-        const p1 = this.p0.add(vp);
-        return new Edge3(this.p0, p1);
     }
 
     /**
