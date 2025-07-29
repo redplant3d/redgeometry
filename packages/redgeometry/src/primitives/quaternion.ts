@@ -114,21 +114,21 @@ export class Quaternion implements ReadonlyQuaternion {
 
     /**
      * Returns a quaternion with minimal rotation from `v1` to `v2`.
+     *
+     * Note: `v1` and `v2` are assumed to be unit vectors.
      */
     public static fromRotationBetween(v1: ReadonlyVector3, v2: ReadonlyVector3): Quaternion {
-        const v1u = v1.unit();
-        const v2u = v2.unit();
+        // This angle is doubled
+        const cos = v1.dot(v2);
 
-        // Vector halfway between `v1` and `v2`
-        const vu = v1u.add(v2u).unitOrZero();
+        // If the angle is close to 180 degrees `va` just needs to be perpendicular to `v1`
+        const va = cos < COS_ACUTE ? v1.perpAny() : v1.cross(v2);
 
-        // If `vu` is zero then `vd = 0` and `vn` just needs to be perpendicular to `v1`
-        const vd = v1u.dot(vu);
+        // We add an identity quaternion and set it to unit length to get half the rotation
+        const q = new Quaternion(cos + 1, va.x, va.y, va.z);
+        q.setUnit(q);
 
-        // TODO: Check for `vd === 0` instead?
-        const vn = vu.isZero() ? v1u.perpAny() : v1u.cross(vu);
-
-        return new Quaternion(vd, vn.x, vn.y, vn.z);
+        return q;
     }
 
     /**
