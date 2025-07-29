@@ -1,14 +1,9 @@
-import type { DefaultSystemStage, WorldId, WorldModule } from "../ecs/types.js";
+import type { DefaultSystemStage, WorldModule } from "../ecs/types.js";
 import type { World } from "../ecs/world.js";
 
 export type AnimationFrameEvent = {
     eventId: "animation-frame";
     time: number;
-};
-
-export type TimeInitData = {
-    dataId: "time-init";
-    receiverIds: WorldId[];
 };
 
 export type TimeData = {
@@ -28,15 +23,7 @@ export function startTimeSystem(world: World): void {
 }
 
 export function timeSystem(world: World): void {
-    const initData = world.readData<TimeInitData>("time-init");
-
     const animationFrameEvents = world.readEvents<AnimationFrameEvent>("animation-frame").toArray();
-
-    // Propagate events
-    for (const id of initData.receiverIds) {
-        const channel = world.getChannel(id);
-        channel.queueEvents(animationFrameEvents);
-    }
 
     let { delta, frame, time } = world.readData<TimeData>("time");
 

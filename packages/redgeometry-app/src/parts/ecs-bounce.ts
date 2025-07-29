@@ -77,9 +77,6 @@ function writeStateSystem(world: World): void {
     };
 
     world.writeData(stateData);
-
-    const channel = world.getChannel("remote");
-    channel.queueData(stateData);
 }
 
 function spawnSystem(world: World): void {
@@ -273,7 +270,7 @@ function notificationSystem(world: World): void {
 }
 
 class AppPartMainModule implements WorldModule {
-    public readonly moduleId = "main";
+    public readonly moduleId = "app-part-main";
 
     public setup(world: World): void {
         world.addSystem<DefaultSystemStage>({ stage: "start", fn: initMainSystem });
@@ -289,7 +286,7 @@ class AppPartMainModule implements WorldModule {
 }
 
 class AppPartRemoteModule implements WorldModule {
-    public readonly moduleId = "remote";
+    public readonly moduleId = "app-part-remote";
 
     public setup(world: World): void {
         world.addModules([new AppContextModule()]);
@@ -325,12 +322,6 @@ class AppPartRemoteModule implements WorldModule {
 
 export const ECS_MAIN_WORLD: WorldOptions = {
     id: "main",
-    modules: [new AppMainModule(), new AppPartMainModule()],
-    schedules: WORLD_SCHEDULE_OPTIONS_DEFAULT,
-};
-
-export const ECS_REMOTE_WORLD: WorldOptions = {
-    id: "remote",
-    modules: [new AppRemoteModule(), new AppPartRemoteModule()],
+    modules: [new AppMainModule(), new AppPartMainModule(), new AppRemoteModule(), new AppPartRemoteModule()],
     schedules: WORLD_SCHEDULE_OPTIONS_DEFAULT,
 };

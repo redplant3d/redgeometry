@@ -19,7 +19,7 @@ type CanvasStyle = string | CanvasGradient | CanvasPattern;
 export function initCanvasContextSystem(world: World): void {
     const { canvas } = world.readData<AppCanvasData>("app-canvas");
 
-    const context = canvas.getContext("2d") as CanvasRenderingContext2D | OffscreenCanvasRenderingContext2D | null;
+    const context = canvas.getContext("2d") as CanvasRenderingContext2D | null;
 
     if (context === null) {
         throwError("Unable to create app rendering context");
@@ -31,15 +31,15 @@ export function initCanvasContextSystem(world: World): void {
 }
 
 export class AppContextPlugin implements WorldPlugin {
-    private context: CanvasRenderingContext2D | OffscreenCanvasRenderingContext2D;
+    private context: CanvasRenderingContext2D;
 
     public readonly pluginId = "app-context";
 
-    public constructor(context: CanvasRenderingContext2D | OffscreenCanvasRenderingContext2D) {
+    public constructor(context: CanvasRenderingContext2D) {
         this.context = context;
     }
 
-    public get canvas(): HTMLCanvasElement | OffscreenCanvas {
+    public get canvas(): HTMLCanvasElement {
         return this.context.canvas;
     }
 
@@ -386,11 +386,7 @@ export class AppContextPlugin implements WorldPlugin {
         ctx.setTransform(el[0], el[1], el[2], el[3], el[4], el[5]);
     }
 
-    private addCircle(
-        ctx: CanvasRenderingContext2D | OffscreenCanvasRenderingContext2D,
-        c: ReadonlyVector2,
-        r: number,
-    ): void {
+    private addCircle(ctx: CanvasRenderingContext2D, c: ReadonlyVector2, r: number): void {
         ctx.moveTo(c.x + r, c.y);
         ctx.arcTo(c.x + r, c.y + r, c.x, c.y + r, r);
         ctx.arcTo(c.x - r, c.y + r, c.x - r, c.y, r);
@@ -399,10 +395,7 @@ export class AppContextPlugin implements WorldPlugin {
         ctx.closePath();
     }
 
-    private addMeshFaceToContext(
-        ctx: CanvasRenderingContext2D | OffscreenCanvasRenderingContext2D,
-        face: MeshFace2,
-    ): void {
+    private addMeshFaceToContext(ctx: CanvasRenderingContext2D, face: MeshFace2): void {
         const p0 = face.start.p0;
         ctx.moveTo(p0.x, p0.y);
 
@@ -413,7 +406,7 @@ export class AppContextPlugin implements WorldPlugin {
         ctx.closePath();
     }
 
-    private addPath(ctx: CanvasRenderingContext2D | OffscreenCanvasRenderingContext2D, path: Path2): void {
+    private addPath(ctx: CanvasRenderingContext2D, path: Path2): void {
         if (!path.isValid()) {
             return;
         }
@@ -484,7 +477,7 @@ export class AppContextPlugin implements WorldPlugin {
         }
     }
 
-    private addPolygon(ctx: CanvasRenderingContext2D | OffscreenCanvasRenderingContext2D, poly: Polygon2): void {
+    private addPolygon(ctx: CanvasRenderingContext2D, poly: Polygon2): void {
         const points = poly.points;
 
         if (points.length === 0) {

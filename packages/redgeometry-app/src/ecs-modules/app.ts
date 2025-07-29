@@ -11,7 +11,7 @@ import {
 } from "./app-input.js";
 import type { AppLauncherData } from "./app-launcher.js";
 import { InputModule, type InputInitData } from "./input.js";
-import { TimeModule, type AnimationFrameEvent, type TimeInitData } from "./time.js";
+import { TimeModule, type AnimationFrameEvent } from "./time.js";
 
 export type AppMainData = {
     dataId: "app-main";
@@ -31,7 +31,7 @@ export type AppMainInputData = {
 
 export type AppCanvasData = {
     dataId: "app-canvas";
-    canvas: HTMLCanvasElement | OffscreenCanvas;
+    canvas: HTMLCanvasElement;
 };
 
 export type AppStateData = {
@@ -72,7 +72,7 @@ export function initAppMainPreSystem(world: World): void {
 
     world.writeData<AppCanvasData>({
         dataId: "app-canvas",
-        canvas: canvas.transferControlToOffscreen(),
+        canvas,
     });
 
     canvasContainer.appendChild(canvas);
@@ -99,23 +99,17 @@ export function initAppMainPreSystem(world: World): void {
     window.addEventListener("resize", () => {
         const { canvasContainer } = world.readData<AppMainData>("app-main");
 
-        world.queueEvent<WindowResizeEvent>({
+        world.writeEvent<WindowResizeEvent>({
             eventId: "window-resize",
             width: canvasContainer.clientWidth,
             height: canvasContainer.clientHeight,
         });
     });
 
-    world.writeData<TimeInitData>({
-        dataId: "time-init",
-        receiverIds: ["remote"],
-    });
-
     world.writeData<InputInitData>({
         dataId: "input-init",
         keyboardEventHandler: self,
         mouseEventHandler: canvas,
-        receiverIds: ["remote"],
     });
 }
 
@@ -134,7 +128,7 @@ export function addAppInputsSystem(world: World): void {
 
     const randomizeButton = new ButtonInputElement("randomize", "randomize");
     randomizeButton.addEventListener("click", () => {
-        world.queueEvent<AppCommandEvent>({ eventId: "app-command", command: "randomize" });
+        world.writeEvent<AppCommandEvent>({ eventId: "app-command", command: "randomize" });
     });
     inputElements.push(randomizeButton);
 
@@ -148,7 +142,7 @@ export function addAppInputsSystem(world: World): void {
 
     const updateButton = new ButtonInputElement("update", "update");
     updateButton.addEventListener("click", () => {
-        world.queueEvent<AppCommandEvent>({ eventId: "app-command", command: "update" });
+        world.writeEvent<AppCommandEvent>({ eventId: "app-command", command: "update" });
     });
     inputElements.push(updateButton);
 
@@ -173,20 +167,6 @@ export function writeAppStateSystem(world: World): void {
 }
 
 export async function initAppMainPostSystem(world: World): Promise<void> {
-    const channel = world.getChannel("remote");
-
-    const appStateData = world.readData<AppStateData>("app-state");
-    channel.queueData<AppStateData>(appStateData);
-
-    const appCanvasData = world.readData<AppCanvasData>("app-canvas");
-    if (appCanvasData.canvas instanceof OffscreenCanvas) {
-        channel.queueData<AppCanvasData>(appCanvasData, [appCanvasData.canvas]);
-    } else {
-        channel.queueData<AppCanvasData>(appCanvasData);
-    }
-
-    await channel.runScheduleAsync("start");
-
     requestAnimationFrame((time) => {
         world.writeEvent<AnimationFrameEvent>({ eventId: "animation-frame", time });
         world.runSchedule<DefaultWorldScheduleId>("update");
@@ -194,36 +174,9 @@ export async function initAppMainPostSystem(world: World): Promise<void> {
 }
 
 export async function appMainSystem(world: World): Promise<void> {
-    const channel = world.getChannel("remote");
-
-    const windowResizeEvents = world.readEvents<WindowResizeEvent>("window-resize").toArray();
-    channel.queueEvents(windowResizeEvents);
-
-    const appStateData = world.readData<AppStateData>("app-state");
-    channel.queueData(appStateData);
-
-    const appCommandEvents = world.readEvents<AppCommandEvent>("app-command").toArray();
-    channel.queueEvents(appCommandEvents);
-
-    await channel.runScheduleAsync<DefaultWorldScheduleId>("update");
-
     requestAnimationFrame((time) => {
         world.writeEvent<AnimationFrameEvent>({ eventId: "animation-frame", time });
         world.runSchedule<DefaultWorldScheduleId>("update");
-    });
-}
-
-export function initAppRemoteSystem(world: World): void {
-    world.writeData<TimeInitData>({
-        dataId: "time-init",
-        receiverIds: [],
-    });
-
-    world.writeData<InputInitData>({
-        dataId: "input-init",
-        keyboardEventHandler: undefined,
-        mouseEventHandler: undefined,
-        receiverIds: [],
     });
 }
 
@@ -281,7 +234,6 @@ export class AppRemoteModule implements WorldModule {
     public setup(world: World): void {
         world.addModules([new TimeModule(), new InputModule()]);
 
-        world.addSystem<DefaultSystemStage>({ stage: "start-pre", fn: initAppRemoteSystem });
         world.addSystem<DefaultSystemStage>({ stage: "update-pre", fn: resizeCanvasSystem });
     }
 }

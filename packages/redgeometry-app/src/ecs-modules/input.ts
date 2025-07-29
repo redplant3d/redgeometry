@@ -1,13 +1,12 @@
 import { assertUnreachable } from "redgeometry/src/utility/debug";
 import type { Enum } from "redgeometry/src/utility/types";
-import type { DefaultSystemStage, WorldId, WorldModule, WorldPlugin } from "../ecs/types.js";
+import type { DefaultSystemStage, WorldModule, WorldPlugin } from "../ecs/types.js";
 import type { World } from "../ecs/world.js";
 
 export type InputInitData = {
     dataId: "input-init";
     keyboardEventHandler: GlobalEventHandlers | undefined;
     mouseEventHandler: GlobalEventHandlers | undefined;
-    receiverIds: WorldId[];
 };
 
 type InputCaptureData = {
@@ -280,7 +279,6 @@ export function startInputSystem(world: World): void {
 }
 
 export function updateInputSystem(world: World): void {
-    const initData = world.readData<InputInitData>("input-init");
     const captureData = world.readData<InputCaptureData>("input-capture");
 
     // Write events
@@ -288,15 +286,6 @@ export function updateInputSystem(world: World): void {
     world.writeEvents(captureData.mouseButtonEvents);
     world.writeEvents(captureData.mouseMotionEvents);
     world.writeEvents(captureData.mouseWheelEvents);
-
-    // Propagate events
-    for (const id of initData.receiverIds) {
-        const channel = world.getChannel(id);
-        channel.queueEvents(captureData.keyboardButtonEvents);
-        channel.queueEvents(captureData.mouseButtonEvents);
-        channel.queueEvents(captureData.mouseMotionEvents);
-        channel.queueEvents(captureData.mouseWheelEvents);
-    }
 
     // Reset event capture data
     captureData.keyboardButtonEvents.length = 0;

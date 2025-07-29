@@ -16,7 +16,6 @@ import type {
     WorldDataIdOf,
     WorldEvent,
     WorldEventIdOf,
-    WorldId,
     WorldModule,
     WorldModuleId,
     WorldPlugin,
@@ -24,17 +23,6 @@ import type {
     WorldPluginIdOf,
     WorldScheduleId,
 } from "./types.js";
-
-/**
- * Channel to remote worlds.
- */
-export interface WorldChannel {
-    queueData<T extends WorldData>(data: T, transfer?: Transferable[]): void;
-    queueEvent<T extends WorldEvent>(event: T, transfer?: Transferable[]): void;
-    queueEvents<T extends WorldEvent>(events: T[], transfer?: Transferable[]): void;
-    queueSchedule<T extends WorldScheduleId>(stage: T): void;
-    runScheduleAsync<T extends WorldScheduleId>(stage: T): Promise<void>;
-}
 
 export type WorldScheduleOptions<
     T extends WorldScheduleId = DefaultWorldScheduleId,
@@ -83,7 +71,6 @@ export const WORLD_SCHEDULE_OPTIONS_DEFAULT: WorldScheduleOptions<DefaultWorldSc
 ];
 
 export class World {
-    private channels: Map<WorldId, WorldChannel>;
     private data: Map<WorldDataId, WorldData | undefined>;
     private ecStorage: EntityComponentStorage;
     private evStorage: WorldEventStorage;
@@ -93,7 +80,6 @@ export class World {
     private stages: Map<WorldScheduleId, SystemSchedule[]>;
 
     public constructor() {
-        this.channels = new Map();
         this.data = new Map();
         this.ecStorage = new EntityComponentStorage();
         this.evStorage = new WorldEventStorage();
@@ -101,14 +87,6 @@ export class World {
         this.plugins = new Map();
         this.schedules = new Map();
         this.stages = new Map();
-    }
-
-    public addChannel(id: WorldId, channel: WorldChannel): void {
-        if (this.channels.has(id)) {
-            log.warn("World channel '{}' already exists and will be overwritten", id);
-        }
-
-        this.channels.set(id, channel);
     }
 
     public addComponent<T extends Component>(entityId: EntityId, component: T): void {
@@ -168,16 +146,6 @@ export class World {
 
     public destroyEntity(entity: EntityId): void {
         this.ecStorage.destroyEntity(entity);
-    }
-
-    public getChannel(worldId: WorldId): WorldChannel {
-        const remote = this.channels.get(worldId);
-
-        if (remote === undefined) {
-            throwError("World channel '{}' not available", worldId);
-        }
-
-        return remote;
     }
 
     public findComponent<T extends Component>(entity: EntityId, componentId: ComponentIdOf<T>): T | undefined {
@@ -266,10 +234,6 @@ export class World {
         predicate: (q: EntityComponentQueryValue<T>) => boolean,
     ): EntityComponentIterator<T> {
         return this.ecStorage.queryEntities(predicate);
-    }
-
-    public queueEvent<T extends WorldEvent>(event: T): void {
-        this.evStorage.addEvent(event);
     }
 
     public readData<T extends WorldData>(type: WorldDataIdOf<T>): T {

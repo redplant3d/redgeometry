@@ -68,9 +68,6 @@ function writeStateSystem(world: World): void {
     };
 
     world.writeData(stateData);
-
-    const channel = world.getChannel("remote");
-    channel.queueData(stateData);
 }
 
 function updateSystem(world: World): void {
@@ -291,12 +288,6 @@ class AppPartRemoteModule implements WorldModule {
 
 export const SNAP_ROUNDING_MAIN_WORLD: WorldOptions = {
     id: "main",
-    modules: [new AppMainModule(), new AppPartMainModule()],
-    schedules: WORLD_SCHEDULE_OPTIONS_DEFAULT,
-};
-
-export const SNAP_ROUNDING_REMOTE_WORLD: WorldOptions = {
-    id: "remote",
-    modules: [new AppRemoteModule(), new AppPartRemoteModule()],
+    modules: [new AppMainModule(), new AppPartMainModule(), new AppRemoteModule(), new AppPartRemoteModule()],
     schedules: WORLD_SCHEDULE_OPTIONS_DEFAULT,
 };

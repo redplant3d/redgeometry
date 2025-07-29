@@ -1,7 +1,7 @@
 import { throwError } from "redgeometry/src/utility/debug";
 import type { AppContext, AppRemoteChild, AppRemoteParent } from "../ecs/app.js";
 import type { WorldData, WorldEvent, WorldGroupId, WorldId, WorldScheduleId } from "../ecs/types.js";
-import type { World, WorldChannel } from "../ecs/world.js";
+import type { World } from "../ecs/world.js";
 
 export type AppMessageRequestData = {
     worldId: WorldId;
@@ -43,7 +43,7 @@ export type WorldGroupParent = {
     channelMap: Map<WorldId, WorldChannelRemote>;
 };
 
-export class WorldChannelLocal implements WorldChannel {
+export class WorldChannelLocal {
     public readonly world: World;
     public readonly worldId: WorldId;
 
@@ -92,7 +92,7 @@ export class WorldChannelLocal implements WorldChannel {
     }
 }
 
-export class WorldChannelRemote implements WorldChannel {
+export class WorldChannelRemote {
     public readonly remote: AppRemoteChild | undefined;
     public readonly worldId: WorldId;
 
@@ -192,28 +192,7 @@ export class WorldGroup {
     }
 
     public init(): void {
-        const { channelMap, children, parent } = this;
-
-        // Add channels to worlds
-        for (const { world, worldId } of channelMap.values()) {
-            for (const channel of channelMap.values()) {
-                if (channel.worldId !== worldId) {
-                    world.addChannel(channel.worldId, channel);
-                }
-            }
-
-            for (const child of children) {
-                for (const channel of child.channelMap.values()) {
-                    world.addChannel(channel.worldId, channel);
-                }
-            }
-
-            if (parent !== undefined) {
-                for (const channel of parent.channelMap.values()) {
-                    world.addChannel(channel.worldId, channel);
-                }
-            }
-        }
+        const { children, parent } = this;
 
         const resFn = this.receiveResponse.bind(this);
         const reqFn = this.receiveRequest.bind(this);
@@ -285,23 +264,6 @@ export class WorldGroup {
     }
 }
 
-export interface WorkerRef {
-    readonly name: string;
-
-    addEventListener(
-        type: string,
-        listener: (this: WorkerRef, ev: MessageEvent) => unknown,
-        options?: boolean | AddEventListenerOptions,
-    ): void;
-    close(): void;
-    postMessage<T>(message: T, transfer: Transferable[]): void;
-    removeEventListener(
-        type: string,
-        listener: EventListenerOrEventListenerObject,
-        options?: boolean | EventListenerOptions,
-    ): void;
-}
-
 export class LocalAppRemote implements AppRemoteChild, AppRemoteParent {
     private requestFn: AppMessageRequestFn;
     private responseFn: AppMessageResponseFn;
@@ -367,100 +329,5 @@ export class LocalAppRemote implements AppRemoteChild, AppRemoteParent {
         await Promise.resolve();
 
         return this.requestFn(message);
-    }
-}
-
-export class WebAppRemoteChild implements AppRemoteChild {
-    private callbacks: Map<number, { resolve: (value: void) => void; reject: (reason?: unknown) => void }>;
-    private currentMessageId: number;
-    private worker: Worker;
-
-    public readonly requestReceiverId: WorldGroupId;
-    public readonly requestSenderId: WorldGroupId;
-
-    public constructor(requestSenderId: WorldGroupId, requestReceiverId: WorldGroupId, scriptURL: URL | string) {
-        this.requestSenderId = requestSenderId;
-        this.requestReceiverId = requestReceiverId;
-
-        this.callbacks = new Map();
-        this.currentMessageId = 0;
-        this.worker = new Worker(scriptURL, { name: requestReceiverId });
-    }
-
-    public sendRequest(data: AppMessageRequestData, transfer: Transferable[]): void {
-        const message: AppMessageRequest = {
-            type: "AppMessageRequest",
-            data,
-            messageId: this.currentMessageId,
-            senderId: this.requestSenderId,
-        };
-
-        this.currentMessageId += 1;
-        this.worker.postMessage(message, transfer);
-    }
-
-    public async sendRequestAsync(data: AppMessageRequestData, transfer: Transferable[]): Promise<void> {
-        const message: AppMessageRequest = {
-            type: "AppMessageRequest",
-            data,
-            messageId: this.currentMessageId,
-            senderId: this.requestSenderId,
-        };
-
-        const promise = new Promise<void>((resolve, reject) => {
-            this.callbacks.set(this.currentMessageId, { resolve, reject });
-        });
-
-        this.currentMessageId += 1;
-        this.worker.postMessage(message, transfer);
-
-        return promise;
-    }
-
-    public setReceiveResponseFn(resFn: AppMessageResponseFn): void {
-        this.worker.addEventListener("message", (ev: MessageEvent<AppMessageResponse>) => {
-            const { data } = ev;
-
-            resFn(data);
-
-            const callback = this.callbacks.get(data.messageId);
-
-            if (callback === undefined) {
-                return;
-            }
-
-            callback.resolve();
-
-            this.callbacks.delete(data.messageId);
-        });
-    }
-}
-
-export class WebAppRemoteParent implements AppRemoteParent {
-    private workerRef: WorkerRef;
-
-    public readonly responseReceiverId: WorldGroupId;
-    public readonly responseSenderId: WorldGroupId;
-
-    public constructor(responseSenderId: WorldGroupId, responseReceiverId: WorldGroupId) {
-        this.responseSenderId = responseSenderId;
-        this.responseReceiverId = responseReceiverId;
-
-        this.workerRef = self as WorkerRef;
-    }
-
-    public sendResponse(requestMessageId: number, data: AppMessageResponseData[], transfer: Transferable[]): void {
-        const message: AppMessageResponse = {
-            type: "AppMessageResponse",
-            data,
-            messageId: requestMessageId,
-            senderId: this.responseSenderId,
-        };
-
-        this.workerRef.postMessage(message, transfer);
-    }
-
-    public setReceiveRequestFn(fn: AppMessageRequestFn): void {
-        this.workerRef.addEventListener("message", (ev) => fn(ev.data));
     }
 }

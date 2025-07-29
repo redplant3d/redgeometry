@@ -1,8 +1,6 @@
 import { assertDebug, log, throwError } from "redgeometry/src/utility/debug";
 import {
     LocalAppRemote,
-    WebAppRemoteChild,
-    WebAppRemoteParent,
     WorldChannelLocal,
     WorldChannelRemote,
     WorldGroup,
@@ -231,51 +229,5 @@ export class LocalAppContext implements AppContext {
 
     public isValidGroup(_groupOptions: WorldGroupOptions): boolean {
         return true;
-    }
-}
-
-export class WebAppContext implements AppContext {
-    private defaultScriptURL: string | URL;
-
-    public readonly isMain: boolean;
-    public readonly isWorker: boolean;
-    public readonly selfName: string | undefined;
-
-    public constructor(defaultScriptURL: string | URL) {
-        this.defaultScriptURL = defaultScriptURL;
-
-        const isMain = typeof window !== "undefined";
-        const isWorker = !isMain;
-        const selfName = isWorker ? self.name : undefined;
-
-        this.isMain = isMain;
-        this.isWorker = isWorker;
-        this.selfName = selfName;
-    }
-
-    public createRemoteChild(
-        requestSenderId: WorldGroupId,
-        requestReceiverId: WorldGroupId,
-        scriptURL: URL | string | undefined,
-    ): AppRemoteChild {
-        return new WebAppRemoteChild(requestSenderId, requestReceiverId, scriptURL ?? this.defaultScriptURL);
-    }
-
-    public createRemoteParent(responseSenderId: WorldGroupId, responseReceiverId: WorldGroupId): AppRemoteParent {
-        return new WebAppRemoteParent(responseSenderId, responseReceiverId);
-    }
-
-    public isValidGroup(groupOptions: WorldGroupOptions): boolean {
-        const workerName = groupOptions.id;
-
-        if (this.selfName === workerName) {
-            return true;
-        }
-
-        if (this.selfName === undefined && groupOptions.parent === undefined) {
-            return true;
-        }
-
-        return false;
     }
 }
