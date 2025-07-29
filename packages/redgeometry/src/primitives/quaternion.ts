@@ -126,7 +126,7 @@ export class Quaternion implements ReadonlyQuaternion {
         const vd = v1u.dot(vu);
 
         // TODO: Check for `vd === 0` instead?
-        const vn = vu.isZero() ? v1u.perp() : v1u.cross(vu);
+        const vn = vu.isZero() ? v1u.perpAny() : v1u.cross(vu);
 
         return new Quaternion(vd, vn.x, vn.y, vn.z);
     }
