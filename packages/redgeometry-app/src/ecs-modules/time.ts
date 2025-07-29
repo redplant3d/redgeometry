@@ -30,7 +30,7 @@ export function startTimeSystem(world: World): void {
 export function timeSystem(world: World): void {
     const initData = world.readData<TimeInitData>("time-init");
 
-    const animationFrameEvents = world.readEvents<AnimationFrameEvent>("animation-frame");
+    const animationFrameEvents = world.readEvents<AnimationFrameEvent>("animation-frame").toArray();
 
     // Propagate events
     for (const id of initData.receiverIds) {

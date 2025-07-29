@@ -306,15 +306,15 @@ export function updateInputSystem(world: World): void {
 
     // Update keyboard plugin
     const keyboardPlugin = world.getPlugin<KeyboardPlugin>("keyboard");
-    const keyboardButtonEvents = world.readEvents<InputKeyboardButtonEvent>("input-keyboard-button");
+    const keyboardButtonEvents = world.readEvents<InputKeyboardButtonEvent>("input-keyboard-button").toArray();
     keyboardPlugin.clear();
     keyboardPlugin.applyEvents(keyboardButtonEvents);
 
     // Update mouse plugin
     const mousePlugin = world.getPlugin<MousePlugin>("mouse");
-    const mouseButtonEvents = world.readEvents<InputMouseButtonEvent>("input-mouse-button");
-    const mouseMotionEvents = world.readEvents<InputMouseMotionEvent>("input-mouse-motion");
-    const mouseWheelEvents = world.readEvents<InputMouseWheelEvent>("input-mouse-wheel");
+    const mouseButtonEvents = world.readEvents<InputMouseButtonEvent>("input-mouse-button").toArray();
+    const mouseMotionEvents = world.readEvents<InputMouseMotionEvent>("input-mouse-motion").toArray();
+    const mouseWheelEvents = world.readEvents<InputMouseWheelEvent>("input-mouse-wheel").toArray();
     mousePlugin.clear();
     mousePlugin.applyEvents(mouseButtonEvents, mouseMotionEvents, mouseWheelEvents);
 }

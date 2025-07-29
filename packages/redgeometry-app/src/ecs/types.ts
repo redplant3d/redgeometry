@@ -1,5 +1,5 @@
 import type { Nominal } from "redgeometry/src/utility/types";
-import type { World } from "./world.js";
+import type { ComponentFlags, EntityFlags, World } from "./world.js";
 
 // Entity
 export type EntityId = Nominal<number, "EntityId">;
@@ -11,16 +11,13 @@ export type Component = { readonly componentId: ComponentId };
 export type ComponentIdOf<T extends Component> = T["componentId"];
 export type ComponentIdsOf<T extends Component[]> = { [P in keyof T]: ComponentIdOf<T[P]> };
 
+export type ComponentUnion<T extends Component[]> = T[number];
+
 // System
 export type SystemSync = (world: World) => void;
 export type SystemAsync = (world: World) => Promise<void>;
 
-export type SystemArgs = [unknown, ...unknown[]];
-
-export type SystemWithArgsSync<T extends SystemArgs> = (world: World, ...args: T) => void;
-export type SystemWithArgsAsync<T extends SystemArgs> = (world: World, ...args: T) => Promise<void>;
-
-export type System = SystemSync | SystemAsync | SystemWithArgsSync<SystemArgs> | SystemWithArgsAsync<SystemArgs>;
+export type System = SystemSync | SystemAsync;
 
 // System stage
 export type SystemStage = string;
@@ -65,18 +62,51 @@ export type WorldEventId = string;
 export type WorldEvent = { readonly eventId: WorldEventId };
 
 export type WorldEventIdOf<T extends WorldEvent> = T["eventId"];
+export type WorldEventIdsOf<T extends WorldEvent[]> = { [P in keyof T]: WorldEventIdOf<T[P]> };
+
+export type WorldEventUnion<T extends WorldEvent[]> = T[number];
 
 // World schedule
 export type WorldScheduleId = string;
 
 export type DefaultWorldScheduleId = "start" | "update" | "stop";
 
-// Serializable
-export type Serializable = {
-    toArray(): number[];
-};
+// Query
+export interface EntityComponentQueryValue<U extends Component> {
+    /**
+     * Equivalent to `hasComponentFlagsAny(componentId,
+     * ComponentFlags.Default | ComponentFlags.Added | ComponentFlags.Updated)`
+     */
+    hasComponent<T extends U>(componentId: ComponentIdOf<T>): boolean;
+    hasComponentFlags<T extends U>(componentId: ComponentIdOf<T>, flagMask: ComponentFlags): boolean;
+    hasComponentFlagsAny<T extends U>(componentId: ComponentIdOf<T>, flagMask: ComponentFlags): boolean;
+    hasEntityFlags(flagMask: EntityFlags): boolean;
+    hasEntityFlagsAny(flagMask: EntityFlags): boolean;
+    /**
+     * Equivalent to `hasEntityFlagsAny(EntityFlags.Default | EntityFlags.Created)`
+     */
+    isEntityAlive(): boolean;
+}
 
-export type SerializableConstructor<T extends Serializable> = {
-    new (...args: never[]): T;
-    fromArray(data: number[]): T;
-};
+export interface EntityComponentIterator<U extends Component> {
+    findComponent<T extends Component>(componentId: ComponentIdOf<T>): T | undefined;
+    getComponent<T extends U>(componentId: ComponentIdOf<T>): T;
+    getComponentFlags<T extends Component>(componentId: ComponentIdOf<T>): ComponentFlags;
+    getEntityFlags(): EntityFlags;
+    getEntityId(): EntityId;
+    /**
+     * Equivalent to `hasComponentFlagsAny(componentId,
+     * ComponentFlags.Default | ComponentFlags.Added | ComponentFlags.Updated)`
+     */
+    hasComponent<T extends Component>(componentId: ComponentIdOf<T>): boolean;
+    hasComponentFlags<T extends Component>(componentId: ComponentIdOf<T>, flagMask: ComponentFlags): boolean;
+    hasComponentFlagsAny<T extends Component>(componentId: ComponentIdOf<T>, flagMask: ComponentFlags): boolean;
+    hasEntityFlags(flagMask: EntityFlags): boolean;
+    hasEntityFlagsAny(flagMask: EntityFlags): boolean;
+    /**
+     * Equivalent to `hasEntityFlagsAny(EntityFlags.Default | EntityFlags.Created)`
+     */
+    isEntityAlive(): boolean;
+    next(): boolean;
+    toEntityIdArray(): EntityId[];
+}

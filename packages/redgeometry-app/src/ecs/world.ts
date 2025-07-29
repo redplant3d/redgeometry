@@ -1,30 +1,20 @@
 import { log, throwError } from "redgeometry/src/utility/debug";
-import {
-    EntityComponentIterator,
-    EntityComponentStorage,
-    EntityHierarchySelector,
-} from "../utility/ecs-storage-sparse.js";
-import {
-    SystemSchedule,
-    type SystemDependencyOptions,
-    type SystemOptions,
-    type SystemWithArgsOptions,
-    type SystemsOptions,
-} from "./schedule.js";
+import { EntityComponentStorage } from "./entity-component.js";
+import { WorldEventIterator, WorldEventStorage } from "./event.js";
+import { SystemSchedule, type SystemDependencyOptions, type SystemOptions, type SystemsOptions } from "./schedule.js";
 import type {
     Component,
     ComponentIdOf,
-    ComponentIdsOf,
     DefaultSystemStage,
     DefaultWorldScheduleId,
+    EntityComponentIterator,
+    EntityComponentQueryValue,
     EntityId,
-    SystemArgs,
     SystemStage,
     WorldData,
     WorldDataId,
     WorldDataIdOf,
     WorldEvent,
-    WorldEventId,
     WorldEventIdOf,
     WorldId,
     WorldModule,
@@ -34,8 +24,6 @@ import type {
     WorldPluginIdOf,
     WorldScheduleId,
 } from "./types.js";
-
-export { EntityComponentIterator, EntityHierarchySelector };
 
 /**
  * Channel to remote worlds.
@@ -60,13 +48,24 @@ export type WorldScheduleStage<T extends SystemStage> = {
     id: T;
 };
 
-export const ChangeFlags = {
+export const ComponentFlags = {
     NONE: 0,
-    CREATED: 1,
-    UPDATED: 2,
-    DELETED: 4,
-} as const;
-export type ChangeFlags = number;
+    DEFAULT: 1,
+    ADDED: 2,
+    UPDATED: 4,
+    DELETED: 8,
+    ALL: 15,
+};
+export type ComponentFlags = number;
+
+export const EntityFlags = {
+    NONE: 0,
+    DEFAULT: 1,
+    CREATED: 2,
+    DESTROYED: 4,
+    ALL: 7,
+};
+export type EntityFlags = number;
 
 export const WORLD_SCHEDULE_OPTIONS_DEFAULT: WorldScheduleOptions<DefaultWorldScheduleId, DefaultSystemStage>[] = [
     {
@@ -83,25 +82,21 @@ export const WORLD_SCHEDULE_OPTIONS_DEFAULT: WorldScheduleOptions<DefaultWorldSc
     },
 ];
 
-/**
- * Represents an instance context for entities and systems.
- */
 export class World {
     private channels: Map<WorldId, WorldChannel>;
     private data: Map<WorldDataId, WorldData | undefined>;
     private ecStorage: EntityComponentStorage;
-    private events: Map<WorldEventId, WorldEvent[]>;
+    private evStorage: WorldEventStorage;
     private modules: Map<WorldModuleId, WorldModule>;
     private plugins: Map<WorldPluginId, WorldPlugin | undefined>;
     private schedules: Map<SystemStage, SystemSchedule>;
     private stages: Map<WorldScheduleId, SystemSchedule[]>;
 
     public constructor() {
-        this.ecStorage = new EntityComponentStorage();
-
         this.channels = new Map();
         this.data = new Map();
-        this.events = new Map();
+        this.ecStorage = new EntityComponentStorage();
+        this.evStorage = new WorldEventStorage();
         this.modules = new Map();
         this.plugins = new Map();
         this.schedules = new Map();
@@ -114,6 +109,10 @@ export class World {
         }
 
         this.channels.set(id, channel);
+    }
+
+    public addComponent<T extends Component>(entityId: EntityId, component: T): void {
+        this.ecStorage.addComponent(entityId, component);
     }
 
     public addDependency<T extends SystemStage>(dep: SystemDependencyOptions<T>): void {
@@ -150,46 +149,25 @@ export class World {
         schedule.addSystem(options);
     }
 
-    public addSystemWithArgs<T extends SystemStage, U extends SystemArgs>(options: SystemWithArgsOptions<T, U>): void {
-        const schedule = this.getSchedule(options.stage);
-        schedule.addSystemWithArgs(options);
-    }
-
     public addSystems<T extends SystemStage>(options: SystemsOptions<T>): void {
         const schedule = this.getSchedule(options.stage);
         schedule.addSystems(options);
     }
 
-    /**
-     * Clears all entities from this world.
-     */
     public clearEntities(): void {
         this.ecStorage.clear();
     }
 
-    /**
-     * Creates a new entity.
-     */
-    public createEntity<T extends Component[]>(parent: EntityId | undefined, ...components: T): EntityId {
-        return this.ecStorage.createEntity(parent, components);
+    public createEntity(): EntityId {
+        return this.ecStorage.createEntity();
     }
 
-    public createHierarchySelector(): EntityHierarchySelector {
-        return this.ecStorage.createHierarchySelector();
+    public deleteComponent<T extends Component>(entity: EntityId, componentId: ComponentIdOf<T>): void {
+        this.ecStorage.deleteComponent(entity, componentId);
     }
 
-    /**
-     * Removes `componentId` from `entity` and returns if it was sucessful.
-     */
-    public deleteComponent<T extends Component>(entity: EntityId, componentId: ComponentIdOf<T>): boolean {
-        return this.ecStorage.deleteComponent(entity, componentId);
-    }
-
-    /**
-     * Destroys `entity` from the world and returns if it was sucessful.
-     */
-    public destroyEntity(entity: EntityId): boolean {
-        return this.ecStorage.destroyEntity(entity);
+    public destroyEntity(entity: EntityId): void {
+        this.ecStorage.destroyEntity(entity);
     }
 
     public getChannel(worldId: WorldId): WorldChannel {
@@ -202,18 +180,16 @@ export class World {
         return remote;
     }
 
-    /**
-     * Returns the component `type` of `entity`.
-     */
-    public getComponent<T extends Component>(entity: EntityId, componentId: ComponentIdOf<T>): T | undefined {
-        return this.ecStorage.getComponent(entity, componentId);
+    public findComponent<T extends Component>(entity: EntityId, componentId: ComponentIdOf<T>): T | undefined {
+        return this.ecStorage.findComponent(entity, componentId);
     }
 
-    /**
-     * Get entities that have changed recently.
-     */
-    public getEntitiesChanged(): IterableIterator<EntityId> {
-        return this.ecStorage.getEntitiesChanged();
+    public getComponentFlags<T extends Component>(entityId: EntityId, componentId: ComponentIdOf<T>): ComponentFlags {
+        return this.ecStorage.getComponentFlags(entityId, componentId);
+    }
+
+    public getEntityFlags(entityId: EntityId): EntityFlags {
+        return this.ecStorage.getEntityFlags(entityId);
     }
 
     public getPlugin<T extends WorldPlugin>(pluginId: WorldPluginIdOf<T>): T {
@@ -236,26 +212,36 @@ export class World {
         return schedule;
     }
 
-    public hasChangeFlag<T extends Component>(
+    public hasComponent<T extends Component>(entityId: EntityId, componentId: ComponentIdOf<T>): boolean {
+        return this.ecStorage.hasComponent(entityId, componentId);
+    }
+
+    public hasComponentFlags<T extends Component>(
         entityId: EntityId,
         componentId: ComponentIdOf<T>,
-        flag: ChangeFlags,
+        flagMask: ComponentFlags,
     ): boolean {
-        return this.ecStorage.hasChangeFlag(entityId, componentId, flag);
+        return this.ecStorage.hasComponentFlags(entityId, componentId, flagMask);
     }
 
-    public hasComponent<T extends Component>(entity: EntityId, componentId: ComponentIdOf<T>): boolean {
-        return this.ecStorage.hasComponent(entity, componentId);
+    public hasComponentFlagsAny<T extends Component>(
+        entityId: EntityId,
+        componentId: ComponentIdOf<T>,
+        flagMask: ComponentFlags,
+    ): boolean {
+        return this.ecStorage.hasComponentFlagsAny(entityId, componentId, flagMask);
     }
 
-    public hasEvents<T extends WorldEvent>(type: WorldEventIdOf<T>): boolean {
-        const events = this.events.get(type);
+    public hasEntityFlags(entityId: EntityId, flagMask: EntityFlags): boolean {
+        return this.ecStorage.hasEntityFlags(entityId, flagMask);
+    }
 
-        if (events !== undefined) {
-            return events.length > 0;
-        } else {
-            return false;
-        }
+    public hasEntityFlagsAny(entityId: EntityId, flagMask: EntityFlags): boolean {
+        return this.ecStorage.hasEntityFlagsAny(entityId, flagMask);
+    }
+
+    public hasEvents<T extends WorldEvent>(eventId: WorldEventIdOf<T>): boolean {
+        return this.evStorage.hasEvent(eventId);
     }
 
     public init(): void {
@@ -272,18 +258,18 @@ export class World {
         // }
     }
 
-    public queryEntities<T extends Component[]>(componentIds: ComponentIdsOf<T>): EntityComponentIterator {
-        return this.ecStorage.queryEntities(componentIds);
+    public isEntityAlive(entityId: EntityId): boolean {
+        return this.ecStorage.isEntityAlive(entityId);
+    }
+
+    public queryEntities<T extends Component = Component>(
+        predicate: (q: EntityComponentQueryValue<T>) => boolean,
+    ): EntityComponentIterator<T> {
+        return this.ecStorage.queryEntities(predicate);
     }
 
     public queueEvent<T extends WorldEvent>(event: T): void {
-        const events = this.events.get(event.eventId);
-
-        if (events !== undefined) {
-            events.push(event);
-        } else {
-            throwError("World event '{}' is not registered", event.eventId);
-        }
+        this.evStorage.addEvent(event);
     }
 
     public readData<T extends WorldData>(type: WorldDataIdOf<T>): T {
@@ -296,28 +282,12 @@ export class World {
         return data as T;
     }
 
-    public readEvents<T extends WorldEvent>(type: WorldEventIdOf<T>): T[] {
-        const events = this.events.get(type);
-
-        if (events === undefined) {
-            throwError("Cannot get events '{}'", type);
-        }
-
-        return events as T[];
+    public readEvents<T extends WorldEvent>(eventId: WorldEventIdOf<T>): WorldEventIterator<T> {
+        return this.evStorage.getEvents(eventId);
     }
 
-    public readLatestEvent<T extends WorldEvent>(type: WorldEventIdOf<T>): T | undefined {
-        const events = this.events.get(type);
-
-        if (events === undefined) {
-            throwError("Cannot get events '{}'", type);
-        }
-
-        if (events.length === 0) {
-            return undefined;
-        }
-
-        return events[events.length - 1] as T;
+    public readLatestEvent<T extends WorldEvent>(eventId: WorldEventIdOf<T>): T | undefined {
+        return this.evStorage.findLastEvent(eventId);
     }
 
     public registerData<T extends WorldData>(dataId: WorldDataIdOf<T>): void {
@@ -329,11 +299,7 @@ export class World {
     }
 
     public registerEvent<T extends WorldEvent>(eventId: WorldEventIdOf<T>): void {
-        if (this.events.has(eventId)) {
-            log.warn("World already has event '{}' and will be overwritten", eventId);
-        }
-
-        this.events.set(eventId, []);
+        this.evStorage.registerEvent(eventId);
     }
 
     public registerPlugin<T extends WorldPlugin>(pluginId: WorldPluginIdOf<T>): void {
@@ -366,10 +332,6 @@ export class World {
         this.ecStorage.setComponent(entityId, component);
     }
 
-    public setParent(entity: EntityId, parent: EntityId): void {
-        this.ecStorage.setParent(entity, parent);
-    }
-
     public setPlugin<T extends WorldPlugin>(plugin: T): void {
         if (!this.plugins.has(plugin.pluginId)) {
             throwError("World plugin '{}' is not registered", plugin.pluginId);
@@ -378,9 +340,6 @@ export class World {
         this.plugins.set(plugin.pluginId, plugin);
     }
 
-    /**
-     * Marks `componentId` of `entity` for update.
-     */
     public updateComponent<T extends Component>(entityId: EntityId, componentId: ComponentIdOf<T>): void {
         this.ecStorage.updateComponent(entityId, componentId);
     }
@@ -408,27 +367,15 @@ export class World {
     }
 
     public writeEvent<T extends WorldEvent>(event: T): void {
-        const events = this.events.get(event.eventId);
-
-        if (events === undefined) {
-            throwError("World event '{}' is not registered", event.eventId);
-        }
-
-        events.push(event);
+        this.evStorage.addEvent(event);
     }
 
     public writeEvents<T extends WorldEvent>(events: T[]): void {
-        for (const ev of events) {
-            this.writeEvent(ev);
-        }
+        this.evStorage.addEvents(events);
     }
 
     private cleanup(): void {
-        this.ecStorage.cleanup();
-
-        // Reset events
-        for (const eventId of this.events.keys()) {
-            this.events.set(eventId, []);
-        }
+        this.ecStorage.reset();
+        this.evStorage.reset();
     }
 }

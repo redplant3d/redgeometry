@@ -196,13 +196,13 @@ export async function initAppMainPostSystem(world: World): Promise<void> {
 export async function appMainSystem(world: World): Promise<void> {
     const channel = world.getChannel("remote");
 
-    const windowResizeEvents = world.readEvents<WindowResizeEvent>("window-resize");
+    const windowResizeEvents = world.readEvents<WindowResizeEvent>("window-resize").toArray();
     channel.queueEvents(windowResizeEvents);
 
     const appStateData = world.readData<AppStateData>("app-state");
     channel.queueData(appStateData);
 
-    const appCommandEvents = world.readEvents<AppCommandEvent>("app-command");
+    const appCommandEvents = world.readEvents<AppCommandEvent>("app-command").toArray();
     channel.queueEvents(appCommandEvents);
 
     await channel.runScheduleAsync<DefaultWorldScheduleId>("update");

@@ -9,7 +9,7 @@ import { AppMainModule, AppRemoteModule, type AppStateData } from "../ecs-module
 import type { TimeData } from "../ecs-modules/time.js";
 import type { WorldOptions } from "../ecs/app.js";
 import type { DefaultSystemStage, WorldModule } from "../ecs/types.js";
-import { ChangeFlags, WORLD_SCHEDULE_OPTIONS_DEFAULT, type World } from "../ecs/world.js";
+import { ComponentFlags, WORLD_SCHEDULE_OPTIONS_DEFAULT, type World } from "../ecs/world.js";
 
 type AppPartMainData = {
     dataId: "app-part-main";
@@ -125,14 +125,20 @@ function spawnSystem(world: World): void {
             );
             const velocity = new Vector2(random.nextFloatBetween(-1, 1), random.nextFloatBetween(-1, 1));
 
-            world.createEntity<[CircleComponent | RectangleComponent, ObjectComponent]>(
-                undefined,
-                { componentId: shape },
-                { componentId: "object", size, color, position, velocity },
-            );
+            const entity = world.createEntity();
+            world.addComponent<CircleComponent | RectangleComponent>(entity, {
+                componentId: shape,
+            });
+            world.addComponent<ObjectComponent>(entity, {
+                componentId: "object",
+                size,
+                color,
+                position,
+                velocity,
+            });
         }
     } else {
-        const query = world.queryEntities<[ObjectComponent]>(["object"]);
+        const query = world.queryEntities<ObjectComponent>((q) => q.hasComponent("object"));
 
         let i = nextCount;
 
@@ -156,15 +162,11 @@ function movementSystem(world: World): void {
 
     const { width, height } = ctx.canvas;
 
-    const query = world.queryEntities<[ObjectComponent]>(["object"]);
+    const query = world.queryEntities<ObjectComponent>((q) => q.hasComponent("object"));
 
     while (query.next()) {
         const entityId = query.getEntityId();
-        const object = world.getComponent<ObjectComponent>(entityId, "object");
-
-        if (object === undefined) {
-            continue;
-        }
+        const object = query.getComponent<ObjectComponent>("object");
 
         const p = object.position;
         const v = object.velocity;
@@ -200,11 +202,12 @@ function movementSystem(world: World): void {
 
 function commandEventSystem(world: World): void {
     const appRemoteData = world.readData<AppPartRemoteData>("app-part-remote");
-    const appCommandEvents = world.readEvents<AppPartCommandEvent>("app-part-command");
+    const iter = world.readEvents<AppPartCommandEvent>("app-part-command");
 
     // TODO: Reimplement
-    for (const e of appCommandEvents) {
-        switch (e.command) {
+    while (iter.next()) {
+        const ev = iter.getEvent();
+        switch (ev.command) {
             case "save": {
                 // console.time("saveEntities");
                 // appRemoteData.json = world.saveEntities();
@@ -240,18 +243,15 @@ function clearRenderSystem(world: World): void {
 function circleRenderSystem(world: World): void {
     const ctx = world.getPlugin<AppContextPlugin>("app-context");
 
-    const query = world.queryEntities<[CircleComponent, ObjectComponent]>(["circle", "object"]);
+    const query = world.queryEntities<CircleComponent | ObjectComponent>(
+        (q) => q.hasComponent<CircleComponent>("circle") && q.hasComponent<ObjectComponent>("object"),
+    );
 
     const red = Path2.createEmpty();
     const blue = Path2.createEmpty();
 
     while (query.next()) {
-        const entityId = query.getEntityId();
-        const object = world.getComponent<ObjectComponent>(entityId, "object");
-
-        if (object === undefined) {
-            continue;
-        }
+        const object = query.getComponent<ObjectComponent>("object");
 
         const p = object.position;
         const d = object.size;
@@ -271,14 +271,16 @@ function circleRenderSystem(world: World): void {
 function rectangleRenderSystem(world: World): void {
     const ctx = world.getPlugin<AppContextPlugin>("app-context");
 
-    const query = world.queryEntities<[RectangleComponent, ObjectComponent]>(["rectangle", "object"]);
+    const query = world.queryEntities<RectangleComponent | ObjectComponent>(
+        (q) => q.hasComponent<RectangleComponent>("rectangle") && q.hasComponent<ObjectComponent>("object"),
+    );
 
     const red = Path2.createEmpty();
     const blue = Path2.createEmpty();
 
     while (query.next()) {
         const entityId = query.getEntityId();
-        const object = world.getComponent<ObjectComponent>(entityId, "object");
+        const object = world.findComponent<ObjectComponent>(entityId, "object");
 
         if (object === undefined) {
             continue;
@@ -308,12 +310,14 @@ function notificationSystem(world: World): void {
     let createdCount = 0;
     let deletedCount = 0;
 
-    for (const entityId of world.getEntitiesChanged()) {
-        if (world.hasChangeFlag<ObjectComponent>(entityId, "object", ChangeFlags.CREATED)) {
+    const query = world.queryEntities(() => true);
+
+    while (query.next()) {
+        if (query.hasComponentFlags<ObjectComponent>("object", ComponentFlags.ADDED)) {
             createdCount += 1;
         }
 
-        if (world.hasChangeFlag<ObjectComponent>(entityId, "object", ChangeFlags.DELETED)) {
+        if (query.hasComponentFlags<ObjectComponent>("object", ComponentFlags.DELETED)) {
             deletedCount += 1;
         }
     }

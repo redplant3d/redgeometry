@@ -1,13 +1,5 @@
 import { assertDebug, log } from "redgeometry/src/utility/debug";
-import type {
-    System,
-    SystemArgs,
-    SystemAsync,
-    SystemStage,
-    SystemSync,
-    SystemWithArgsAsync,
-    SystemWithArgsSync,
-} from "./types.js";
+import type { System, SystemAsync, SystemStage, SystemSync } from "./types.js";
 import type { World } from "./world.js";
 
 export type SystemAwaitMode = "none" | "dependency";
@@ -15,13 +7,6 @@ export type SystemAwaitMode = "none" | "dependency";
 export type SystemOptions<T extends SystemStage> = {
     stage: T;
     fn: SystemSync | SystemAsync;
-    awaitMode?: SystemAwaitMode;
-};
-
-export type SystemWithArgsOptions<T extends SystemStage, U extends SystemArgs> = {
-    stage: T;
-    fn: SystemWithArgsSync<U> | SystemWithArgsAsync<U>;
-    args: U;
     awaitMode?: SystemAwaitMode;
 };
 
@@ -36,9 +21,7 @@ export type SystemDependencyOptions<T = SystemStage> = {
     optional?: boolean;
 };
 
-type SystemOptionsEntry =
-    | (SystemOptions<SystemStage> & { args: undefined })
-    | SystemWithArgsOptions<SystemStage, SystemArgs>;
+type SystemOptionsEntry = SystemOptions<SystemStage>;
 
 type SystemScheduleEntry = {
     depsAsync: SystemScheduleEntry[];
@@ -80,16 +63,6 @@ export class SystemSchedule {
         this.options.push({
             stage: options.stage,
             fn: options.fn,
-            args: undefined,
-            awaitMode: options.awaitMode,
-        });
-    }
-
-    public addSystemWithArgs<T extends SystemStage, U extends SystemArgs>(options: SystemWithArgsOptions<T, U>): void {
-        this.options.push({
-            stage: options.stage,
-            fn: options.fn as SystemWithArgsSync<SystemArgs> | SystemWithArgsAsync<SystemArgs>,
-            args: options.args,
             awaitMode: options.awaitMode,
         });
     }
@@ -99,7 +72,6 @@ export class SystemSchedule {
             this.options.push({
                 stage: options.stage,
                 fn: optionFn,
-                args: undefined,
                 awaitMode: undefined,
             });
         }
@@ -113,7 +85,7 @@ export class SystemSchedule {
 
     public async execute(world: World): Promise<void> {
         for (const entry of this.entries) {
-            const { fn, awaitMode, args } = entry.options;
+            const { fn, awaitMode } = entry.options;
 
             // Wait for incoming dependencies
             for (const depAsync of entry.depsAsync) {
@@ -126,17 +98,9 @@ export class SystemSchedule {
 
             // Call system
             if (awaitMode === "dependency") {
-                if (args !== undefined) {
-                    entry.promise = fn(world, ...args) as Promise<void>;
-                } else {
-                    entry.promise = fn(world) as Promise<void>;
-                }
+                entry.promise = fn(world) as Promise<void>;
             } else {
-                if (args !== undefined) {
-                    fn(world, ...args);
-                } else {
-                    fn(world);
-                }
+                fn(world);
             }
         }
     }
