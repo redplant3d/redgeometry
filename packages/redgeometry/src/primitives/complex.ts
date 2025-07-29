@@ -22,7 +22,7 @@ export interface ReadonlyComplex {
     lengthSq(): number;
     mul(z: ReadonlyComplex): Complex;
     mulV(v: ReadonlyVector2): Vector2;
-    nlerp(v: ReadonlyComplex, t: number): Complex;
+    nlerp(z: ReadonlyComplex, t: number): Complex;
     sub(z: ReadonlyComplex): Complex;
     toArray(): [number, number];
     toString(): string;
