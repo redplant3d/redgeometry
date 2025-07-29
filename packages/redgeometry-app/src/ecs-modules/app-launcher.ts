@@ -19,8 +19,6 @@ export class AppLauncherModule implements WorldModule {
     }
 
     public setup(world: World): void {
-        world.registerData<AppLauncherData>("app-launcher");
-
         world.writeData<AppLauncherData>({
             dataId: "app-launcher",
             appPartIds: this.appPartIds,

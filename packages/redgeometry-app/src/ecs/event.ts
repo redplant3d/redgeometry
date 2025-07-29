@@ -1,4 +1,4 @@
-import { log, throwError } from "redgeometry/src/utility/debug";
+import { throwError } from "redgeometry/src/utility/debug";
 import type { WorldEvent, WorldEventId, WorldEventIdOf, WorldEventIdsOf, WorldEventUnion } from "./types.js";
 
 type WorldEventJournalEntry = {
@@ -6,19 +6,13 @@ type WorldEventJournalEntry = {
 };
 
 export class WorldEventStorage {
-    public eventIds: Set<WorldEventId>;
     public eventJournalEntries: WorldEventJournalEntry[];
 
     public constructor() {
-        this.eventIds = new Set();
         this.eventJournalEntries = [];
     }
 
     public addEvent<T extends WorldEvent>(event: T): void {
-        if (!this.eventIds.has(event.eventId)) {
-            log.error("World event '{}' is not registered", event.eventId);
-        }
-
         this.eventJournalEntries.push({
             event,
         });
@@ -31,10 +25,6 @@ export class WorldEventStorage {
     }
 
     public findLastEvent<T extends WorldEvent>(eventId: WorldEventIdOf<T>): T | undefined {
-        if (!this.eventIds.has(eventId)) {
-            log.error("World event '{}' is not registered", eventId);
-        }
-
         for (let i = this.eventJournalEntries.length - 1; i >= 0; i--) {
             const ev = this.eventJournalEntries[i].event;
 
@@ -51,10 +41,6 @@ export class WorldEventStorage {
     }
 
     public getEventsArray<T extends WorldEvent>(eventId: WorldEventIdOf<T>): T[] {
-        if (!this.eventIds.has(eventId)) {
-            log.error("World event '{}' is not registered", eventId);
-        }
-
         const events: T[] = [];
 
         for (const entry of this.eventJournalEntries) {
@@ -82,14 +68,6 @@ export class WorldEventStorage {
         }
 
         return false;
-    }
-
-    public registerEvent<T extends WorldEvent>(eventId: WorldEventIdOf<T>): void {
-        if (this.eventIds.has(eventId)) {
-            log.error("World event '{}' has already been registered", eventId);
-        }
-
-        this.eventIds.add(eventId);
     }
 
     public reset(): void {

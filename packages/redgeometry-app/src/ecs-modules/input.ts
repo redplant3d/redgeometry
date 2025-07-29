@@ -513,17 +513,6 @@ export class InputModule implements WorldModule {
     public readonly moduleId = "input-receiver";
 
     public setup(world: World): void {
-        world.registerPlugin<MousePlugin>("mouse");
-        world.registerPlugin<KeyboardPlugin>("keyboard");
-
-        world.registerData<InputCaptureData>("input-capture");
-        world.registerData<InputInitData>("input-init");
-
-        world.registerEvent<InputKeyboardButtonEvent>("input-keyboard-button");
-        world.registerEvent<InputMouseMotionEvent>("input-mouse-motion");
-        world.registerEvent<InputMouseButtonEvent>("input-mouse-button");
-        world.registerEvent<InputMouseWheelEvent>("input-mouse-wheel");
-
         world.addSystem<DefaultSystemStage>({ stage: "start-post", fn: startInputSystem });
         world.addSystem<DefaultSystemStage>({ stage: "update-pre", fn: updateInputSystem });
     }

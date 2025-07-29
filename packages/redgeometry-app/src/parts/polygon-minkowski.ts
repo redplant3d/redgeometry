@@ -129,9 +129,6 @@ class AppPartMainModule implements WorldModule {
     public readonly moduleId = "app-part-main";
 
     public setup(world: World): void {
-        world.registerData<AppPartMainData>("app-part-main");
-        world.registerData<AppPartStateData>("app-part-state");
-
         world.addSystems<DefaultSystemStage>({ stage: "start", fns: [initMainSystem, writeStateSystem] });
         world.addSystems<DefaultSystemStage>({ stage: "update", fns: [writeStateSystem] });
 
@@ -144,9 +141,6 @@ class AppPartRemoteModule implements WorldModule {
 
     public setup(world: World): void {
         world.addModules([new AppContextModule()]);
-
-        world.registerData<AppPartRemoteData>("app-part-remote");
-        world.registerData<AppPartStateData>("app-part-state");
 
         world.addSystems<DefaultSystemStage>({ stage: "start", fns: [initRemoteSystem] });
         world.addSystems<DefaultSystemStage>({ stage: "update", fns: [updateSystem, renderSystem] });

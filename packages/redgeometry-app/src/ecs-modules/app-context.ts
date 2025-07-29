@@ -505,8 +505,6 @@ export class AppContextModule implements WorldModule {
     public readonly moduleId = "app-context";
 
     public setup(world: World): void {
-        world.registerPlugin<AppContextPlugin>("app-context");
-
         world.addSystem<DefaultSystemStage>({ stage: "start-pre", fn: initCanvasContextSystem });
     }
 }

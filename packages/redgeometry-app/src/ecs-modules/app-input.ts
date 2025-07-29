@@ -28,8 +28,6 @@ export class AppInputModule implements WorldModule {
     public readonly moduleId = "app-input";
 
     public setup(world: World): void {
-        world.registerData<AppInputData>("app-input");
-
         world.addSystem<DefaultSystemStage>({ stage: "start-post", fn: startInputElementsSystem });
         world.addSystem<DefaultSystemStage>({ stage: "stop-pre", fn: stopInputElementsSystem });
     }

@@ -257,14 +257,6 @@ export class AppMainModule implements WorldModule {
     public setup(world: World): void {
         world.addModules([new TimeModule(), new InputModule(), new AppInputModule()]);
 
-        world.registerData<AppMainData>("app-main");
-        world.registerData<AppMainInputData>("app-main-input");
-        world.registerData<AppCanvasData>("app-canvas");
-        world.registerData<AppStateData>("app-state");
-
-        world.registerEvent<AppCommandEvent>("app-command");
-        world.registerEvent<WindowResizeEvent>("window-resize");
-
         world.addSystem<DefaultSystemStage>({ stage: "start-pre", fn: initAppMainPreSystem });
         world.addSystem<DefaultSystemStage>({ stage: "start-pre", fn: addAppInputsSystem });
         world.addSystem<DefaultSystemStage>({ stage: "start-pre", fn: writeAppStateSystem });
@@ -288,12 +280,6 @@ export class AppRemoteModule implements WorldModule {
 
     public setup(world: World): void {
         world.addModules([new TimeModule(), new InputModule()]);
-
-        world.registerData<AppCanvasData>("app-canvas");
-        world.registerData<AppStateData>("app-state");
-
-        world.registerEvent<AppCommandEvent>("app-command");
-        world.registerEvent<WindowResizeEvent>("window-resize");
 
         world.addSystem<DefaultSystemStage>({ stage: "start-pre", fn: initAppRemoteSystem });
         world.addSystem<DefaultSystemStage>({ stage: "update-pre", fn: resizeCanvasSystem });

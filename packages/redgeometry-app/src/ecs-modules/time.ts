@@ -53,11 +53,6 @@ export class TimeModule implements WorldModule {
     public readonly moduleId = "time";
 
     public setup(world: World): void {
-        world.registerData<TimeInitData>("time-init");
-        world.registerData<TimeData>("time");
-
-        world.registerEvent<AnimationFrameEvent>("animation-frame");
-
         world.addSystem<DefaultSystemStage>({ stage: "start-post", fn: startTimeSystem });
         world.addSystem<DefaultSystemStage>({ stage: "update-pre", fn: timeSystem });
     }

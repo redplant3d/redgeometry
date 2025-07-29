@@ -290,26 +290,6 @@ export class World {
         return this.evStorage.findLastEvent(eventId);
     }
 
-    public registerData<T extends WorldData>(dataId: WorldDataIdOf<T>): void {
-        if (this.data.has(dataId)) {
-            log.warn("World already has data '{}' and will be overwritten", dataId);
-        }
-
-        this.data.set(dataId, undefined);
-    }
-
-    public registerEvent<T extends WorldEvent>(eventId: WorldEventIdOf<T>): void {
-        this.evStorage.registerEvent(eventId);
-    }
-
-    public registerPlugin<T extends WorldPlugin>(pluginId: WorldPluginIdOf<T>): void {
-        if (this.plugins.has(pluginId)) {
-            log.warn("World already has plugin '{}' and will be overwritten", pluginId);
-        }
-
-        this.plugins.set(pluginId, undefined);
-    }
-
     public async runSchedule<T extends WorldScheduleId>(scheduleId: T): Promise<void> {
         const schedules = this.stages.get(scheduleId);
 
@@ -333,10 +313,6 @@ export class World {
     }
 
     public setPlugin<T extends WorldPlugin>(plugin: T): void {
-        if (!this.plugins.has(plugin.pluginId)) {
-            throwError("World plugin '{}' is not registered", plugin.pluginId);
-        }
-
         this.plugins.set(plugin.pluginId, plugin);
     }
 
@@ -359,10 +335,6 @@ export class World {
     }
 
     public writeData<T extends WorldData>(data: T): void {
-        if (!this.data.has(data.dataId)) {
-            throwError("World data '{}' is not registered", data.dataId);
-        }
-
         this.data.set(data.dataId, data);
     }
 
