@@ -35,6 +35,7 @@ export interface ReadonlyQuaternion {
     mul(q: ReadonlyQuaternion): Quaternion;
     mulV(v: ReadonlyVector3): Vector3;
     nlerp(q: ReadonlyQuaternion, t: number): Quaternion;
+    orthonormalBasis(): { v1: Vector3; v2: Vector3; v3: Vector3 };
     slerp(q: ReadonlyQuaternion, t: number): Quaternion;
     sub(q: ReadonlyQuaternion): Quaternion;
     toArray(): number[];
@@ -471,6 +472,42 @@ export class Quaternion implements ReadonlyQuaternion {
         }
 
         return new Quaternion(a / len, b / len, c / len, d / len);
+    }
+
+    /**
+     * Returns an orthonormal basis of the current quaternion.
+     *
+     * Note: The current quaternion is assumed to be of unit length.
+     */
+    public orthonormalBasis(): { v1: Vector3; v2: Vector3; v3: Vector3 } {
+        const qaa = this.a * this.a;
+        const qbb = this.b * this.b;
+        const qcc = this.c * this.c;
+        const qdd = this.d * this.d;
+        const q0 = qaa + qbb - qcc - qdd;
+        const q4 = qaa - qbb + qcc - qdd;
+        const q8 = qaa - qbb - qcc + qdd;
+
+        const qbc = this.b * this.c;
+        const qad = this.a * this.d;
+        const q1 = qbc + qbc + qad + qad;
+        const q3 = qbc + qbc - qad - qad;
+
+        const qbd = this.b * this.d;
+        const qac = this.a * this.c;
+        const q2 = qbd + qbd - qac - qac;
+        const q6 = qbd + qbd + qac + qac;
+
+        const qcd = this.c * this.d;
+        const qab = this.a * this.b;
+        const q5 = qcd + qcd + qab + qab;
+        const q7 = qcd + qcd - qab - qab;
+
+        const v1 = new Vector3(q0, q1, q2);
+        const v2 = new Vector3(q3, q4, q5);
+        const v3 = new Vector3(q6, q7, q8);
+
+        return { v1, v2, v3 };
     }
 
     public set(a: number, b: number, c: number, d: number): void {

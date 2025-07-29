@@ -905,7 +905,7 @@ export class Vector3 implements ReadonlyVector3 {
     }
 
     /**
-     * Returns the orthonormal basis of the current vector.
+     * Returns an orthonormal basis of the current vector.
      *
      * References:
      * - Tom Duff, James Burgess, Per Christensen, Christophe Hery, Andrew Kensler, Max Liani and Ryusuke Villemin.

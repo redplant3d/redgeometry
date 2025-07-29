@@ -23,6 +23,7 @@ export interface ReadonlyComplex {
     mul(z: ReadonlyComplex): Complex;
     mulV(v: ReadonlyVector2): Vector2;
     nlerp(z: ReadonlyComplex, t: number): Complex;
+    orthonormalBasis(): { v1: Vector2; v2: Vector2 };
     sub(z: ReadonlyComplex): Complex;
     toArray(): [number, number];
     toString(): string;
@@ -164,6 +165,23 @@ export class Complex implements ReadonlyComplex {
         }
 
         return new Complex(a / len, b / len);
+    }
+
+    /**
+     * Returns an orthonormal basis of the current complex.
+     *
+     * Note: The current complex is assumed to be of unit length.
+     */
+    public orthonormalBasis(): { v1: Vector2; v2: Vector2 } {
+        const z0 = this.a;
+        const z1 = this.b;
+        const z2 = -this.b;
+        const z3 = this.a;
+
+        const v1 = new Vector2(z0, z1);
+        const v2 = new Vector2(z2, z3);
+
+        return { v1, v2 };
     }
 
     public set(a: number, b: number): void {
