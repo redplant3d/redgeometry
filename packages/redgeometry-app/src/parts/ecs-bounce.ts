@@ -202,14 +202,15 @@ function commandEventSystem(world: World): void {
     const appRemoteData = world.readData<AppPartRemoteData>("app-part-remote");
     const appCommandEvents = world.readEvents<AppPartCommandEvent>("app-part-command");
 
+    // TODO: Reimplement
     for (const e of appCommandEvents) {
         switch (e.command) {
             case "save": {
-                console.time("saveEntities");
-                appRemoteData.json = world.saveEntities();
-                console.timeEnd("saveEntities");
+                // console.time("saveEntities");
+                // appRemoteData.json = world.saveEntities();
+                // console.timeEnd("saveEntities");
 
-                log.info("World saved ({} bytes)", appRemoteData.json.length);
+                // log.info("World saved ({} bytes)", appRemoteData.json.length);
 
                 break;
             }
@@ -218,11 +219,11 @@ function commandEventSystem(world: World): void {
                     break;
                 }
 
-                console.time("loadEntities");
-                world.loadEntities(appRemoteData.json);
-                console.timeEnd("loadEntities");
+                // console.time("loadEntities");
+                // world.loadEntities(appRemoteData.json);
+                // console.timeEnd("loadEntities");
 
-                log.info("World loaded ({} bytes)", appRemoteData.json.length);
+                // log.info("World loaded ({} bytes)", appRemoteData.json.length);
 
                 break;
             }
@@ -351,9 +352,6 @@ class AppPartRemoteModule implements WorldModule {
         world.registerData<AppPartRemoteData>("app-part-remote");
         world.registerData<AppPartStateData>("app-part-state");
         world.registerEvent<AppPartCommandEvent>("app-part-command");
-
-        world.registerSerializable(Vector2);
-        world.registerSerializable(Vector2);
 
         world.addSystem<DefaultSystemStage>({ stage: "start", fn: initRemoteSystem });
 

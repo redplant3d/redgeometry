@@ -1,7 +1,6 @@
 import { throwError } from "redgeometry/src/utility/debug";
 import type { Component, ComponentId, ComponentIdOf, ComponentIdsOf, EntityId } from "../ecs/types.js";
 import { ChangeFlags } from "../ecs/world.js";
-import type { SerializationMap } from "./serialize.js";
 
 type EntityEntry = {
     entityId: EntityId;
@@ -160,23 +159,6 @@ export class EntityComponentStorage {
         return componentEntry.components.has(entityId);
     }
 
-    public loadEntities(serializationMap: SerializationMap, text: string): void {
-        this.clear();
-
-        const data = serializationMap.deserialize(text) as {
-            entityEntries: EntityEntry[];
-            componentEntries: ComponentEntry[];
-        };
-
-        for (const entry of data.entityEntries) {
-            this.entityEntries.set(entry.entityId, entry);
-        }
-
-        for (const entry of data.componentEntries) {
-            this.componentEntries.set(entry.componendId, entry);
-        }
-    }
-
     public queryEntities<T extends Component[]>(componentIds: ComponentIdsOf<T>): EntityComponentIterator {
         const componentEntries: ComponentEntry[] = [];
 
@@ -186,13 +168,6 @@ export class EntityComponentStorage {
         }
 
         return new EntityComponentIterator(this.entityEntries.values(), componentEntries);
-    }
-
-    public saveEntities(serializationMap: SerializationMap): string {
-        return serializationMap.serialize({
-            entityEntries: [...this.entityEntries.values()],
-            componentEntries: [...this.componentEntries.values()],
-        });
     }
 
     public setComponent<T extends Component>(entityId: EntityId, component: T): void {

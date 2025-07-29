@@ -3,7 +3,6 @@ import { Bitset } from "redgeometry/src/utility/set";
 import type { Component, ComponentId, ComponentIdOf, ComponentIdsOf, EntityId } from "../ecs/types.js";
 import { ChangeFlags } from "../ecs/world.js";
 import { ObjectPool } from "./object.js";
-import type { SerializationMap } from "./serialize.js";
 
 export const EntityChangeFlags = {
     NONE: 0,
@@ -144,10 +143,6 @@ export class EntityComponentStorage {
         return table.hasEntry(componentId);
     }
 
-    public loadEntities(_serializationMap: SerializationMap, _text: string): void {
-        throwError("Not implemented");
-    }
-
     public queryEntities<T extends Component[]>(componentIds: ComponentIdsOf<T>): EntityComponentIterator {
         const componentTables: ComponentTable[] = [];
 
@@ -167,10 +162,6 @@ export class EntityComponentStorage {
         }
 
         return new EntityComponentIterator(this.entityEntries, this.componentEntries, componentTables);
-    }
-
-    public saveEntities(_serializationMap: SerializationMap): string {
-        throwError("Not implemented");
     }
 
     public setComponent<T extends Component>(entityId: EntityId, component: T): void {

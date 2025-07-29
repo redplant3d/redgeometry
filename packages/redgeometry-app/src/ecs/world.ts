@@ -4,7 +4,6 @@ import {
     EntityComponentStorage,
     EntityHierarchySelector,
 } from "../utility/ecs-storage-sparse.js";
-import { SERIALIZATION_MAPPINGS_DEFAULT, SerializationMap } from "../utility/serialize.js";
 import {
     SystemSchedule,
     type SystemDependencyOptions,
@@ -19,8 +18,6 @@ import type {
     DefaultSystemStage,
     DefaultWorldScheduleId,
     EntityId,
-    Serializable,
-    SerializableConstructor,
     SystemArgs,
     SystemStage,
     WorldData,
@@ -97,11 +94,9 @@ export class World {
     private modules: Map<WorldModuleId, WorldModule>;
     private plugins: Map<WorldPluginId, WorldPlugin | undefined>;
     private schedules: Map<SystemStage, SystemSchedule>;
-    private serializationMap: SerializationMap;
     private stages: Map<WorldScheduleId, SystemSchedule[]>;
 
     public constructor() {
-        this.serializationMap = new SerializationMap([...SERIALIZATION_MAPPINGS_DEFAULT]);
         this.ecStorage = new EntityComponentStorage();
 
         this.channels = new Map();
@@ -277,10 +272,6 @@ export class World {
         // }
     }
 
-    public loadEntities(text: string): void {
-        this.ecStorage.loadEntities(this.serializationMap, text);
-    }
-
     public queryEntities<T extends Component[]>(componentIds: ComponentIdsOf<T>): EntityComponentIterator {
         return this.ecStorage.queryEntities(componentIds);
     }
@@ -353,14 +344,6 @@ export class World {
         this.plugins.set(pluginId, undefined);
     }
 
-    public registerSerializable<T extends Serializable>(ClassType: SerializableConstructor<T>): void {
-        this.serializationMap.add(
-            ClassType,
-            (obj: T) => obj.toArray(),
-            (data: number[]) => ClassType.fromArray(data),
-        );
-    }
-
     public async runSchedule<T extends WorldScheduleId>(scheduleId: T): Promise<void> {
         const schedules = this.stages.get(scheduleId);
 
@@ -377,10 +360,6 @@ export class World {
         } else if (scheduleId === "update") {
             this.cleanup();
         }
-    }
-
-    public saveEntities(): string {
-        return this.ecStorage.saveEntities(this.serializationMap);
     }
 
     public setComponent<T extends Component>(entityId: EntityId, component: T): void {
