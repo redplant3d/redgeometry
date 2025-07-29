@@ -1,3 +1,4 @@
+import { COS_ACUTE } from "../core/consts.js";
 import { assertUnreachable } from "../utility/debug.js";
 import { eqApproxAbs, eqApproxRel, lerp } from "../utility/scalar.js";
 import type { Enum } from "../utility/types.js";
@@ -33,8 +34,7 @@ export interface ReadonlyQuaternion {
     lerp(q: ReadonlyQuaternion, t: number): Quaternion;
     mul(q: ReadonlyQuaternion): Quaternion;
     mulV(v: ReadonlyVector3): Vector3;
-    nlerp(v: ReadonlyQuaternion, t: number): Quaternion;
-    pow(x: number): Quaternion;
+    nlerp(q: ReadonlyQuaternion, t: number): Quaternion;
     slerp(q: ReadonlyQuaternion, t: number): Quaternion;
     sub(q: ReadonlyQuaternion): Quaternion;
     toArray(): number[];
@@ -104,12 +104,15 @@ export class Quaternion implements ReadonlyQuaternion {
         return new Quaternion(cos, 0, 0, sin);
     }
 
-    public static fromRotationAxis(v: ReadonlyVector3, angle: number): Quaternion {
+    /**
+     * Returns a quaternion with rotation around `axis` and `angle`.
+     *
+     * Note: `axis` is assumed to be a unit vector.
+     */
+    public static fromRotationAxis(axis: ReadonlyVector3, angle: number): Quaternion {
         const sin = Math.sin(0.5 * angle);
         const cos = Math.cos(0.5 * angle);
-
-        // `cos * v.length()` ensures correct scaling
-        return new Quaternion(cos * v.length(), sin * v.x, sin * v.y, sin * v.z);
+        return new Quaternion(cos, sin * axis.x, sin * axis.y, sin * axis.z);
     }
 
     /**
@@ -118,7 +121,7 @@ export class Quaternion implements ReadonlyQuaternion {
      * Note: `v1` and `v2` are assumed to be unit vectors.
      */
     public static fromRotationBetween(v1: ReadonlyVector3, v2: ReadonlyVector3): Quaternion {
-        // This angle is doubled
+        // This angle is double of the quaternion rotation
         const cos = v1.dot(v2);
 
         // If the angle is close to 180 degrees `va` just needs to be perpendicular to `v1`
@@ -273,7 +276,7 @@ export class Quaternion implements ReadonlyQuaternion {
     /**
      * Returns the rotation axis vector of the current quaternion.
      *
-     * Note: The vector is unscaled and might not be a unit vector.
+     * Note: The result is generally not a unit vector.
      */
     public axis(): Vector3 {
         return new Vector3(this.b, this.c, this.d);
@@ -282,11 +285,10 @@ export class Quaternion implements ReadonlyQuaternion {
     /**
      * Returns the rotation axis angle of the current quaternion.
      *
-     * Note: The angle is also depending on the direction of the rotation axis.
+     * Note: The current quaternion is assumed to be of unit length.
      */
     public axisAngle(): number {
-        const qa = this.a / this.length();
-        return 2 * Math.acos(qa);
+        return 2 * Math.acos(this.a);
     }
 
     public clone(): Quaternion {
@@ -406,8 +408,6 @@ export class Quaternion implements ReadonlyQuaternion {
 
     /**
      * Returns the linear interpolation of the current quaternion and `q`.
-     *
-     * Note: For the more common spherical linear interpolation see `slerp`.
      */
     public lerp(q: ReadonlyQuaternion, t: number): Quaternion {
         const qa = lerp(this.a, q.a, t);
@@ -456,13 +456,13 @@ export class Quaternion implements ReadonlyQuaternion {
     }
 
     /**
-     * Returns the normalized linear interpolation of the current quaternion.
+     * Returns the normalized linear interpolation of the current quaternion and `q`.
      */
-    public nlerp(z: ReadonlyQuaternion, t: number): Quaternion {
-        const a = lerp(this.a, z.a, t);
-        const b = lerp(this.b, z.b, t);
-        const c = lerp(this.c, z.c, t);
-        const d = lerp(this.d, z.d, t);
+    public nlerp(q: ReadonlyQuaternion, t: number): Quaternion {
+        const a = lerp(this.a, q.a, t);
+        const b = lerp(this.b, q.b, t);
+        const c = lerp(this.c, q.c, t);
+        const d = lerp(this.d, q.d, t);
 
         const len = Math.sqrt(a * a + b * b + c * c + d * d);
 
@@ -471,22 +471,6 @@ export class Quaternion implements ReadonlyQuaternion {
         }
 
         return new Quaternion(a / len, b / len, c / len, d / len);
-    }
-
-    /**
-     * Returns the current quaternion to the power of `x`.
-     *
-     * References:
-     * - https://en.wikipedia.org/wiki/Quaternion#Exponential,_logarithm,_and_power_functions
-     */
-    public pow(x: number): Quaternion {
-        const len = this.length();
-        const r = Math.pow(len, x);
-        const angle = x * Math.acos(this.a / len);
-        const rsin = r * Math.sin(angle);
-        const rcos = r * Math.cos(angle);
-        const va = this.axis().unit();
-        return new Quaternion(rcos, rsin * va.x, rsin * va.y, rsin * va.z);
     }
 
     public set(a: number, b: number, c: number, d: number): void {
@@ -513,21 +497,18 @@ export class Quaternion implements ReadonlyQuaternion {
     public setFromRotationX(angle: number): void {
         const sin = Math.sin(0.5 * angle);
         const cos = Math.cos(0.5 * angle);
-
         this.set(cos, sin, 0, 0);
     }
 
     public setFromRotationY(angle: number): void {
         const sin = Math.sin(0.5 * angle);
         const cos = Math.cos(0.5 * angle);
-
         this.set(cos, 0, sin, 0);
     }
 
     public setFromRotationZ(angle: number): void {
         const sin = Math.sin(0.5 * angle);
         const cos = Math.cos(0.5 * angle);
-
         this.set(cos, 0, 0, sin);
     }
 
@@ -540,14 +521,18 @@ export class Quaternion implements ReadonlyQuaternion {
         this.set(qa, qb, qc, qd);
     }
 
+    /**
+     * ```
+     * | cos |   | a |
+     * | sin | * | b |
+     * |   0 |   | c |
+     * |   0 |   | d |
+     * ```
+     */
     public setRotateX(q: ReadonlyQuaternion, angle: number): void {
         const sin = Math.sin(0.5 * angle);
         const cos = Math.cos(0.5 * angle);
 
-        // | cos |   | a |
-        // | sin | * | b |
-        // |   0 |   | c |
-        // |   0 |   | d |
         const qa = cos * q.a - sin * q.b;
         const qb = cos * q.b + sin * q.a;
         const qc = cos * q.c - sin * q.d;
@@ -556,14 +541,18 @@ export class Quaternion implements ReadonlyQuaternion {
         this.set(qa, qb, qc, qd);
     }
 
+    /**
+     * ```
+     * | a |   | cos |
+     * | b | * | sin |
+     * | c |   |   0 |
+     * | d |   |   0 |
+     * ```
+     */
     public setRotateXPre(q: ReadonlyQuaternion, angle: number): void {
         const sin = Math.sin(0.5 * angle);
         const cos = Math.cos(0.5 * angle);
 
-        // | a |   | cos |
-        // | b | * | sin |
-        // | c |   |   0 |
-        // | d |   |   0 |
         const qa = q.a * cos - q.b * sin;
         const qb = q.b * cos + q.a * sin;
         const qc = q.c * cos + q.d * sin;
@@ -572,14 +561,18 @@ export class Quaternion implements ReadonlyQuaternion {
         this.set(qa, qb, qc, qd);
     }
 
+    /**
+     * ```
+     * | cos |   | a |
+     * |   0 | * | b |
+     * | sin |   | c |
+     * |   0 |   | d |
+     * ```
+     */
     public setRotateY(q: ReadonlyQuaternion, angle: number): void {
         const sin = Math.sin(0.5 * angle);
         const cos = Math.cos(0.5 * angle);
 
-        // | cos |   | a |
-        // |   0 | * | b |
-        // | sin |   | c |
-        // |   0 |   | d |
         const qa = cos * q.a - sin * q.c;
         const qb = cos * q.b + sin * q.d;
         const qc = cos * q.c + sin * q.a;
@@ -588,14 +581,18 @@ export class Quaternion implements ReadonlyQuaternion {
         this.set(qa, qb, qc, qd);
     }
 
+    /**
+     * ```
+     * | a |   | cos |
+     * | b | * |   0 |
+     * | c |   | sin |
+     * | d |   |   0 |
+     * ```
+     */
     public setRotateYPre(q: ReadonlyQuaternion, angle: number): void {
         const sin = Math.sin(0.5 * angle);
         const cos = Math.cos(0.5 * angle);
 
-        // | a |   | cos |
-        // | b | * |   0 |
-        // | c |   | sin |
-        // | d |   |   0 |
         const qa = q.a * cos - q.c * sin;
         const qb = q.b * cos - q.d * sin;
         const qc = q.c * cos + q.a * sin;
@@ -604,14 +601,18 @@ export class Quaternion implements ReadonlyQuaternion {
         this.set(qa, qb, qc, qd);
     }
 
+    /**
+     * ```
+     * | cos |   | a |
+     * |   0 | * | b |
+     * |   0 |   | c |
+     * | sin |   | d |
+     * ```
+     */
     public setRotateZ(q: ReadonlyQuaternion, angle: number): void {
         const sin = Math.sin(0.5 * angle);
         const cos = Math.cos(0.5 * angle);
 
-        // | cos |   | a |
-        // |   0 | * | b |
-        // |   0 |   | c |
-        // | sin |   | d |
         const qa = cos * q.a - sin * q.d;
         const qb = cos * q.b - sin * q.c;
         const qc = cos * q.c + sin * q.b;
@@ -620,14 +621,18 @@ export class Quaternion implements ReadonlyQuaternion {
         this.set(qa, qb, qc, qd);
     }
 
+    /**
+     * ```
+     * | a |   | cos |
+     * | b | * |   0 |
+     * | c |   |   0 |
+     * | d |   | sin |
+     * ```
+     */
     public setRotateZPre(q: ReadonlyQuaternion, angle: number): void {
         const sin = Math.sin(0.5 * angle);
         const cos = Math.cos(0.5 * angle);
 
-        // | a |   | cos |
-        // | b | * |   0 |
-        // | c |   |   0 |
-        // | d |   | sin |
         const qa = q.a * cos - q.d * sin;
         const qb = q.b * cos + q.c * sin;
         const qc = q.c * cos - q.b * sin;
