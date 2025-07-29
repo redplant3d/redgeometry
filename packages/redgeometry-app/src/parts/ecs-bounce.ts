@@ -4,7 +4,7 @@ import { log } from "redgeometry/src/utility/debug";
 import { RandomXSR128, type Random } from "redgeometry/src/utility/random";
 import { AppContextModule, type AppContextPlugin } from "../ecs-modules/app-context.js";
 import type { AppInputData } from "../ecs-modules/app-input.js";
-import { ButtonInputElement, RangeInputElement } from "../ecs-modules/app-input.js";
+import { RangeInputElement } from "../ecs-modules/app-input.js";
 import { AppMainModule, AppRemoteModule, type AppStateData } from "../ecs-modules/app.js";
 import type { TimeData } from "../ecs-modules/time.js";
 import type { WorldOptions } from "../ecs/app.js";
@@ -14,8 +14,6 @@ import { ComponentFlags, WORLD_SCHEDULE_OPTIONS_DEFAULT, type World } from "../e
 type AppPartMainData = {
     dataId: "app-part-main";
     inputCount: RangeInputElement;
-    inputLoad: ButtonInputElement;
-    inputSave: ButtonInputElement;
 };
 
 type AppPartRemoteData = {
@@ -28,11 +26,6 @@ type AppPartRemoteData = {
 type AppPartStateData = {
     dataId: "app-part-state";
     count: number;
-};
-
-type AppPartCommandEvent = {
-    eventId: "app-part-command";
-    command: "save" | "load";
 };
 
 type CircleComponent = {
@@ -58,23 +51,9 @@ function initMainSystem(world: World): void {
     inputCount.setStyle("width: 200px");
     inputElements.push(inputCount);
 
-    const inputSave = new ButtonInputElement("save", "save");
-    inputSave.addEventListener("click", () =>
-        world.queueEvent<AppPartCommandEvent>({ eventId: "app-part-command", command: "save" }),
-    );
-    inputElements.push(inputSave);
-
-    const inputLoad = new ButtonInputElement("load", "load");
-    inputLoad.addEventListener("click", () =>
-        world.queueEvent<AppPartCommandEvent>({ eventId: "app-part-command", command: "load" }),
-    );
-    inputElements.push(inputLoad);
-
     world.writeData<AppPartMainData>({
         dataId: "app-part-main",
         inputCount,
-        inputSave,
-        inputLoad,
     });
 }
 
@@ -200,40 +179,6 @@ function movementSystem(world: World): void {
     }
 }
 
-function commandEventSystem(world: World): void {
-    const appRemoteData = world.readData<AppPartRemoteData>("app-part-remote");
-    const iter = world.readEvents<AppPartCommandEvent>("app-part-command");
-
-    // TODO: Reimplement
-    while (iter.next()) {
-        const ev = iter.getEvent();
-        switch (ev.command) {
-            case "save": {
-                // console.time("saveEntities");
-                // appRemoteData.json = world.saveEntities();
-                // console.timeEnd("saveEntities");
-
-                // log.info("World saved ({} bytes)", appRemoteData.json.length);
-
-                break;
-            }
-            case "load": {
-                if (appRemoteData.json === undefined) {
-                    break;
-                }
-
-                // console.time("loadEntities");
-                // world.loadEntities(appRemoteData.json);
-                // console.timeEnd("loadEntities");
-
-                // log.info("World loaded ({} bytes)", appRemoteData.json.length);
-
-                break;
-            }
-        }
-    }
-}
-
 function clearRenderSystem(world: World): void {
     const ctx = world.getPlugin<AppContextPlugin>("app-context");
 
@@ -333,7 +278,6 @@ class AppPartMainModule implements WorldModule {
     public setup(world: World): void {
         world.registerData<AppPartStateData>("app-part-state");
         world.registerData<AppPartMainData>("app-part-main");
-        world.registerEvent<AppPartCommandEvent>("app-part-command");
 
         world.addSystem<DefaultSystemStage>({ stage: "start", fn: initMainSystem });
         world.addSystem<DefaultSystemStage>({ stage: "start", fn: writeStateSystem });
@@ -355,7 +299,6 @@ class AppPartRemoteModule implements WorldModule {
 
         world.registerData<AppPartRemoteData>("app-part-remote");
         world.registerData<AppPartStateData>("app-part-state");
-        world.registerEvent<AppPartCommandEvent>("app-part-command");
 
         world.addSystem<DefaultSystemStage>({ stage: "start", fn: initRemoteSystem });
 
@@ -364,7 +307,6 @@ class AppPartRemoteModule implements WorldModule {
             fns: [
                 spawnSystem,
                 movementSystem,
-                commandEventSystem,
                 clearRenderSystem,
                 circleRenderSystem,
                 rectangleRenderSystem,
@@ -374,7 +316,7 @@ class AppPartRemoteModule implements WorldModule {
 
         world.addDependency<DefaultSystemStage>({
             stage: "update",
-            seq: [commandEventSystem, spawnSystem, movementSystem, clearRenderSystem],
+            seq: [spawnSystem, movementSystem, clearRenderSystem],
         });
         world.addDependency<DefaultSystemStage>({
             stage: "update",
