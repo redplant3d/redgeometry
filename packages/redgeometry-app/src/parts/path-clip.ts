@@ -8,7 +8,7 @@ import type { AppContextPlugin } from "../ecs-modules/app-context.js";
 import { AppContextModule } from "../ecs-modules/app-context.js";
 import type { AppInputData } from "../ecs-modules/app-input.js";
 import { ComboBoxInputElement, RangeInputElement } from "../ecs-modules/app-input.js";
-import { AppMainModule, AppRemoteModule, type AppStateData } from "../ecs-modules/app.js";
+import { AppMainModule, type AppStateData } from "../ecs-modules/app.js";
 import type { WorldOptions } from "../ecs/app.js";
 import type { DefaultSystemStage, WorldModule } from "../ecs/types.js";
 import { WORLD_SCHEDULE_OPTIONS_DEFAULT, type World } from "../ecs/world.js";
@@ -153,14 +153,6 @@ class AppPartMainModule implements WorldModule {
         world.addSystems<DefaultSystemStage>({ stage: "update", fns: [writeStateSystem] });
 
         world.addDependency<DefaultSystemStage>({ stage: "start", seq: [initMainSystem, writeStateSystem] });
-    }
-}
-
-class AppPartRemoteModule implements WorldModule {
-    public readonly moduleId = "app-part-remote";
-
-    public setup(world: World): void {
-        world.addModules([new AppContextModule()]);
 
         world.addSystems<DefaultSystemStage>({ stage: "start", fns: [initRemoteSystem] });
         world.addSystems<DefaultSystemStage>({ stage: "update", fns: [updateSystem, renderSystem] });
@@ -171,6 +163,6 @@ class AppPartRemoteModule implements WorldModule {
 
 export const PATH_CLIP_MAIN_WORLD: WorldOptions = {
     id: "main",
-    modules: [new AppMainModule(), new AppPartMainModule(), new AppRemoteModule(), new AppPartRemoteModule()],
+    modules: [new AppMainModule(), new AppPartMainModule(), new AppContextModule()],
     schedules: WORLD_SCHEDULE_OPTIONS_DEFAULT,
 };

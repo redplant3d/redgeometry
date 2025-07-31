@@ -1,6 +1,7 @@
 import type { DefaultSystemStage, DefaultWorldScheduleId, WorldModule } from "../ecs/types.js";
 import type { World } from "../ecs/world.js";
 import { createRandomSeed } from "../utility/helper.js";
+import { AppContextModule } from "./app-context.js";
 import {
     AppInputModule,
     ButtonInputElement,
@@ -208,7 +209,7 @@ export class AppMainModule implements WorldModule {
     public readonly moduleId = "app-main-input";
 
     public setup(world: World): void {
-        world.addModules([new TimeModule(), new InputModule(), new AppInputModule()]);
+        world.addModules([new TimeModule(), new InputModule(), new AppInputModule(), new AppContextModule()]);
 
         world.addSystem<DefaultSystemStage>({ stage: "start-pre", fn: initAppMainPreSystem });
         world.addSystem<DefaultSystemStage>({ stage: "start-pre", fn: addAppInputsSystem });
@@ -225,14 +226,6 @@ export class AppMainModule implements WorldModule {
             stage: "start-post",
             seq: [startInputElementsSystem, initAppMainPostSystem],
         });
-    }
-}
-
-export class AppRemoteModule implements WorldModule {
-    public readonly moduleId = "app-remote";
-
-    public setup(world: World): void {
-        world.addModules([new TimeModule(), new InputModule()]);
 
         world.addSystem<DefaultSystemStage>({ stage: "update-pre", fn: resizeCanvasSystem });
     }
