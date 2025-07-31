@@ -1,5 +1,6 @@
 import { expect } from "vitest";
 import type { ReadonlyQuaternion, ReadonlyVector2, ReadonlyVector3 } from "../src/index.js";
+import { meshValidate, type Mesh2 } from "../src/internal/mesh-next.js";
 import type { ReadonlyComplex } from "../src/primitives/complex.js";
 
 export function expectToBeCloseVector2(p1: ReadonlyVector2, p2: ReadonlyVector2, numDigits?: number): void {
@@ -43,4 +44,12 @@ export function expectToBeCloseEuler(
     expect(eul1x).toBeCloseTo(eul2x, numDigits ?? 15);
     expect(eul1y).toBeCloseTo(eul2y, numDigits ?? 15);
     expect(eul1z).toBeCloseTo(eul2z, numDigits ?? 15);
+}
+
+export function expectToBeTrue(value: boolean): asserts value {
+    expect(value).toEqual(true);
+}
+
+export function expectNoMesh2Errors<S, F, E, V>(mesh: Mesh2<S, F, E, V>): void {
+    expect(meshValidate(mesh).errors).toEqual([]);
 }

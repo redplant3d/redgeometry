@@ -1,6 +1,7 @@
 import { LocalAppContext } from "./ecs/app.js";
 import { ECS_MAIN_WORLD } from "./parts/ecs-bounce.js";
 import { MATRIX_MAIN_WORLD } from "./parts/matrix.js";
+import { MESH_NEXT_MAIN_WORLD } from "./parts/mesh-next.js";
 import { MESH_MAIN_WORLD } from "./parts/mesh.js";
 import { PATH_AREA_MAIN_WORLD } from "./parts/path-area.js";
 import { PATH_CLIP_MAIN_WORLD } from "./parts/path-clip.js";
@@ -29,6 +30,10 @@ launcher.addPart(
 launcher.addPart(
     { id: "mesh", runWorldId: "main", runScheduleId: "start" },
     { id: "mesh-main", parent: undefined, worlds: [MESH_MAIN_WORLD] },
+);
+launcher.addPart(
+    { id: "mesh-next", runWorldId: "main", runScheduleId: "start" },
+    { id: "mesh-next-main", parent: undefined, worlds: [MESH_NEXT_MAIN_WORLD] },
 );
 launcher.addPart(
     { id: "path-area", runWorldId: "main", runScheduleId: "start" },

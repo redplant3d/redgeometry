@@ -1,6 +1,7 @@
 import type { Mesh2, MeshFace2 } from "redgeometry/src/core/mesh";
-import { type Path2 } from "redgeometry/src/core/path";
-import type { Polygon2 } from "redgeometry/src/core/polygon";
+import { Path2 } from "redgeometry/src/core/path";
+import { Polygon2 } from "redgeometry/src/core/polygon";
+import type { Mesh2 as Mesh2Next, MeshFaceIdx as MeshNextFaceIdx } from "redgeometry/src/internal/mesh-next";
 import type { ReadonlyMinMaxBox2 } from "redgeometry/src/primitives/box";
 import type { Edge2, ReadonlyEdge2 } from "redgeometry/src/primitives/edge";
 import type { ReadonlyMatrix3A } from "redgeometry/src/primitives/matrix";
@@ -10,6 +11,7 @@ import { assertUnreachable, throwError } from "redgeometry/src/utility/debug";
 import type { Random } from "redgeometry/src/utility/random";
 import type { DefaultSystemStage, WorldModule, WorldPlugin } from "../ecs/types.js";
 import type { World } from "../ecs/world.js";
+import { ColorRgba } from "../utility/color.js";
 import { createRandomColor } from "../utility/helper.js";
 import type { Image2 } from "../utility/image.js";
 import type { AppCanvasData } from "./app.js";
@@ -140,6 +142,157 @@ export class AppContextPlugin implements WorldPlugin {
         ctx.strokeStyle = style;
         ctx.stroke();
         ctx.restore();
+    }
+
+    public drawMesh2Next<S, F, E, V>(
+        mesh: Mesh2Next<S, F, E, V>,
+        options?: { pointWidth?: number; edgeWidth?: number; linkWidth?: number },
+    ): void {
+        const pointWidth = options?.pointWidth ?? 8;
+        const edgeWidth = options?.pointWidth ?? 2;
+        const linkWidth = options?.pointWidth ?? 2;
+
+        const meshVertices = mesh.vertices;
+        const meshEdges = mesh.edges;
+        const meshFaces = mesh.faces;
+        const meshLinks = mesh.links;
+        const meshLoops = mesh.loops;
+
+        const points: ReadonlyVector2[] = [];
+        const edges: Path2[] = [];
+        const faceEntries: { face: MeshNextFaceIdx; path: Path2 }[] = [];
+        const linkEntries: { face: MeshNextFaceIdx; path: Path2 }[] = [];
+
+        const iterVertices = meshVertices.createIterator();
+
+        while (iterVertices.next()) {
+            const vtx = iterVertices.getIndex();
+            const vtxPos = meshVertices.getPos(vtx);
+
+            points.push(vtxPos);
+        }
+
+        const iterEdges = meshEdges.createIterator();
+
+        while (iterEdges.next()) {
+            const edge = iterEdges.getIndex();
+            const edgeLink = meshEdges.getLink(edge);
+
+            const vtx0 = meshLinks.getVertex(edgeLink);
+            const vtx1 = meshLinks.getVertexSym(edgeLink);
+
+            const p0 = meshVertices.getPos(vtx0);
+            const p1 = meshVertices.getPos(vtx1);
+
+            const vu = p1.sub(p0).unit();
+            const vn = vu.neg().perp();
+
+            const pp0 = p0.addMulS(vu, 4 * pointWidth).addMulS(vn, 4 * linkWidth);
+            const pp1 = p1.addMulS(vu, -4 * pointWidth).addMulS(vn, 4 * linkWidth);
+
+            const path = Path2.createEmpty();
+            path.moveTo(pp0);
+            path.lineTo(pp1);
+
+            edges.push(path);
+        }
+
+        const iterFaces = meshFaces.createIterator();
+        const iterLoopNext = meshLoops.createIteratorNext(-1);
+        const iterLinkLnext = meshLinks.createIteratorLnext(-1);
+
+        while (iterFaces.next()) {
+            const face = iterFaces.getIndex();
+            const faceFirstLoop = meshFaces.getFirstLoop(face);
+            const path = Path2.createEmpty();
+
+            iterLoopNext.reset(faceFirstLoop);
+
+            while (iterLoopNext.next()) {
+                const loop = iterLoopNext.getIndex();
+                const loopFirstLink = meshLoops.getFirstLink(loop);
+                const polygon = Polygon2.createEmpty();
+
+                iterLinkLnext.reset(loopFirstLink);
+
+                while (iterLinkLnext.next()) {
+                    const link = iterLinkLnext.getIndex();
+                    const linkVtx = meshLinks.getVertex(link);
+                    const linkVtxPos = meshVertices.getPos(linkVtx);
+
+                    polygon.add(linkVtxPos);
+                }
+
+                path.addPolygon(polygon);
+            }
+
+            faceEntries.push({ face, path });
+        }
+
+        const iterLinks = meshLinks.createIterator();
+
+        while (iterLinks.next()) {
+            const link = iterLinks.getIndex();
+
+            const vtx0 = meshLinks.getVertex(link);
+            const vtx1 = meshLinks.getVertexSym(link);
+
+            const p0 = meshVertices.getPos(vtx0);
+            const p1 = meshVertices.getPos(vtx1);
+
+            const path = Path2.createEmpty();
+
+            if (vtx0 === vtx1) {
+                const r = 10;
+                const x = r * Math.cos(1);
+                const y = r * Math.sin(1);
+                const v0 = new Vector2(-x, -y);
+                const v1 = new Vector2(x, -y);
+                const v2 = new Vector2(x, 0);
+                const pp0 = p0.add(v0);
+                const pp1 = p1.add(v1);
+                const pp2 = pp1.add(v2);
+
+                path.moveTo(pp0);
+                path.svgArcTo(pp1, r, r, 0, true, false);
+                path.lineTo(pp2);
+            } else {
+                const vu = p1.sub(p0).unit();
+                const vn = vu.neg().perp();
+
+                const pp0 = p0.addMulS(vu, 2 * pointWidth).addMulS(vn, 1.5 * linkWidth);
+                const pp1 = p1.addMulS(vu, -2 * pointWidth).addMulS(vn, 1.5 * linkWidth);
+                const pp2 = p1.addMulS(vu, -3 * pointWidth).addMulS(vn, 4 * linkWidth);
+
+                path.moveTo(pp0);
+                path.lineTo(pp1);
+                path.lineTo(pp2);
+            }
+
+            const loop = meshLinks.getLoop(link);
+            const face = meshLoops.getFace(loop);
+
+            linkEntries.push({ face, path });
+        }
+
+        for (const faceEntry of faceEntries) {
+            const c = ColorRgba.fromHSV(faceEntry.face / meshFaces.length, 0.2, 1, 0.5);
+            const pc = faceEntry.path.centroid();
+
+            if (pc !== undefined) {
+                this.fillPath(faceEntry.path, c.style());
+                this.fillText(faceEntry.face.toString(), pc, "#000000");
+            }
+        }
+
+        for (const linkEntry of linkEntries) {
+            const c = ColorRgba.fromHSV(linkEntry.face / meshFaces.length, 1, 1, 1);
+
+            this.drawPath(linkEntry.path, c.style(), linkWidth);
+        }
+
+        this.drawPaths(edges, "#888888", edgeWidth);
+        this.fillPoints(points, "#000000", pointWidth);
     }
 
     public drawMeshEdges(mesh: Mesh2, style: CanvasStyle = "#000000", width = 1): void {
