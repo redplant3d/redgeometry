@@ -174,6 +174,21 @@ export class Bitset {
         }
     }
 
+    public toBigInt(): bigint {
+        let val = 0n;
+        let shift = 0n;
+
+        // LSB to MSB
+        for (let i = 0; i < this.data.length; i++) {
+            // Convert to unsigned integer
+            const n = this.data[i] >>> 0;
+            val |= BigInt(n) << shift;
+            shift += 32n;
+        }
+
+        return val;
+    }
+
     public toDataString(): string {
         let str = "";
 
