@@ -721,10 +721,12 @@ export class Matrix3A implements ReadonlyMatrix3A {
     }
 
     /**
+     * Returns the point `p` transformed by the current matrix.
+     *
      * ```
-     * | e0  e2  e4 |   | x |
-     * | e1  e3  e5 | * | y |
-     * |  0   0   1 |   | 1 |
+     * | e0  e2  e4 |   | px |   | x |
+     * | e1  e3  e5 | * | py | = | y |
+     * |  0   0   1 |   |  1 |
      * ```
      */
     public transformPoint(p: ReadonlyVector2): Vector2 {
@@ -737,10 +739,12 @@ export class Matrix3A implements ReadonlyMatrix3A {
     }
 
     /**
+     * Returns the vector `v` transformed by the current matrix.
+     *
      * ```
-     * | e0  e2  e4 |   | x |
-     * | e1  e3  e5 | * | y |
-     * |  0   0   1 |   | 0 |
+     * | e0  e2  e4 |   | vx |   | x |
+     * | e1  e3  e5 | * | vy | = | y |
+     * |  0   0   1 |   |  0 |
      * ```
      */
     public transformVector(v: ReadonlyVector2): Vector2 {
@@ -1572,10 +1576,12 @@ export class Matrix3 implements ReadonlyMatrix3 {
     }
 
     /**
+     * Returns the point `p` transformed by the current matrix including homogeneous division.
+     *
      * ```
-     * | e0  e3  e6 |   | x |
-     * | e1  e4  e7 | * | y |
-     * | e2  e5  e8 |   | 1 |
+     * | e0  e3  e6 |   | px |   | x / w |
+     * | e1  e4  e7 | * | py | = | y / w |
+     * | e2  e5  e8 |   |  1 |
      * ```
      */
     public transformPoint(p: ReadonlyVector2): Vector2 {
@@ -1589,10 +1595,12 @@ export class Matrix3 implements ReadonlyMatrix3 {
     }
 
     /**
+     * Returns the point `p` transformed by the current matrix assuming an affine transformation.
+     *
      * ```
-     * | e0  e3  e6 |   | x |
-     * | e1  e4  e7 | * | y |
-     * |  x   x   x |   | 1 |
+     * | e0  e3  e6 |   | px |   | x |
+     * | e1  e4  e7 | * | py | = | y |
+     * |  0   0   1 |   |  1 |
      * ```
      */
     public transformPointAffine(p: ReadonlyVector2): Vector2 {
@@ -1605,10 +1613,12 @@ export class Matrix3 implements ReadonlyMatrix3 {
     }
 
     /**
+     * Returns the vector `v` transformed by the current matrix assuming an affine transformation.
+     *
      * ```
-     * | e0  e3  e6 |   | x |
-     * | e1  e4  e7 | * | y |
-     * |  x   x   x |   | 0 |
+     * | e0  e3  e6 |   | vx |   | x |
+     * | e1  e4  e7 | * | vy | = | y |
+     * |  0   0   1 |   |  0 |
      * ```
      */
     public transformVectorAffine(v: ReadonlyVector2): Vector2 {
@@ -2580,11 +2590,13 @@ export class Matrix4A implements ReadonlyMatrix4A {
     }
 
     /**
+     * Returns the point `p` transformed by the current matrix.
+     *
      * ```
-     * | e0  e3  e6   e9 |   | x |
-     * | e1  e4  e7  e10 | * | y |
-     * | e2  e5  e8  e11 |   | z |
-     * |  0   0   0    1 |   | 1 |
+     * | e0  e3  e6   e9 |   | px |   | x |
+     * | e1  e4  e7  e10 | * | py | = | y |
+     * | e2  e5  e8  e11 |   | pz |   | z |
+     * |  0   0   0    1 |   |  1 |
      * ```
      */
     public transformPoint(p: ReadonlyVector3): Vector3 {
@@ -2598,11 +2610,13 @@ export class Matrix4A implements ReadonlyMatrix4A {
     }
 
     /**
+     * Returns the vector `v` transformed by the current matrix.
+     *
      * ```
-     * | e0  e3  e6   e9 |   | x |
-     * | e1  e4  e7  e10 | * | y |
-     * | e2  e5  e8  e11 |   | z |
-     * |  0   0   0    1 |   | 0 |
+     * | e0  e3  e6   e9 |   | vx |   | x |
+     * | e1  e4  e7  e10 | * | vy | = | y |
+     * | e2  e5  e8  e11 |   | vz |   | z |
+     * |  0   0   0    1 |   |  0 |
      * ```
      */
     public transformVector(v: ReadonlyVector3): Vector3 {
@@ -4022,11 +4036,13 @@ export class Matrix4 implements ReadonlyMatrix4 {
     }
 
     /**
+     * Returns the point `p` transformed by the current matrix including homogeneous division.
+     *
      * ```
-     * | e0  e4   e8  e12 |   | x |
-     * | e1  e5   e9  e13 | * | y |
-     * | e2  e6  e10  e14 |   | z |
-     * | e3  e7  e11  e15 |   | 1 |
+     * | e0  e4   e8  e12 |   | px |   | x / w |
+     * | e1  e5   e9  e13 | * | py | = | y / w |
+     * | e2  e6  e10  e14 |   | pz |   | z / w |
+     * | e3  e7  e11  e15 |   |  1 |
      * ```
      */
     public transformPoint(p: ReadonlyVector3): Vector3 {
@@ -4041,11 +4057,13 @@ export class Matrix4 implements ReadonlyMatrix4 {
     }
 
     /**
+     * Returns the point `p` transformed by the current matrix assuming an affine transformation.
+     *
      * ```
-     * | e0  e4   e8  e12 |   | x |
-     * | e1  e5   e9  e13 | * | y |
-     * | e2  e6  e10  e14 |   | z |
-     * |  x   x   x     x |   | 1 |
+     * | e0  e4   e8  e12 |   | px |   | x |
+     * | e1  e5   e9  e13 | * | py | = | y |
+     * | e2  e6  e10  e14 |   | pz |   | z |
+     * |  0   0    0    1 |   |  1 |
      * ```
      */
     public transformPointAffine(v: ReadonlyVector3): Vector3 {
@@ -4059,11 +4077,13 @@ export class Matrix4 implements ReadonlyMatrix4 {
     }
 
     /**
+     * Returns the vector `v` transformed by the current matrix assuming an affine transformation.
+     *
      * ```
-     * | e0  e4   e8  e12 |   | x |
-     * | e1  e5   e9  e13 | * | y |
-     * | e2  e6  e10  e14 |   | z |
-     * |  x   x   x     x |   | 0 |
+     * | e0  e4   e8  e12 |   | vx |   | x |
+     * | e1  e5   e9  e13 | * | vy | = | y |
+     * | e2  e6  e10  e14 |   | vz |   | z |
+     * |  0   0    0    1 |   |  0 |
      * ```
      */
     public transformVectorAffine(v: ReadonlyVector3): Vector3 {
