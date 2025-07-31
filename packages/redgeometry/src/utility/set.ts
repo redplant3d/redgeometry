@@ -189,15 +189,51 @@ export class Bitset {
         return val;
     }
 
-    public toDataString(): string {
-        let str = "";
+    public toBinaryString(): string {
+        const lastIdx = this.data.length - 1;
 
-        // LSB to MSB
-        for (let i = 0; i < this.data.length; i++) {
+        if (lastIdx < 0) {
+            // Empty
+            return "0b0";
+        }
+
+        let str = "0b";
+
+        // MSB to LSB
+        for (let i = lastIdx; i >= 0; i--) {
             // Convert to unsigned integer
             const n = this.data[i] >>> 0;
-            str += n.toString(2).padStart(32, "0");
-            str += "\n";
+
+            if (i === lastIdx) {
+                str += n.toString(2);
+            } else {
+                str += n.toString(2).padStart(32, "0");
+            }
+        }
+
+        return str;
+    }
+
+    public toHexString(): string {
+        const lastIdx = this.data.length - 1;
+
+        if (lastIdx < 0) {
+            // Empty
+            return "0x0";
+        }
+
+        let str = "0x";
+
+        // MSB to LSB
+        for (let i = lastIdx; i >= 0; i--) {
+            // Convert to unsigned integer
+            const n = this.data[i] >>> 0;
+
+            if (i === lastIdx) {
+                str += n.toString(16);
+            } else {
+                str += n.toString(16).padStart(8, "0");
+            }
         }
 
         return str;
