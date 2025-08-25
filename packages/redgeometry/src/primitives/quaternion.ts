@@ -23,24 +23,35 @@ export interface ReadonlyQuaternion {
     axisAngle(): number;
     clone(): Quaternion;
     conjugate(): Quaternion;
+    divS(s: number): Quaternion;
+    dot(z: ReadonlyQuaternion): number;
     eq(q: ReadonlyQuaternion): boolean;
     eqApproxAbs(q: ReadonlyQuaternion, eps: number): boolean;
     eqApproxRel(q: ReadonlyQuaternion, eps: number): boolean;
     eulerAngles(order: RotationOrder): { x: number; y: number; z: number };
     inverse(): Quaternion;
+    isFinite(): boolean;
     isIdentity(): boolean;
     length(): number;
     lengthSq(): number;
     lerp(q: ReadonlyQuaternion, t: number): Quaternion;
     mul(q: ReadonlyQuaternion): Quaternion;
+    mulS(s: number): Quaternion;
     mulV(v: ReadonlyVector3): Vector3;
     nlerp(q: ReadonlyQuaternion, t: number): Quaternion;
     orthonormalBasis(): { v1: Vector3; v2: Vector3; v3: Vector3 };
+    rotateX(q: ReadonlyQuaternion, angle: number): Quaternion;
+    rotateXPre(q: ReadonlyQuaternion, angle: number): Quaternion;
+    rotateY(q: ReadonlyQuaternion, angle: number): Quaternion;
+    rotateYPre(q: ReadonlyQuaternion, angle: number): Quaternion;
+    rotateZ(q: ReadonlyQuaternion, angle: number): Quaternion;
+    rotateZPre(q: ReadonlyQuaternion, angle: number): Quaternion;
     slerp(q: ReadonlyQuaternion, t: number): Quaternion;
     sub(q: ReadonlyQuaternion): Quaternion;
     toArray(): number[];
     toString(): string;
     unit(): Quaternion;
+    unitOrIdentity(): Quaternion;
 }
 
 export const RotationOrder = {
@@ -300,6 +311,14 @@ export class Quaternion implements ReadonlyQuaternion {
         return new Quaternion(this.a, -this.b, -this.c, -this.d);
     }
 
+    public divS(s: number): Quaternion {
+        return new Quaternion(this.a / s, this.b / s, this.c / s, this.d / s);
+    }
+
+    public dot(q: ReadonlyQuaternion): number {
+        return this.a * q.a + this.b * q.b + this.c * q.c + this.d * q.d;
+    }
+
     public eq(q: ReadonlyQuaternion): boolean {
         return this.a === q.a && this.b === q.b && this.c === q.c && this.d === q.d;
     }
@@ -399,6 +418,10 @@ export class Quaternion implements ReadonlyQuaternion {
         return this.a === 1 && this.b === 0 && this.c === 0 && this.d === 0;
     }
 
+    public isFinite(): boolean {
+        return Number.isFinite(this.a) && Number.isFinite(this.b) && Number.isFinite(this.c) && Number.isFinite(this.d);
+    }
+
     public length(): number {
         return Math.sqrt(this.lengthSq());
     }
@@ -433,6 +456,10 @@ export class Quaternion implements ReadonlyQuaternion {
             this.a * q.c - this.b * q.d + this.c * q.a + this.d * q.b,
             this.a * q.d + this.b * q.c - this.c * q.b + this.d * q.a,
         );
+    }
+
+    public mulS(s: number): Quaternion {
+        return new Quaternion(s * this.a, s * this.b, s * this.c, s * this.d);
     }
 
     /**
@@ -510,6 +537,126 @@ export class Quaternion implements ReadonlyQuaternion {
         return { v1, v2, v3 };
     }
 
+    /**
+     * ```
+     * | cos |   | a |
+     * | sin | * | b |
+     * |   0 |   | c |
+     * |   0 |   | d |
+     * ```
+     */
+    public rotateX(q: ReadonlyQuaternion, angle: number): Quaternion {
+        const sin = Math.sin(0.5 * angle);
+        const cos = Math.cos(0.5 * angle);
+
+        const qa = cos * q.a - sin * q.b;
+        const qb = cos * q.b + sin * q.a;
+        const qc = cos * q.c - sin * q.d;
+        const qd = cos * q.d + sin * q.c;
+
+        return new Quaternion(qa, qb, qc, qd);
+    }
+
+    /**
+     * ```
+     * | a |   | cos |
+     * | b | * | sin |
+     * | c |   |   0 |
+     * | d |   |   0 |
+     * ```
+     */
+    public rotateXPre(q: ReadonlyQuaternion, angle: number): Quaternion {
+        const sin = Math.sin(0.5 * angle);
+        const cos = Math.cos(0.5 * angle);
+
+        const qa = q.a * cos - q.b * sin;
+        const qb = q.b * cos + q.a * sin;
+        const qc = q.c * cos + q.d * sin;
+        const qd = q.d * cos - q.c * sin;
+
+        return new Quaternion(qa, qb, qc, qd);
+    }
+
+    /**
+     * ```
+     * | cos |   | a |
+     * |   0 | * | b |
+     * | sin |   | c |
+     * |   0 |   | d |
+     * ```
+     */
+    public rotateY(q: ReadonlyQuaternion, angle: number): Quaternion {
+        const sin = Math.sin(0.5 * angle);
+        const cos = Math.cos(0.5 * angle);
+
+        const qa = cos * q.a - sin * q.c;
+        const qb = cos * q.b + sin * q.d;
+        const qc = cos * q.c + sin * q.a;
+        const qd = cos * q.d - sin * q.b;
+
+        return new Quaternion(qa, qb, qc, qd);
+    }
+
+    /**
+     * ```
+     * | a |   | cos |
+     * | b | * |   0 |
+     * | c |   | sin |
+     * | d |   |   0 |
+     * ```
+     */
+    public rotateYPre(q: ReadonlyQuaternion, angle: number): Quaternion {
+        const sin = Math.sin(0.5 * angle);
+        const cos = Math.cos(0.5 * angle);
+
+        const qa = q.a * cos - q.c * sin;
+        const qb = q.b * cos - q.d * sin;
+        const qc = q.c * cos + q.a * sin;
+        const qd = q.d * cos + q.b * sin;
+
+        return new Quaternion(qa, qb, qc, qd);
+    }
+
+    /**
+     * ```
+     * | cos |   | a |
+     * |   0 | * | b |
+     * |   0 |   | c |
+     * | sin |   | d |
+     * ```
+     */
+    public rotateZ(q: ReadonlyQuaternion, angle: number): Quaternion {
+        const sin = Math.sin(0.5 * angle);
+        const cos = Math.cos(0.5 * angle);
+
+        const qa = cos * q.a - sin * q.d;
+        const qb = cos * q.b - sin * q.c;
+        const qc = cos * q.c + sin * q.b;
+        const qd = cos * q.d + sin * q.a;
+
+        return new Quaternion(qa, qb, qc, qd);
+    }
+
+    /**
+     * ```
+     * | a |   | cos |
+     * | b | * |   0 |
+     * | c |   |   0 |
+     * | d |   | sin |
+     * ```
+     */
+    public rotateZPre(q: ReadonlyQuaternion, angle: number): Quaternion {
+        const sin = Math.sin(0.5 * angle);
+        const cos = Math.cos(0.5 * angle);
+
+        const qa = q.a * cos - q.d * sin;
+        const qb = q.b * cos + q.c * sin;
+        const qc = q.c * cos - q.b * sin;
+        const qd = q.d * cos + q.a * sin;
+
+        return new Quaternion(qa, qb, qc, qd);
+    }
+
     public set(a: number, b: number, c: number, d: number): void {
         this.a = a;
         this.b = b;
@@ -522,6 +669,13 @@ export class Quaternion implements ReadonlyQuaternion {
         this.b = q1.b + q2.b;
         this.c = q1.c + q2.c;
         this.d = q1.d + q2.d;
+    }
+
+    public setDivS(q: ReadonlyQuaternion, s: number): void {
+        this.a = q.a / s;
+        this.b = q.b / s;
+        this.c = q.c / s;
+        this.d = q.d / s;
     }
 
     public setFrom(q: ReadonlyQuaternion): void {
@@ -556,6 +710,13 @@ export class Quaternion implements ReadonlyQuaternion {
         const qd = q1.a * q2.d + q1.b * q2.c - q1.c * q2.b + q1.d * q2.a;
 
         this.set(qa, qb, qc, qd);
+    }
+
+    public setMulS(q: ReadonlyQuaternion, s: number): void {
+        this.a = s * q.a;
+        this.b = s * q.b;
+        this.c = s * q.c;
+        this.d = s * q.d;
     }
 
     /**
@@ -687,10 +848,7 @@ export class Quaternion implements ReadonlyQuaternion {
 
     public setUnit(q: ReadonlyQuaternion): void {
         const s = q.length();
-        this.a = q.a / s;
-        this.b = q.b / s;
-        this.c = q.c / s;
-        this.d = q.d / s;
+        this.setDivS(q, s);
     }
 
     /**
@@ -698,7 +856,7 @@ export class Quaternion implements ReadonlyQuaternion {
      */
     public slerp(q: ReadonlyQuaternion, t: number): Quaternion {
         // Glenn Davis formula (referenced by Ken Shoemake)
-        const dot = this.a * q.a + this.b * q.b + this.c * q.c + this.d * q.d;
+        const dot = this.dot(q);
         const lenSq2 = this.lengthSq() * q.lengthSq();
 
         if (dot * dot >= lenSq2) {
@@ -738,6 +896,16 @@ export class Quaternion implements ReadonlyQuaternion {
 
     public unit(): Quaternion {
         const s = this.length();
-        return new Quaternion(this.a / s, this.b / s, this.c / s, this.d / s);
+        return this.divS(s);
+    }
+
+    public unitOrIdentity(): Quaternion {
+        const s = this.length();
+
+        if (s === 0) {
+            return Quaternion.createIdentity();
+        }
+
+        return this.divS(s);
     }
 }

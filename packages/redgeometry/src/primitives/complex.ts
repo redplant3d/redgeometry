@@ -10,24 +10,33 @@ export interface ReadonlyComplex {
     readonly a: number;
     readonly b: number;
 
+    add(z: ReadonlyComplex): Complex;
     angle(z: ReadonlyComplex): number;
     clone(): Complex;
     conjugate(): Complex;
+    divS(s: number): Complex;
+    dot(z: ReadonlyComplex): number;
     eq(z: ReadonlyComplex): boolean;
     eqApproxAbs(z: ReadonlyComplex, eps: number): boolean;
     eqApproxRel(z: ReadonlyComplex, eps: number): boolean;
     inverse(): Complex;
+    isFinite(): boolean;
     isIdentity(): boolean;
     length(): number;
     lengthSq(): number;
+    lerp(z: ReadonlyComplex, t: number): Complex;
     mul(z: ReadonlyComplex): Complex;
+    mulS(s: number): Complex;
     mulV(v: ReadonlyVector2): Vector2;
     nlerp(z: ReadonlyComplex, t: number): Complex;
     orthonormalBasis(): { v1: Vector2; v2: Vector2 };
+    rotate(z: ReadonlyComplex, a: number): Complex;
+    slerp(z: ReadonlyComplex, t: number): Complex;
     sub(z: ReadonlyComplex): Complex;
     toArray(): [number, number];
     toString(): string;
     unit(): Complex;
+    unitOrIdentity(): Complex;
 }
 
 /**
@@ -102,6 +111,14 @@ export class Complex implements ReadonlyComplex {
         return new Complex(this.a, -this.b);
     }
 
+    public divS(s: number): Complex {
+        return new Complex(this.a / s, this.b / s);
+    }
+
+    public dot(z: ReadonlyComplex): number {
+        return this.a * z.a + this.b * z.b;
+    }
+
     public eq(z: ReadonlyComplex): boolean {
         return this.a === z.a && this.b === z.b;
     }
@@ -123,12 +140,25 @@ export class Complex implements ReadonlyComplex {
         return this.a === 1 && this.b === 0;
     }
 
+    public isFinite(): boolean {
+        return Number.isFinite(this.a) && Number.isFinite(this.b);
+    }
+
     public length(): number {
         return Math.sqrt(this.lengthSq());
     }
 
     public lengthSq(): number {
         return this.a * this.a + this.b * this.b;
+    }
+
+    /**
+     * Returns the linear interpolation of the current complex and `z`.
+     */
+    public lerp(z: ReadonlyComplex, t: number): Complex {
+        const za = lerp(this.a, z.a, t);
+        const zb = lerp(this.b, z.b, t);
+        return new Complex(za, zb);
     }
 
     /**
@@ -139,6 +169,10 @@ export class Complex implements ReadonlyComplex {
      */
     public mul(z: ReadonlyComplex): Complex {
         return new Complex(this.a * z.a - this.b * z.b, this.a * z.b + this.b * z.a);
+    }
+
+    public mulS(s: number): Complex {
+        return new Complex(s * this.a, s * this.b);
     }
 
     /**
@@ -184,6 +218,16 @@ export class Complex implements ReadonlyComplex {
         return { v1, v2 };
     }
 
+    public rotate(z: ReadonlyComplex, a: number): Complex {
+        const sin = Math.sin(a);
+        const cos = Math.cos(a);
+
+        const za = cos * z.a - sin * z.b;
+        const zb = cos * z.b + sin * z.a;
+
+        return new Complex(za, zb);
+    }
+
     public set(a: number, b: number): void {
         this.a = a;
         this.b = b;
@@ -194,6 +238,11 @@ export class Complex implements ReadonlyComplex {
         this.b = z1.b + z2.b;
     }
 
+    public setDivS(z: ReadonlyComplex, s: number): void {
+        this.a = z.a / s;
+        this.b = z.b / s;
+    }
+
     public setFrom(z: ReadonlyComplex): void {
         this.a = z.a;
         this.b = z.b;
@@ -202,15 +251,18 @@ export class Complex implements ReadonlyComplex {
     public setFromRotationAngle(angle: number): void {
         const sin = Math.sin(angle);
         const cos = Math.cos(angle);
-
         this.set(cos, sin);
     }
 
     public setMul(z1: ReadonlyComplex, z2: ReadonlyComplex): void {
         const za = z1.a * z2.a - z1.b * z2.b;
         const zb = z1.a * z2.b + z1.b * z2.a;
-
         this.set(za, zb);
+    }
+
+    public setMulS(z: ReadonlyComplex, s: number): void {
+        this.a = s * z.a;
+        this.b = s * z.b;
     }
 
     public setRotate(z: ReadonlyComplex, angle: number): void {
@@ -230,8 +282,35 @@ export class Complex implements ReadonlyComplex {
 
     public setUnit(z: ReadonlyComplex): void {
         const s = z.length();
-        this.a = z.a / s;
-        this.b = z.b / s;
+        this.setDivS(z, s);
+    }
+
+    /**
+     * Returns the spherical linear interpolation of the current complext and `z`.
+     */
+    public slerp(z: ReadonlyComplex, t: number): Complex {
+        const dot = this.dot(z);
+        const lenSq2 = this.lengthSq() * z.lengthSq();
+
+        if (dot * dot >= lenSq2) {
+            // Fallback (angle either undefined, very close or equal to zero)
+            return this.lerp(z, t);
+        }
+
+        const cos = dot / Math.sqrt(lenSq2);
+
+        const angle = Math.acos(cos);
+        const sin1 = Math.sin(angle - angle * t);
+        const sin2 = Math.sin(angle * t);
+        const sin3 = Math.sin(angle);
+
+        const s1 = sin1 / sin3;
+        const s2 = sin2 / sin3;
+
+        const za = s1 * this.a + s2 * z.a;
+        const zb = s1 * this.b + s2 * z.b;
+
+        return new Complex(za, zb);
     }
 
     public sub(z: ReadonlyComplex): Complex {
@@ -248,6 +327,16 @@ export class Complex implements ReadonlyComplex {
 
     public unit(): Complex {
         const s = this.length();
-        return new Complex(this.a / s, this.b / s);
+        return this.divS(s);
+    }
+
+    public unitOrIdentity(): Complex {
+        const s = this.length();
+
+        if (s === 0) {
+            return Complex.createIdentity();
+        }
+
+        return this.divS(s);
     }
 }
