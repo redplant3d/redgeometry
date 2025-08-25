@@ -164,6 +164,10 @@ export class Matrix3A implements ReadonlyMatrix3A {
         return new Matrix3A([e[i + 0], e[i + 1], e[i + 2], e[i + 3], e[i + 4], e[i + 5]]);
     }
 
+    public static fromColumns(col0: Vector2, col1: Vector2, col2: Vector2): Matrix3A {
+        return new Matrix3A([col0.x, col0.y, col1.x, col1.y, col2.x, col2.y]);
+    }
+
     /**
      * ```
      * | e0  e3  e6 |
@@ -826,6 +830,10 @@ export class Matrix3 implements ReadonlyMatrix3 {
         const i = offset;
 
         return new Matrix3([e[i + 0], e[i + 1], e[i + 2], e[i + 3], e[i + 4], e[i + 5], e[i + 6], e[i + 7], e[i + 8]]);
+    }
+
+    public static fromColumns(col0: Vector3, col1: Vector3, col2: Vector3): Matrix3 {
+        return new Matrix3([col0.x, col0.y, col0.z, col1.x, col1.y, col1.z, col2.x, col2.y, col2.z]);
     }
 
     /**
@@ -1703,6 +1711,23 @@ export class Matrix4A implements ReadonlyMatrix4A {
             e[i + 9],
             e[i + 10],
             e[i + 11],
+        ]);
+    }
+
+    public static fromColumns(col0: Vector3, col1: Vector3, col2: Vector3, col3: Vector3): Matrix4A {
+        return new Matrix4A([
+            col0.x,
+            col0.y,
+            col0.z,
+            col1.x,
+            col1.y,
+            col1.z,
+            col2.x,
+            col2.y,
+            col2.z,
+            col3.x,
+            col3.y,
+            col3.z,
         ]);
     }
 
@@ -2720,6 +2745,27 @@ export class Matrix4 implements ReadonlyMatrix4 {
             e[i + 13],
             e[i + 14],
             e[i + 15],
+        ]);
+    }
+
+    public static fromColumns(col0: Vector4, col1: Vector4, col2: Vector4, col3: Vector4): Matrix4 {
+        return new Matrix4([
+            col0.x,
+            col0.y,
+            col0.z,
+            col0.w,
+            col1.x,
+            col1.y,
+            col1.z,
+            col1.w,
+            col2.x,
+            col2.y,
+            col2.z,
+            col2.w,
+            col3.x,
+            col3.y,
+            col3.z,
+            col3.w,
         ]);
     }
 
