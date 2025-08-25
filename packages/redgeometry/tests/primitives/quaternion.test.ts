@@ -202,7 +202,7 @@ test("Quaternion - mulV", () => {
 
     const v = new Vector3(1, 2, 3);
 
-    const v1 = mat3.mul(mat2).mul(mat1).mulV(v);
+    const v1 = mat3.mul(mat2).mul(mat1).transformPoint(v);
     const v2 = q3.mul(q2).mul(q1).mulV(v);
     const v3 = qa.mulV(v);
     const v4 = qb.mulV(v);

@@ -48,7 +48,7 @@ export interface ReadonlyMatrix3A {
     eqApproxRel(mat: ReadonlyMatrix3A, eps: number): boolean;
     extractSRT(): { s: Vector2; r: Complex; t: Vector2 };
     mul(mat: ReadonlyMatrix3A): Matrix3A;
-    mulV(v: ReadonlyVector2): Vector2;
+    mulV(v: ReadonlyVector3): Vector3;
     toArray(): MatrixElements3A;
     toString(): string;
     transformPoint(p: ReadonlyVector2): Vector2;
@@ -88,7 +88,7 @@ export interface ReadonlyMatrix4A {
     eqApproxRel(mat: ReadonlyMatrix4A, eps: number): boolean;
     extractSRT(): { s: Vector3; r: Quaternion; t: Vector3 };
     mul(mat: ReadonlyMatrix4A): Matrix4A;
-    mulV(v: ReadonlyVector3): Vector3;
+    mulV(v: ReadonlyVector4): Vector4;
     toArray(): MatrixElements4A;
     toString(): string;
     transformPoint(p: ReadonlyVector3): Vector3;
@@ -373,16 +373,16 @@ export class Matrix3A implements ReadonlyMatrix3A {
      * ```
      * | e0  e2  e4 |   | x |
      * | e1  e3  e5 | * | y |
-     * |  0   0   1 |   | 1 |
+     * |  0   0   1 |   | z |
      * ```
      */
-    public mulV(v: ReadonlyVector2): Vector2 {
+    public mulV(v: ReadonlyVector3): Vector3 {
         const e = this.elements;
 
-        const x = e[0] * v.x + e[2] * v.y + e[4];
-        const y = e[1] * v.x + e[3] * v.y + e[5];
+        const x = e[0] * v.x + e[2] * v.y + e[4] * v.z;
+        const y = e[1] * v.x + e[3] * v.y + e[5] * v.z;
 
-        return new Vector2(x, y);
+        return new Vector3(x, y, v.z);
     }
 
     /**
@@ -1994,17 +1994,17 @@ export class Matrix4A implements ReadonlyMatrix4A {
      * | e0  e3  e6   e9 |   | x |
      * | e1  e4  e7  e10 | * | y |
      * | e2  e5  e8  e11 |   | z |
-     * |  0   0   0    1 |   | 1 |
+     * |  0   0   0    1 |   | w |
      * ```
      */
-    public mulV(v: ReadonlyVector3): Vector3 {
+    public mulV(v: ReadonlyVector4): Vector4 {
         const e = this.elements;
 
-        const x = e[0] * v.x + e[3] * v.y + e[6] * v.z + e[9];
-        const y = e[1] * v.x + e[4] * v.y + e[7] * v.z + e[10];
-        const z = e[2] * v.x + e[5] * v.y + e[8] * v.z + e[11];
+        const x = e[0] * v.x + e[3] * v.y + e[6] * v.z + e[9] * v.w;
+        const y = e[1] * v.x + e[4] * v.y + e[7] * v.z + e[10] * v.w;
+        const z = e[2] * v.x + e[5] * v.y + e[8] * v.z + e[11] * v.w;
 
-        return new Vector3(x, y, z);
+        return new Vector4(x, y, z, v.w);
     }
 
     /**

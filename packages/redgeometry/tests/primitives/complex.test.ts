@@ -30,7 +30,7 @@ test("Quaternion - mulV", () => {
     const mat = Matrix3A.fromRotation(z.a, z.b);
     const v = new Vector2(1, 2);
 
-    const v1 = mat.mulV(v);
+    const v1 = mat.transformPoint(v);
     const v2 = z.mulV(v);
 
     expectToBeCloseVector2(v1, v2);

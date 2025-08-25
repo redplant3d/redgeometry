@@ -237,14 +237,14 @@ export class Path2 implements PathSink2 {
 
         this.moveTo(pc);
 
-        this.lineTo(mat.mulV(v1));
+        this.lineTo(mat.transformPoint(v1));
 
         // Iteratively process 90 degree segments
         while (a > 0.5 * Math.PI + 0.005) {
             // Rotate vector CCW
             v1 = new Vector2(-v1.y, v1.x);
-            const p1 = mat.mulV(vc);
-            const p2 = mat.mulV(v1);
+            const p1 = mat.transformPoint(vc);
+            const p2 = mat.transformPoint(v1);
             this.arcTo(p1, p2);
 
             // Rotate control point CCW
@@ -261,8 +261,8 @@ export class Path2 implements PathSink2 {
         // but we can safely assume it does (only critical for angles close to 180 degrees)
         cos = Math.sqrt(0.5 * v1.dot(v2) + 0.5);
 
-        const p1 = mat.mulV(vc);
-        const p2 = mat.mulV(v2);
+        const p1 = mat.transformPoint(vc);
+        const p2 = mat.transformPoint(v2);
         this.conicTo(p1, p2, cos);
 
         this.close();
@@ -552,7 +552,7 @@ export class Path2 implements PathSink2 {
         // Vector from center (transformed midpoint)
         let v = p0.sub(p1).mulS(0.5);
 
-        v = mat.mulV(v);
+        v = mat.transformPoint(v);
 
         // Radii (see https://www.w3.org/TR/SVG/implnote.html#ArcCorrectionOutOfRangeRadii)
         let sx = Math.abs(rx);
@@ -651,8 +651,8 @@ export class Path2 implements PathSink2 {
             v1 = new Vector2(-v1.y, v1.x);
 
             // Transformed points of the arc segment
-            pp0 = mat.mulV(v);
-            pp1 = mat.mulV(v1);
+            pp0 = mat.transformPoint(v);
+            pp1 = mat.transformPoint(v1);
 
             this.arcTo(pp0, pp1);
 
@@ -667,7 +667,7 @@ export class Path2 implements PathSink2 {
         v = v.mulS(2).divS(v.dot(v));
 
         // Final arc segment
-        pp0 = mat.mulV(v);
+        pp0 = mat.transformPoint(v);
         pp1 = p1;
 
         // This is actually half of the remaining cos. It is required that `v1 dot v2 > -1` holds

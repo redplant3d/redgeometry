@@ -46,7 +46,7 @@ test("Matrix3A - inverse", () => {
 
 test("Matrix3A - mulV", () => {
     const mat = Matrix3A.createIdentity();
-    const v = new Vector2(1, 2);
+    const v = new Vector3(1, 2, 3);
 
     const mulV = mat.mulV(v);
 
@@ -230,7 +230,7 @@ test("Matrix4A - inverse", () => {
 
 test("Matrix4A - mulV", () => {
     const mat = Matrix4A.createIdentity();
-    const v = new Vector3(1, 2, 3);
+    const v = new Vector4(1, 2, 3, 4);
 
     const mulV = mat.mulV(v);
 
