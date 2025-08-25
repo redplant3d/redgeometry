@@ -22,6 +22,7 @@ export interface ReadonlyRay2 {
     readonly origin: ReadonlyVector2;
 
     clone(): Ray2;
+    isFinite(): boolean;
     parameterFromPoint(p: ReadonlyVector2): number;
     reverse(): Ray2;
     signedDistanceFromPoint(p: ReadonlyVector2): number;
@@ -126,6 +127,10 @@ export class Ray2 implements ReadonlyRay2 {
 
     public clone(): Ray2 {
         return new Ray2(this.origin, this.direction);
+    }
+
+    public isFinite(): boolean {
+        return this.origin.isFinite() && this.direction.isFinite();
     }
 
     /**

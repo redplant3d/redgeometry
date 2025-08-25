@@ -574,7 +574,7 @@ export class MinMaxBox3 implements ReadonlyMinMaxBox3 {
     }
 
     public axisZ(): Vector3 {
-        return Vector3.createUnitY();
+        return Vector3.createUnitZ();
     }
 
     public center(): Vector3 {
@@ -1119,7 +1119,7 @@ export class AxisAlignedBox3 implements ReadonlyAxisAlignedBox3 {
     }
 
     public axisZ(): Vector3 {
-        return Vector3.createUnitY();
+        return Vector3.createUnitZ();
     }
 
     public clone(): AxisAlignedBox3 {

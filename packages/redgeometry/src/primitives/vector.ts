@@ -872,6 +872,27 @@ export class Vector3 implements ReadonlyVector3 {
     }
 
     /**
+     * Returns an orthonormal basis of the current vector.
+     *
+     * References:
+     * - Tom Duff, James Burgess, Per Christensen, Christophe Hery, Andrew Kensler, Max Liani and Ryusuke Villemin.
+     *   *Building an Orthonormal Basis, Revisited*.
+     *   Journal of Computer Graphics Techniques Vol. 6, No. 1, 2017.
+     */
+    public orthonormalBasis(): { v1: Vector3; v2: Vector3; v3: Vector3 } {
+        const v1 = this.unit();
+
+        const sign = v1.z >= 0 ? 1 : -1;
+        const a = -1 / (sign + v1.z);
+        const b = v1.x * v1.y * a;
+
+        const v2 = new Vector3(1 + sign * v1.x * v1.x * a, sign * b, -sign * v1.x);
+        const v3 = new Vector3(b, sign + v1.y * v1.y * a, -v1.y);
+
+        return { v1, v2, v3 };
+    }
+
+    /**
      * Returns a vector that is perpendicular to the current vector and an appropriate axis.
      *
      * The result is defined by the cross product:
@@ -902,27 +923,6 @@ export class Vector3 implements ReadonlyVector3 {
                 return new Vector3(this.y, -this.x, 0);
             }
         }
-    }
-
-    /**
-     * Returns an orthonormal basis of the current vector.
-     *
-     * References:
-     * - Tom Duff, James Burgess, Per Christensen, Christophe Hery, Andrew Kensler, Max Liani and Ryusuke Villemin.
-     *   *Building an Orthonormal Basis, Revisited*.
-     *   Journal of Computer Graphics Techniques Vol. 6, No. 1, 2017.
-     */
-    public orthonormalBasis(): { v1: Vector3; v2: Vector3; v3: Vector3 } {
-        const v1 = this.unit();
-
-        const sign = v1.z >= 0 ? 1 : -1;
-        const a = -1 / (sign + v1.z);
-        const b = v1.x * v1.y * a;
-
-        const v2 = new Vector3(1 + sign * v1.x * v1.x * a, sign * b, -sign * v1.x);
-        const v3 = new Vector3(b, sign + v1.y * v1.y * a, -v1.y);
-
-        return { v1, v2, v3 };
     }
 
     public set(x: number, y: number, z: number): void {
