@@ -13,7 +13,7 @@ export function isSimpleQuad(c: ReadonlyBezier2Curve2, cosTolerance: number): bo
     const v1 = c.p1.sub(c.p0);
     const v2 = c.p2.sub(c.p1);
 
-    return v1.dot(v2) > cosTolerance * Math.sqrt(v1.lengthSq() * v2.lengthSq());
+    return v1.dot(v2) >= cosTolerance * Math.sqrt(v1.lengthSq() * v2.lengthSq());
 }
 
 export function simplifyParameterStepQuad(c: ReadonlyBezier2Curve2, m: number): number {
