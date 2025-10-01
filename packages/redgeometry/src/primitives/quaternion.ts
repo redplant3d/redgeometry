@@ -48,7 +48,7 @@ export interface ReadonlyQuaternion {
     rotateZPre(q: ReadonlyQuaternion, angle: number): Quaternion;
     slerp(q: ReadonlyQuaternion, t: number): Quaternion;
     sub(q: ReadonlyQuaternion): Quaternion;
-    toArray(): number[];
+    toArray(): [number, number, number, number];
     toString(): string;
     unit(): Quaternion;
     unitOrIdentity(): Quaternion;
@@ -886,7 +886,7 @@ export class Quaternion implements ReadonlyQuaternion {
         return new Quaternion(this.a - q.a, this.b - q.b, this.c - q.c, this.d - q.d);
     }
 
-    public toArray(): number[] {
+    public toArray(): [number, number, number, number] {
         return [this.a, this.b, this.c, this.d];
     }
 
