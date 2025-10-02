@@ -268,9 +268,8 @@ export class Quaternion implements ReadonlyQuaternion {
      */
     public angle(q: ReadonlyQuaternion): number {
         // Glenn Davis formula (referenced by Ken Shoemake)
-        const dot = this.a * q.a + this.b * q.b + this.c * q.c + this.d * q.d;
-        const lenSq2 = this.lengthSq() * q.lengthSq();
-        const sqrt = Math.sqrt(lenSq2);
+        const dot = this.dot(q);
+        const sqrt = Math.sqrt(this.lengthSq() * q.lengthSq());
 
         if (sqrt <= dot) {
             // Angle either undefined, very close or equal to zero
@@ -857,16 +856,14 @@ export class Quaternion implements ReadonlyQuaternion {
     public slerp(q: ReadonlyQuaternion, t: number): Quaternion {
         // Glenn Davis formula (referenced by Ken Shoemake)
         const dot = this.dot(q);
-        const lenSq2 = this.lengthSq() * q.lengthSq();
+        const sqrt = Math.sqrt(this.lengthSq() * q.lengthSq());
 
-        if (dot * dot >= lenSq2) {
+        if (sqrt <= dot) {
             // Fallback (angle either undefined, very close or equal to zero)
             return this.lerp(q, t);
         }
 
-        const cos = dot / Math.sqrt(lenSq2);
-
-        const angle = Math.acos(cos);
+        const angle = Math.acos(dot / sqrt);
         const sin1 = Math.sin(angle - angle * t);
         const sin2 = Math.sin(angle * t);
         const sin3 = Math.sin(angle);

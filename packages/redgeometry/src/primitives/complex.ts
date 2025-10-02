@@ -86,9 +86,8 @@ export class Complex implements ReadonlyComplex {
      */
     public angle(z: ReadonlyComplex): number {
         // Formula adapted from `Quaternion`
-        const dot = this.a * z.a + this.b * z.b;
-        const lenSq2 = this.lengthSq() * z.lengthSq();
-        const sqrt = Math.sqrt(lenSq2);
+        const dot = this.dot(z);
+        const sqrt = Math.sqrt(this.lengthSq() * z.lengthSq());
 
         if (sqrt <= dot) {
             // Angle either undefined, very close or equal to zero
@@ -289,17 +288,16 @@ export class Complex implements ReadonlyComplex {
      * Returns the spherical linear interpolation of the current complext and `z`.
      */
     public slerp(z: ReadonlyComplex, t: number): Complex {
+        // Formula adapted from `Quaternion`
         const dot = this.dot(z);
-        const lenSq2 = this.lengthSq() * z.lengthSq();
+        const sqrt = Math.sqrt(this.lengthSq() * z.lengthSq());
 
-        if (dot * dot >= lenSq2) {
+        if (sqrt <= dot) {
             // Fallback (angle either undefined, very close or equal to zero)
             return this.lerp(z, t);
         }
 
-        const cos = dot / Math.sqrt(lenSq2);
-
-        const angle = Math.acos(cos);
+        const angle = Math.acos(dot / sqrt);
         const sin1 = Math.sin(angle - angle * t);
         const sin2 = Math.sin(angle * t);
         const sin3 = Math.sin(angle);

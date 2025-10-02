@@ -301,8 +301,7 @@ export class Vector2 implements ReadonlyVector2 {
      */
     public angle(v: ReadonlyVector2): number {
         const dot = this.dot(v);
-        const lenSq2 = this.lengthSq() * v.lengthSq();
-        const sqrt = Math.sqrt(lenSq2);
+        const sqrt = Math.sqrt(this.lengthSq() * v.lengthSq());
 
         if (sqrt <= dot) {
             // Angle either undefined, very close or equal to zero
@@ -539,15 +538,14 @@ export class Vector2 implements ReadonlyVector2 {
      */
     public slerp(v: ReadonlyVector2, t: number): Vector2 {
         const dot = this.dot(v);
-        const lenSq2 = this.lengthSq() * v.lengthSq();
+        const sqrt = Math.sqrt(this.lengthSq() * v.lengthSq());
 
-        if (dot * dot >= lenSq2) {
+        if (sqrt <= dot) {
             // Fallback (angle either undefined, very close or equal to zero)
             return this.lerp(v, t);
         }
 
-        const cos = dot / Math.sqrt(lenSq2);
-        const angle = Math.acos(cos);
+        const angle = Math.acos(dot / sqrt);
         const sin1 = Math.sin(angle - angle * t);
         const sin2 = Math.sin(angle * t);
         const sin3 = Math.sin(angle);
@@ -717,8 +715,7 @@ export class Vector3 implements ReadonlyVector3 {
      */
     public angle(v: ReadonlyVector3): number {
         const dot = this.dot(v);
-        const lenSq2 = this.lengthSq() * v.lengthSq();
-        const sqrt = Math.sqrt(lenSq2);
+        const sqrt = Math.sqrt(this.lengthSq() * v.lengthSq());
 
         if (sqrt <= dot) {
             // Angle either undefined, very close or equal to zero
@@ -1011,15 +1008,14 @@ export class Vector3 implements ReadonlyVector3 {
      */
     public slerp(v: ReadonlyVector3, t: number): Vector3 {
         const dot = this.dot(v);
-        const lenSq2 = this.lengthSq() * v.lengthSq();
+        const sqrt = Math.sqrt(this.lengthSq() * v.lengthSq());
 
-        if (dot * dot >= lenSq2) {
+        if (sqrt <= dot) {
             // Fallback (angle either undefined, very close or equal to zero)
             return this.lerp(v, t);
         }
 
-        const cos = dot / Math.sqrt(lenSq2);
-        const angle = Math.acos(cos);
+        const angle = Math.acos(dot / sqrt);
         const sin1 = Math.sin(angle - angle * t);
         const sin2 = Math.sin(angle * t);
         const sin3 = Math.sin(angle);
