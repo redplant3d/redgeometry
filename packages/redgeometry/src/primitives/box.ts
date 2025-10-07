@@ -61,13 +61,14 @@ export interface ReadonlyMinMaxBox2 {
     axisY(): Vector2;
     center(): Vector2;
     clone(): MinMaxBox2;
+    contains(box: ReadonlyMinMaxBox2, eps: number): boolean;
     containsPoint(p: ReadonlyVector2, eps: number): boolean;
     cornerAt(index: number): Vector2;
     eq(box: ReadonlyMinMaxBox2): boolean;
     eqApproxAbs(box: ReadonlyMinMaxBox2, eps: number): boolean;
     eqApproxRel(box: ReadonlyMinMaxBox2, eps: number): boolean;
     extents(): Vector2;
-    intersects(b: ReadonlyMinMaxBox2, eps: number): boolean;
+    intersects(box: ReadonlyMinMaxBox2, eps: number): boolean;
     intersectsRay(ray: ReadonlyRay2): boolean;
     isEmpty(): boolean;
     isPoint(): boolean;
@@ -95,13 +96,14 @@ export interface ReadonlyMinMaxBox3 {
     axisZ(): Vector3;
     center(): Vector3;
     clone(): MinMaxBox3;
+    contains(box: ReadonlyMinMaxBox3, eps: number): boolean;
     containsPoint(p: ReadonlyVector3, eps: number): boolean;
     cornerAt(index: number): Vector3;
     eq(box: ReadonlyMinMaxBox3): boolean;
     eqApproxAbs(box: ReadonlyMinMaxBox3, eps: number): boolean;
     eqApproxRel(box: ReadonlyMinMaxBox3, eps: number): boolean;
     extents(): Vector3;
-    intersects(b: ReadonlyMinMaxBox3, eps: number): boolean;
+    intersects(box: ReadonlyMinMaxBox3, eps: number): boolean;
     intersectsRay(ray: ReadonlyRay3): boolean;
     isEmpty(): boolean;
     isPoint(): boolean;
@@ -124,12 +126,13 @@ export interface ReadonlyAxisAlignedBox2 {
     axisX(): Vector2;
     axisY(): Vector2;
     clone(): AxisAlignedBox2;
+    contains(box: ReadonlyAxisAlignedBox2, eps: number): boolean;
     containsPoint(p: ReadonlyVector2, eps: number): boolean;
     cornerAt(index: number): Vector2;
     eq(box: ReadonlyAxisAlignedBox2): boolean;
     eqApproxAbs(box: ReadonlyAxisAlignedBox2, eps: number): boolean;
     eqApproxRel(box: ReadonlyAxisAlignedBox2, eps: number): boolean;
-    intersects(box: AxisAlignedBox2, eps: number): boolean;
+    intersects(box: ReadonlyAxisAlignedBox2, eps: number): boolean;
     isEmpty(): boolean;
     isPoint(): boolean;
     maxX(): number;
@@ -154,6 +157,7 @@ export interface ReadonlyAxisAlignedBox3 {
     axisY(): Vector3;
     axisZ(): Vector3;
     clone(): AxisAlignedBox3;
+    contains(box: ReadonlyAxisAlignedBox3, eps: number): boolean;
     containsPoint(p: ReadonlyVector3, eps: number): boolean;
     cornerAt(index: number): Vector3;
     eq(box: ReadonlyAxisAlignedBox3): boolean;
@@ -187,12 +191,15 @@ export interface ReadonlyOrientedBox2 {
     axisX(): Vector2;
     axisY(): Vector2;
     clone(): OrientedBox2;
+    contains(box: ReadonlyOrientedBox2, eps: number): boolean;
+    containsOnAxis(box: ReadonlyOrientedBox2, axis: ReadonlyVector2, eps: number): boolean;
     containsPoint(p: ReadonlyVector2, eps: number): boolean;
     cornerAt(index: number): Vector2;
     eq(box: ReadonlyOrientedBox2): boolean;
     eqApproxAbs(box: ReadonlyOrientedBox2, eps: number): boolean;
     eqApproxRel(box: ReadonlyOrientedBox2, eps: number): boolean;
     intersects(box: OrientedBox2, eps: number): boolean;
+    intersectsOnAxis(box: ReadonlyOrientedBox2, axis: ReadonlyVector2, eps: number): boolean;
     isEmpty(): boolean;
     isPoint(): boolean;
     scaleAbs(sx: number, sy: number): OrientedBox2;
@@ -213,12 +220,15 @@ export interface ReadonlyOrientedBox3 {
     axisY(): Vector3;
     axisZ(): Vector3;
     clone(): OrientedBox3;
+    contains(box: ReadonlyOrientedBox3, eps: number): boolean;
+    containsOnAxis(box: ReadonlyOrientedBox3, axis: ReadonlyVector3, eps: number): boolean;
     containsPoint(p: ReadonlyVector3, eps: number): boolean;
     cornerAt(index: number): Vector3;
     eq(box: ReadonlyOrientedBox3): boolean;
     eqApproxAbs(box: ReadonlyOrientedBox3, eps: number): boolean;
     eqApproxRel(box: ReadonlyOrientedBox3, eps: number): boolean;
-    intersects(box: OrientedBox3, eps: number): boolean;
+    intersects(box: ReadonlyOrientedBox3, eps: number): boolean;
+    intersectsOnAxis(box: ReadonlyOrientedBox3, axis: ReadonlyVector3, eps: number): boolean;
     isEmpty(): boolean;
     isPoint(): boolean;
     scaleAbs(sx: number, sy: number, sz: number): OrientedBox3;
@@ -310,6 +320,15 @@ export class MinMaxBox2 implements ReadonlyMinMaxBox2 {
         return new MinMaxBox2(this.minX, this.minY, this.maxX, this.maxY);
     }
 
+    public contains(box: ReadonlyMinMaxBox2, eps: number): boolean {
+        const x0 = this.minX - box.minX;
+        const y0 = this.minY - box.minY;
+        const x1 = box.maxX - this.maxX;
+        const y1 = box.maxY - this.maxY;
+
+        return x0 <= eps && x1 <= eps && y0 <= eps && y1 <= eps;
+    }
+
     public containsPoint(p: ReadonlyVector2, eps: number): boolean {
         const x0 = this.minX - p.x;
         const y0 = this.minY - p.y;
@@ -363,11 +382,11 @@ export class MinMaxBox2 implements ReadonlyMinMaxBox2 {
         return new Vector2(x, y);
     }
 
-    public intersects(b: ReadonlyMinMaxBox2, eps: number): boolean {
-        const x0 = this.minX - b.maxX;
-        const y0 = this.minY - b.maxY;
-        const x1 = b.minX - this.maxX;
-        const y1 = b.minY - this.maxY;
+    public intersects(box: ReadonlyMinMaxBox2, eps: number): boolean {
+        const x0 = this.minX - box.maxX;
+        const y0 = this.minY - box.maxY;
+        const x1 = box.minX - this.maxX;
+        const y1 = box.minY - this.maxY;
 
         return x0 <= eps && x1 <= eps && y0 <= eps && y1 <= eps;
     }
@@ -589,6 +608,17 @@ export class MinMaxBox3 implements ReadonlyMinMaxBox3 {
         return new MinMaxBox3(this.minX, this.minY, this.minZ, this.maxX, this.maxY, this.maxZ);
     }
 
+    public contains(box: ReadonlyMinMaxBox3, eps: number): boolean {
+        const x0 = this.minX - box.minX;
+        const y0 = this.minY - box.minY;
+        const z0 = this.minZ - box.minZ;
+        const x1 = box.maxX - this.maxX;
+        const y1 = box.maxY - this.maxY;
+        const z1 = box.maxZ - this.maxZ;
+
+        return x0 <= eps && x1 <= eps && y0 <= eps && y1 <= eps && z0 <= eps && z1 <= eps;
+    }
+
     public containsPoint(p: ReadonlyVector3, eps: number): boolean {
         const x0 = this.minX - p.x;
         const y0 = this.minY - p.y;
@@ -664,13 +694,13 @@ export class MinMaxBox3 implements ReadonlyMinMaxBox3 {
         return new Vector3(x, y, z);
     }
 
-    public intersects(b: ReadonlyMinMaxBox3, eps: number): boolean {
-        const x0 = this.minX - b.maxX;
-        const y0 = this.minY - b.maxY;
-        const z0 = this.minZ - b.maxZ;
-        const x1 = b.minX - this.maxX;
-        const y1 = b.minY - this.maxY;
-        const z1 = b.minZ - this.maxZ;
+    public intersects(box: ReadonlyMinMaxBox3, eps: number): boolean {
+        const x0 = this.minX - box.maxX;
+        const y0 = this.minY - box.maxY;
+        const z0 = this.minZ - box.maxZ;
+        const x1 = box.minX - this.maxX;
+        const y1 = box.minY - this.maxY;
+        const z1 = box.minZ - this.maxZ;
 
         return x0 <= eps && x1 <= eps && y0 <= eps && y1 <= eps && z0 <= eps && z1 <= eps;
     }
@@ -900,6 +930,19 @@ export class AxisAlignedBox2 implements ReadonlyAxisAlignedBox2 {
         return new AxisAlignedBox2(this.center, this.extents);
     }
 
+    public contains(box: ReadonlyAxisAlignedBox2, eps: number): boolean {
+        const cx = box.center.x - this.center.x;
+        const cy = box.center.y - this.center.y;
+        const ex = this.extents.x - box.extents.x + eps;
+        const ey = this.extents.y - box.extents.y + eps;
+
+        //  this.center.x - this.extents.x - eps <= box.center.x - box.extents.x &&
+        //  this.center.y - this.extents.y - eps <= box.center.y - box.extents.y &&
+        //  this.center.x + this.extents.x + eps >= box.center.x + box.extents.x &&
+        //  this.center.y + this.extents.y + eps >= box.center.y + box.extents.y
+        return cx <= ex && cx >= -ex && cy <= ey && cy >= -ey;
+    }
+
     public containsPoint(p: ReadonlyVector2, eps: number): boolean {
         const cx = p.x - this.center.x;
         const cy = p.y - this.center.y;
@@ -1124,6 +1167,23 @@ export class AxisAlignedBox3 implements ReadonlyAxisAlignedBox3 {
 
     public clone(): AxisAlignedBox3 {
         return new AxisAlignedBox3(this.center, this.extents);
+    }
+
+    public contains(box: ReadonlyAxisAlignedBox3, eps: number): boolean {
+        const cx = box.center.x - this.center.x;
+        const cy = box.center.y - this.center.y;
+        const cz = box.center.z - this.center.z;
+        const ex = this.extents.x - box.extents.x + eps;
+        const ey = this.extents.y - box.extents.y + eps;
+        const ez = this.extents.z - box.extents.z + eps;
+
+        //  this.center.x - this.extents.x - eps <= box.center.x - box.extents.x &&
+        //  this.center.y - this.extents.y - eps <= box.center.y - box.extents.y &&
+        //  this.center.z - this.extents.z - eps <= box.center.z - box.extents.z &&
+        //  this.center.x + this.extents.x + eps >= box.center.x + box.extents.x &&
+        //  this.center.y + this.extents.y + eps >= box.center.y + box.extents.y &&
+        //  this.center.z + this.extents.z + eps >= box.center.z + box.extents.z
+        return cx <= ex && cx >= -ex && cy <= ey && cy >= -ey && cz <= ez && cz >= -ez;
     }
 
     public containsPoint(p: ReadonlyVector3, eps: number): boolean {
@@ -1375,6 +1435,39 @@ export class OrientedBox2 implements ReadonlyOrientedBox2 {
         return new OrientedBox2(this.center, this.extents, this.rotation);
     }
 
+    public contains(box: ReadonlyOrientedBox2, eps: number): boolean {
+        const basis1 = this.rotation.orthonormalBasis();
+        const basis2 = box.rotation.orthonormalBasis();
+
+        return (
+            this.containsOnAxis(box, basis1.v1, eps) &&
+            this.containsOnAxis(box, basis1.v2, eps) &&
+            this.containsOnAxis(box, basis2.v1, eps) &&
+            this.containsOnAxis(box, basis2.v2, eps)
+        );
+    }
+
+    public containsOnAxis(box: ReadonlyOrientedBox2, axis: ReadonlyVector2, eps: number): boolean {
+        let min1 = Number.POSITIVE_INFINITY;
+        let min2 = Number.POSITIVE_INFINITY;
+        let max1 = Number.NEGATIVE_INFINITY;
+        let max2 = Number.NEGATIVE_INFINITY;
+
+        for (let i = 0; i < 4; i++) {
+            const p1 = this.cornerAt(i);
+            const x1 = axis.dot(p1);
+            min1 = Math.min(min1, x1);
+            max1 = Math.max(max1, x1);
+
+            const p2 = box.cornerAt(i);
+            const x2 = axis.dot(p2);
+            min2 = Math.min(min2, x2);
+            max2 = Math.max(max2, x2);
+        }
+
+        return max2 - max1 <= eps && min1 - min2 <= eps;
+    }
+
     public containsPoint(p: ReadonlyVector2, eps: number): boolean {
         const v = p.sub(this.center);
         const vc = this.rotation.inverse().mulV(v);
@@ -1418,7 +1511,7 @@ export class OrientedBox2 implements ReadonlyOrientedBox2 {
         );
     }
 
-    public intersects(box: OrientedBox2, eps: number): boolean {
+    public intersects(box: ReadonlyOrientedBox2, eps: number): boolean {
         const basis1 = this.rotation.orthonormalBasis();
         const basis2 = box.rotation.orthonormalBasis();
 
@@ -1430,7 +1523,7 @@ export class OrientedBox2 implements ReadonlyOrientedBox2 {
         );
     }
 
-    public intersectsOnAxis(box: OrientedBox2, axis: Vector2, eps: number): boolean {
+    public intersectsOnAxis(box: ReadonlyOrientedBox2, axis: ReadonlyVector2, eps: number): boolean {
         let min1 = Number.POSITIVE_INFINITY;
         let min2 = Number.POSITIVE_INFINITY;
         let max1 = Number.NEGATIVE_INFINITY;
@@ -1619,6 +1712,41 @@ export class OrientedBox3 implements ReadonlyOrientedBox3 {
 
     public clone(): OrientedBox3 {
         return new OrientedBox3(this.center, this.extents, this.rotation);
+    }
+
+    public contains(box: ReadonlyOrientedBox3, eps: number): boolean {
+        const basis1 = this.rotation.orthonormalBasis();
+        const basis2 = box.rotation.orthonormalBasis();
+
+        return (
+            this.containsOnAxis(box, basis1.v1, eps) &&
+            this.containsOnAxis(box, basis1.v2, eps) &&
+            this.containsOnAxis(box, basis1.v3, eps) &&
+            this.containsOnAxis(box, basis2.v1, eps) &&
+            this.containsOnAxis(box, basis2.v2, eps) &&
+            this.containsOnAxis(box, basis2.v3, eps)
+        );
+    }
+
+    public containsOnAxis(box: ReadonlyOrientedBox3, axis: ReadonlyVector3, eps: number): boolean {
+        let min1 = Number.POSITIVE_INFINITY;
+        let min2 = Number.POSITIVE_INFINITY;
+        let max1 = Number.NEGATIVE_INFINITY;
+        let max2 = Number.NEGATIVE_INFINITY;
+
+        for (let i = 0; i < 8; i++) {
+            const p1 = this.cornerAt(i);
+            const x1 = axis.dot(p1);
+            min1 = Math.min(min1, x1);
+            max1 = Math.max(max1, x1);
+
+            const p2 = box.cornerAt(i);
+            const x2 = axis.dot(p2);
+            min2 = Math.min(min2, x2);
+            max2 = Math.max(max2, x2);
+        }
+
+        return max2 - max1 <= eps && min1 - min2 <= eps;
     }
 
     public containsPoint(p: ReadonlyVector3, eps: number): boolean {
