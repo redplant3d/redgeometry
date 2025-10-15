@@ -27,6 +27,7 @@ export interface ReadonlyVector2 {
     addMulS(v: ReadonlyVector2, s: number): Vector2;
     addS(s: number): Vector2;
     angle(v: ReadonlyVector2): number;
+    ceil(): Vector2;
     clamp(vmin: ReadonlyVector2, vmax: ReadonlyVector2): Vector2;
     clone(): Vector2;
     cross(v: ReadonlyVector2): number;
@@ -38,6 +39,7 @@ export interface ReadonlyVector2 {
     eq(v: ReadonlyVector2): boolean;
     eqApproxAbs(v: ReadonlyVector2, eps: number): boolean;
     eqApproxRel(v: ReadonlyVector2, eps: number): boolean;
+    floor(): Vector2;
     isFinite(): boolean;
     isOne(): boolean;
     isZero(): boolean;
@@ -52,6 +54,8 @@ export interface ReadonlyVector2 {
     nlerp(v: ReadonlyVector2, t: number): Vector2;
     perp(): Vector2;
     polarAngle(): number;
+    round(): Vector2;
+    roundToPrecision(k: number): Vector2;
     slerp(v: ReadonlyVector2, t: number): Vector2;
     sub(v: ReadonlyVector2): Vector2;
     subS(s: number): Vector2;
@@ -71,6 +75,7 @@ export interface ReadonlyVector3 {
     addMulS(v: ReadonlyVector3, s: number): Vector3;
     addS(s: number): Vector3;
     angle(v: ReadonlyVector3): number;
+    ceil(): Vector3;
     clamp(vmin: ReadonlyVector3, vmax: ReadonlyVector3): Vector3;
     clone(): Vector3;
     cross(v: ReadonlyVector3): Vector3;
@@ -82,6 +87,7 @@ export interface ReadonlyVector3 {
     eq(v: ReadonlyVector3): boolean;
     eqApproxAbs(v: ReadonlyVector3, eps: number): boolean;
     eqApproxRel(v: ReadonlyVector3, eps: number): boolean;
+    floor(): Vector3;
     isFinite(): boolean;
     isOne(): boolean;
     isZero(): boolean;
@@ -96,6 +102,8 @@ export interface ReadonlyVector3 {
     nlerp(v: ReadonlyVector3, t: number): Vector3;
     orthonormalBasis(): { v1: Vector3; v2: Vector3; v3: Vector3 };
     perpAny(): Vector3;
+    round(): Vector3;
+    roundToPrecision(k: number): Vector3;
     slerp(v: ReadonlyVector3, t: number): Vector3;
     sub(v: ReadonlyVector3): Vector3;
     subS(s: number): Vector3;
@@ -117,6 +125,7 @@ export interface ReadonlyVector4 {
     add(v: ReadonlyVector4): Vector4;
     addMulS(v: ReadonlyVector4, s: number): Vector4;
     addS(s: number): Vector4;
+    ceil(): Vector4;
     clamp(vmin: ReadonlyVector4, vmax: ReadonlyVector4): Vector4;
     clone(): Vector4;
     distance(v: ReadonlyVector4): number;
@@ -127,6 +136,7 @@ export interface ReadonlyVector4 {
     eq(v: ReadonlyVector4): boolean;
     eqApproxAbs(v: ReadonlyVector4, eps: number): boolean;
     eqApproxRel(v: ReadonlyVector4, eps: number): boolean;
+    floor(): Vector4;
     isFinite(): boolean;
     isOne(): boolean;
     isZero(): boolean;
@@ -139,6 +149,8 @@ export interface ReadonlyVector4 {
     mulS(s: number): Vector4;
     neg(): Vector4;
     nlerp(v: ReadonlyVector4, t: number): Vector4;
+    round(): Vector4;
+    roundToPrecision(k: number): Vector4;
     sub(v: ReadonlyVector4): Vector4;
     subS(s: number): Vector4;
     toArray(): [number, number, number, number];
@@ -245,16 +257,6 @@ export class Vector2 implements ReadonlyVector2 {
         }
     }
 
-    /**
-     * Returns a rounded vector from `v` with specified precision where `k` denotes the
-     * reciprocal of the minimum interval that the rounded number is able to represent
-     */
-    public static roundToPrecision(v: ReadonlyVector2, k: number): Vector2 {
-        const x = roundToPrecision(v.x, k);
-        const y = roundToPrecision(v.y, k);
-        return new Vector2(x, y);
-    }
-
     public static signedArea(p0: ReadonlyVector2, p1: ReadonlyVector2, p: ReadonlyVector2): number {
         // `result < 0` -> `p` is below `(p0, p1)`
         // `result > 0` -> `p` is above `(p0, p1)`
@@ -314,6 +316,13 @@ export class Vector2 implements ReadonlyVector2 {
         }
 
         return Math.acos(dot / sqrt);
+    }
+
+    public ceil(): Vector2 {
+        const x = Math.ceil(this.x);
+        const y = Math.ceil(this.y);
+
+        return new Vector2(x, y);
     }
 
     public clamp(vmin: ReadonlyVector2, vmax: ReadonlyVector2): Vector2 {
@@ -379,6 +388,13 @@ export class Vector2 implements ReadonlyVector2 {
 
     public eqApproxRel(v: ReadonlyVector2, eps: number): boolean {
         return eqApproxRel(this.x, v.x, eps) && eqApproxRel(this.y, v.y, eps);
+    }
+
+    public floor(): Vector2 {
+        const x = Math.floor(this.x);
+        const y = Math.floor(this.y);
+
+        return new Vector2(x, y);
     }
 
     public isFinite(): boolean {
@@ -470,6 +486,24 @@ export class Vector2 implements ReadonlyVector2 {
      */
     public polarAngle(): number {
         return Math.atan2(this.y, this.x);
+    }
+
+    public round(): Vector2 {
+        const x = Math.round(this.x);
+        const y = Math.round(this.y);
+
+        return new Vector2(x, y);
+    }
+
+    /**
+     * Returns a rounded vector from `v` with specified precision where `k` denotes the
+     * reciprocal of the minimum interval that the rounded number is able to represent
+     */
+    public roundToPrecision(k: number): Vector2 {
+        const x = roundToPrecision(this.x, k);
+        const y = roundToPrecision(this.y, k);
+
+        return new Vector2(x, y);
     }
 
     public set(x: number, y: number): void {
@@ -665,17 +699,6 @@ export class Vector3 implements ReadonlyVector3 {
         return new Vector3(x / w, y / w, z / w);
     }
 
-    /**
-     * Returns a rounded vector from `v` with specified precision where `k` denotes the
-     * reciprocal of the minimum interval that the rounded number is able to represent
-     */
-    public static roundToPrecision(v: ReadonlyVector3, k: number): Vector3 {
-        const x = roundToPrecision(v.x, k);
-        const y = roundToPrecision(v.y, k);
-        const z = roundToPrecision(v.z, k);
-        return new Vector3(x, y, z);
-    }
-
     public static toObject(v: ReadonlyVector3): Vector3Like {
         return { x: v.x, y: v.y, z: v.z };
     }
@@ -728,6 +751,14 @@ export class Vector3 implements ReadonlyVector3 {
         }
 
         return Math.acos(dot / sqrt);
+    }
+
+    public ceil(): Vector3 {
+        const x = Math.ceil(this.x);
+        const y = Math.ceil(this.y);
+        const z = Math.ceil(this.z);
+
+        return new Vector3(x, y, z);
     }
 
     public clamp(vmin: ReadonlyVector3, vmax: ReadonlyVector3): Vector3 {
@@ -788,6 +819,14 @@ export class Vector3 implements ReadonlyVector3 {
 
     public eqApproxRel(v: ReadonlyVector3, eps: number): boolean {
         return eqApproxRel(this.x, v.x, eps) && eqApproxRel(this.y, v.y, eps) && eqApproxRel(this.z, v.z, eps);
+    }
+
+    public floor(): Vector3 {
+        const x = Math.floor(this.x);
+        const y = Math.floor(this.y);
+        const z = Math.floor(this.z);
+
+        return new Vector3(x, y, z);
     }
 
     public isFinite(): boolean {
@@ -920,6 +959,26 @@ export class Vector3 implements ReadonlyVector3 {
                 return new Vector3(this.y, -this.x, 0);
             }
         }
+    }
+
+    public round(): Vector3 {
+        const x = Math.round(this.x);
+        const y = Math.round(this.y);
+        const z = Math.round(this.z);
+
+        return new Vector3(x, y, z);
+    }
+
+    /**
+     * Returns a rounded vector from `v` with specified precision where `k` denotes the
+     * reciprocal of the minimum interval that the rounded number is able to represent
+     */
+    public roundToPrecision(k: number): Vector3 {
+        const x = roundToPrecision(this.x, k);
+        const y = roundToPrecision(this.y, k);
+        const z = roundToPrecision(this.z, k);
+
+        return new Vector3(x, y, z);
     }
 
     public set(x: number, y: number, z: number): void {
@@ -1146,18 +1205,6 @@ export class Vector4 implements ReadonlyVector4 {
         return new Vector4(obj.x, obj.y, obj.z, obj.w);
     }
 
-    /**
-     * Returns a rounded vector from `v` with specified precision where `k` denotes the
-     * reciprocal of the minimum interval that the rounded number is able to represent
-     */
-    public static roundToPrecision(v: ReadonlyVector4, k: number): Vector4 {
-        const x = roundToPrecision(v.x, k);
-        const y = roundToPrecision(v.y, k);
-        const z = roundToPrecision(v.z, k);
-        const w = roundToPrecision(v.w, k);
-        return new Vector4(x, y, z, w);
-    }
-
     public static toObject(v: ReadonlyVector4): Vector4Like {
         return { x: v.x, y: v.y, z: v.z, w: v.w };
     }
@@ -1189,6 +1236,15 @@ export class Vector4 implements ReadonlyVector4 {
      */
     public addS(s: number): Vector4 {
         return new Vector4(this.x + s, this.y + s, this.z + s, this.w + s);
+    }
+
+    public ceil(): Vector4 {
+        const x = Math.ceil(this.x);
+        const y = Math.ceil(this.y);
+        const z = Math.ceil(this.z);
+        const w = Math.ceil(this.w);
+
+        return new Vector4(x, y, z, w);
     }
 
     public clamp(vmin: ReadonlyVector4, vmax: ReadonlyVector4): Vector4 {
@@ -1254,6 +1310,15 @@ export class Vector4 implements ReadonlyVector4 {
             eqApproxRel(this.z, v.z, eps) &&
             eqApproxAbs(this.w, v.w, eps)
         );
+    }
+
+    public floor(): Vector4 {
+        const x = Math.floor(this.x);
+        const y = Math.floor(this.y);
+        const z = Math.floor(this.z);
+        const w = Math.floor(this.w);
+
+        return new Vector4(x, y, z, w);
     }
 
     public isFinite(): boolean {
@@ -1336,6 +1401,28 @@ export class Vector4 implements ReadonlyVector4 {
         }
 
         return new Vector4(x / len, y / len, z / len, w / len);
+    }
+
+    public round(): Vector4 {
+        const x = Math.round(this.x);
+        const y = Math.round(this.y);
+        const z = Math.round(this.z);
+        const w = Math.round(this.w);
+
+        return new Vector4(x, y, z, w);
+    }
+
+    /**
+     * Returns a rounded vector from `v` with specified precision where `k` denotes the
+     * reciprocal of the minimum interval that the rounded number is able to represent
+     */
+    public roundToPrecision(k: number): Vector4 {
+        const x = roundToPrecision(this.x, k);
+        const y = roundToPrecision(this.y, k);
+        const z = roundToPrecision(this.z, k);
+        const w = roundToPrecision(this.w, k);
+
+        return new Vector4(x, y, z, w);
     }
 
     public set(x: number, y: number, z: number, w: number): void {
