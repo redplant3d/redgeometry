@@ -324,8 +324,7 @@ export class Complex implements ReadonlyComplex {
     }
 
     public unit(): Complex {
-        const s = this.length();
-        return this.divS(s);
+        return this.divS(this.length());
     }
 
     public unitOrIdentity(): Complex {

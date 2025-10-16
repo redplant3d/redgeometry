@@ -616,8 +616,7 @@ export class Vector2 implements ReadonlyVector2 {
     }
 
     public unit(): Vector2 {
-        const s = this.length();
-        return this.divS(s);
+        return this.divS(this.length());
     }
 
     public unitOrZero(): Vector2 {
@@ -1112,8 +1111,7 @@ export class Vector3 implements ReadonlyVector3 {
     }
 
     public unit(): Vector3 {
-        const s = this.length();
-        return this.divS(s);
+        return this.divS(this.length());
     }
 
     public unitOrZero(): Vector3 {
@@ -1530,8 +1528,7 @@ export class Vector4 implements ReadonlyVector4 {
     }
 
     public unit(): Vector4 {
-        const s = this.length();
-        return this.divS(s);
+        return this.divS(this.length());
     }
 
     public unitOrZero(): Vector4 {

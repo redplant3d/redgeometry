@@ -892,8 +892,7 @@ export class Quaternion implements ReadonlyQuaternion {
     }
 
     public unit(): Quaternion {
-        const s = this.length();
-        return this.divS(s);
+        return this.divS(this.length());
     }
 
     public unitOrIdentity(): Quaternion {
