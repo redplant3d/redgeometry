@@ -170,11 +170,11 @@ function fillEdges(
                 let p1 = new Vector2(width * random.nextFloat(), height * random.nextFloat());
 
                 if (random.nextFloat() < pinProbability) {
-                    p0 = Vector2.roundToPrecision(p0, k);
+                    p0 = p0.roundToPrecision(k);
                 }
 
                 if (random.nextFloat() < pinProbability) {
-                    p1 = Vector2.roundToPrecision(p1, k);
+                    p1 = p1.roundToPrecision(k);
                 }
 
                 addEdge(snapRound, p0, p1);
@@ -211,8 +211,8 @@ function fillEdges(
             const t0 = random.nextFloatBetween(0, 0.5);
             const t1 = random.nextFloatBetween(0.5, 1);
 
-            const pp0 = Vector2.roundToPrecision(p0.lerp(p1, t0), k);
-            const pp1 = Vector2.roundToPrecision(p0.lerp(p1, t1), k);
+            const pp0 = p0.lerp(p1, t0).roundToPrecision(k);
+            const pp1 = p0.lerp(p1, t1).roundToPrecision(k);
 
             addEdge(snapRound, p0, p1);
             addEdge(snapRound, pp0, pp1, true);
