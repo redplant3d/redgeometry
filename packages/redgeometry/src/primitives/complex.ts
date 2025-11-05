@@ -1,4 +1,4 @@
-import { COS_ACUTE } from "../core/consts.js";
+import { COS_ACUTE, COS_OBTUSE } from "../core/consts.js";
 import { eqApproxAbs, eqApproxRel, lerp } from "../utility/scalar.js";
 import { Vector2, type ReadonlyVector2 } from "./vector.js";
 
@@ -72,9 +72,18 @@ export class Complex implements ReadonlyComplex {
         return new Complex(cos, sin);
     }
 
+    /**
+     * Returns a complex with minimal rotation from `v1` to `v2`.
+     *
+     * Note: `v1` and `v2` are assumed to be unit vectors.
+     */
     public static fromRotationBetween(v1: ReadonlyVector2, v2: ReadonlyVector2): Complex {
         // This angle is double of the complex rotation
         const cos = v1.dot(v2);
+
+        if (cos > COS_OBTUSE) {
+            return Complex.createIdentity();
+        }
 
         if (cos < COS_ACUTE) {
             return new Complex(0, 1);

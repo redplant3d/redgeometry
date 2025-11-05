@@ -1,4 +1,4 @@
-import { COS_ACUTE } from "../core/consts.js";
+import { COS_ACUTE, COS_OBTUSE } from "../core/consts.js";
 import { assertUnreachable } from "../utility/debug.js";
 import { eqApproxAbs, eqApproxRel, lerp } from "../utility/scalar.js";
 import type { Enum } from "../utility/types.js";
@@ -136,10 +136,19 @@ export class Quaternion implements ReadonlyQuaternion {
         // This angle is double of the quaternion rotation
         const cos = v1.dot(v2);
 
-        // If the angle is close to 180 degrees `va` just needs to be perpendicular to `v1`
-        const va = cos < COS_ACUTE ? v1.perpAny() : v1.cross(v2);
+        if (cos > COS_OBTUSE) {
+            return Quaternion.createIdentity();
+        }
+
+        if (cos < COS_ACUTE) {
+            // If the angle is close to 180 degrees the axis just needs to be perpendicular to `v1`
+            const v1p = v1.perpAny().unit();
+            return new Quaternion(0, v1p.x, v1p.y, v1p.z);
+        }
 
         // We add an identity quaternion and set it to unit length to get half the rotation
+        const va = v1.cross(v2);
+
         const q = new Quaternion(cos + 1, va.x, va.y, va.z);
         q.setUnit(q);
 
