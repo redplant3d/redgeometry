@@ -1,3 +1,4 @@
+import { COS_ACUTE } from "../core/consts.js";
 import { eqApproxAbs, eqApproxRel, lerp } from "../utility/scalar.js";
 import { Vector2, type ReadonlyVector2 } from "./vector.js";
 
@@ -66,9 +67,43 @@ export class Complex implements ReadonlyComplex {
     }
 
     public static fromRotationAngle(angle: number): Complex {
-        const sin = Math.sin(angle);
-        const cos = Math.cos(angle);
+        const sin = Math.sin(0.5 * angle);
+        const cos = Math.cos(0.5 * angle);
         return new Complex(cos, sin);
+    }
+
+    public static fromRotationBetween(v1: ReadonlyVector2, v2: ReadonlyVector2): Complex {
+        // This angle is double of the complex rotation
+        const cos = v1.dot(v2);
+
+        if (cos < COS_ACUTE) {
+            return new Complex(0, 1);
+        }
+
+        const sin = v1.cross(v2);
+
+        // We add an identity complex and set it to unit length to get half the rotation
+        const q = new Complex(cos + 1, sin);
+        q.setUnit(q);
+
+        return q;
+    }
+
+    public static fromRotationMatrix(z0: number, z1: number): Complex {
+        // z0 = zaa - zbb
+        // z1 = zab + zab
+        if (z0 >= 0) {
+            // Based on: https://en.wikipedia.org/wiki/Square_root_of_a_2_by_2_matrix
+            const za = 1 + z0;
+            const zb = z1;
+            const f = 1 / Math.sqrt(2 * za);
+            return new Complex(f * za, f * zb);
+        } else {
+            const za = z1;
+            const zb = 1 - z0;
+            const f = 1 / Math.sqrt(2 * zb);
+            return new Complex(f * za, f * zb);
+        }
     }
 
     public static toObject(z: ReadonlyComplex): ComplexLike {
@@ -96,10 +131,10 @@ export class Complex implements ReadonlyComplex {
 
         if (sqrt <= -dot) {
             // Angle very close or equal to Pi
-            return Math.PI;
+            return 2 * Math.PI;
         }
 
-        return Math.acos(dot / sqrt);
+        return 2 * Math.acos(dot / sqrt);
     }
 
     public clone(): Complex {
@@ -176,12 +211,15 @@ export class Complex implements ReadonlyComplex {
 
     /**
      * ```
-     * | a | * | vx |
-     * | b |   | vy |
+     * | a | * | vx | * |  a |
+     * | b |   | vy |   | -b |
      * ```
      */
     public mulV(v: ReadonlyVector2): Vector2 {
-        return new Vector2(this.a * v.x - this.b * v.y, this.a * v.y + this.b * v.x);
+        const za = this.a * v.x - this.b * v.y;
+        const zb = this.a * v.y + this.b * v.x;
+
+        return new Vector2(this.a * za - this.b * zb, this.a * zb + this.b * za);
     }
 
     /**
@@ -206,10 +244,13 @@ export class Complex implements ReadonlyComplex {
      * Note: The current complex is assumed to be of unit length.
      */
     public orthonormalBasis(): { v1: Vector2; v2: Vector2 } {
-        const z0 = this.a;
-        const z1 = this.b;
-        const z2 = -this.b;
-        const z3 = this.a;
+        const zaa = this.a * this.a;
+        const zbb = this.b * this.b;
+        const zab = this.a * this.b;
+        const z0 = zaa - zbb;
+        const z1 = zab + zab;
+        const z2 = -z1;
+        const z3 = z0;
 
         const v1 = new Vector2(z0, z1);
         const v2 = new Vector2(z2, z3);
@@ -218,8 +259,8 @@ export class Complex implements ReadonlyComplex {
     }
 
     public rotate(z: ReadonlyComplex, a: number): Complex {
-        const sin = Math.sin(a);
-        const cos = Math.cos(a);
+        const sin = Math.sin(0.5 * a);
+        const cos = Math.cos(0.5 * a);
 
         const za = cos * z.a - sin * z.b;
         const zb = cos * z.b + sin * z.a;
@@ -248,8 +289,8 @@ export class Complex implements ReadonlyComplex {
     }
 
     public setFromRotationAngle(angle: number): void {
-        const sin = Math.sin(angle);
-        const cos = Math.cos(angle);
+        const sin = Math.sin(0.5 * angle);
+        const cos = Math.cos(0.5 * angle);
         this.set(cos, sin);
     }
 
@@ -265,8 +306,8 @@ export class Complex implements ReadonlyComplex {
     }
 
     public setRotate(z: ReadonlyComplex, angle: number): void {
-        const sin = Math.sin(angle);
-        const cos = Math.cos(angle);
+        const sin = Math.sin(0.5 * angle);
+        const cos = Math.cos(0.5 * angle);
 
         const za = cos * z.a - sin * z.b;
         const zb = cos * z.b + sin * z.a;

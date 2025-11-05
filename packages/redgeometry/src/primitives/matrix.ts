@@ -247,10 +247,13 @@ export class Matrix3A implements ReadonlyMatrix3A {
      * ```
      */
     public static fromRotation(za: number, zb: number): Matrix3A {
-        const z0 = za;
-        const z1 = zb;
-        const z2 = -zb;
-        const z3 = za;
+        const zaa = za * za;
+        const zbb = zb * zb;
+        const zab = za * zb;
+        const z0 = zaa - zbb;
+        const z1 = zab + zab;
+        const z2 = -z1;
+        const z3 = z0;
 
         return new Matrix3A([z0, z1, z2, z3, 0, 0]);
     }
@@ -344,7 +347,7 @@ export class Matrix3A implements ReadonlyMatrix3A {
         const fx = 1 / sx;
 
         const s = new Vector2(sx, sy);
-        const r = new Complex(fx * e[0], fx * e[1]);
+        const r = Complex.fromRotationMatrix(fx * e[0], fx * e[1]);
         const t = new Vector2(e[4], e[5]);
 
         return { s, r, t };
@@ -509,10 +512,13 @@ export class Matrix3A implements ReadonlyMatrix3A {
      * ```
      */
     public setFromRotation(za: number, zb: number): void {
-        const z0 = za;
-        const z1 = zb;
-        const z2 = -zb;
-        const z3 = za;
+        const zaa = za * za;
+        const zbb = zb * zb;
+        const zab = za * zb;
+        const z0 = zaa - zbb;
+        const z1 = zab + zab;
+        const z2 = -z1;
+        const z3 = z0;
 
         this.set(z0, z1, z2, z3, 0, 0);
     }
@@ -591,10 +597,13 @@ export class Matrix3A implements ReadonlyMatrix3A {
      * ```
      */
     public setRotate(mat: ReadonlyMatrix3A, za: number, zb: number): void {
-        const z0 = za;
-        const z1 = zb;
-        const z2 = -zb;
-        const z3 = za;
+        const zaa = za * za;
+        const zbb = zb * zb;
+        const zab = za * zb;
+        const z0 = zaa - zbb;
+        const z1 = zab + zab;
+        const z2 = -z1;
+        const z3 = z0;
 
         const ea = mat.elements;
         const e = this.elements;
@@ -623,10 +632,13 @@ export class Matrix3A implements ReadonlyMatrix3A {
      * ```
      */
     public setRotatePre(mat: ReadonlyMatrix3A, za: number, zb: number): void {
-        const z0 = za;
-        const z1 = zb;
-        const z2 = -zb;
-        const z3 = za;
+        const zaa = za * za;
+        const zbb = zb * zb;
+        const zab = za * zb;
+        const z0 = zaa - zbb;
+        const z1 = zab + zab;
+        const z2 = -z1;
+        const z3 = z0;
 
         const ea = mat.elements;
         const e = this.elements;
@@ -921,10 +933,13 @@ export class Matrix3 implements ReadonlyMatrix3 {
      * ```
      */
     public static fromRotation(za: number, zb: number): Matrix3 {
-        const z0 = za;
-        const z1 = zb;
-        const z2 = -zb;
-        const z3 = za;
+        const zaa = za * za;
+        const zbb = zb * zb;
+        const zab = za * zb;
+        const z0 = zaa - zbb;
+        const z1 = zab + zab;
+        const z2 = -z1;
+        const z3 = z0;
 
         return new Matrix3([z0, z1, 0, z2, z3, 0, 0, 0, 1]);
     }
@@ -1056,7 +1071,7 @@ export class Matrix3 implements ReadonlyMatrix3 {
         const fx = 1 / sx;
 
         const s = new Vector2(sx, sy);
-        const r = new Complex(fx * e[0], fx * e[1]);
+        const r = Complex.fromRotationMatrix(fx * e[0], fx * e[1]);
         const t = new Vector2(e[6], e[7]);
 
         return { s, r, t };
@@ -1273,10 +1288,13 @@ export class Matrix3 implements ReadonlyMatrix3 {
      * ```
      */
     public setFromRotation(za: number, zb: number): void {
-        const z0 = za;
-        const z1 = zb;
-        const z2 = -zb;
-        const z3 = za;
+        const zaa = za * za;
+        const zbb = zb * zb;
+        const zab = za * zb;
+        const z0 = zaa - zbb;
+        const z1 = zab + zab;
+        const z2 = -z1;
+        const z3 = z0;
 
         this.set(z0, z1, 0, z2, z3, 0, 0, 0, 1);
     }
@@ -1361,10 +1379,13 @@ export class Matrix3 implements ReadonlyMatrix3 {
      * ```
      */
     public setRotate(mat: ReadonlyMatrix3, za: number, zb: number): void {
-        const z0 = za;
-        const z1 = zb;
-        const z2 = -zb;
-        const z3 = za;
+        const zaa = za * za;
+        const zbb = zb * zb;
+        const zab = za * zb;
+        const z0 = zaa - zbb;
+        const z1 = zab + zab;
+        const z2 = -z1;
+        const z3 = z0;
 
         const ea = mat.elements;
         const e = this.elements;
@@ -1393,10 +1414,13 @@ export class Matrix3 implements ReadonlyMatrix3 {
      * ```
      */
     public setRotatePre(mat: ReadonlyMatrix3, za: number, zb: number): void {
-        const z0 = za;
-        const z1 = zb;
-        const z2 = -zb;
-        const z3 = za;
+        const zaa = za * za;
+        const zbb = zb * zb;
+        const zab = za * zb;
+        const z0 = zaa - zbb;
+        const z1 = zab + zab;
+        const z2 = -z1;
+        const z3 = z0;
 
         const ea = mat.elements;
         const e = this.elements;
