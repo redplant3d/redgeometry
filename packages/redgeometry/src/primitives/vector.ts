@@ -909,20 +909,21 @@ export class Vector3 implements ReadonlyVector3 {
     /**
      * Returns an orthonormal basis of the current vector.
      *
+     * Note: The current vector is assumed to be of unit length.
+     *
      * References:
      * - Tom Duff, James Burgess, Per Christensen, Christophe Hery, Andrew Kensler, Max Liani and Ryusuke Villemin.
      *   *Building an Orthonormal Basis, Revisited*.
      *   Journal of Computer Graphics Techniques Vol. 6, No. 1, 2017.
      */
     public orthonormalBasis(): { v1: Vector3; v2: Vector3; v3: Vector3 } {
-        const v1 = this.unit();
+        const sign = this.z >= 0 ? 1 : -1;
+        const a = -1 / (sign + this.z);
+        const b = this.x * this.y * a;
 
-        const sign = v1.z >= 0 ? 1 : -1;
-        const a = -1 / (sign + v1.z);
-        const b = v1.x * v1.y * a;
-
-        const v2 = new Vector3(1 + sign * v1.x * v1.x * a, sign * b, -sign * v1.x);
-        const v3 = new Vector3(b, sign + v1.y * v1.y * a, -v1.y);
+        const v1 = this.clone();
+        const v2 = new Vector3(1 + sign * this.x * this.x * a, sign * b, -sign * this.x);
+        const v3 = new Vector3(b, sign + this.y * this.y * a, -this.y);
 
         return { v1, v2, v3 };
     }
