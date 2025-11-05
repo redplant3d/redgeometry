@@ -191,6 +191,12 @@ export class Quaternion implements ReadonlyQuaternion {
         }
     }
 
+    /**
+     * Returns a quaternion from an unscaled rotation matrix.
+     *
+     * References:
+     * - https://en.wikipedia.org/wiki/Rotation_matrix#Quaternion
+     */
     public static fromRotationMatrix(
         q0: number,
         q1: number,
@@ -202,13 +208,13 @@ export class Quaternion implements ReadonlyQuaternion {
         q7: number,
         q8: number,
     ): Quaternion {
-        // q0 = qa^2 + qb^2 - qc^2 - qd^2
-        // q4 = qa^2 - qb^2 + qc^2 - qd^2
-        // q5 = qa^2 - qb^2 - qc^2 + qd^2
+        // q0 = qaa + qbb - qcc - qdd
+        // q4 = qaa - qbb + qcc - qdd
+        // q8 = qaa - qbb - qcc + qdd
         if (q0 >= 0) {
-            // qa^2 + qb^2 >= qc^2 + qd^2
+            // qaa + qbb >= qcc + qdd
             if (q4 + q8 >= 0) {
-                // 2 qa^2 >= 2 qb^2
+                // 2 qaa >= 2 qbb
                 const qa = 1 + q0 + q4 + q8;
                 const qb = q5 - q7;
                 const qc = q6 - q2;
@@ -216,7 +222,7 @@ export class Quaternion implements ReadonlyQuaternion {
                 const f = 0.5 / Math.sqrt(qa);
                 return new Quaternion(f * qa, f * qb, f * qc, f * qd);
             } else {
-                // 2 qb^2 > 2 qa^2
+                // 2 qbb > 2 qaa
                 const qa = q5 - q7;
                 const qb = 1 + q0 - q4 - q8;
                 const qc = q3 + q1;
@@ -225,9 +231,9 @@ export class Quaternion implements ReadonlyQuaternion {
                 return new Quaternion(f * qa, f * qb, f * qc, f * qd);
             }
         } else {
-            // qc^2 + qd^2 > qa^2 + qb^2
+            // qcc + qdd > qaa + qbb
             if (q4 - q8 >= 0) {
-                // 2 qc^2 >= 2 qd^2
+                // 2 qcc >= 2 qdd
                 const qa = q6 - q2;
                 const qb = q3 + q1;
                 const qc = 1 - q0 + q4 - q8;
@@ -235,7 +241,7 @@ export class Quaternion implements ReadonlyQuaternion {
                 const f = 0.5 / Math.sqrt(qc);
                 return new Quaternion(f * qa, f * qb, f * qc, f * qd);
             } else {
-                // 2 qd^2 > 2 qc^2
+                // 2 qdd > 2 qcc
                 const qa = q1 - q3;
                 const qb = q6 + q2;
                 const qc = q7 + q5;

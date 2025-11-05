@@ -24,7 +24,7 @@ test("Complex - setRotate", () => {
     expectToBeCloseComplex(z, Complex.IDENTITY);
 });
 
-test("Quaternion - mulV", () => {
+test("Complex - mulV", () => {
     const a = 1;
     const z = Complex.fromRotationAngle(a);
     const mat = Matrix3A.fromRotation(z.a, z.b);

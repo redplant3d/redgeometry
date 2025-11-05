@@ -22,9 +22,9 @@ test("Matrix3A - extract", () => {
 
     const { s, r, t } = mat.extractSRT();
 
-    expectToBeCloseVector2(s, v, 14);
-    expectToBeCloseComplex(r, z, 14);
-    expectToBeCloseVector2(t, p, 14);
+    expectToBeCloseVector2(s, v);
+    expectToBeCloseComplex(r, z);
+    expectToBeCloseVector2(t, p);
 });
 
 test("Matrix3A - inverse", () => {
@@ -114,9 +114,9 @@ test("Matrix3 - extract", () => {
 
     const { s, r, t } = mat.extractSRT();
 
-    expectToBeCloseVector2(s, v, 14);
-    expectToBeCloseComplex(r, z, 14);
-    expectToBeCloseVector2(t, p, 14);
+    expectToBeCloseVector2(s, v);
+    expectToBeCloseComplex(r, z);
+    expectToBeCloseVector2(t, p);
 });
 
 test("Matrix3 - inverse", () => {
@@ -206,9 +206,9 @@ test("Matrix4A - extract", () => {
 
     const { s, r, t } = mat.extractSRT();
 
-    expectToBeCloseVector3(s, v, 14);
-    expectToBeCloseQuaternion(r, q, 14);
-    expectToBeCloseVector3(t, p, 14);
+    expectToBeCloseVector3(s, v);
+    expectToBeCloseQuaternion(r, q);
+    expectToBeCloseVector3(t, p);
 });
 
 test("Matrix4A - inverse", () => {
@@ -336,9 +336,9 @@ test("Matrix4 - extract", () => {
 
     const { s, r, t } = mat.extractSRT();
 
-    expectToBeCloseVector3(s, v, 14);
-    expectToBeCloseQuaternion(r, q, 14);
-    expectToBeCloseVector3(t, p, 14);
+    expectToBeCloseVector3(s, v);
+    expectToBeCloseQuaternion(r, q);
+    expectToBeCloseVector3(t, p);
 });
 
 test("Matrix4 - inverse", () => {

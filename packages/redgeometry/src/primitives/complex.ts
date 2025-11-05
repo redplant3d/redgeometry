@@ -89,16 +89,23 @@ export class Complex implements ReadonlyComplex {
         return q;
     }
 
+    /**
+     * Returns a complex from an unscaled rotation matrix.
+     *
+     * References:
+     * - https://en.wikipedia.org/wiki/Square_root_of_a_2_by_2_matrix
+     */
     public static fromRotationMatrix(z0: number, z1: number): Complex {
         // z0 = zaa - zbb
         // z1 = zab + zab
         if (z0 >= 0) {
-            // Based on: https://en.wikipedia.org/wiki/Square_root_of_a_2_by_2_matrix
+            // zaa >= zbb
             const za = 1 + z0;
             const zb = z1;
             const f = 1 / Math.sqrt(2 * za);
             return new Complex(f * za, f * zb);
         } else {
+            // zbb > zaa
             const za = z1;
             const zb = 1 - z0;
             const f = 1 / Math.sqrt(2 * zb);
