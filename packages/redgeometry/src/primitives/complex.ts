@@ -1,6 +1,6 @@
-import { COS_ACUTE, COS_OBTUSE } from "../core/consts.js";
-import { eqApproxAbs, eqApproxRel, lerp } from "../utility/scalar.js";
-import { Vector2, type ReadonlyVector2 } from "./vector.js";
+import { COS_ACUTE, COS_OBTUSE } from "../core/consts.ts";
+import { eqApproxAbs, eqApproxRel, lerp } from "../utility/scalar.ts";
+import { Vector2, type ReadonlyVector2 } from "./vector.ts";
 
 export type ComplexLike = {
     readonly a: number;

@@ -1,7 +1,7 @@
-import { eqApproxAbs, eqApproxRel } from "../utility/scalar.js";
-import type { FixedSizeArray } from "../utility/types.js";
-import { Complex } from "./complex.js";
-import { Quaternion } from "./quaternion.js";
+import { eqApproxAbs, eqApproxRel } from "../utility/scalar.ts";
+import type { FixedSizeArray } from "../utility/types.ts";
+import { Complex } from "./complex.ts";
+import { Quaternion } from "./quaternion.ts";
 import {
     Vector2,
     Vector3,
@@ -9,7 +9,7 @@ import {
     type ReadonlyVector2,
     type ReadonlyVector3,
     type ReadonlyVector4,
-} from "./vector.js";
+} from "./vector.ts";
 
 export type MatrixElements3A = FixedSizeArray<number, 6>;
 export type MatrixElements3 = FixedSizeArray<number, 9>;

@@ -9,12 +9,12 @@ import type { ReadonlyRay2 } from "redgeometry/src/primitives/ray";
 import { Vector2, type ReadonlyVector2 } from "redgeometry/src/primitives/vector";
 import { assertUnreachable, throwError } from "redgeometry/src/utility/debug";
 import type { Random } from "redgeometry/src/utility/random";
-import type { DefaultSystemStage, WorldModule, WorldPlugin } from "../ecs/types.js";
-import type { World } from "../ecs/world.js";
-import { ColorRgba } from "../utility/color.js";
-import { createRandomColor } from "../utility/helper.js";
-import type { Image2 } from "../utility/image.js";
-import type { AppCanvasData } from "./app.js";
+import type { DefaultSystemStage, WorldModule, WorldPlugin } from "../ecs/types.ts";
+import type { World } from "../ecs/world.ts";
+import { ColorRgba } from "../utility/color.ts";
+import { createRandomColor } from "../utility/helper.ts";
+import type { Image2 } from "../utility/image.ts";
+import type { AppCanvasData } from "./app.ts";
 
 type CanvasStyle = string | CanvasGradient | CanvasPattern;
 

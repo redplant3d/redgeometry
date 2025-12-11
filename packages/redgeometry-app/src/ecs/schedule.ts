@@ -1,6 +1,6 @@
 import { assertDebug, log } from "redgeometry/src/utility/debug";
-import type { System, SystemAsync, SystemStage, SystemSync } from "./types.js";
-import type { World } from "./world.js";
+import type { System, SystemAsync, SystemStage, SystemSync } from "./types.ts";
+import type { World } from "./world.ts";
 
 export type SystemAwaitMode = "none" | "dependency";
 

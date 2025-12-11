@@ -5,14 +5,14 @@ import { PATH_CLIP_OPTIONS_DEFAULT, PATH_QUALITY_OPTIONS_DEFAULT } from "redgeom
 import { MinMaxBox2 } from "redgeometry/src/primitives/box";
 import type { ReadonlyVector2 } from "redgeometry/src/primitives/vector";
 import { RandomXSR128 } from "redgeometry/src/utility/random";
-import type { AppContextPlugin } from "../ecs-modules/app-context.js";
-import type { AppInputData } from "../ecs-modules/app-input.js";
-import { RangeInputElement } from "../ecs-modules/app-input.js";
-import { AppMainModule, type AppStateData } from "../ecs-modules/app.js";
-import type { WorldOptions } from "../ecs/app.js";
-import type { DefaultSystemStage, WorldModule } from "../ecs/types.js";
-import { WORLD_SCHEDULE_OPTIONS_DEFAULT, type World } from "../ecs/world.js";
-import { createRandomPoint } from "../utility/helper.js";
+import type { AppContextPlugin } from "../ecs-modules/app-context.ts";
+import type { AppInputData } from "../ecs-modules/app-input.ts";
+import { RangeInputElement } from "../ecs-modules/app-input.ts";
+import { AppMainModule, type AppStateData } from "../ecs-modules/app.ts";
+import type { WorldOptions } from "../ecs/app.ts";
+import type { DefaultSystemStage, WorldModule } from "../ecs/types.ts";
+import { WORLD_SCHEDULE_OPTIONS_DEFAULT, type World } from "../ecs/world.ts";
+import { createRandomPoint } from "../utility/helper.ts";
 
 type AppPartMainData = {
     dataId: "app-part-main";

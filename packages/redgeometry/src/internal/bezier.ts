@@ -4,13 +4,13 @@ import type {
     ReadonlyBezier3Curve2,
     ReadonlyBezierCurve2,
     ReadonlyBezierRCurve2,
-} from "../primitives/bezier.js";
-import type { MinMaxBox2 } from "../primitives/box.js";
-import { Vector2, type ReadonlyVector2, type ReadonlyVector3 } from "../primitives/vector.js";
-import { log } from "../utility/debug.js";
-import { Interval } from "../utility/interval.js";
-import { lerp } from "../utility/scalar.js";
-import { solveCubic, solveQuadratic } from "../utility/solve.js";
+} from "../primitives/bezier.ts";
+import type { MinMaxBox2 } from "../primitives/box.ts";
+import { Vector2, type ReadonlyVector2, type ReadonlyVector3 } from "../primitives/vector.ts";
+import { log } from "../utility/debug.ts";
+import { Interval } from "../utility/interval.ts";
+import { lerp } from "../utility/scalar.ts";
+import { solveCubic, solveQuadratic } from "../utility/solve.ts";
 
 export function setEncloseCurveAt(c: ReadonlyBezierCurve2, box: MinMaxBox2, t: number): void {
     if (!isInParameterRange(t)) {

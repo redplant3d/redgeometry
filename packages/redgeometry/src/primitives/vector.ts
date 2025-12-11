@@ -1,4 +1,4 @@
-import { clamp, eqApproxAbs, eqApproxRel, lerp, roundToPrecision } from "../utility/scalar.js";
+import { clamp, eqApproxAbs, eqApproxRel, lerp, roundToPrecision } from "../utility/scalar.ts";
 
 export type Vector2Like = {
     readonly x: number;

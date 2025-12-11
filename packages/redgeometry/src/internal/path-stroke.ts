@@ -1,4 +1,4 @@
-import { COS_OBTUSE } from "../core/consts.js";
+import { COS_OBTUSE } from "../core/consts.ts";
 import {
     CapType,
     JoinType,
@@ -6,10 +6,10 @@ import {
     type CustomCap,
     type PathStrokeOptions,
     type StrokeCaps,
-} from "../core/path-options.js";
-import { Path2 } from "../core/path.js";
-import { Bezier2Curve2, type ReadonlyBezier1Curve2, type ReadonlyBezier2Curve2 } from "../primitives/bezier.js";
-import { Vector2, type ReadonlyVector2 } from "../primitives/vector.js";
+} from "../core/path-options.ts";
+import { Path2 } from "../core/path.ts";
+import { Bezier2Curve2, type ReadonlyBezier1Curve2, type ReadonlyBezier2Curve2 } from "../primitives/bezier.ts";
+import { Vector2, type ReadonlyVector2 } from "../primitives/vector.ts";
 import {
     getDashArcLengthLinear,
     getDashArcLengthQuadratic,
@@ -17,8 +17,8 @@ import {
     getDashParameterLinear,
     getDashParameterQuadratic,
     getDashStart,
-} from "./path-dash.js";
-import { insertInnerJoin, insertOuterJoin } from "./path-offset.js";
+} from "./path-dash.ts";
+import { insertInnerJoin, insertOuterJoin } from "./path-offset.ts";
 
 export class StrokeState {
     public caps: StrokeCaps;

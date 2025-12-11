@@ -1,20 +1,20 @@
-import { LocalAppContext } from "./ecs/app.js";
-import { ECS_MAIN_WORLD } from "./parts/ecs-bounce.js";
-import { MATRIX_MAIN_WORLD } from "./parts/matrix.js";
-import { MESH_NEXT_MAIN_WORLD } from "./parts/mesh-next.js";
-import { MESH_MAIN_WORLD } from "./parts/mesh.js";
-import { PATH_AREA_MAIN_WORLD } from "./parts/path-area.js";
-import { PATH_CLIP_MAIN_WORLD } from "./parts/path-clip.js";
-import { PATH_INTERSECTION_MAIN_WORLD } from "./parts/path-intersection.js";
-import { PATH_OPERATIONS_MAIN_WORLD } from "./parts/path-operations.js";
-import { PATH_OVERLAY_MAIN_WORLD } from "./parts/path-overlay.js";
-import { PLAYGROUND_MAIN_WORLD } from "./parts/playground.js";
-import { POLYGON_MINKOWSKI_MAIN_WORLD } from "./parts/polygon-minkowski.js";
-import { SAMPLING_MAIN_WORLD } from "./parts/sampling.js";
-import { SNAP_ROUNDING_MAIN_WORLD } from "./parts/snap-rounding.js";
-import { STRAIGHT_SKELETON_MAIN_WORLD } from "./parts/straight-skeleton.js";
-import { TRIANGULATE_MAIN_WORLD } from "./parts/triangulate.js";
-import { AppLauncher } from "./utility/launcher.js";
+import { LocalAppContext } from "./ecs/app.ts";
+import { ECS_MAIN_WORLD } from "./parts/ecs-bounce.ts";
+import { MATRIX_MAIN_WORLD } from "./parts/matrix.ts";
+import { MESH_NEXT_MAIN_WORLD } from "./parts/mesh-next.ts";
+import { MESH_MAIN_WORLD } from "./parts/mesh.ts";
+import { PATH_AREA_MAIN_WORLD } from "./parts/path-area.ts";
+import { PATH_CLIP_MAIN_WORLD } from "./parts/path-clip.ts";
+import { PATH_INTERSECTION_MAIN_WORLD } from "./parts/path-intersection.ts";
+import { PATH_OPERATIONS_MAIN_WORLD } from "./parts/path-operations.ts";
+import { PATH_OVERLAY_MAIN_WORLD } from "./parts/path-overlay.ts";
+import { PLAYGROUND_MAIN_WORLD } from "./parts/playground.ts";
+import { POLYGON_MINKOWSKI_MAIN_WORLD } from "./parts/polygon-minkowski.ts";
+import { SAMPLING_MAIN_WORLD } from "./parts/sampling.ts";
+import { SNAP_ROUNDING_MAIN_WORLD } from "./parts/snap-rounding.ts";
+import { STRAIGHT_SKELETON_MAIN_WORLD } from "./parts/straight-skeleton.ts";
+import { TRIANGULATE_MAIN_WORLD } from "./parts/triangulate.ts";
+import { AppLauncher } from "./utility/launcher.ts";
 
 const context = new LocalAppContext();
 

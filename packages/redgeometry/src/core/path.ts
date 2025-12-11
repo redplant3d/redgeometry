@@ -1,4 +1,4 @@
-import { copyCommandsReversed } from "../internal/path.js";
+import { copyCommandsReversed } from "../internal/path.ts";
 import {
     Bezier1Curve2,
     Bezier2Curve2,
@@ -6,16 +6,16 @@ import {
     BezierRCurve2,
     type BezierCurve2,
     type ReadonlyBezierCurve2,
-} from "../primitives/bezier.js";
-import { MinMaxBox2 } from "../primitives/box.js";
-import { Complex } from "../primitives/complex.js";
-import { Matrix3A, type ReadonlyMatrix3, type ReadonlyMatrix3A } from "../primitives/matrix.js";
-import { Vector2, type ReadonlyVector2, type Vector2Like } from "../primitives/vector.js";
-import { copyArray, copyArrayReversed } from "../utility/array.js";
-import { assertUnreachable } from "../utility/debug.js";
-import type { Enum } from "../utility/types.js";
-import { Mesh2 } from "./mesh.js";
-import { PathClip2 } from "./path-clip.js";
+} from "../primitives/bezier.ts";
+import { MinMaxBox2 } from "../primitives/box.ts";
+import { Complex } from "../primitives/complex.ts";
+import { Matrix3A, type ReadonlyMatrix3, type ReadonlyMatrix3A } from "../primitives/matrix.ts";
+import { Vector2, type ReadonlyVector2, type Vector2Like } from "../primitives/vector.ts";
+import { copyArray, copyArrayReversed } from "../utility/array.ts";
+import { assertUnreachable } from "../utility/debug.ts";
+import type { Enum } from "../utility/types.ts";
+import { Mesh2 } from "./mesh.ts";
+import { PathClip2 } from "./path-clip.ts";
 import {
     createPathDash,
     createPathFlatten,
@@ -32,9 +32,9 @@ import {
     type PathOffsetOptions,
     type PathQualityOptions,
     type PathStrokeOptions,
-} from "./path-options.js";
-import { Polygon2 } from "./polygon.js";
-import { isWindingInside, type CustomWindingOperator, type WindingOperator } from "./winding.js";
+} from "./path-options.ts";
+import { Polygon2 } from "./polygon.ts";
+import { isWindingInside, type CustomWindingOperator, type WindingOperator } from "./winding.ts";
 
 export interface PathSink2 {
     close(): void;

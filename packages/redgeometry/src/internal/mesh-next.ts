@@ -1,11 +1,11 @@
-import type { Path2 } from "../core/path.js";
-import { isWindingInside, WindingOperator, type CustomWindingOperator } from "../core/winding.js";
-import { Bezier1Curve2 } from "../primitives/bezier.js";
-import { MinMaxBox2 } from "../primitives/box.js";
-import { Edge2 } from "../primitives/edge.js";
-import { Vector2, type ReadonlyVector2 } from "../primitives/vector.js";
-import { assertDebug, log, throwError, ValidationHelper } from "../utility/debug.js";
-import type { Nominal } from "../utility/types.js";
+import type { Path2 } from "../core/path.ts";
+import { isWindingInside, WindingOperator, type CustomWindingOperator } from "../core/winding.ts";
+import { Bezier1Curve2 } from "../primitives/bezier.ts";
+import { MinMaxBox2 } from "../primitives/box.ts";
+import { Edge2 } from "../primitives/edge.ts";
+import { Vector2, type ReadonlyVector2 } from "../primitives/vector.ts";
+import { assertDebug, log, throwError, ValidationHelper } from "../utility/debug.ts";
+import type { Nominal } from "../utility/types.ts";
 
 export type MeshVertexIdx = Nominal<number, "MeshVertexIdx">;
 export type MeshEdgeIdx = Nominal<number, "MeshEdgeIdx">;

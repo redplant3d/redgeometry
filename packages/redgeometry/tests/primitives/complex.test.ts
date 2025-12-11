@@ -1,8 +1,8 @@
 import { test } from "vitest";
-import { Complex } from "../../src/primitives/complex.js";
-import { Matrix3A } from "../../src/primitives/matrix.js";
-import { Vector2 } from "../../src/primitives/vector.js";
-import { expectToBeCloseComplex, expectToBeCloseVector2 } from "../expect.js";
+import { Complex } from "../../src/primitives/complex.ts";
+import { Matrix3A } from "../../src/primitives/matrix.ts";
+import { Vector2 } from "../../src/primitives/vector.ts";
+import { expectToBeCloseComplex, expectToBeCloseVector2 } from "../expect.ts";
 
 test("Complex - inverse", () => {
     const z = new Complex(1, 2);

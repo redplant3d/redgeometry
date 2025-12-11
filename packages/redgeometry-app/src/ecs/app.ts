@@ -10,7 +10,7 @@ import {
     type AppMessageResponseFn,
     type WorldGroupChild,
     type WorldGroupParent,
-} from "../utility/ecs-app.js";
+} from "../utility/ecs-app.ts";
 import type {
     DefaultSystemStage,
     DefaultWorldScheduleId,
@@ -19,8 +19,8 @@ import type {
     WorldId,
     WorldModule,
     WorldScheduleId,
-} from "./types.js";
-import { World, type WorldScheduleOptions } from "./world.js";
+} from "./types.ts";
+import { World, type WorldScheduleOptions } from "./world.ts";
 
 export type WorldOptions<
     T extends WorldScheduleId = DefaultWorldScheduleId,

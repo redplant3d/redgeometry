@@ -7,7 +7,7 @@ import {
     type ServeOptions,
     type WatchOptions,
 } from "esbuild";
-import { createDir, joinPaths, writeFile } from "./file.js";
+import { createDir, joinPaths, writeFile } from "./file.ts";
 
 const FOOTER_LIVE_RELOAD_DEFAULT = `
 // footer

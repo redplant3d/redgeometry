@@ -1,8 +1,8 @@
-import { clamp } from "../utility/scalar.js";
-import { solveQuadratic } from "../utility/solve.js";
-import { Bezier1Curve2 } from "./bezier.js";
-import { MinMaxBox2, MinMaxBox3 } from "./box.js";
-import { Ray2, Ray3 } from "./ray.js";
+import { clamp } from "../utility/scalar.ts";
+import { solveQuadratic } from "../utility/solve.ts";
+import { Bezier1Curve2 } from "./bezier.ts";
+import { MinMaxBox2, MinMaxBox3 } from "./box.ts";
+import { Ray2, Ray3 } from "./ray.ts";
 import {
     type ReadonlyVector2,
     type ReadonlyVector3,
@@ -10,7 +10,7 @@ import {
     type Vector3Like,
     Vector2,
     Vector3,
-} from "./vector.js";
+} from "./vector.ts";
 
 export type Edge2Like = {
     readonly p0: Vector2Like;

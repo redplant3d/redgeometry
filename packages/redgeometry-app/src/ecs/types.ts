@@ -1,5 +1,5 @@
 import type { Nominal } from "redgeometry/src/utility/types";
-import type { ComponentFlags, EntityFlags, World } from "./world.js";
+import type { ComponentFlags, EntityFlags, World } from "./world.ts";
 
 // Entity
 export type EntityId = Nominal<number, "EntityId">;

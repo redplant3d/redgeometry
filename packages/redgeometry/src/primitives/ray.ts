@@ -5,7 +5,7 @@ import {
     type ReadonlyVector3,
     type Vector2Like,
     type Vector3Like,
-} from "./vector.js";
+} from "./vector.ts";
 
 export type Ray2Like = {
     readonly origin: Vector2Like;

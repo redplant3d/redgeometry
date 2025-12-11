@@ -1,14 +1,14 @@
 import { expect, test } from "vitest";
-import { Complex } from "../../src/primitives/complex.js";
-import { Matrix3, Matrix3A, Matrix4, Matrix4A } from "../../src/primitives/matrix.js";
-import { Quaternion, RotationOrder } from "../../src/primitives/quaternion.js";
-import { Vector2, Vector3, Vector4 } from "../../src/primitives/vector.js";
+import { Complex } from "../../src/primitives/complex.ts";
+import { Matrix3, Matrix3A, Matrix4, Matrix4A } from "../../src/primitives/matrix.ts";
+import { Quaternion, RotationOrder } from "../../src/primitives/quaternion.ts";
+import { Vector2, Vector3, Vector4 } from "../../src/primitives/vector.ts";
 import {
     expectToBeCloseComplex,
     expectToBeCloseQuaternion,
     expectToBeCloseVector2,
     expectToBeCloseVector3,
-} from "../expect.js";
+} from "../expect.ts";
 
 test("Matrix3A - extract", () => {
     const v = new Vector2(1, 2);

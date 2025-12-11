@@ -1,5 +1,5 @@
 import { expect, test } from "vitest";
-import { MinMaxBox2, MinMaxBox3 } from "../../src/primitives/box.js";
+import { MinMaxBox2, MinMaxBox3 } from "../../src/primitives/box.ts";
 
 test("Box2 - intersects", () => {
     const b1 = new MinMaxBox2(0, 0, 2, 2);

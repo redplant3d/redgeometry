@@ -1,9 +1,9 @@
-import { COS_ACUTE, COS_OBTUSE } from "../core/consts.js";
-import { JoinType } from "../core/path-options.js";
-import type { Path2 } from "../core/path.js";
-import { Bezier2Curve2, BezierRCurve2, type ReadonlyBezier2Curve2 } from "../primitives/bezier.js";
-import type { ReadonlyVector2 } from "../primitives/vector.js";
-import { assertUnreachable } from "../utility/debug.js";
+import { COS_ACUTE, COS_OBTUSE } from "../core/consts.ts";
+import { JoinType } from "../core/path-options.ts";
+import type { Path2 } from "../core/path.ts";
+import { Bezier2Curve2, BezierRCurve2, type ReadonlyBezier2Curve2 } from "../primitives/bezier.ts";
+import type { ReadonlyVector2 } from "../primitives/vector.ts";
+import { assertUnreachable } from "../utility/debug.ts";
 
 export function offsetQuadraticSimple(path: Path2, c: ReadonlyBezier2Curve2, d: number): void {
     // Possible null vector (curve is a point)

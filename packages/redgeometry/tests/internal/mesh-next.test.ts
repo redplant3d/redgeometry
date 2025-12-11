@@ -21,9 +21,9 @@ import {
     type MeshLoopIdx,
     type MeshShellIdx,
     type MeshVertexIdx,
-} from "../../src/internal/mesh-next.js";
-import { Vector2, type ReadonlyVector2 } from "../../src/primitives/vector.js";
-import { expectNoMesh2Errors, expectToBeTrue } from "../expect.js";
+} from "../../src/internal/mesh-next.ts";
+import { Vector2, type ReadonlyVector2 } from "../../src/primitives/vector.ts";
+import { expectNoMesh2Errors, expectToBeTrue } from "../expect.ts";
 
 test("MeshVertices - createEmpty/create/init/reset/destroy/clear", () => {
     const vertices = MeshVertices.createEmpty<string, string>();

@@ -1,5 +1,5 @@
 import { expect, test } from "vitest";
-import { ArrayMultiMap, ArrayMultiSet, copyArray, copyArrayReversed } from "../../src/utility/array.js";
+import { ArrayMultiMap, ArrayMultiSet, copyArray, copyArrayReversed } from "../../src/utility/array.ts";
 
 test("ArrayMultiSet.findIndex", () => {
     const compareFn = (a: number, b: number): number => a - b;

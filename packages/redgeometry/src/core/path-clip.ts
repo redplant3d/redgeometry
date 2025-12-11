@@ -1,19 +1,19 @@
-import { PathSweepEvent2, createSweepEventQueue, isIncOutBoolean } from "../internal/path-sweep.js";
-import { Bezier1Curve2, type ReadonlyBezierCurve2 } from "../primitives/bezier.js";
-import type { ReadonlyEdge2 } from "../primitives/edge.js";
-import { ArrayMultiSet } from "../utility/array.js";
-import { log } from "../utility/debug.js";
-import type { Mesh2 } from "./mesh.js";
+import { PathSweepEvent2, createSweepEventQueue, isIncOutBoolean } from "../internal/path-sweep.ts";
+import { Bezier1Curve2, type ReadonlyBezierCurve2 } from "../primitives/bezier.ts";
+import type { ReadonlyEdge2 } from "../primitives/edge.ts";
+import { ArrayMultiSet } from "../utility/array.ts";
+import { log } from "../utility/debug.ts";
+import type { Mesh2 } from "./mesh.ts";
 import {
     ApproximationMode,
     PATH_CLIP_OPTIONS_DEFAULT,
     type BooleanOperator,
     type PathClipOptions,
     type PathQualityOptions,
-} from "./path-options.js";
-import type { Path2 } from "./path.js";
-import { SnapRound2 } from "./snapround.js";
-import { isWindingInside2, type CustomWindingOperator, type WindingOperator } from "./winding.js";
+} from "./path-options.ts";
+import type { Path2 } from "./path.ts";
+import { SnapRound2 } from "./snapround.ts";
+import { isWindingInside2, type CustomWindingOperator, type WindingOperator } from "./winding.ts";
 
 export class PathClip2 {
     private booleanOperator: BooleanOperator;

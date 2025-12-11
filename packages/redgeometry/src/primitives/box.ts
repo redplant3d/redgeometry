@@ -1,9 +1,9 @@
-import { eqApproxAbs, eqApproxRel, lerp } from "../utility/scalar.js";
-import type { FixedSizeArray } from "../utility/types.js";
-import { Complex, type ComplexLike, type ReadonlyComplex } from "./complex.js";
-import type { ReadonlyMatrix3, ReadonlyMatrix3A, ReadonlyMatrix4, ReadonlyMatrix4A } from "./matrix.js";
-import { Quaternion, type QuaternionLike, type ReadonlyQuaternion } from "./quaternion.js";
-import type { ReadonlyRay2, ReadonlyRay3 } from "./ray.js";
+import { eqApproxAbs, eqApproxRel, lerp } from "../utility/scalar.ts";
+import type { FixedSizeArray } from "../utility/types.ts";
+import { Complex, type ComplexLike, type ReadonlyComplex } from "./complex.ts";
+import type { ReadonlyMatrix3, ReadonlyMatrix3A, ReadonlyMatrix4, ReadonlyMatrix4A } from "./matrix.ts";
+import { Quaternion, type QuaternionLike, type ReadonlyQuaternion } from "./quaternion.ts";
+import type { ReadonlyRay2, ReadonlyRay3 } from "./ray.ts";
 import {
     Vector2,
     Vector3,
@@ -11,7 +11,7 @@ import {
     type ReadonlyVector3,
     type Vector2Like,
     type Vector3Like,
-} from "./vector.js";
+} from "./vector.ts";
 
 export type MinMaxBox2Like = {
     readonly minX: number;

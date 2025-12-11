@@ -4,15 +4,15 @@ import { PathClip2 } from "redgeometry/src/core/path-clip";
 import { PATH_QUALITY_OPTIONS_DEFAULT } from "redgeometry/src/core/path-options";
 import { Polygon2 } from "redgeometry/src/core/polygon";
 import { RandomXSR128 } from "redgeometry/src/utility/random";
-import type { AppContextPlugin } from "../ecs-modules/app-context.js";
-import { AppContextModule } from "../ecs-modules/app-context.js";
-import type { AppInputData } from "../ecs-modules/app-input.js";
-import { ComboBoxInputElement, RangeInputElement } from "../ecs-modules/app-input.js";
-import { AppMainModule, type AppStateData } from "../ecs-modules/app.js";
-import type { WorldOptions } from "../ecs/app.js";
-import type { DefaultSystemStage, WorldModule } from "../ecs/types.js";
-import { WORLD_SCHEDULE_OPTIONS_DEFAULT, type World } from "../ecs/world.js";
-import { createRandomPolygonPair, getBooleanOperator, getWindingOperator } from "../utility/helper.js";
+import type { AppContextPlugin } from "../ecs-modules/app-context.ts";
+import { AppContextModule } from "../ecs-modules/app-context.ts";
+import type { AppInputData } from "../ecs-modules/app-input.ts";
+import { ComboBoxInputElement, RangeInputElement } from "../ecs-modules/app-input.ts";
+import { AppMainModule, type AppStateData } from "../ecs-modules/app.ts";
+import type { WorldOptions } from "../ecs/app.ts";
+import type { DefaultSystemStage, WorldModule } from "../ecs/types.ts";
+import { WORLD_SCHEDULE_OPTIONS_DEFAULT, type World } from "../ecs/world.ts";
+import { createRandomPolygonPair, getBooleanOperator, getWindingOperator } from "../utility/helper.ts";
 
 type AppPartMainData = {
     dataId: "app-part-main";

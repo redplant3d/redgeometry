@@ -1,8 +1,8 @@
-import { COS_ACUTE, COS_OBTUSE } from "../core/consts.js";
-import { assertUnreachable } from "../utility/debug.js";
-import { eqApproxAbs, eqApproxRel, lerp } from "../utility/scalar.js";
-import type { Enum } from "../utility/types.js";
-import { Vector3, type ReadonlyVector3 } from "./vector.js";
+import { COS_ACUTE, COS_OBTUSE } from "../core/consts.ts";
+import { assertUnreachable } from "../utility/debug.ts";
+import { eqApproxAbs, eqApproxRel, lerp } from "../utility/scalar.ts";
+import type { Enum } from "../utility/types.ts";
+import { Vector3, type ReadonlyVector3 } from "./vector.ts";
 
 export type QuaternionLike = {
     readonly a: number;

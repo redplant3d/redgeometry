@@ -1,12 +1,12 @@
-import type { ReadonlyVector2 } from "../primitives/vector.js";
-import type { Enum } from "../utility/types.js";
-import { PathDashIncremental2, PathDashRecursive2, type PathDash2 } from "./path-dash.js";
-import { PathFlattenIncremental2, PathFlattenRecursive2, type PathFlatten2 } from "./path-flatten.js";
-import { PathOffsetIncremental2, PathOffsetRecursive2, type PathOffset2 } from "./path-offset.js";
-import { PathSimplifyIncremental2, PathSimplifyRecursive2, type PathSimplify2 } from "./path-simplify.js";
-import { PathStrokeIncremental2, PathStrokeRecursive2, type PathStroke2 } from "./path-stroke.js";
-import type { PathSink2 } from "./path.js";
-import { WindingOperator, type CustomWindingOperator } from "./winding.js";
+import type { ReadonlyVector2 } from "../primitives/vector.ts";
+import type { Enum } from "../utility/types.ts";
+import { PathDashIncremental2, PathDashRecursive2, type PathDash2 } from "./path-dash.ts";
+import { PathFlattenIncremental2, PathFlattenRecursive2, type PathFlatten2 } from "./path-flatten.ts";
+import { PathOffsetIncremental2, PathOffsetRecursive2, type PathOffset2 } from "./path-offset.ts";
+import { PathSimplifyIncremental2, PathSimplifyRecursive2, type PathSimplify2 } from "./path-simplify.ts";
+import { PathStrokeIncremental2, PathStrokeRecursive2, type PathStroke2 } from "./path-stroke.ts";
+import type { PathSink2 } from "./path.ts";
+import { WindingOperator, type CustomWindingOperator } from "./winding.ts";
 
 export const ApproximationMode = {
     INCREMENTAL: 0,

@@ -3,15 +3,15 @@ import { WindingOperator } from "redgeometry/src/core/winding";
 import { MinMaxBox2, type ReadonlyMinMaxBox2 } from "redgeometry/src/primitives/box";
 import { Vector2 } from "redgeometry/src/primitives/vector";
 import { RandomXSR128 } from "redgeometry/src/utility/random";
-import type { AppContextPlugin } from "../ecs-modules/app-context.js";
-import type { AppInputData } from "../ecs-modules/app-input.js";
-import { TextBoxInputElement } from "../ecs-modules/app-input.js";
-import { AppMainModule, type AppStateData } from "../ecs-modules/app.js";
-import type { MousePlugin } from "../ecs-modules/input.js";
-import type { WorldOptions } from "../ecs/app.js";
-import type { DefaultSystemStage, WorldModule } from "../ecs/types.js";
-import { WORLD_SCHEDULE_OPTIONS_DEFAULT, type World } from "../ecs/world.js";
-import { createRandomPath } from "../utility/helper.js";
+import type { AppContextPlugin } from "../ecs-modules/app-context.ts";
+import type { AppInputData } from "../ecs-modules/app-input.ts";
+import { TextBoxInputElement } from "../ecs-modules/app-input.ts";
+import { AppMainModule, type AppStateData } from "../ecs-modules/app.ts";
+import type { MousePlugin } from "../ecs-modules/input.ts";
+import type { WorldOptions } from "../ecs/app.ts";
+import type { DefaultSystemStage, WorldModule } from "../ecs/types.ts";
+import { WORLD_SCHEDULE_OPTIONS_DEFAULT, type World } from "../ecs/world.ts";
+import { createRandomPath } from "../utility/helper.ts";
 
 type AppPartMainData = {
     dataId: "app-part-main";

@@ -1,8 +1,8 @@
-import { Bezier1Curve2, type ReadonlyBezierCurve2 } from "../primitives/bezier.js";
-import { Vector2, type ReadonlyVector2 } from "../primitives/vector.js";
-import { ArrayMultiMap } from "../utility/array.js";
-import { assertDebug, log } from "../utility/debug.js";
-import { Path2 } from "./path.js";
+import { Bezier1Curve2, type ReadonlyBezierCurve2 } from "../primitives/bezier.ts";
+import { Vector2, type ReadonlyVector2 } from "../primitives/vector.ts";
+import { ArrayMultiMap } from "../utility/array.ts";
+import { assertDebug, log } from "../utility/debug.ts";
+import { Path2 } from "./path.ts";
 
 type MeshStatus2 = {
     isMerge: boolean;

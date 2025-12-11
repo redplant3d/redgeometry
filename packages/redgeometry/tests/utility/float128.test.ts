@@ -1,5 +1,5 @@
 import { expect, test } from "vitest";
-import { Float128 } from "../../src/utility/float128.js";
+import { Float128 } from "../../src/utility/float128.ts";
 
 test("add", () => {
     const f0 = Float128.from(0);

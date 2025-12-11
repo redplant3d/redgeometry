@@ -1,7 +1,7 @@
 import { throwError } from "redgeometry/src/utility/debug";
-import { AppLauncherModule } from "../ecs-modules/app-launcher.js";
-import { App, type AppContext, type WorldGroupOptions } from "../ecs/app.js";
-import type { DefaultWorldScheduleId, WorldId } from "../ecs/types.js";
+import { AppLauncherModule } from "../ecs-modules/app-launcher.ts";
+import { App, type AppContext, type WorldGroupOptions } from "../ecs/app.ts";
+import type { DefaultWorldScheduleId, WorldId } from "../ecs/types.ts";
 
 export type AppPartId = string;
 

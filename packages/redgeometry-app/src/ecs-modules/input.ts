@@ -1,7 +1,7 @@
 import { assertUnreachable } from "redgeometry/src/utility/debug";
 import type { Enum } from "redgeometry/src/utility/types";
-import type { DefaultSystemStage, WorldModule, WorldPlugin } from "../ecs/types.js";
-import type { World } from "../ecs/world.js";
+import type { DefaultSystemStage, WorldModule, WorldPlugin } from "../ecs/types.ts";
+import type { World } from "../ecs/world.ts";
 
 export type InputInitData = {
     dataId: "input-init";

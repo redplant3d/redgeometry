@@ -5,11 +5,12 @@
         "esModuleInterop": true,
         "isolatedDeclarations": true,
         "isolatedModules": true,
-        "module": "NodeNext",
-        "moduleResolution": "NodeNext",
+        "module": "nodenext",
+        "moduleResolution": "nodenext",
         "noEmit": true,
+        "rewriteRelativeImportExtensions": true,
         "strict": true,
-        "target": "ESNext",
+        "target": "esnext",
         "verbatimModuleSyntax": true
     }
 }

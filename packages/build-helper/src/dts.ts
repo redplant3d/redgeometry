@@ -1,5 +1,5 @@
 import { generateDtsBundle, type EntryPointConfig } from "dts-bundle-generator";
-import { writeFile } from "./file.js";
+import { writeFile } from "./file.ts";
 
 export type DtsBundleOptions = {
     config: EntryPointConfig;

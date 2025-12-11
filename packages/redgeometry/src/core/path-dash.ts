@@ -1,4 +1,4 @@
-import { DashState } from "../internal/path-dash.js";
+import { DashState } from "../internal/path-dash.ts";
 import {
     isDegenerateQuad,
     isSimpleConic,
@@ -9,7 +9,7 @@ import {
     simplifyParameterStepConic,
     simplifyParameterStepCubic,
     simplifyParameterStepQuad,
-} from "../internal/path-simplify.js";
+} from "../internal/path-simplify.ts";
 import {
     Bezier1Curve2,
     Bezier2Curve2,
@@ -18,12 +18,12 @@ import {
     type ReadonlyBezier2Curve2,
     type ReadonlyBezier3Curve2,
     type ReadonlyBezierRCurve2,
-} from "../primitives/bezier.js";
-import { Vector2 } from "../primitives/vector.js";
-import { assertUnreachable } from "../utility/debug.js";
-import { MAX_PARAMETER } from "./consts.js";
-import { type PathDashOptions, type PathQualityOptions } from "./path-options.js";
-import { type Path2 } from "./path.js";
+} from "../primitives/bezier.ts";
+import { Vector2 } from "../primitives/vector.ts";
+import { assertUnreachable } from "../utility/debug.ts";
+import { MAX_PARAMETER } from "./consts.ts";
+import { type PathDashOptions, type PathQualityOptions } from "./path-options.ts";
+import { type Path2 } from "./path.ts";
 
 export interface PathDash2 {
     process(input: Path2, output: Path2, options: PathDashOptions): void;

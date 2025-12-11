@@ -1,4 +1,4 @@
-import type { Enum } from "../utility/types.js";
+import type { Enum } from "../utility/types.ts";
 
 export type CustomWindingOperator = (wind: number) => boolean;
 

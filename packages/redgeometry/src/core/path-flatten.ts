@@ -3,7 +3,7 @@ import {
     simplifyCubicMidpoint,
     simplifyParameterStepConic,
     simplifyParameterStepCubic,
-} from "../internal/path-simplify.js";
+} from "../internal/path-simplify.ts";
 import {
     Bezier2Curve2,
     Bezier3Curve2,
@@ -11,11 +11,11 @@ import {
     type ReadonlyBezier2Curve2,
     type ReadonlyBezier3Curve2,
     type ReadonlyBezierRCurve2,
-} from "../primitives/bezier.js";
-import { Vector2 } from "../primitives/vector.js";
-import { assertUnreachable } from "../utility/debug.js";
-import type { PathQualityOptions } from "./path-options.js";
-import { type Path2 } from "./path.js";
+} from "../primitives/bezier.ts";
+import { Vector2 } from "../primitives/vector.ts";
+import { assertUnreachable } from "../utility/debug.ts";
+import type { PathQualityOptions } from "./path-options.ts";
+import { type Path2 } from "./path.ts";
 
 export interface PathFlatten2 {
     process(input: Path2, output: Path2, forceClose: boolean): void;

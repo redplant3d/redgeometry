@@ -1,6 +1,6 @@
 import { expect, test } from "vitest";
-import { Path2, PathCommandType, type PathCommand } from "../../src/core/path.js";
-import { Vector2 } from "../../src/primitives/vector.js";
+import { Path2, PathCommandType, type PathCommand } from "../../src/core/path.ts";
+import { Vector2 } from "../../src/primitives/vector.ts";
 
 const cmdMove: PathCommand = { type: PathCommandType.MOVE };
 const cmdLine: PathCommand = { type: PathCommandType.LINEAR };

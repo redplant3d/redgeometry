@@ -1,5 +1,5 @@
-import { PathCommandType, type PathCommand } from "../core/path.js";
-import { assertDebug } from "../utility/debug.js";
+import { PathCommandType, type PathCommand } from "../core/path.ts";
+import { assertDebug } from "../utility/debug.ts";
 
 export function copyCommandsReversed(
     src: PathCommand[],

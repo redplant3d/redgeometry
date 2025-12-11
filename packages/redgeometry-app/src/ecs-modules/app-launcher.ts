@@ -1,5 +1,5 @@
-import type { WorldModule } from "../ecs/types.js";
-import type { World } from "../ecs/world.js";
+import type { WorldModule } from "../ecs/types.ts";
+import type { World } from "../ecs/world.ts";
 
 export type AppLauncherData = {
     dataId: "app-launcher";

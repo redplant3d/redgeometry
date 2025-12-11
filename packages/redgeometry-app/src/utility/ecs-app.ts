@@ -1,7 +1,7 @@
 import { throwError } from "redgeometry/src/utility/debug";
-import type { AppContext, AppRemoteChild, AppRemoteParent } from "../ecs/app.js";
-import type { WorldData, WorldEvent, WorldGroupId, WorldId, WorldScheduleId } from "../ecs/types.js";
-import type { World } from "../ecs/world.js";
+import type { AppContext, AppRemoteChild, AppRemoteParent } from "../ecs/app.ts";
+import type { WorldData, WorldEvent, WorldGroupId, WorldId, WorldScheduleId } from "../ecs/types.ts";
+import type { World } from "../ecs/world.ts";
 
 export type AppMessageRequestData = {
     worldId: WorldId;

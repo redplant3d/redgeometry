@@ -1,8 +1,8 @@
-import type { PathDashOptions } from "../core/path-options.js";
-import { Path2 } from "../core/path.js";
-import { Bezier2Curve2, type ReadonlyBezier1Curve2, type ReadonlyBezier2Curve2 } from "../primitives/bezier.js";
-import type { ReadonlyVector2 } from "../primitives/vector.js";
-import { getArcLengthQuadratic, getParameterAtArcLengthQuadratic } from "./bezier.js";
+import type { PathDashOptions } from "../core/path-options.ts";
+import { Path2 } from "../core/path.ts";
+import { Bezier2Curve2, type ReadonlyBezier1Curve2, type ReadonlyBezier2Curve2 } from "../primitives/bezier.ts";
+import type { ReadonlyVector2 } from "../primitives/vector.ts";
+import { getArcLengthQuadratic, getParameterAtArcLengthQuadratic } from "./bezier.ts";
 
 export class DashState {
     public currentIndex: number;

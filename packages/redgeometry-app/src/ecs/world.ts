@@ -1,7 +1,7 @@
 import { log, throwError } from "redgeometry/src/utility/debug";
-import { EntityComponentStorage } from "./entity-component.js";
-import { WorldEventIterator, WorldEventStorage } from "./event.js";
-import { SystemSchedule, type SystemDependencyOptions, type SystemOptions, type SystemsOptions } from "./schedule.js";
+import { EntityComponentStorage } from "./entity-component.ts";
+import { WorldEventIterator, WorldEventStorage } from "./event.ts";
+import { SystemSchedule, type SystemDependencyOptions, type SystemOptions, type SystemsOptions } from "./schedule.ts";
 import type {
     Component,
     ComponentIdOf,
@@ -22,7 +22,7 @@ import type {
     WorldPluginId,
     WorldPluginIdOf,
     WorldScheduleId,
-} from "./types.js";
+} from "./types.ts";
 
 export type WorldScheduleOptions<
     T extends WorldScheduleId = DefaultWorldScheduleId,

@@ -1,7 +1,7 @@
 import { assertDebug, assertUnreachable, log, throwError } from "redgeometry/src/utility/debug";
 import type { Enum } from "redgeometry/src/utility/types";
-import type { Component, ComponentId, ComponentIdOf, EntityComponentQueryValue, EntityId } from "./types.js";
-import { ComponentFlags, EntityFlags } from "./world.js";
+import type { Component, ComponentId, ComponentIdOf, EntityComponentQueryValue, EntityId } from "./types.ts";
+import { ComponentFlags, EntityFlags } from "./world.ts";
 
 export type EntityRef = number;
 export type EntityVersion = number;

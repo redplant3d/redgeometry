@@ -1,4 +1,4 @@
-import type { FixedSizeArrayBuilder } from "../internal/types.js";
+import type { FixedSizeArrayBuilder } from "../internal/types.ts";
 
 export type Constructor<T> = {
     new (...args: never[]): T;

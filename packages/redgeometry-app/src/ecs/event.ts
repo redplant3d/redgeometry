@@ -1,5 +1,5 @@
 import { throwError } from "redgeometry/src/utility/debug";
-import type { WorldEvent, WorldEventId, WorldEventIdOf, WorldEventIdsOf, WorldEventUnion } from "./types.js";
+import type { WorldEvent, WorldEventId, WorldEventIdOf, WorldEventIdsOf, WorldEventUnion } from "./types.ts";
 
 type WorldEventJournalEntry = {
     event: WorldEvent;

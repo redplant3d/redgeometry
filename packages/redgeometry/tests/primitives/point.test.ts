@@ -1,5 +1,5 @@
 import { expect, test } from "vitest";
-import { Vector2 } from "../../src/primitives/vector.js";
+import { Vector2 } from "../../src/primitives/vector.ts";
 
 test("signedArea", () => {
     const p0 = new Vector2(200, 200);

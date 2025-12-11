@@ -1,6 +1,6 @@
 import { expect, test } from "vitest";
-import { Polygon2 } from "../../src/core/polygon.js";
-import { Vector2 } from "../../src/primitives/vector.js";
+import { Polygon2 } from "../../src/core/polygon.ts";
+import { Vector2 } from "../../src/primitives/vector.ts";
 
 test("isConvex", () => {
     const p0 = new Vector2(0, 0);

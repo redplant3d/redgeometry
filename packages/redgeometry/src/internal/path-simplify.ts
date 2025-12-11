@@ -1,10 +1,10 @@
-import { COS_ACUTE } from "../core/consts.js";
+import { COS_ACUTE } from "../core/consts.ts";
 import {
     Bezier2Curve2,
     type ReadonlyBezier2Curve2,
     type ReadonlyBezier3Curve2,
     type ReadonlyBezierRCurve2,
-} from "../primitives/bezier.js";
+} from "../primitives/bezier.ts";
 
 /**
  * Returns `true` if the conic satisfies `cosTolerance`.

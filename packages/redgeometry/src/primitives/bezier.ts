@@ -6,12 +6,12 @@ import {
     getWindingAtParameterQuadratic,
     minimizeCurveDistanceAt,
     setEncloseCurveAt,
-} from "../internal/bezier.js";
-import { Interval } from "../utility/interval.js";
-import { solveCubic, solveLinear, solveQuadratic } from "../utility/solve.js";
-import { MinMaxBox2 } from "./box.js";
-import { Edge2 } from "./edge.js";
-import { Vector2, Vector3, type ReadonlyVector2, type ReadonlyVector3, type Vector2Like } from "./vector.js";
+} from "../internal/bezier.ts";
+import { Interval } from "../utility/interval.ts";
+import { solveCubic, solveLinear, solveQuadratic } from "../utility/solve.ts";
+import { MinMaxBox2 } from "./box.ts";
+import { Edge2 } from "./edge.ts";
+import { Vector2, Vector3, type ReadonlyVector2, type ReadonlyVector3, type Vector2Like } from "./vector.ts";
 
 export type Bezier1Curve2Like = {
     readonly p0: Vector2Like;

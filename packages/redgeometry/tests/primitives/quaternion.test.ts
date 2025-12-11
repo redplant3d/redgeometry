@@ -1,8 +1,8 @@
 import { test } from "vitest";
-import { Matrix4A } from "../../src/primitives/matrix.js";
-import { Quaternion, RotationOrder } from "../../src/primitives/quaternion.js";
-import { Vector3 } from "../../src/primitives/vector.js";
-import { expectToBeCloseEuler, expectToBeCloseQuaternion, expectToBeCloseVector3 } from "../expect.js";
+import { Matrix4A } from "../../src/primitives/matrix.ts";
+import { Quaternion, RotationOrder } from "../../src/primitives/quaternion.ts";
+import { Vector3 } from "../../src/primitives/vector.ts";
+import { expectToBeCloseEuler, expectToBeCloseQuaternion, expectToBeCloseVector3 } from "../expect.ts";
 
 test("Quaternion - fromRotationAngleX", () => {
     const a = 1;

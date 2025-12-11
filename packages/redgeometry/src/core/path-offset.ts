@@ -1,4 +1,4 @@
-import { insertOffsetJoin, offsetQuadraticDegenerate, offsetQuadraticSimple } from "../internal/path-offset.js";
+import { insertOffsetJoin, offsetQuadraticDegenerate, offsetQuadraticSimple } from "../internal/path-offset.ts";
 import {
     isDegenerateQuad,
     isSimpleConic,
@@ -9,7 +9,7 @@ import {
     simplifyParameterStepConic,
     simplifyParameterStepCubic,
     simplifyParameterStepQuad,
-} from "../internal/path-simplify.js";
+} from "../internal/path-simplify.ts";
 import {
     Bezier1Curve2,
     Bezier2Curve2,
@@ -18,12 +18,12 @@ import {
     type ReadonlyBezier2Curve2,
     type ReadonlyBezier3Curve2,
     type ReadonlyBezierRCurve2,
-} from "../primitives/bezier.js";
-import { Vector2, type ReadonlyVector2 } from "../primitives/vector.js";
-import { assertUnreachable } from "../utility/debug.js";
-import { MAX_PARAMETER } from "./consts.js";
-import { JoinType, type PathOffsetOptions, type PathQualityOptions } from "./path-options.js";
-import { Path2 } from "./path.js";
+} from "../primitives/bezier.ts";
+import { Vector2, type ReadonlyVector2 } from "../primitives/vector.ts";
+import { assertUnreachable } from "../utility/debug.ts";
+import { MAX_PARAMETER } from "./consts.ts";
+import { JoinType, type PathOffsetOptions, type PathQualityOptions } from "./path-options.ts";
+import { Path2 } from "./path.ts";
 
 export interface PathOffset2 {
     process(input: Path2, output: Path2, options: PathOffsetOptions): void;

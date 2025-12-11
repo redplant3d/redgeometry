@@ -1,4 +1,4 @@
-import type { ValueRef } from "./types.js";
+import type { ValueRef } from "./types.ts";
 
 export type FormatParameters = unknown[];
 

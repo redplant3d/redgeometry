@@ -1,14 +1,14 @@
-import { PathOverlayState2 } from "../internal/path-overlay.js";
-import { PathSweepEvent2, createSweepEventQueue } from "../internal/path-sweep.js";
-import { Bezier1Curve2, type ReadonlyBezierCurve2 } from "../primitives/bezier.js";
-import type { ReadonlyEdge2 } from "../primitives/edge.js";
-import { ArrayMultiSet, arrayEquals } from "../utility/array.js";
-import { assertDebug, log } from "../utility/debug.js";
-import { MeshChain2, MeshEdge2, type Mesh2 } from "./mesh.js";
-import { ApproximationMode, PATH_CLIP_OPTIONS_DEFAULT, type PathQualityOptions } from "./path-options.js";
-import type { Path2 } from "./path.js";
-import { SnapRound2, type EdgeSegmentRef2 } from "./snapround.js";
-import type { CustomWindingOperator, WindingOperator } from "./winding.js";
+import { PathOverlayState2 } from "../internal/path-overlay.ts";
+import { PathSweepEvent2, createSweepEventQueue } from "../internal/path-sweep.ts";
+import { Bezier1Curve2, type ReadonlyBezierCurve2 } from "../primitives/bezier.ts";
+import type { ReadonlyEdge2 } from "../primitives/edge.ts";
+import { ArrayMultiSet, arrayEquals } from "../utility/array.ts";
+import { assertDebug, log } from "../utility/debug.ts";
+import { MeshChain2, MeshEdge2, type Mesh2 } from "./mesh.ts";
+import { ApproximationMode, PATH_CLIP_OPTIONS_DEFAULT, type PathQualityOptions } from "./path-options.ts";
+import type { Path2 } from "./path.ts";
+import { SnapRound2, type EdgeSegmentRef2 } from "./snapround.ts";
+import type { CustomWindingOperator, WindingOperator } from "./winding.ts";
 
 export type PathOverlayData2 = {
     tag: number[];

@@ -1,5 +1,5 @@
-import { assertUnreachable, throwError } from "../utility/debug.js";
-import type { Constructor } from "../utility/types.js";
+import { assertUnreachable, throwError } from "../utility/debug.ts";
+import type { Constructor } from "../utility/types.ts";
 
 export type ClassObjectMapping<T> = {
     type: "Class";

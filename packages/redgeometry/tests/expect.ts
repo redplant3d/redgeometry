@@ -1,7 +1,7 @@
 import { expect } from "vitest";
-import type { ReadonlyQuaternion, ReadonlyVector2, ReadonlyVector3 } from "../src/index.js";
-import { meshValidate, type Mesh2 } from "../src/internal/mesh-next.js";
-import type { ReadonlyComplex } from "../src/primitives/complex.js";
+import type { ReadonlyQuaternion, ReadonlyVector2, ReadonlyVector3 } from "../src/index.ts";
+import { meshValidate, type Mesh2 } from "../src/internal/mesh-next.ts";
+import type { ReadonlyComplex } from "../src/primitives/complex.ts";
 
 export function expectToBeCloseVector2(p1: ReadonlyVector2, p2: ReadonlyVector2, numDigits?: number): void {
     expect(p1.x).toBeCloseTo(p2.x, numDigits ?? 15);

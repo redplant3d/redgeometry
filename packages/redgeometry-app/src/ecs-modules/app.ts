@@ -1,7 +1,7 @@
-import type { DefaultSystemStage, DefaultWorldScheduleId, WorldModule } from "../ecs/types.js";
-import type { World } from "../ecs/world.js";
-import { createRandomSeed } from "../utility/helper.js";
-import { AppContextModule } from "./app-context.js";
+import type { DefaultSystemStage, DefaultWorldScheduleId, WorldModule } from "../ecs/types.ts";
+import type { World } from "../ecs/world.ts";
+import { createRandomSeed } from "../utility/helper.ts";
+import { AppContextModule } from "./app-context.ts";
 import {
     AppInputModule,
     ButtonInputElement,
@@ -9,10 +9,10 @@ import {
     TextBoxInputElement,
     startInputElementsSystem,
     type AppInputData,
-} from "./app-input.js";
-import type { AppLauncherData } from "./app-launcher.js";
-import { InputModule, type InputInitData } from "./input.js";
-import { TimeModule, type AnimationFrameEvent } from "./time.js";
+} from "./app-input.ts";
+import type { AppLauncherData } from "./app-launcher.ts";
+import { InputModule, type InputInitData } from "./input.ts";
+import { TimeModule, type AnimationFrameEvent } from "./time.ts";
 
 export type AppMainData = {
     dataId: "app-main";
