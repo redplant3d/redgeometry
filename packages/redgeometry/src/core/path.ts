@@ -8,6 +8,7 @@ import {
     type ReadonlyBezierCurve2,
 } from "../primitives/bezier.js";
 import { MinMaxBox2 } from "../primitives/box.js";
+import { Complex } from "../primitives/complex.js";
 import { Matrix3A, type ReadonlyMatrix3, type ReadonlyMatrix3A } from "../primitives/matrix.js";
 import { Vector2, type ReadonlyVector2, type Vector2Like } from "../primitives/vector.js";
 import { copyArray, copyArrayReversed } from "../utility/array.js";
@@ -213,10 +214,9 @@ export class Path2 implements PathSink2 {
             a %= 2 * Math.PI;
         }
 
-        let sin = Math.sin(startAngle);
-        let cos = Math.cos(startAngle);
+        const z0 = Complex.fromRotationAngle(startAngle);
 
-        const mat = Matrix3A.fromRotation(cos, sin);
+        const mat = Matrix3A.fromRotation(z0.a, z0.b);
 
         mat.setScale(mat, rx, ry);
         mat.setTranslate(mat, pc.x, pc.y);
@@ -228,8 +228,9 @@ export class Path2 implements PathSink2 {
 
         a = Math.abs(a);
 
-        sin = Math.sin(a);
-        cos = Math.cos(a);
+        // TODO: Is there a better solution?
+        const sin = Math.sin(a);
+        let cos = Math.cos(a);
 
         let v1 = new Vector2(1, 0);
         let vc = new Vector2(1, 1);
@@ -543,11 +544,10 @@ export class Path2 implements PathSink2 {
         }
 
         // Calculate sin/cos for reuse
-        let sin = Math.sin(xAxisRotation);
-        let cos = Math.cos(xAxisRotation);
+        const z0 = Complex.fromRotationAngle(xAxisRotation);
 
         // Inverse rotation to align the ellipse
-        const mat = Matrix3A.fromRotation(cos, -sin);
+        const mat = Matrix3A.fromRotation(z0.a, -z0.b);
 
         // Vector from center (transformed midpoint)
         let v = p0.sub(p1).mulS(0.5);
@@ -600,19 +600,22 @@ export class Path2 implements PathSink2 {
         let v1 = pp0.sub(pc);
         let v2 = pp1.sub(pc);
 
+        // TODO: Is there a better solution?
+        const z1 = Complex.fromRotationBetween(Vector2.UNIT_X, v1);
+
         // Set up the final transformation matrix
-        mat.setFromRotation(v1.x, v1.y);
+        mat.setFromRotation(z1.a, z1.b);
         mat.setTranslate(mat, pc.x, pc.y);
         mat.setScale(mat, sx, sy);
-        mat.setRotate(mat, cos, sin);
+        mat.setRotate(mat, z0.a, z0.b);
 
         // We have `sin = v1.cross(v2) / (v1.length * v2.length)`
         // with the length of `v1` and `v2` both 1 (unit vectors)
-        sin = v1.cross(v2);
+        const sin = v1.cross(v2);
 
         // Accordingly `cos = v1.dot(v2) / (v1.length * v2.length)`
         // to get the angle between `v1` and `v2`
-        cos = v1.dot(v2);
+        let cos = v1.dot(v2);
 
         // So the sweep angle is `atan2(y, x) = atan2(sin, cos)`
         // https://stackoverflow.com/a/16544330
