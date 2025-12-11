@@ -27,6 +27,6 @@
         "node": ">=14.17"
     },
     "scripts": {
-        "build": "vite-node ./scripts/build.ts"
+        "build": "node ./scripts/build.ts"
     }
 }
