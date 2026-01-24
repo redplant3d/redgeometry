@@ -43,7 +43,7 @@ export const ComponentFlags = {
     UPDATED: 4,
     DELETED: 8,
     ALL: 15,
-};
+} as const;
 export type ComponentFlags = number;
 
 export const EntityFlags = {
@@ -52,7 +52,7 @@ export const EntityFlags = {
     CREATED: 2,
     DESTROYED: 4,
     ALL: 7,
-};
+} as const;
 export type EntityFlags = number;
 
 export const WORLD_SCHEDULE_OPTIONS_DEFAULT: WorldScheduleOptions<DefaultWorldScheduleId, DefaultSystemStage>[] = [
