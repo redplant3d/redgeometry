@@ -7,7 +7,7 @@ import {
     mesh2MergeEdgeAt,
     mesh2RemoveEdge,
     mesh2RemoveShell,
-    mesh2RemoveVertex,
+    mesh2RemoveVertexAndEdges,
     mesh2SplitEdgeAt,
     MeshEdges,
     MeshFaces,
@@ -497,7 +497,7 @@ test("Mesh2 - addVertexFaceShell/removeShell", () => {
     expectNoMesh2Errors(mesh);
 });
 
-test("Mesh2 - addVertex/removeVertex (Points)", () => {
+test("Mesh2 - addVertex/removeVertexAndEdges (Points)", () => {
     const mesh0 = Mesh.createEmpty<unknown, unknown, unknown, unknown, ReadonlyVector2>();
     const vfs1 = mesh2AddVertexFaceShell(mesh0, new Vector2(100, 100));
     const vtx2 = mesh2AddVertex(mesh0, new Vector2(400, 400), vfs1.face);
@@ -506,14 +506,14 @@ test("Mesh2 - addVertex/removeVertex (Points)", () => {
     const mesh1 = mesh0.clone();
     const mesh2 = mesh0.clone();
 
-    mesh2RemoveVertex(mesh1, vfs1.vertex);
+    mesh2RemoveVertexAndEdges(mesh1, vfs1.vertex);
     expectNoMesh2Errors(mesh1);
 
-    mesh2RemoveVertex(mesh2, vtx2);
+    mesh2RemoveVertexAndEdges(mesh2, vtx2);
     expectNoMesh2Errors(mesh2);
 });
 
-test("Mesh2 - addVertex/removeVertex (Line)", () => {
+test("Mesh2 - addVertex/removeVertexAndEdges (Line)", () => {
     const mesh0 = Mesh.createEmpty<unknown, unknown, unknown, unknown, ReadonlyVector2>();
     const vfs1 = mesh2AddVertexFaceShell(mesh0, new Vector2(100, 100));
     const vtx2 = mesh2AddVertex(mesh0, new Vector2(400, 400), vfs1.face);
@@ -523,14 +523,14 @@ test("Mesh2 - addVertex/removeVertex (Line)", () => {
     const mesh1 = mesh0.clone();
     const mesh2 = mesh0.clone();
 
-    mesh2RemoveVertex(mesh1, vfs1.vertex);
+    mesh2RemoveVertexAndEdges(mesh1, vfs1.vertex);
     expectNoMesh2Errors(mesh1);
 
-    mesh2RemoveVertex(mesh2, vtx2);
+    mesh2RemoveVertexAndEdges(mesh2, vtx2);
     expectNoMesh2Errors(mesh2);
 });
 
-test("Mesh2 - addVertex/removeVertex (Trident)", () => {
+test("Mesh2 - addVertex/removeVertexAndEdges (Trident)", () => {
     const mesh0 = Mesh.createEmpty<unknown, unknown, unknown, unknown, ReadonlyVector2>();
     const vfs1 = mesh2AddVertexFaceShell(mesh0, new Vector2(100, 100));
     const vtx2 = mesh2AddVertex(mesh0, new Vector2(400, 100), vfs1.face);
@@ -545,17 +545,17 @@ test("Mesh2 - addVertex/removeVertex (Trident)", () => {
     const mesh2 = mesh0.clone();
     const mesh3 = mesh0.clone();
 
-    mesh2RemoveVertex(mesh1, vfs1.vertex);
+    mesh2RemoveVertexAndEdges(mesh1, vfs1.vertex);
     expectNoMesh2Errors(mesh1);
 
-    mesh2RemoveVertex(mesh2, vtx2);
+    mesh2RemoveVertexAndEdges(mesh2, vtx2);
     expectNoMesh2Errors(mesh2);
 
-    mesh2RemoveVertex(mesh3, vtx3);
+    mesh2RemoveVertexAndEdges(mesh3, vtx3);
     expectNoMesh2Errors(mesh3);
 });
 
-test("Mesh2 - addVertex/removeVertex (Triangle)", () => {
+test("Mesh2 - addVertex/removeVertexAndEdges (Triangle)", () => {
     const mesh0 = Mesh.createEmpty<unknown, unknown, unknown, unknown, ReadonlyVector2>();
     const vfs1 = mesh2AddVertexFaceShell(mesh0, new Vector2(100, 100));
     const vtx2 = mesh2AddVertex(mesh0, new Vector2(400, 100), vfs1.face);
@@ -569,13 +569,13 @@ test("Mesh2 - addVertex/removeVertex (Triangle)", () => {
     const mesh2 = mesh0.clone();
     const mesh3 = mesh0.clone();
 
-    mesh2RemoveVertex(mesh1, vfs1.vertex);
+    mesh2RemoveVertexAndEdges(mesh1, vfs1.vertex);
     expectNoMesh2Errors(mesh1);
 
-    mesh2RemoveVertex(mesh2, vtx2);
+    mesh2RemoveVertexAndEdges(mesh2, vtx2);
     expectNoMesh2Errors(mesh2);
 
-    mesh2RemoveVertex(mesh3, vtx3);
+    mesh2RemoveVertexAndEdges(mesh3, vtx3);
     expectNoMesh2Errors(mesh2);
 });
 

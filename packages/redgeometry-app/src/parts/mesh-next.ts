@@ -8,12 +8,11 @@ import {
     mesh2FindClosestLinkAt,
     mesh2FindClosestVertexAt,
     mesh2FindFaceAt,
-    mesh2IsLastVertex,
     mesh2MergeEdgeAt,
     mesh2MergeLink,
     mesh2RemoveEdge,
     mesh2RemoveShell,
-    mesh2RemoveVertex,
+    mesh2RemoveVertexAndEdges,
     mesh2SplitEdgeAt,
     mesh2SplitLink,
     meshPrint,
@@ -132,15 +131,14 @@ function updateSystem(world: World): void {
     if (keyboardPlugin.isPressed(KeyboardButtons.KEY_Q)) {
         const vtx = mesh2FindClosestVertexAt(mesh, pos);
         if (shell !== undefined && vtx !== undefined && isVertexClose(mesh, vtx, pos, 10)) {
-            if (mesh2IsLastVertex(mesh, vtx)) {
-                mesh2RemoveShell(mesh, shell);
+            mesh2RemoveVertexAndEdges(mesh, vtx);
+
+            if (!mesh.shells.isValid(shell)) {
                 mesh.truncate();
                 remoteData.meshShell = undefined;
                 log.info("Truncating mesh");
-            } else {
-                const face = mesh.shells.getFirstFace(shell);
-                mesh2RemoveVertex(mesh, vtx, face);
             }
+
             remoteData.vtxFrom = undefined;
             remoteData.needsValidate = true;
         }

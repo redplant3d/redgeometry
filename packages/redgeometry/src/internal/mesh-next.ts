@@ -2269,8 +2269,10 @@ export function mesh2AddEdge<S, F, E, V>(
 
         if (area < 0) {
             mesh.makeEdgeFace(link1, link2, newEdge1, newEdge2, newFace);
+            mesh2UpdateInnerLoops(mesh, link1, link2);
         } else {
             mesh.makeEdgeFace(link2, link1, newEdge2, newEdge1, newFace);
+            mesh2UpdateInnerLoops(mesh, link2, link1);
         }
     } else {
         mesh.makeEdgeKillLoop(link1, link2, newEdge1, newEdge2);
@@ -2316,6 +2318,7 @@ export function mesh2FindClosestEdgeAt<S, F, E, V>(
     mesh: Mesh2<S, F, E, V>,
     p: ReadonlyVector2,
 ): MeshEdgeIdx | undefined {
+    // TODO: Better way to get consistent results?
     let minD = Number.POSITIVE_INFINITY;
     let minEdge = undefined;
 
@@ -2330,6 +2333,47 @@ export function mesh2FindClosestEdgeAt<S, F, E, V>(
 
         const p0 = mesh.vertices.getPos(vtx0);
         const p1 = mesh.vertices.getPos(vtx1);
+
+        if (Vector2.signedArea(p0, p1, p) < 0) {
+            // Edge has wrong direction
+            continue;
+        }
+
+        const e = new Edge2(p0, p1);
+        const d = e.closestPointDistance(p);
+
+        if (d < minD) {
+            minD = d;
+            minEdge = edge;
+        }
+    }
+
+    return minEdge;
+}
+
+export function mesh2FindClosestEdgeOriented<S, F, E, V>(
+    mesh: Mesh2<S, F, E, V>,
+    p: ReadonlyVector2,
+): MeshEdgeIdx | undefined {
+    let minD = Number.POSITIVE_INFINITY;
+    let minEdge = undefined;
+
+    const iter = mesh.edges.createIterator();
+
+    while (iter.next()) {
+        const edge = iter.getIndex();
+        const link = mesh.edges.getLink(edge);
+
+        const vtx0 = mesh.links.getVertex(link);
+        const vtx1 = mesh.links.getVertexSym(link);
+
+        const p0 = mesh.vertices.getPos(vtx0);
+        const p1 = mesh.vertices.getPos(vtx1);
+
+        if (p0.x !== p1.x ? p0.x < p1.x : p0.y < p1.y) {
+            // Edge has wrong orientation
+            continue;
+        }
 
         const e = new Edge2(p0, p1);
         const d = e.closestPointDistance(p);
@@ -2346,7 +2390,7 @@ export function mesh2FindClosestEdgeAt<S, F, E, V>(
 export function mesh2FindClosestEdgeAtExcept<S, F, E, V>(
     mesh: Mesh2<S, F, E, V>,
     p: ReadonlyVector2,
-    except: MeshVertexIdx,
+    except: ReadonlyArray<MeshVertexIdx>,
 ): MeshEdgeIdx | undefined {
     let minD = Number.POSITIVE_INFINITY;
     let minEdge = undefined;
@@ -2360,12 +2404,17 @@ export function mesh2FindClosestEdgeAtExcept<S, F, E, V>(
         const vtx0 = mesh.links.getVertex(link);
         const vtx1 = mesh.links.getVertexSym(link);
 
-        if (vtx0 === except || vtx1 === except) {
+        if (except.includes(vtx0) || except.includes(vtx1)) {
             continue;
         }
 
         const p0 = mesh.vertices.getPos(vtx0);
         const p1 = mesh.vertices.getPos(vtx1);
+
+        if (Vector2.signedArea(p0, p1, p) < 0) {
+            // Edge has wrong direction
+            continue;
+        }
 
         const e = new Edge2(p0, p1);
         const d = e.closestPointDistance(p);
@@ -2440,7 +2489,7 @@ export function mesh2FindClosestVertexAt<S, F, E, V>(
 export function mesh2FindClosestVertexAtExcept<S, F, E, V>(
     mesh: Mesh2<S, F, E, V>,
     p: ReadonlyVector2,
-    except: MeshVertexIdx,
+    except: ReadonlyArray<MeshVertexIdx>,
 ): MeshVertexIdx | undefined {
     let minD = Number.POSITIVE_INFINITY;
     let minVtx = undefined;
@@ -2450,7 +2499,7 @@ export function mesh2FindClosestVertexAtExcept<S, F, E, V>(
     while (iter.next()) {
         const vtx = iter.getIndex();
 
-        if (vtx === except) {
+        if (except.includes(vtx)) {
             continue;
         }
 
@@ -2468,36 +2517,37 @@ export function mesh2FindClosestVertexAtExcept<S, F, E, V>(
 
 export function mesh2FindFaceAt<S, F, E, V>(
     mesh: Mesh2<S, F, E, V>,
-    p: ReadonlyVector2,
+    position: ReadonlyVector2,
     windingOperator: WindingOperator | CustomWindingOperator,
 ): MeshFaceIdx | undefined {
-    const iterLoops = mesh.loops.createIterator();
+    // TODO: Find loops instead?
+    const iterFace = mesh.faces.createIterator();
+    const iterLoopsNext = mesh.loops.createIteratorNext(-1);
     const iterLinksLnext = mesh.links.createIteratorLnext(-1);
 
-    while (iterLoops.next()) {
-        const loop = iterLoops.getIndex();
-        const loopFirstLink = mesh.loops.getFirstLink(loop);
-
+    while (iterFace.next()) {
         let wind = 0;
 
-        iterLinksLnext.reset(loopFirstLink);
+        const face = iterFace.getIndex();
+        const firstLoop = mesh.faces.getFirstLoop(face);
 
-        while (iterLinksLnext.next()) {
-            const link = iterLinksLnext.getIndex();
+        iterLoopsNext.reset(firstLoop);
 
-            const vtx0 = mesh.links.getVertex(link);
-            const vtx1 = mesh.links.getVertexSym(link);
+        while (iterLoopsNext.next()) {
+            const loop = iterLoopsNext.getIndex();
+            const firstLink = mesh.loops.getFirstLink(loop);
 
-            const p0 = mesh.vertices.getPos(vtx0);
-            const p1 = mesh.vertices.getPos(vtx1);
+            iterLinksLnext.reset(firstLink);
 
-            const c = new Bezier1Curve2(p0, p1);
+            while (iterLinksLnext.next()) {
+                const link = iterLinksLnext.getIndex();
 
-            wind += c.windingAt(p);
+                wind += mesh2GetLinkWinding(mesh, link, position);
+            }
         }
 
         if (isWindingInside(wind, windingOperator)) {
-            return mesh.loops.getFace(loop);
+            return face;
         }
     }
 
@@ -2530,6 +2580,25 @@ export function mesh2GetBounds<S, F, E, V>(mesh: Mesh2<S, F, E, V>): MinMaxBox2 
     }
 
     return box;
+}
+
+export function mesh2ClosestPointOnEdge<S, F, E, V>(
+    mesh: Mesh2<S, F, E, V>,
+    edge: MeshEdgeIdx,
+    p: ReadonlyVector2,
+): Vector2 {
+    const link = mesh.edges.getLink(edge);
+    const linkSym = mesh.links.getSym(link);
+
+    const vtx = mesh.links.getVertex(link);
+    const vtxSym = mesh.links.getVertex(linkSym);
+
+    const p0 = mesh.vertices.getPos(vtx);
+    const p1 = mesh.vertices.getPos(vtxSym);
+
+    const e = new Edge2(p0, p1);
+
+    return e.closestPoint(p);
 }
 
 export function mesh2GetConnectingLink<S, F, E, V>(
@@ -2610,7 +2679,38 @@ export function mesh2GetFacingLink<S, F, E, V>(
 }
 
 /**
- * Returns `true` if `vtx` is the last vertex in it shell.
+ * Return the winding number of `link` from `position`.
+ *
+ * Note: Links with the same loop on each side return `0`.
+ */
+export function mesh2GetLinkWinding<S, F, E, V>(
+    mesh: Mesh2<S, F, E, V>,
+    link: MeshLinkIdx,
+    position: ReadonlyVector2,
+): number {
+    const linkSym = mesh.links.getSym(link);
+
+    const loop = mesh.links.getLoop(link);
+    const loopSym = mesh.links.getLoop(linkSym);
+
+    if (loop === loopSym) {
+        // Edge does not contribute to winding
+        return 0;
+    }
+
+    const vtx = mesh.links.getVertex(link);
+    const vtxSym = mesh.links.getVertex(linkSym);
+
+    const pos = mesh.vertices.getPos(vtx);
+    const posSym = mesh.vertices.getPos(vtxSym);
+
+    const c = new Bezier1Curve2(pos, posSym);
+
+    return c.windingAt(position);
+}
+
+/**
+ * Returns `true` if `vtx` is the last vertex in its shell.
  */
 export function mesh2IsLastVertex<S, F, E, V>(mesh: Mesh2<S, F, E, V>, vtx: MeshVertexIdx): boolean {
     const link = mesh.vertices.getFirstLink(vtx);
@@ -2635,11 +2735,44 @@ export function mesh2IsLastVertex<S, F, E, V>(mesh: Mesh2<S, F, E, V>, vtx: Mesh
     return true;
 }
 
-export function mesh2MergeEdgeAt<S, F, E, V>(
+/**
+ * Returns `true` if every vertex position of `innerLoop` is fully inside `outerLoop`.
+ */
+export function mesh2IsLoopInside<S, F, E, V>(
     mesh: Mesh2<S, F, E, V>,
-    vertex: MeshVertexIdx,
-    edgeToKeep: MaybeMeshEdgeIdx,
+    innerLoop: MeshLoopIdx,
+    outerLoop: MeshLoopIdx,
+    windingOperator: WindingOperator | CustomWindingOperator,
 ): boolean {
+    const innerFirstLink = mesh.loops.getFirstLink(innerLoop);
+    const outerFirstLink = mesh.loops.getFirstLink(outerLoop);
+
+    let currInnerLink = innerFirstLink;
+
+    do {
+        const innerVtx = mesh.links.getVertex(currInnerLink);
+        const innerPos = mesh.vertices.getPos(innerVtx);
+
+        let currOuterLink = outerFirstLink;
+        let wind = 0;
+
+        do {
+            wind += mesh2GetLinkWinding(mesh, currOuterLink, innerPos);
+
+            currOuterLink = mesh.links.getLnext(currOuterLink);
+        } while (currOuterLink !== outerFirstLink);
+
+        if (!isWindingInside(wind, windingOperator)) {
+            return false;
+        }
+
+        currInnerLink = mesh.links.getLnext(currInnerLink);
+    } while (currInnerLink !== innerFirstLink);
+
+    return true;
+}
+
+export function mesh2IsMergableVertex<S, F, E, V>(mesh: Mesh2<S, F, E, V>, vertex: MeshVertexIdx): boolean {
     const linkSym = mesh.vertices.getFirstLink(vertex);
     const linkOnextSym = mesh.links.getOnext(linkSym);
     const linkOnextOnextSym = mesh.links.getOnext(linkOnextSym);
@@ -2659,6 +2792,24 @@ export function mesh2MergeEdgeAt<S, F, E, V>(
         // Must not merge to same origin
         return false;
     }
+
+    return true;
+}
+
+export function mesh2MergeEdgeAt<S, F, E, V>(
+    mesh: Mesh2<S, F, E, V>,
+    vertex: MeshVertexIdx,
+    edgeToKeep: MaybeMeshEdgeIdx,
+): boolean {
+    if (!mesh2IsMergableVertex(mesh, vertex)) {
+        return false;
+    }
+
+    const linkSym = mesh.vertices.getFirstLink(vertex);
+    const linkOnextSym = mesh.links.getOnext(linkSym);
+
+    const link = mesh.links.getSym(linkSym);
+    const linkOnext = mesh.links.getSym(linkOnextSym);
 
     const edge = mesh.links.getEdge(link);
     const edgeSym = mesh.links.getEdge(linkSym);
@@ -2763,8 +2914,10 @@ export function mesh2MergeLink<S, F, E, V>(
 
         if (area < 0) {
             mesh.makeEdgeFace(link1, link2, edge, edgeSym, newFace);
+            mesh2UpdateInnerLoops(mesh, link1, link2);
         } else {
             mesh.makeEdgeFace(link2, link1, edgeSym, edge, newFace);
+            mesh2UpdateInnerLoops(mesh, link2, link1);
         }
     } else {
         mesh.makeEdgeKillLoop(link1, link2, edge, edgeSym);
@@ -2886,18 +3039,45 @@ export function mesh2RemoveShell<S, F, E, V>(mesh: Mesh2<S, F, E, V>, shell: Mes
 }
 
 /**
- * Removes `vtx` from the mesh while preserving `faceToKeep`.
+ * Removes `vertex` from the mesh.
+ *
+ * The shell and face are also removed if `vertex` is the last one in the mesh.
+ */
+export function mesh2RemoveVertex<S, F, E, V>(mesh: Mesh2<S, F, E, V>, vertex: MeshVertexIdx): void {
+    const link = mesh.vertices.getFirstLink(vertex);
+
+    const edge = mesh.links.getEdge(link);
+    assertDebug(edge === -1, "Vertex must have no edges");
+
+    const loop = mesh.links.getLoop(link);
+    const face = mesh.loops.getFace(loop);
+
+    if (mesh2IsLastVertex(mesh, vertex)) {
+        const shell = mesh.faces.getShell(face);
+        mesh.killVertexFaceShell(vertex, face, shell);
+
+        mesh.shells.destroy(shell);
+        mesh.faces.destroy(face);
+    } else {
+        mesh.killVertex(vertex, face);
+    }
+
+    mesh.vertices.destroy(vertex);
+}
+
+/**
+ * Removes `vertex` from the mesh while preserving `faceToKeep`.
  *
  * If edges are removed and `faceToKeep` is a valid face of either side of
  * its edge, the other face will be removed instead of `faceToKeep`.
  */
-export function mesh2RemoveVertex<S, F, E, V>(
+export function mesh2RemoveVertexAndEdges<S, F, E, V>(
     mesh: Mesh2<S, F, E, V>,
-    vtx: MeshVertexIdx,
+    vertex: MeshVertexIdx,
     faceToKeep: MaybeMeshFaceIdx = -1,
 ): void {
     // Gradually remove edges around the vertex
-    let curr = mesh.vertices.getFirstLink(vtx);
+    let curr = mesh.vertices.getFirstLink(vertex);
     let currEdge = mesh.links.getEdge(curr);
 
     while (currEdge !== -1) {
@@ -2911,11 +3091,7 @@ export function mesh2RemoveVertex<S, F, E, V>(
     }
 
     // Finally, remove the vertex
-    const loop = mesh.links.getLoop(curr);
-    const face = mesh.loops.getFace(loop);
-
-    mesh.killVertex(vtx, face);
-    mesh.vertices.destroy(vtx);
+    mesh2RemoveVertex(mesh, vertex);
 }
 
 export function mesh2SplitEdgeAt<S, F, E, V>(
@@ -2989,6 +3165,37 @@ export function mesh2SplitLink<S, F, E, V>(
     mesh.makeEdgeKillLoop(link1, link2, edge, edgeSym);
 
     return newVertex;
+}
+
+/**
+ * Checks if loops from the face of `outerLink` are inside of the loop
+ * of `innerLink` and moves them to the face of `innerLink`.
+ */
+export function mesh2UpdateInnerLoops<S, F, E, V>(
+    mesh: Mesh2<S, F, E, V>,
+    outerLink: MeshLinkIdx,
+    innerLink: MeshLinkIdx,
+): void {
+    // The face of the outer loop contains all loops that need to be checked
+    const outerLoop = mesh.links.getLoop(outerLink);
+
+    // The inner face is the new face
+    const innerLoop = mesh.links.getLoop(innerLink);
+    const innerFace = mesh.loops.getFace(innerLoop);
+
+    // Skip `outerLoop` because its equivalent to `innerLoop` (but inverted)
+    let currLoop = mesh.loops.getNext(outerLoop);
+
+    do {
+        // Assign the next loop before the current loop is potentially moved to another face
+        const nextLoop = mesh.loops.getNext(currLoop);
+
+        if (mesh2IsLoopInside(mesh, currLoop, innerLoop, WindingOperator.POSITIVE)) {
+            mesh2MoveLoopToFace(mesh, currLoop, innerFace);
+        }
+
+        currLoop = nextLoop;
+    } while (currLoop !== outerLoop);
 }
 
 export function mesh2WriteFaceToPath<S, F, E, V>(mesh: Mesh2<S, F, E, V>, idx: MeshFaceIdx, outPath: Path2): void {
