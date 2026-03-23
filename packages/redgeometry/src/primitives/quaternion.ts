@@ -1,6 +1,6 @@
 import { COS_ACUTE, COS_OBTUSE } from "../core/consts.ts";
 import { assertUnreachable } from "../utility/debug.ts";
-import { eqApproxAbs, eqApproxRel, lerp } from "../utility/scalar.ts";
+import { clamp, eqApproxAbs, eqApproxRel, lerp } from "../utility/scalar.ts";
 import type { Enum } from "../utility/types.ts";
 import { Vector3, type ReadonlyVector3 } from "./vector.ts";
 
@@ -378,7 +378,7 @@ export class Quaternion implements ReadonlyQuaternion {
             case 0 /* XYZ */: {
                 return {
                     x: Math.atan2(qab2 - qcd2, qaa - qbb - qcc + qdd),
-                    y: Math.asin(qbd2 + qac2),
+                    y: Math.asin(clamp(qbd2 + qac2, -1, 1)),
                     z: Math.atan2(qad2 - qbc2, qaa + qbb - qcc - qdd),
                 };
             }
@@ -386,12 +386,12 @@ export class Quaternion implements ReadonlyQuaternion {
                 return {
                     x: Math.atan2(qcd2 + qab2, qaa - qbb + qcc - qdd),
                     y: Math.atan2(qbd2 + qac2, qaa + qbb - qcc - qdd),
-                    z: Math.asin(qad2 - qbc2),
+                    z: Math.asin(clamp(qad2 - qbc2, -1, 1)),
                 };
             }
             case 2 /* YXZ */: {
                 return {
-                    x: Math.asin(qab2 - qcd2),
+                    x: Math.asin(clamp(qab2 - qcd2, -1, 1)),
                     y: Math.atan2(qbd2 + qac2, qaa - qbb - qcc + qdd),
                     z: Math.atan2(qbc2 + qad2, qaa - qbb + qcc - qdd),
                 };
@@ -400,12 +400,12 @@ export class Quaternion implements ReadonlyQuaternion {
                 return {
                     x: Math.atan2(qab2 - qcd2, qaa - qbb + qcc - qdd),
                     y: Math.atan2(qac2 - qbd2, qaa + qbb - qcc - qdd),
-                    z: Math.asin(qbc2 + qad2),
+                    z: Math.asin(clamp(qbc2 + qad2, -1, 1)),
                 };
             }
             case 4 /* ZXY */: {
                 return {
-                    x: Math.asin(qcd2 + qab2),
+                    x: Math.asin(clamp(qcd2 + qab2, -1, 1)),
                     y: Math.atan2(qac2 - qbd2, qaa - qbb - qcc + qdd),
                     z: Math.atan2(qad2 - qbc2, qaa - qbb + qcc - qdd),
                 };
@@ -413,7 +413,7 @@ export class Quaternion implements ReadonlyQuaternion {
             case 5 /* ZYX */: {
                 return {
                     x: Math.atan2(qcd2 + qab2, qaa - qbb - qcc + qdd),
-                    y: Math.asin(qac2 - qbd2),
+                    y: Math.asin(clamp(qac2 - qbd2, -1, 1)),
                     z: Math.atan2(qbc2 + qad2, qaa + qbb - qcc - qdd),
                 };
             }
