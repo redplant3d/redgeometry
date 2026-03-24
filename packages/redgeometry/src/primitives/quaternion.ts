@@ -726,7 +726,7 @@ export class Quaternion implements ReadonlyQuaternion {
         this.set(qa, qb, qc, qd);
     }
 
-    public setMulS(q: ReadonlyQuaternion, s: number): void {
+    public setMulS(s: number, q: ReadonlyQuaternion): void {
         this.a = s * q.a;
         this.b = s * q.b;
         this.c = s * q.c;

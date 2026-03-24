@@ -316,7 +316,7 @@ export class Complex implements ReadonlyComplex {
         this.set(za, zb);
     }
 
-    public setMulS(z: ReadonlyComplex, s: number): void {
+    public setMulS(s: number, z: ReadonlyComplex): void {
         this.a = s * z.a;
         this.b = s * z.b;
     }
