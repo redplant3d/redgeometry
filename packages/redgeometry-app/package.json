@@ -6,7 +6,7 @@
         "redgeometry": "workspace:*"
     },
     "scripts": {
-        "build": "node ./scripts/build.ts",
-        "serve": "node ./scripts/serve.ts"
+        "build": "vite build",
+        "serve": "vite serve"
     }
 }
