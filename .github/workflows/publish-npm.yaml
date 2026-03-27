@@ -3,6 +3,8 @@ on:
     push:
         branches:
             - release
+permissions:
+    id-token: write
 jobs:
     publish-npm:
         runs-on: ubuntu-latest
@@ -29,5 +31,3 @@ jobs:
               run: pnpm --filter redgeometry run build
             - name: Publish
               run: pnpm publish ./packages/redgeometry --no-git-checks
-              env:
-                  NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
