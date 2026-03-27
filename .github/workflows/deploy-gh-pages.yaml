@@ -3,6 +3,7 @@ on:
     push:
         branches:
             - release
+            - develop
 jobs:
     deploy-gh-pages:
         runs-on: ubuntu-latest
