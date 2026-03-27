@@ -12,6 +12,7 @@ export default tseslint.config({
     },
     rules: {
         eqeqeq: "error",
+        "no-useless-assignment": "off",
         "@typescript-eslint/no-explicit-any": [
             "error",
             {
