@@ -5,6 +5,9 @@ const config: UserConfigExport = (env: ConfigEnv) => ({
     define: {
         REDGEOMETRY_DEBUG: env.mode === "development",
     },
+    server: {
+        host: true,
+    },
 });
 
 export default config;
