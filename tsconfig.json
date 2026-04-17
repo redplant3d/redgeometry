@@ -2,15 +2,12 @@
     "compilerOptions": {
         "declaration": true,
         "erasableSyntaxOnly": true,
-        "esModuleInterop": true,
         "isolatedDeclarations": true,
         "isolatedModules": true,
         "module": "nodenext",
         "moduleResolution": "nodenext",
         "noEmit": true,
         "rewriteRelativeImportExtensions": true,
-        "strict": true,
-        "target": "esnext",
         "verbatimModuleSyntax": true
     }
 }
