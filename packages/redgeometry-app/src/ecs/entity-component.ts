@@ -164,11 +164,12 @@ export class EntityComponentStorage {
 
     public getEntityFlags(entityId: EntityId): EntityFlags {
         const entityRef = this.entities.getRefOrError(entityId);
-        const currSet = this.getComponentSet(entityRef);
 
         if (entityRef < 0) {
             return EntityFlags.NONE;
         }
+
+        const currSet = this.getComponentSet(entityRef);
 
         return currSet.state.getEntityFlags();
     }
