@@ -929,35 +929,21 @@ export class Vector3 implements ReadonlyVector3 {
     }
 
     /**
-     * Returns a vector that is perpendicular to the current vector and an appropriate axis.
+     * Returns any vector that is perpendicular to the current vector.
      *
-     * The result is defined by the cross product:
-     * - `(x, y, z) cross (1, 0, 0) == (0, z, -y)` if x is the absolute minimum
-     * - `(x, y, z) cross (0, 1, 0) == (-z, 0, x)` if y is the absolute minimum
-     * - `(x, y, z) cross (0, 0, 1) == (y, -x, 0)` if z is the absolute minimum
+     * References:
+     * - John F. Hughes, Tomas Moller.
+     *   *Building an Orthonormal Basis from a Unit Vector*.
+     *   Journal of Graphics Tools, Volume 4, 1999 - Issue 4.
      */
     public perpAny(): Vector3 {
         const absX = Math.abs(this.x);
-        const absY = Math.abs(this.y);
         const absZ = Math.abs(this.z);
 
-        // Use the two biggest absolute values
-        if (absX <= absY) {
-            if (absX <= absZ) {
-                // `(x, y, z) cross (1, 0, 0) == (0, z, -y)`
-                return new Vector3(0, this.z, -this.y);
-            } else {
-                // `(x, y, z) cross (0, 0, 1) == (y, -x, 0)`
-                return new Vector3(this.y, -this.x, 0);
-            }
+        if (absX > absZ) {
+            return new Vector3(-this.y, this.x, 0);
         } else {
-            if (absY <= absZ) {
-                // `(x, y, z) cross (0, 1, 0) == (-z, 0, x)`
-                return new Vector3(-this.z, 0, this.x);
-            } else {
-                // `(x, y, z) cross (0, 0, 1) == (y, -x, 0)`
-                return new Vector3(this.y, -this.x, 0);
-            }
+            return new Vector3(0, -this.z, this.y);
         }
     }
 
