@@ -54,6 +54,8 @@ export interface ReadonlyVector2 {
     nlerp(v: ReadonlyVector2, t: number): Vector2;
     perp(): Vector2;
     polarAngle(): number;
+    project(v: ReadonlyVector2): Vector2;
+    reject(v: ReadonlyVector2): Vector2;
     round(): Vector2;
     roundToPrecision(k: number): Vector2;
     slerp(v: ReadonlyVector2, t: number): Vector2;
@@ -102,6 +104,8 @@ export interface ReadonlyVector3 {
     nlerp(v: ReadonlyVector3, t: number): Vector3;
     orthonormalBasis(): { v1: Vector3; v2: Vector3; v3: Vector3 };
     perpAny(): Vector3;
+    project(v: ReadonlyVector3): Vector3;
+    reject(v: ReadonlyVector3): Vector3;
     round(): Vector3;
     roundToPrecision(k: number): Vector3;
     slerp(v: ReadonlyVector3, t: number): Vector3;
@@ -149,6 +153,8 @@ export interface ReadonlyVector4 {
     mulS(s: number): Vector4;
     neg(): Vector4;
     nlerp(v: ReadonlyVector4, t: number): Vector4;
+    project(v: ReadonlyVector4): Vector4;
+    reject(v: ReadonlyVector4): Vector4;
     round(): Vector4;
     roundToPrecision(k: number): Vector4;
     sub(v: ReadonlyVector4): Vector4;
@@ -486,6 +492,28 @@ export class Vector2 implements ReadonlyVector2 {
      */
     public polarAngle(): number {
         return Math.atan2(this.y, this.x);
+    }
+
+    /**
+     * Returns the projection of the current vector onto `v`.
+     *
+     * Note: `v` is assumed to be of nonzero length.
+     */
+    public project(v: ReadonlyVector2): Vector2 {
+        const s = this.dot(v) / v.lengthSq();
+
+        return v.mulS(s);
+    }
+
+    /**
+     * Returns the rejection of the current vector from `v`.
+     *
+     * Note: `v` is assumed to be of nonzero length.
+     */
+    public reject(v: ReadonlyVector2): Vector2 {
+        const s = this.dot(v) / v.lengthSq();
+
+        return this.addMulS(v, -s);
     }
 
     public round(): Vector2 {
@@ -947,6 +975,28 @@ export class Vector3 implements ReadonlyVector3 {
         }
     }
 
+    /**
+     * Returns the projection of the current vector onto `v`.
+     *
+     * Note: `v` is assumed to be of nonzero length.
+     */
+    public project(v: ReadonlyVector3): Vector3 {
+        const s = this.dot(v) / v.lengthSq();
+
+        return v.mulS(s);
+    }
+
+    /**
+     * Returns the rejection of the current vector from `v`.
+     *
+     * Note: `v` is assumed to be of nonzero length.
+     */
+    public reject(v: ReadonlyVector3): Vector3 {
+        const s = this.dot(v) / v.lengthSq();
+
+        return this.addMulS(v, -s);
+    }
+
     public round(): Vector3 {
         const x = Math.round(this.x);
         const y = Math.round(this.y);
@@ -1386,6 +1436,28 @@ export class Vector4 implements ReadonlyVector4 {
         }
 
         return new Vector4(x / len, y / len, z / len, w / len);
+    }
+
+    /**
+     * Returns the projection of the current vector onto `v`.
+     *
+     * Note: `v` is assumed to be of nonzero length.
+     */
+    public project(v: ReadonlyVector4): Vector4 {
+        const s = this.dot(v) / v.lengthSq();
+
+        return v.mulS(s);
+    }
+
+    /**
+     * Returns the rejection of the current vector from `v`.
+     *
+     * Note: `v` is assumed to be of nonzero length.
+     */
+    public reject(v: ReadonlyVector4): Vector4 {
+        const s = this.dot(v) / v.lengthSq();
+
+        return this.addMulS(v, -s);
     }
 
     public round(): Vector4 {
