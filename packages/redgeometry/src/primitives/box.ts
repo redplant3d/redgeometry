@@ -343,7 +343,7 @@ export class MinMaxBox2 implements ReadonlyMinMaxBox2 {
     }
 
     public cornerAt(index: number): Vector2 {
-        switch (index & 4) {
+        switch (index & 3) {
             case 0:
                 return new Vector2(this.minX, this.minY);
             case 1:
@@ -635,7 +635,7 @@ export class MinMaxBox3 implements ReadonlyMinMaxBox3 {
     }
 
     public cornerAt(index: number): Vector3 {
-        switch (index & 8) {
+        switch (index & 7) {
             case 0:
                 return new Vector3(this.minX, this.minY, this.minZ);
             case 1:
