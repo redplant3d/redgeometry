@@ -39,6 +39,8 @@ export interface ReadonlyVector2 {
     eq(v: ReadonlyVector2): boolean;
     eqApproxAbs(v: ReadonlyVector2, eps: number): boolean;
     eqApproxRel(v: ReadonlyVector2, eps: number): boolean;
+    extendZ(z: number): Vector3;
+    extendZW(z: number, w: number): Vector4;
     floor(): Vector2;
     isFinite(): boolean;
     isOne(): boolean;
@@ -65,6 +67,8 @@ export interface ReadonlyVector2 {
     toString(): string;
     unit(): Vector2;
     unitOrZero(): Vector2;
+    withX(x: number): Vector2;
+    withY(y: number): Vector2;
 }
 
 export interface ReadonlyVector3 {
@@ -89,6 +93,7 @@ export interface ReadonlyVector3 {
     eq(v: ReadonlyVector3): boolean;
     eqApproxAbs(v: ReadonlyVector3, eps: number): boolean;
     eqApproxRel(v: ReadonlyVector3, eps: number): boolean;
+    extendW(w: number): Vector4;
     floor(): Vector3;
     isFinite(): boolean;
     isOne(): boolean;
@@ -115,6 +120,9 @@ export interface ReadonlyVector3 {
     toString(): string;
     unit(): Vector3;
     unitOrZero(): Vector3;
+    withX(x: number): Vector3;
+    withY(y: number): Vector3;
+    withZ(z: number): Vector3;
     xy(): Vector2;
     xz(): Vector2;
 }
@@ -163,6 +171,10 @@ export interface ReadonlyVector4 {
     toString(): string;
     unit(): Vector4;
     unitOrZero(): Vector4;
+    withX(x: number): Vector4;
+    withY(y: number): Vector4;
+    withZ(z: number): Vector4;
+    withW(w: number): Vector4;
     xy(): Vector2;
     xyz(): Vector3;
     xz(): Vector2;
@@ -394,6 +406,20 @@ export class Vector2 implements ReadonlyVector2 {
 
     public eqApproxRel(v: ReadonlyVector2, eps: number): boolean {
         return eqApproxRel(this.x, v.x, eps) && eqApproxRel(this.y, v.y, eps);
+    }
+
+    /**
+     * Returns an extended vector from the current one with `z`.
+     */
+    public extendZ(z: number): Vector3 {
+        return new Vector3(this.x, this.y, z);
+    }
+
+    /**
+     * Returns an extended vector from the current one with `z` and `w`.
+     */
+    public extendZW(z: number, w: number): Vector4 {
+        return new Vector4(this.x, this.y, z, w);
     }
 
     public floor(): Vector2 {
@@ -656,6 +682,20 @@ export class Vector2 implements ReadonlyVector2 {
 
         return this.divS(s);
     }
+
+    /**
+     * Returns the current vector with the value `x`.
+     */
+    public withX(x: number): Vector2 {
+        return new Vector2(x, this.y);
+    }
+
+    /**
+     * Returns the current vector with the value `y`.
+     */
+    public withY(y: number): Vector2 {
+        return new Vector2(this.x, y);
+    }
 }
 
 export class Vector3 implements ReadonlyVector3 {
@@ -846,6 +886,13 @@ export class Vector3 implements ReadonlyVector3 {
 
     public eqApproxRel(v: ReadonlyVector3, eps: number): boolean {
         return eqApproxRel(this.x, v.x, eps) && eqApproxRel(this.y, v.y, eps) && eqApproxRel(this.z, v.z, eps);
+    }
+
+    /**
+     * Returns an extended vector from the current one with `w`.
+     */
+    public extendW(w: number): Vector4 {
+        return new Vector4(this.x, this.y, this.z, w);
     }
 
     public floor(): Vector3 {
@@ -1159,6 +1206,27 @@ export class Vector3 implements ReadonlyVector3 {
         }
 
         return this.divS(s);
+    }
+
+    /**
+     * Returns the current vector with the value `x`.
+     */
+    public withX(x: number): Vector3 {
+        return new Vector3(x, this.y, this.z);
+    }
+
+    /**
+     * Returns the current vector with the value `y`.
+     */
+    public withY(y: number): Vector3 {
+        return new Vector3(this.x, y, this.z);
+    }
+
+    /**
+     * Returns the current vector with the value `z`.
+     */
+    public withZ(z: number): Vector3 {
+        return new Vector3(this.x, this.y, z);
     }
 
     public xy(): Vector2 {
@@ -1598,6 +1666,34 @@ export class Vector4 implements ReadonlyVector4 {
         }
 
         return this.divS(s);
+    }
+
+    /**
+     * Returns the current vector with the value `x`.
+     */
+    public withX(x: number): Vector4 {
+        return new Vector4(x, this.y, this.z, this.w);
+    }
+
+    /**
+     * Returns the current vector with the value `y`.
+     */
+    public withY(y: number): Vector4 {
+        return new Vector4(this.x, y, this.z, this.w);
+    }
+
+    /**
+     * Returns the current vector with the value `z`.
+     */
+    public withZ(z: number): Vector4 {
+        return new Vector4(this.x, this.y, z, this.w);
+    }
+
+    /**
+     * Returns the current vector with the value `w`.
+     */
+    public withW(w: number): Vector4 {
+        return new Vector4(this.x, this.y, this.z, w);
     }
 
     public xy(): Vector2 {
