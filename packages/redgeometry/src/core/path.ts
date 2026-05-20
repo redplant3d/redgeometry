@@ -256,7 +256,7 @@ export class Path2 implements PathSink2 {
 
         // Calculate the remaining control point
         vc = v1.add(v2);
-        vc = vc.mulS(2).divS(vc.dot(vc));
+        vc = vc.mulS(2).divS(vc.lengthSq());
 
         // This is actually half of the remaining cos. It is required that `v1 dot v2 > -1` holds
         // but we can safely assume it does (only critical for angles close to 180 degrees)
@@ -667,7 +667,7 @@ export class Path2 implements PathSink2 {
 
         // Calculate the remaining control point
         v = v1.add(v2);
-        v = v.mulS(2).divS(v.dot(v));
+        v = v.mulS(2).divS(v.lengthSq());
 
         // Final arc segment
         pp0 = mat.transformPoint(v);

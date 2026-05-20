@@ -219,7 +219,7 @@ export class Edge2 implements ReadonlyEdge2 {
         const v2 = p.sub(e.p0);
 
         const a = v1.dot(v1);
-        const b = v1.dot(v2.neg());
+        const b = -v1.dot(v2);
         const c = v2.dot(v2) - r * r;
 
         const roots = solveQuadratic(a, b, c);

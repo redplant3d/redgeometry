@@ -542,7 +542,7 @@ export class Vector2 implements ReadonlyVector2 {
     public reject(v: ReadonlyVector2): Vector2 {
         const s = this.dot(v) / v.lengthSq();
 
-        return this.addMulS(v, -s);
+        return this.subMulS(v, s);
     }
 
     public round(): Vector2 {
@@ -1056,7 +1056,7 @@ export class Vector3 implements ReadonlyVector3 {
     public reject(v: ReadonlyVector3): Vector3 {
         const s = this.dot(v) / v.lengthSq();
 
-        return this.addMulS(v, -s);
+        return this.subMulS(v, s);
     }
 
     public round(): Vector3 {
@@ -1553,7 +1553,7 @@ export class Vector4 implements ReadonlyVector4 {
     public reject(v: ReadonlyVector4): Vector4 {
         const s = this.dot(v) / v.lengthSq();
 
-        return this.addMulS(v, -s);
+        return this.subMulS(v, s);
     }
 
     public round(): Vector4 {

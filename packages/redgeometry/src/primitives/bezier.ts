@@ -666,7 +666,7 @@ export class Bezier2Curve2 implements ReadonlyBezier2Curve2 {
         const [qqa, qqb] = this.derivativeCoefficients();
 
         // The vertex is at the minimum of the curvature (only one solution)
-        return qqa.dot(qqb.neg()) / qqa.lengthSq();
+        return -qqa.dot(qqb) / qqa.lengthSq();
     }
 
     public windingAt(p: ReadonlyVector2): number {

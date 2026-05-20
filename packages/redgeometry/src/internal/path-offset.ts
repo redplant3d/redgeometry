@@ -106,7 +106,7 @@ export function insertOuterJoin(
                 path.lineTo(p.add(k));
             } else if (n0.dot(n1) <= COS_ACUTE) {
                 // Join is too sharp ('k' is approaching infinity)
-                path.lineTo(pp0.addMulS(n0.perp(), -mld));
+                path.lineTo(pp0.subMulS(n0.perp(), mld));
                 path.lineTo(pp2.addMulS(n1.perp(), mld));
             } else {
                 const kov = k.dot(p.sub(pp0));

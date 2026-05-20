@@ -188,7 +188,7 @@ export class AppContextPlugin implements WorldPlugin {
             const vn = vu.neg().perp();
 
             const pp0 = p0.addMulS(vu, 4 * pointWidth).addMulS(vn, 4 * linkWidth);
-            const pp1 = p1.addMulS(vu, -4 * pointWidth).addMulS(vn, 4 * linkWidth);
+            const pp1 = p1.subMulS(vu, 4 * pointWidth).addMulS(vn, 4 * linkWidth);
 
             const path = Path2.createEmpty();
             path.moveTo(pp0);
@@ -261,8 +261,8 @@ export class AppContextPlugin implements WorldPlugin {
                 const vn = vu.neg().perp();
 
                 const pp0 = p0.addMulS(vu, 2 * pointWidth).addMulS(vn, 1.5 * linkWidth);
-                const pp1 = p1.addMulS(vu, -2 * pointWidth).addMulS(vn, 1.5 * linkWidth);
-                const pp2 = p1.addMulS(vu, -3 * pointWidth).addMulS(vn, 4 * linkWidth);
+                const pp1 = p1.subMulS(vu, 2 * pointWidth).addMulS(vn, 1.5 * linkWidth);
+                const pp2 = p1.subMulS(vu, 3 * pointWidth).addMulS(vn, 4 * linkWidth);
 
                 path.moveTo(pp0);
                 path.lineTo(pp1);

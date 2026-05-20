@@ -292,7 +292,7 @@ export class StraightSkeleton {
         const v1 = vb.sub(va);
         const v2 = pb.sub(pa);
 
-        return v1.dot(v2.neg()) / v1.dot(v1);
+        return -v1.dot(v2) / v1.lengthSq();
     }
 
     /**
