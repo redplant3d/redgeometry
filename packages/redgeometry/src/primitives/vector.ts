@@ -62,6 +62,7 @@ export interface ReadonlyVector2 {
     roundToPrecision(k: number): Vector2;
     slerp(v: ReadonlyVector2, t: number): Vector2;
     sub(v: ReadonlyVector2): Vector2;
+    subMulS(v: ReadonlyVector2, s: number): Vector2;
     subS(s: number): Vector2;
     toArray(): [number, number];
     toString(): string;
@@ -115,6 +116,7 @@ export interface ReadonlyVector3 {
     roundToPrecision(k: number): Vector3;
     slerp(v: ReadonlyVector3, t: number): Vector3;
     sub(v: ReadonlyVector3): Vector3;
+    subMulS(v: ReadonlyVector3, s: number): Vector3;
     subS(s: number): Vector3;
     toArray(): [number, number, number];
     toString(): string;
@@ -166,6 +168,7 @@ export interface ReadonlyVector4 {
     round(): Vector4;
     roundToPrecision(k: number): Vector4;
     sub(v: ReadonlyVector4): Vector4;
+    subMulS(v: ReadonlyVector4, s: number): Vector4;
     subS(s: number): Vector4;
     toArray(): [number, number, number, number];
     toString(): string;
@@ -610,6 +613,11 @@ export class Vector2 implements ReadonlyVector2 {
         this.y = v1.y - v2.y;
     }
 
+    public setSubMulS(v1: ReadonlyVector2, s: number, v2: ReadonlyVector2): void {
+        this.x = v1.x - s * v2.x;
+        this.y = v1.y - s * v2.y;
+    }
+
     public setSubS(v: ReadonlyVector2, s: number): void {
         this.x = v.x - s;
         this.y = v.y - s;
@@ -652,6 +660,13 @@ export class Vector2 implements ReadonlyVector2 {
      */
     public sub(v: ReadonlyVector2): Vector2 {
         return new Vector2(this.x - v.x, this.y - v.y);
+    }
+
+    /**
+     * Returns the difference of the current vector and a vector `v` multiplied by a scalar `s`.
+     */
+    public subMulS(v: ReadonlyVector2, s: number): Vector2 {
+        return new Vector2(this.x - s * v.x, this.y - s * v.y);
     }
 
     /**
@@ -1132,6 +1147,12 @@ export class Vector3 implements ReadonlyVector3 {
         this.z = v1.z - v2.z;
     }
 
+    public setSubMulS(v1: ReadonlyVector3, s: number, v2: ReadonlyVector3): void {
+        this.x = v1.x - s * v2.x;
+        this.y = v1.y - s * v2.y;
+        this.z = v1.z - s * v2.z;
+    }
+
     public setSubS(v: ReadonlyVector3, s: number): void {
         this.x = v.x - s;
         this.y = v.y - s;
@@ -1177,6 +1198,13 @@ export class Vector3 implements ReadonlyVector3 {
      */
     public sub(v: ReadonlyVector3): Vector3 {
         return new Vector3(this.x - v.x, this.y - v.y, this.z - v.z);
+    }
+
+    /**
+     * Returns the difference of the current vector and a vector `v` multiplied by a scalar `s`.
+     */
+    public subMulS(v: ReadonlyVector3, s: number): Vector3 {
+        return new Vector3(this.x - s * v.x, this.y - s * v.y, this.z - s * v.z);
     }
 
     /**
@@ -1620,6 +1648,13 @@ export class Vector4 implements ReadonlyVector4 {
         this.w = v1.w - v2.w;
     }
 
+    public setSubMulS(v1: ReadonlyVector4, s: number, v2: ReadonlyVector4): void {
+        this.x = v1.x - s * v2.x;
+        this.y = v1.y - s * v2.y;
+        this.z = v1.z - s * v2.z;
+        this.w = v1.w - s * v2.w;
+    }
+
     public setSubS(v: ReadonlyVector4, s: number): void {
         this.x = v.x - s;
         this.y = v.y - s;
@@ -1635,8 +1670,18 @@ export class Vector4 implements ReadonlyVector4 {
         this.w = v.w / s;
     }
 
+    /**
+     * Returns the difference of the current vector and a vector `v`.
+     */
     public sub(v: ReadonlyVector4): Vector4 {
         return new Vector4(this.x - v.x, this.y - v.y, this.z - v.z, this.w - v.w);
+    }
+
+    /**
+     * Returns the difference of the current vector and a vector `v` multiplied by a scalar `s`.
+     */
+    public subMulS(v: ReadonlyVector4, s: number): Vector4 {
+        return new Vector4(this.x - s * v.x, this.y - s * v.y, this.z - s * v.z, this.w - s * v.w);
     }
 
     /**
