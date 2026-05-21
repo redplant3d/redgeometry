@@ -142,7 +142,9 @@ export class Quaternion implements ReadonlyQuaternion {
 
         if (cos < COS_ACUTE) {
             // If the angle is close to 180 degrees the axis just needs to be perpendicular to `v1`
-            const v1p = v1.perpAny().unit();
+            const v1p = v1.perpAny();
+            v1p.setUnit(v1p);
+
             return new Quaternion(0, v1p.x, v1p.y, v1p.z);
         }
 
