@@ -147,7 +147,6 @@ export interface ReadonlyAxisAlignedBox2 {
     toMinMaxBox(): MinMaxBox2;
     toOrientedBox(): OrientedBox2;
     toString(): string;
-    transform(mat: ReadonlyMatrix3 | ReadonlyMatrix3A): AxisAlignedBox2;
 }
 
 export interface ReadonlyAxisAlignedBox3 {
@@ -182,7 +181,6 @@ export interface ReadonlyAxisAlignedBox3 {
     toMinMaxBox(): MinMaxBox3;
     toOrientedBox(): OrientedBox3;
     toString(): string;
-    transform(mat: ReadonlyMatrix4 | ReadonlyMatrix4A): AxisAlignedBox3;
 }
 
 export interface ReadonlyOrientedBox2 {
@@ -211,7 +209,6 @@ export interface ReadonlyOrientedBox2 {
     toArray(): FixedSizeArray<number, 6>;
     toAxisAlignedBox(): AxisAlignedBox2;
     toString(): string;
-    transform(mat: ReadonlyMatrix3 | ReadonlyMatrix3A): OrientedBox2;
 }
 
 export interface ReadonlyOrientedBox3 {
@@ -242,7 +239,6 @@ export interface ReadonlyOrientedBox3 {
     toArray(): FixedSizeArray<number, 10>;
     toAxisAlignedBox(): AxisAlignedBox3;
     toString(): string;
-    transform(mat: ReadonlyMatrix4 | ReadonlyMatrix4A): OrientedBox3;
 }
 
 export class MinMaxBox2 implements ReadonlyMinMaxBox2 {
@@ -1100,15 +1096,6 @@ export class AxisAlignedBox2 implements ReadonlyAxisAlignedBox2 {
     public toString(): string {
         return "{center: " + this.center.toString() + ", extents: " + this.extents.toString() + "}";
     }
-
-    public transform(mat: ReadonlyMatrix3 | ReadonlyMatrix3A): AxisAlignedBox2 {
-        const { s, t } = mat.extractSRT();
-
-        const center = this.center.add(t);
-        const extents = this.extents.mul(s);
-
-        return new AxisAlignedBox2(center, extents);
-    }
 }
 
 export class AxisAlignedBox3 implements ReadonlyAxisAlignedBox3 {
@@ -1374,15 +1361,6 @@ export class AxisAlignedBox3 implements ReadonlyAxisAlignedBox3 {
     public toString(): string {
         return "{center: " + this.center.toString() + ", extents: " + this.extents.toString() + "}";
     }
-
-    public transform(mat: ReadonlyMatrix4 | ReadonlyMatrix4A): AxisAlignedBox3 {
-        const { s, t } = mat.extractSRT();
-
-        const center = this.center.add(t);
-        const extents = this.extents.mul(s);
-
-        return new AxisAlignedBox3(center, extents);
-    }
 }
 
 export class OrientedBox2 implements ReadonlyOrientedBox2 {
@@ -1640,16 +1618,6 @@ export class OrientedBox2 implements ReadonlyOrientedBox2 {
             this.rotation.toString() +
             "}"
         );
-    }
-
-    public transform(mat: ReadonlyMatrix3 | ReadonlyMatrix3A): OrientedBox2 {
-        const { s, r, t } = mat.extractSRT();
-
-        const center = this.center.add(t);
-        const extents = this.extents.mul(s);
-        const rotation = this.rotation.mul(r);
-
-        return new OrientedBox2(center, extents, rotation);
     }
 }
 
@@ -1945,15 +1913,5 @@ export class OrientedBox3 implements ReadonlyOrientedBox3 {
             this.rotation.toString() +
             "}"
         );
-    }
-
-    public transform(mat: ReadonlyMatrix4 | ReadonlyMatrix4A): OrientedBox3 {
-        const { s, r, t } = mat.extractSRT();
-
-        const center = this.center.add(t);
-        const extents = this.extents.mul(s);
-        const rotation = this.rotation.mul(r);
-
-        return new OrientedBox3(center, extents, rotation);
     }
 }
