@@ -17,7 +17,7 @@ const FLOAT_LSB_53 = 2 ** -53;
  * References:
  * - David Blackman, Sebastiano Vigna.
  *   *Scrambled Linear Pseudorandom Number Generators*.
- *   xoshiro/xoroshiro generators and the PRNG shootout (https://prng.di.unimi.it/).
+ *   ACM Transactions on Mathematical Software, Vol. 47, No. 4, Pages 1-32.
  */
 export class RandomXSR128 implements Random {
     private state: Int32Array;
