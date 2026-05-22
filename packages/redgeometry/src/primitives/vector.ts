@@ -60,6 +60,7 @@ export interface ReadonlyVector2 {
     reject(v: ReadonlyVector2): Vector2;
     round(): Vector2;
     roundToPrecision(k: number): Vector2;
+    signedAngle(v: ReadonlyVector2): number;
     slerp(v: ReadonlyVector2, t: number): Vector2;
     sub(v: ReadonlyVector2): Vector2;
     subMulS(v: ReadonlyVector2, s: number): Vector2;
@@ -114,6 +115,7 @@ export interface ReadonlyVector3 {
     reject(v: ReadonlyVector3): Vector3;
     round(): Vector3;
     roundToPrecision(k: number): Vector3;
+    signedAngleAround(v: ReadonlyVector3, axis: ReadonlyVector3): number;
     slerp(v: ReadonlyVector3, t: number): Vector3;
     sub(v: ReadonlyVector3): Vector3;
     subMulS(v: ReadonlyVector3, s: number): Vector3;
@@ -320,7 +322,7 @@ export class Vector2 implements ReadonlyVector2 {
     /**
      * Returns the angle between the current vector and `v` in radians.
      *
-     * Note: The returned value is unsigned and less than or equal to `PI`.
+     * Note: The returned value has a range of `[0, PI]`.
      */
     public angle(v: ReadonlyVector2): number {
         const dot = this.dot(v);
@@ -630,6 +632,18 @@ export class Vector2 implements ReadonlyVector2 {
     }
 
     /**
+     * Returns the signed angle between the current vector and `v` in radians.
+     *
+     * Note: The returned value has a range of `[-PI, PI]`.
+     */
+    public signedAngle(v: ReadonlyVector2): number {
+        const dot = this.dot(v);
+        const cross = this.cross(v);
+
+        return Math.atan2(cross, dot);
+    }
+
+    /**
      * Returns the spherical linear interpolation of the current vector and `v`.
      */
     public slerp(v: ReadonlyVector2, t: number): Vector2 {
@@ -816,7 +830,7 @@ export class Vector3 implements ReadonlyVector3 {
     /**
      * Returns the angle between the current vector and `v` in radians.
      *
-     * Note: The returned value is unsigned and less than or equal to `PI`.
+     * Note: The returned value has a range of `[0, PI]`.
      */
     public angle(v: ReadonlyVector3): number {
         const dot = this.dot(v);
@@ -1164,6 +1178,21 @@ export class Vector3 implements ReadonlyVector3 {
         this.x = v.x / s;
         this.y = v.y / s;
         this.z = v.z / s;
+    }
+
+    /**
+     * Returns the signed angle between the current vector and `v` around `axis` in radians.
+     *
+     * Note: The returned value has a range of `[-PI, PI]`.
+     */
+    public signedAngleAround(v: ReadonlyVector3, axis: ReadonlyVector3): number {
+        const v1a = this.reject(axis);
+        const v2a = v.reject(axis);
+
+        const dot = v1a.dot(v2a);
+        const crossDot = v1a.cross(v2a).dot(axis);
+
+        return Math.atan2(crossDot, dot);
     }
 
     /**
