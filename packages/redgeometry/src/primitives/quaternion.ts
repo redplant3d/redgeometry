@@ -158,6 +158,42 @@ export class Quaternion implements ReadonlyQuaternion {
     }
 
     /**
+     * Returns a quaternion representing a minimal rotation from `v1` to `v2` around `axis`.
+     *
+     * Note: `axis` is assumed to be of unit length.
+     */
+    public static fromRotationBetweenVectorsAround(
+        v1: ReadonlyVector3,
+        v2: ReadonlyVector3,
+        axis: ReadonlyVector3,
+    ): Quaternion {
+        const v1a = v1.reject(axis);
+        const v2a = v2.reject(axis);
+
+        const dot = v1a.dot(v2a);
+        const sqrt = Math.sqrt(v1a.lengthSq() * v2a.lengthSq());
+
+        // This angle is double of the quaternion rotation
+        const cos = dot / sqrt;
+
+        if (cos > COS_OBTUSE) {
+            return Quaternion.createIdentity();
+        }
+
+        if (cos < COS_ACUTE) {
+            return new Quaternion(0, axis.x, axis.y, axis.z);
+        }
+
+        const sin = v1a.cross(v2a).dot(axis) / sqrt;
+
+        // We add an identity quaternion and set it to unit length to get half the rotation
+        const q = new Quaternion(cos + 1, sin * axis.x, sin * axis.y, sin * axis.z);
+        q.setUnit(q);
+
+        return q;
+    }
+
+    /**
      * Returns a quaternion rotated by the intrinsic Euler (Tait-Bryan) angles `angleX`, `angleY` and `angleZ` with `order`.
      */
     public static fromRotationEuler(angleX: number, angleY: number, angleZ: number, order: RotationOrder): Quaternion {
