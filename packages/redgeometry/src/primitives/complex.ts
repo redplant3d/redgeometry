@@ -75,7 +75,7 @@ export class Complex implements ReadonlyComplex {
     /**
      * Returns a complex with minimal rotation from `v1` to `v2`.
      *
-     * Note: `v1` and `v2` are assumed to be unit vectors.
+     * Note: `v1` and `v2` are assumed to be of unit length.
      */
     public static fromRotationBetween(v1: ReadonlyVector2, v2: ReadonlyVector2): Complex {
         // This angle is double of the complex rotation

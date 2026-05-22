@@ -119,7 +119,7 @@ export class Quaternion implements ReadonlyQuaternion {
     /**
      * Returns a quaternion with rotation around `axis` and `angle`.
      *
-     * Note: `axis` is assumed to be a unit vector.
+     * Note: `axis` is assumed to be of unit length.
      */
     public static fromRotationAxis(axis: ReadonlyVector3, angle: number): Quaternion {
         const sin = Math.sin(0.5 * angle);
@@ -130,7 +130,7 @@ export class Quaternion implements ReadonlyQuaternion {
     /**
      * Returns a quaternion with minimal rotation from `v1` to `v2`.
      *
-     * Note: `v1` and `v2` are assumed to be unit vectors.
+     * Note: `v1` and `v2` are assumed to be of unit length.
      */
     public static fromRotationBetween(v1: ReadonlyVector3, v2: ReadonlyVector3): Quaternion {
         // This angle is double of the quaternion rotation
