@@ -601,7 +601,7 @@ export class Path2 implements PathSink2 {
         let v2 = pp1.sub(pc);
 
         // TODO: Is there a better solution?
-        const z1 = Complex.fromRotationBetween(Vector2.UNIT_X, v1);
+        const z1 = Complex.fromRotationBetweenVectors(Vector2.UNIT_X, v1);
 
         // Set up the final transformation matrix
         mat.setFromRotation(z1.a, z1.b);

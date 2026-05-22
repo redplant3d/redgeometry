@@ -98,6 +98,17 @@ export class Quaternion implements ReadonlyQuaternion {
         return new Quaternion(obj.a, obj.b, obj.c, obj.d);
     }
 
+    /**
+     * Returns a quaternion representing a rotation with `angle` around `axis`.
+     *
+     * Note: `axis` is assumed to be of unit length.
+     */
+    public static fromRotationAngleAround(angle: number, axis: ReadonlyVector3): Quaternion {
+        const sin = Math.sin(0.5 * angle);
+        const cos = Math.cos(0.5 * angle);
+        return new Quaternion(cos, sin * axis.x, sin * axis.y, sin * axis.z);
+    }
+
     public static fromRotationAngleX(angle: number): Quaternion {
         const sin = Math.sin(0.5 * angle);
         const cos = Math.cos(0.5 * angle);
@@ -117,22 +128,11 @@ export class Quaternion implements ReadonlyQuaternion {
     }
 
     /**
-     * Returns a quaternion with rotation around `axis` and `angle`.
-     *
-     * Note: `axis` is assumed to be of unit length.
-     */
-    public static fromRotationAxis(axis: ReadonlyVector3, angle: number): Quaternion {
-        const sin = Math.sin(0.5 * angle);
-        const cos = Math.cos(0.5 * angle);
-        return new Quaternion(cos, sin * axis.x, sin * axis.y, sin * axis.z);
-    }
-
-    /**
-     * Returns a quaternion with minimal rotation from `v1` to `v2`.
+     * Returns a quaternion representing a minimal rotation from `v1` to `v2`.
      *
      * Note: `v1` and `v2` are assumed to be of unit length.
      */
-    public static fromRotationBetween(v1: ReadonlyVector3, v2: ReadonlyVector3): Quaternion {
+    public static fromRotationBetweenVectors(v1: ReadonlyVector3, v2: ReadonlyVector3): Quaternion {
         // This angle is double of the quaternion rotation
         const cos = v1.dot(v2);
 

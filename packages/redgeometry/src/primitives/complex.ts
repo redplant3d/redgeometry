@@ -77,7 +77,7 @@ export class Complex implements ReadonlyComplex {
      *
      * Note: `v1` and `v2` are assumed to be of unit length.
      */
-    public static fromRotationBetween(v1: ReadonlyVector2, v2: ReadonlyVector2): Complex {
+    public static fromRotationBetweenVectors(v1: ReadonlyVector2, v2: ReadonlyVector2): Complex {
         // This angle is double of the complex rotation
         const cos = v1.dot(v2);
 
