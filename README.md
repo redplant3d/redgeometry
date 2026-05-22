@@ -50,7 +50,7 @@ Execute `pnpm install` to install/update the development environment and `pnpm r
             "request": "launch",
             "name": "Launch Chrome against localhost",
             "url": "http://127.0.0.1:5173",
-            "webRoot": "${workspaceFolder}/packages/redgeometry-app/dist"
+            "webRoot": "${workspaceFolder}/packages/redgeometry-app/src"
         }
     ]
 }
