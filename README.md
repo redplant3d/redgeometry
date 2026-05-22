@@ -6,19 +6,15 @@
 
 ### Geometry
 
-- Basic primitives and arithmetics (point, vector, matrix)
+- Basic primitives and arithmetics (matrix, vector, quaternion, complex)
 - Bezier curves (linear, quadratic, cubic, rational)
 - Path operations (flatten, simplify, offset, dash, stroke, boolean clip)
 - Mesh (monotonic partitioning, triangulation)
 - Stable snap rounding
 
-### Rendering
-
-- 2D context similar to HTML canvas (software rasterizer)
-
 ### Utility
 
-- Data structures (sorted array, hash map)
+- Data structures
 - Seedable random generator
 - Double word arithmetic types for unsigned integers and floating point numbers
 
@@ -31,12 +27,11 @@
 
 ### Non-Goals
 
-- Sacrifice readability/maintainability to achieve the highest possible performance
-- Become an extensive 2D/3D graphics engine
+- Sacrifice a significant amount of readability/maintainability to maximize performance
 
 ## Development
 
-Execute `npm run init` to install/update the development environment and `npm run serve -w redgeometry-app` to run the development server.
+Execute `pnpm install` to install/update the development environment and `pnpm run --filter redgeometry-app serve` to run the development server.
 
 ### Recommended tools
 
@@ -54,7 +49,7 @@ Execute `npm run init` to install/update the development environment and `npm ru
             "type": "chrome",
             "request": "launch",
             "name": "Launch Chrome against localhost",
-            "url": "http://127.0.0.1:8001",
+            "url": "http://127.0.0.1:5173",
             "webRoot": "${workspaceFolder}/packages/redgeometry-app/dist"
         }
     ]
