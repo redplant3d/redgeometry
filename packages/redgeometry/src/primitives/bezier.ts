@@ -1282,7 +1282,7 @@ export class BezierRCurve2 implements ReadonlyBezierRCurve2 {
     }
 
     public signedArea(): number {
-        // Inspired from: http://ich.deanmcnamee.com/graphics/2016/03/30/CurveArea.html
+        // Inspired from: https://ich.deanmcnamee.com/graphics/2016/03/30/CurveArea.html
         const v0 = this.p0;
         const v1 = this.p1;
         const v2 = this.p2;
