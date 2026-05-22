@@ -5,6 +5,9 @@ const config: UserConfigExport = (env: ConfigEnv) => ({
     define: {
         REDGEOMETRY_DEBUG: env.mode === "development",
     },
+    experimental: {
+        bundledDev: true,
+    },
     server: {
         host: true,
     },
