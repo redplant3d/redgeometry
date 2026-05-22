@@ -141,7 +141,7 @@ test("Quaternion - fromRotationEuler", () => {
     expectToBeCloseQuaternion(qf1, qf3);
 });
 
-test("Quaternion - getEulerAngles", () => {
+test("Quaternion - eulerAngles", () => {
     // Pitch angle (y) must be in the range of `(-Math.PI / 2, Math.PI / 2)` to avoid gimbal lock
     const eul = { x: 0.25, y: 0.5, z: 1 };
 
