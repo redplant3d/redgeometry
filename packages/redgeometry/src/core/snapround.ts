@@ -208,7 +208,7 @@ export class SnapRound2 {
         this.intersections = this.createIntersections(this.inputSegments);
 
         for (const intersection of this.intersections) {
-            const p = roundPoint(intersection);
+            const p = intersection.round();
             this.pixelSet.addMagnet(p);
         }
 
@@ -226,8 +226,8 @@ export class SnapRound2 {
         const k = this.precision;
 
         for (const segment of this.outputSegments) {
-            const p0 = new Vector2(segment.p0.x / k, segment.p0.y / k);
-            const p1 = new Vector2(segment.p1.x / k, segment.p1.y / k);
+            const p0 = segment.p0.divS(k);
+            const p1 = segment.p1.divS(k);
             const ref = segment.ref;
 
             output.push({ p0, p1, ref });
@@ -238,8 +238,8 @@ export class SnapRound2 {
         const k = this.precision;
 
         for (const segment of this.outputSegments) {
-            const p0 = new Vector2(segment.p0.x / k, segment.p0.y / k);
-            const p1 = new Vector2(segment.p1.x / k, segment.p1.y / k);
+            const p0 = segment.p0.divS(k);
+            const p1 = segment.p1.divS(k);
 
             output.push(new Edge2(p0, p1));
         }
@@ -267,8 +267,8 @@ export class SnapRound2 {
     private addEndpoint(p: ReadonlyVector2, k: number, snap: boolean): Vector2 {
         // Note: `snap` demotes `p` to a magnet (useful when lines should perfectly
         // overlap but actually do not because of floating point precision)
-        const scaled = new Vector2(k * p.x, k * p.y);
-        const snapped = roundPoint(scaled);
+        const scaled = p.mulS(k);
+        const snapped = scaled.round();
 
         if (this.isPin(snapped, p, k) && !snap) {
             // Snap pin to grid and return snapped
@@ -395,8 +395,8 @@ export class SnapRound2 {
 
     private intersectEdges(magnets: ReadonlyVector2[], pins: ReadonlyVector2[]): void {
         for (const ur of this.inputSegments) {
-            const p0: ReadonlyVector2 = roundPoint(ur.p0);
-            const p1: ReadonlyVector2 = roundPoint(ur.p1);
+            const p0 = ur.p0.round();
+            const p1 = ur.p1.round();
 
             if (p0.eq(p1)) {
                 // Allow this case to avoid empty pins
@@ -409,7 +409,7 @@ export class SnapRound2 {
 
             this.sortByParameter(magnetIntersections);
 
-            let p = p0;
+            let p: ReadonlyVector2 = p0;
 
             for (const mi of magnetIntersections) {
                 this.addSegmentCandidate(ur, p, mi.p, pins);
@@ -536,10 +536,4 @@ export function intersectSegmentWithPixel(
     }
 
     return result;
-}
-
-function roundPoint(p: ReadonlyVector2): Vector2 {
-    const x = Math.round(p.x);
-    const y = Math.round(p.y);
-    return new Vector2(x, y);
 }
