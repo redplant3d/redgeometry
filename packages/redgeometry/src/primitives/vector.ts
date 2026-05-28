@@ -52,6 +52,7 @@ export interface ReadonlyVector2 {
     min(v: ReadonlyVector2): Vector2;
     mul(v: ReadonlyVector2): Vector2;
     mulS(s: number): Vector2;
+    mulSAdd(s: number, v: ReadonlyVector2): Vector2;
     neg(): Vector2;
     nlerp(v: ReadonlyVector2, t: number): Vector2;
     perp(): Vector2;
@@ -107,6 +108,7 @@ export interface ReadonlyVector3 {
     min(v: ReadonlyVector3): Vector3;
     mul(v: ReadonlyVector3): Vector3;
     mulS(s: number): Vector3;
+    mulSAdd(s: number, v: ReadonlyVector3): Vector3;
     neg(): Vector3;
     nlerp(v: ReadonlyVector3, t: number): Vector3;
     orthonormalBasis(): { v1: Vector3; v2: Vector3; v3: Vector3 };
@@ -163,6 +165,7 @@ export interface ReadonlyVector4 {
     min(v: ReadonlyVector4): Vector4;
     mul(v: ReadonlyVector4): Vector4;
     mulS(s: number): Vector4;
+    mulSAdd(s: number, v: ReadonlyVector4): Vector4;
     neg(): Vector4;
     nlerp(v: ReadonlyVector4, t: number): Vector4;
     project(v: ReadonlyVector4): Vector4;
@@ -488,6 +491,13 @@ export class Vector2 implements ReadonlyVector2 {
         return new Vector2(s * this.x, s * this.y);
     }
 
+    /**
+     * Returns the result of the term `this * s + v`.
+     */
+    public mulSAdd(s: number, v: ReadonlyVector2): Vector2 {
+        return new Vector2(this.x * s + v.x, this.y * s + v.y);
+    }
+
     public neg(): Vector2 {
         return new Vector2(-this.x, -this.y);
     }
@@ -608,6 +618,11 @@ export class Vector2 implements ReadonlyVector2 {
     public setMulS(s: number, v: ReadonlyVector2): void {
         this.x = s * v.x;
         this.y = s * v.y;
+    }
+
+    public setMulSAdd(v1: ReadonlyVector2, s: number, v2: ReadonlyVector2): void {
+        this.x = v1.x * s + v2.x;
+        this.y = v1.y * s + v2.y;
     }
 
     public setSub(v1: ReadonlyVector2, v2: ReadonlyVector2): void {
@@ -989,6 +1004,13 @@ export class Vector3 implements ReadonlyVector3 {
         return new Vector3(s * this.x, s * this.y, s * this.z);
     }
 
+    /**
+     * Returns the result of the term `this * s + v`.
+     */
+    public mulSAdd(s: number, v: ReadonlyVector3): Vector3 {
+        return new Vector3(this.x * s + v.x, this.y * s + v.y, this.z * s + v.z);
+    }
+
     public neg(): Vector3 {
         return new Vector3(-this.x, -this.y, -this.z);
     }
@@ -1153,6 +1175,12 @@ export class Vector3 implements ReadonlyVector3 {
         this.x = s * v.x;
         this.y = s * v.y;
         this.z = s * v.z;
+    }
+
+    public setMulSAdd(v1: ReadonlyVector3, s: number, v2: ReadonlyVector3): void {
+        this.x = v1.x * s + v2.x;
+        this.y = v1.y * s + v2.y;
+        this.z = v1.z * s + v2.z;
     }
 
     public setSub(v1: ReadonlyVector3, v2: ReadonlyVector3): void {
@@ -1541,6 +1569,13 @@ export class Vector4 implements ReadonlyVector4 {
         return new Vector4(s * this.x, s * this.y, s * this.z, s * this.w);
     }
 
+    /**
+     * Returns the result of the term `this * s + v`.
+     */
+    public mulSAdd(s: number, v: ReadonlyVector4): Vector4 {
+        return new Vector4(this.x * s + v.x, this.y * s + v.y, this.z * s + v.z, this.w * s + v.w);
+    }
+
     public neg(): Vector4 {
         return new Vector4(-this.x, -this.y, -this.z, -this.w);
     }
@@ -1668,6 +1703,13 @@ export class Vector4 implements ReadonlyVector4 {
         this.y = s * v.y;
         this.z = s * v.z;
         this.w = s * v.w;
+    }
+
+    public setMulSAdd(v1: ReadonlyVector4, s: number, v2: ReadonlyVector4): void {
+        this.x = v1.x * s + v2.x;
+        this.y = v1.y * s + v2.y;
+        this.z = v1.z * s + v2.z;
+        this.w = v1.w * s + v2.w;
     }
 
     public setSub(v1: ReadonlyVector4, v2: ReadonlyVector4): void {
