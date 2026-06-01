@@ -17,6 +17,7 @@ export * from "./primitives/box.ts";
 export * from "./primitives/complex.ts";
 export * from "./primitives/edge.ts";
 export * from "./primitives/matrix.ts";
+export * from "./primitives/plane.ts";
 export * from "./primitives/quaternion.ts";
 export * from "./primitives/ray.ts";
 export * from "./primitives/vector.ts";
