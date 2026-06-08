@@ -290,7 +290,7 @@ function getWinding(t: number, px: number, x: number, yy: number): number {
 }
 
 function sampleArcLengthQuadratic(wz: number, xz: number, qqa: ReadonlyVector2, qqb: ReadonlyVector2): number {
-    const v = qqa.mulS(xz).add(qqb);
+    const v = qqa.mulSAdd(xz, qqb);
     return wz * v.length();
 }
 
@@ -301,7 +301,8 @@ function sampleArcLengthCubic(
     qqb: ReadonlyVector2,
     qqc: ReadonlyVector2,
 ): number {
-    const v = qqa.mulS(xz).add(qqb).mulS(xz).add(qqc);
+    const v = qqa.mulSAdd(xz, qqb);
+    v.setMulSAdd(v, xz, qqc);
     return wz * v.length();
 }
 
@@ -312,7 +313,8 @@ function sampleArcLengthConic(
     qqb: ReadonlyVector3,
     qqc: ReadonlyVector3,
 ): number {
-    const vv = qqa.mulS(xz).add(qqb).mulS(xz).add(qqc);
+    const vv = qqa.mulSAdd(xz, qqb);
+    vv.mulSAdd(xz, qqc);
     const v = Vector2.fromXYW(vv.x, vv.y, vv.z * vv.z);
     return wz * v.length();
 }

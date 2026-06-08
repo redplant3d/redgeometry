@@ -457,7 +457,7 @@ export class Bezier2Curve2 implements ReadonlyBezier2Curve2 {
 
         // vv = qqa * t + qbb
         // vvv = qqa
-        const vv = qqa.mulS(t).add(qqb);
+        const vv = qqa.mulSAdd(t, qqb);
         const vvv = qqa;
 
         const len = vv.length();
@@ -804,8 +804,8 @@ export class Bezier3Curve2 implements ReadonlyBezier3Curve2 {
 
         // vv = qqa * t^2 + qqb * t + qqc
         // vvv = 2 * qqa * t + qqb
-        const vv = qqa.mulS(t).add(qqb).mulS(t).add(qqc);
-        const vvv = qqa.mulS(2 * t).add(qqb);
+        const vv = qqa.mulSAdd(t, qqb).mulSAdd(t, qqc);
+        const vvv = qqa.mulSAdd(2 * t, qqb);
 
         const len = vv.length();
 
