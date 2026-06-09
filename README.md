@@ -37,7 +37,7 @@ Execute `pnpm install` to install/update the development environment and `pnpm r
 
 - Visual Studio Code
 - Node.js 24.x or later
-- pnpm 10.x
+- pnpm 11.x
 
 ### Example `launch.json`
 
