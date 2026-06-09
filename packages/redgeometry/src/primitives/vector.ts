@@ -585,9 +585,9 @@ export class Vector2 implements ReadonlyVector2 {
         this.y = v1.y + v2.y;
     }
 
-    public setAddMulS(v1: ReadonlyVector2, s: number, v2: ReadonlyVector2): void {
-        this.x = v1.x + s * v2.x;
-        this.y = v1.y + s * v2.y;
+    public setAddMulS(v1: ReadonlyVector2, v2: ReadonlyVector2, s: number): void {
+        this.x = v1.x + v2.x * s;
+        this.y = v1.y + v2.y * s;
     }
 
     public setAddS(v: ReadonlyVector2, s: number): void {
@@ -630,9 +630,9 @@ export class Vector2 implements ReadonlyVector2 {
         this.y = v1.y - v2.y;
     }
 
-    public setSubMulS(v1: ReadonlyVector2, s: number, v2: ReadonlyVector2): void {
-        this.x = v1.x - s * v2.x;
-        this.y = v1.y - s * v2.y;
+    public setSubMulS(v1: ReadonlyVector2, v2: ReadonlyVector2, s: number): void {
+        this.x = v1.x - v2.x * s;
+        this.y = v1.y - v2.y * s;
     }
 
     public setSubS(v: ReadonlyVector2, s: number): void {
@@ -1127,10 +1127,10 @@ export class Vector3 implements ReadonlyVector3 {
         this.z = v1.z + v2.z;
     }
 
-    public setAddMulS(v1: ReadonlyVector3, s: number, v2: ReadonlyVector3): void {
-        this.x = v1.x + s * v2.x;
-        this.y = v1.y + s * v2.y;
-        this.z = v1.z + s * v2.z;
+    public setAddMulS(v1: ReadonlyVector3, v2: ReadonlyVector3, s: number): void {
+        this.x = v1.x + v2.x * s;
+        this.y = v1.y + v2.y * s;
+        this.z = v1.z + v2.z * s;
     }
 
     public setAddS(v: ReadonlyVector3, s: number): void {
@@ -1189,10 +1189,10 @@ export class Vector3 implements ReadonlyVector3 {
         this.z = v1.z - v2.z;
     }
 
-    public setSubMulS(v1: ReadonlyVector3, s: number, v2: ReadonlyVector3): void {
-        this.x = v1.x - s * v2.x;
-        this.y = v1.y - s * v2.y;
-        this.z = v1.z - s * v2.z;
+    public setSubMulS(v1: ReadonlyVector3, v2: ReadonlyVector3, s: number): void {
+        this.x = v1.x - v2.x * s;
+        this.y = v1.y - v2.y * s;
+        this.z = v1.z - v2.z * s;
     }
 
     public setSubS(v: ReadonlyVector3, s: number): void {
@@ -1656,11 +1656,11 @@ export class Vector4 implements ReadonlyVector4 {
         this.w = v1.w + v2.w;
     }
 
-    public setAddMulS(v1: ReadonlyVector4, s: number, v2: ReadonlyVector4): void {
-        this.x = v1.x + s * v2.x;
-        this.y = v1.y + s * v2.y;
-        this.z = v1.z + s * v2.z;
-        this.w = v1.w + s * v2.w;
+    public setAddMulS(v1: ReadonlyVector4, v2: ReadonlyVector4, s: number): void {
+        this.x = v1.x + v2.x * s;
+        this.y = v1.y + v2.y * s;
+        this.z = v1.z + v2.z * s;
+        this.w = v1.w + v2.w * s;
     }
 
     public setAddS(v: ReadonlyVector4, s: number): void {
@@ -1719,11 +1719,11 @@ export class Vector4 implements ReadonlyVector4 {
         this.w = v1.w - v2.w;
     }
 
-    public setSubMulS(v1: ReadonlyVector4, s: number, v2: ReadonlyVector4): void {
-        this.x = v1.x - s * v2.x;
-        this.y = v1.y - s * v2.y;
-        this.z = v1.z - s * v2.z;
-        this.w = v1.w - s * v2.w;
+    public setSubMulS(v1: ReadonlyVector4, v2: ReadonlyVector4, s: number): void {
+        this.x = v1.x - v2.x * s;
+        this.y = v1.y - v2.y * s;
+        this.z = v1.z - v2.z * s;
+        this.w = v1.w - v2.w * s;
     }
 
     public setSubS(v: ReadonlyVector4, s: number): void {
