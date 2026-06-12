@@ -167,17 +167,19 @@ export function writeAppStateSystem(world: World): void {
     });
 }
 
-export async function initAppMainPostSystem(world: World): Promise<void> {
+export function initAppMainPostSystem(world: World): void {
     requestAnimationFrame((time) => {
         world.writeEvent<AnimationFrameEvent>({ eventId: "animation-frame", time });
-        world.runSchedule<DefaultWorldScheduleId>("update");
+
+        void world.runSchedule<DefaultWorldScheduleId>("update");
     });
 }
 
-export async function appMainSystem(world: World): Promise<void> {
+export function appMainSystem(world: World): void {
     requestAnimationFrame((time) => {
         world.writeEvent<AnimationFrameEvent>({ eventId: "animation-frame", time });
-        world.runSchedule<DefaultWorldScheduleId>("update");
+
+        void world.runSchedule<DefaultWorldScheduleId>("update");
     });
 }
 

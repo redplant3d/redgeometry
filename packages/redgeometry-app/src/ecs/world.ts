@@ -1,5 +1,4 @@
 import { log, throwError } from "redgeometry/src/utility/debug";
-import type { Enum } from "redgeometry/src/utility/types";
 import { EntityComponentStorage } from "./entity-component.ts";
 import { WorldEventIterator, WorldEventStorage } from "./event.ts";
 import { SystemSchedule, type SystemDependencyOptions, type SystemOptions, type SystemsOptions } from "./schedule.ts";
@@ -45,7 +44,7 @@ export const ComponentFlags = {
     DELETED: 8,
     ALL: 15,
 } as const;
-export type ComponentFlags = Enum<typeof ComponentFlags> | number;
+export type ComponentFlags = number;
 
 export const EntityFlags = {
     NONE: 0,
@@ -54,7 +53,7 @@ export const EntityFlags = {
     DESTROYED: 4,
     ALL: 7,
 } as const;
-export type EntityFlags = Enum<typeof EntityFlags> | number;
+export type EntityFlags = number;
 
 export const WORLD_SCHEDULE_OPTIONS_DEFAULT: WorldScheduleOptions<DefaultWorldScheduleId, DefaultSystemStage>[] = [
     {

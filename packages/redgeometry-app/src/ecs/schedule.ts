@@ -100,7 +100,7 @@ export class SystemSchedule {
             if (awaitMode === "dependency") {
                 entry.promise = fn(world) as Promise<void>;
             } else {
-                fn(world);
+                void fn(world);
             }
         }
     }

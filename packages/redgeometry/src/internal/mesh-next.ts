@@ -1984,7 +1984,7 @@ export function meshPrint<S, F, E, V, P>(
     let msg = "Mesh: \n";
 
     if (options === undefined || options.shells === true) {
-        msg += `  Shells # length = ${shells.length}, free = [${shells.free}]\n`;
+        msg += `  Shells # length = ${shells.length}, free = [${String(shells.free)}]\n`;
         for (let i = 0; i < shells.length; i++) {
             msg +=
                 `    [${i}] firstFace = ${shells.firstFace[i]},` +
@@ -1994,19 +1994,19 @@ export function meshPrint<S, F, E, V, P>(
     }
 
     if (options === undefined || options.faces === true) {
-        msg += `  Faces # length = ${faces.length}, free = [${faces.free}]\n`;
+        msg += `  Faces # length = ${faces.length}, free = [${String(faces.free)}]\n`;
         for (let i = 0; i < faces.length; i++) {
             msg +=
                 `    [${i}] shell = ${faces.shell[i]},` +
                 ` firstLoop = ${faces.firstLoop[i]},` +
                 ` next = ${faces.next[i]},` +
                 ` prev = ${faces.prev[i]},` +
-                ` data = ${faces.data[i]}\n`;
+                ` data = ${String(faces.data[i])}\n`;
         }
     }
 
     if (options === undefined || options.loops === true) {
-        msg += `  Loops # length = ${loops.length}, free = [${loops.free}]\n`;
+        msg += `  Loops # length = ${loops.length}, free = [${String(loops.free)}]\n`;
         for (let i = 0; i < loops.length; i++) {
             msg +=
                 `    [${i}] face = ${loops.face[i]},` +
@@ -2017,7 +2017,7 @@ export function meshPrint<S, F, E, V, P>(
     }
 
     if (options === undefined || options.links === true) {
-        msg += `  Links # length = ${links.length}, free = [${links.free}]\n`;
+        msg += `  Links # length = ${links.length}, free = [${String(links.free)}]\n`;
         for (let i = 0; i < links.length; i++) {
             msg +=
                 `    [${i}] loop = ${links.loop[i]},` +
@@ -2030,16 +2030,16 @@ export function meshPrint<S, F, E, V, P>(
     }
 
     if (options === undefined || options.edges === true) {
-        msg += `  Edges # length = ${edges.length}, free = [${edges.free}]\n`;
+        msg += `  Edges # length = ${edges.length}, free = [${String(edges.free)}]\n`;
         for (let i = 0; i < edges.length; i++) {
-            msg += `    [${i}] link = ${edges.link[i]}, data = ${edges.data[i]}\n`;
+            msg += `    [${i}] link = ${edges.link[i]}, data = ${String(edges.data[i])}\n`;
         }
     }
 
     if (options === undefined || options.vertices === true) {
-        msg += `  Vertices # length = ${vertices.length}, free = [${vertices.free}]\n`;
+        msg += `  Vertices # length = ${vertices.length}, free = [${String(vertices.free)}]\n`;
         for (let i = 0; i < vertices.length; i++) {
-            msg += `    [${i}] firstLink = ${vertices.firstLink[i]}, data = ${vertices.data[i]}\n`;
+            msg += `    [${i}] firstLink = ${vertices.firstLink[i]}, data = ${String(vertices.data[i])}\n`;
         }
     }
 

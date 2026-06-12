@@ -119,7 +119,7 @@ export class App {
             const channel = group.channelMap.get(worldId);
 
             if (channel !== undefined) {
-                channel.world.runSchedule(scheduleId);
+                void channel.world.runSchedule(scheduleId);
             }
         }
     }

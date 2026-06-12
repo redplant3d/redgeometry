@@ -77,7 +77,7 @@ export class WorldChannelLocal {
     }
 
     public queueSchedule<T extends WorldScheduleId>(scheduleId: T): void {
-        this.executorAsync(scheduleId);
+        void this.executorAsync(scheduleId);
     }
 
     public runScheduleAsync<T extends WorldScheduleId>(scheduleId: T): Promise<void> {
@@ -291,7 +291,7 @@ export class LocalAppRemote implements AppRemoteChild, AppRemoteParent {
             senderId: this.requestSenderId,
         };
 
-        this.executorAsync(message);
+        void this.executorAsync(message);
     }
 
     public async sendRequestAsync(data: AppMessageRequestData, transfer: Transferable[]): Promise<void> {

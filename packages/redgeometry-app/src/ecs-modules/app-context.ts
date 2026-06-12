@@ -21,7 +21,7 @@ type CanvasStyle = string | CanvasGradient | CanvasPattern;
 export function initCanvasContextSystem(world: World): void {
     const { canvas } = world.readData<AppCanvasData>("app-canvas");
 
-    const context = canvas.getContext("2d") as CanvasRenderingContext2D | null;
+    const context = canvas.getContext("2d");
 
     if (context === null) {
         throwError("Unable to create app rendering context");
@@ -46,7 +46,7 @@ export class AppContextPlugin implements WorldPlugin {
     }
 
     public static fromCanvas(canvas: HTMLCanvasElement): AppContextPlugin | undefined {
-        const context = canvas.getContext("2d") as CanvasRenderingContext2D | null;
+        const context = canvas.getContext("2d");
 
         if (context === null) {
             return undefined;
