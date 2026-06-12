@@ -35,9 +35,8 @@ Execute `pnpm install` to install/update the development environment and `pnpm r
 
 ### Recommended tools
 
-- Visual Studio Code
-- Node.js 24.x or later
-- pnpm 11.x
+- [Visual Studio Code](https://code.visualstudio.com/)
+- [mise](https://mise.jdx.dev/)
 
 ### Example `launch.json`
 
