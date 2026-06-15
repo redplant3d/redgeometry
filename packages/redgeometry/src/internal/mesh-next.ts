@@ -2796,6 +2796,79 @@ export function mesh2IsMergableVertex<S, F, E, V>(mesh: Mesh2<S, F, E, V>, verte
     return true;
 }
 
+/**
+ * Returns `true` if all edges around the origin of `link` are oriented clockwise.
+ */
+export function mesh2IsValidLinkOrientation<S, F, E, V>(mesh: Mesh2<S, F, E, V>, link: MeshLinkIdx): boolean {
+    let linkCurr = link;
+    let linkNext = mesh.links.getOnext(linkCurr);
+    let linkNextNext = mesh.links.getOnext(linkNext);
+
+    if (linkCurr === linkNextNext) {
+        // Orientation of two edges cannot be properly validated
+        return true;
+    }
+
+    do {
+        const vtxCurr = mesh.links.getVertex(linkCurr);
+        const posCurr = mesh.vertices.getPos(vtxCurr);
+
+        const vtxSymNext = mesh.links.getVertexSym(linkNext);
+        const posSymNext = mesh.vertices.getPos(vtxSymNext);
+
+        const vtxSym = mesh.links.getVertexSym(linkCurr);
+        const posSym = mesh.vertices.getPos(vtxSym);
+
+        const vtxSymNextNext = mesh.links.getVertexSym(linkNextNext);
+        const posSymNextNext = mesh.vertices.getPos(vtxSymNextNext);
+
+        const v = posSymNext.sub(posCurr);
+        const v1 = posSym.sub(posCurr);
+        const v2 = posSymNextNext.sub(posCurr);
+
+        if (!Vector2.isBetweenCcw(v, v1, v2)) {
+            // Wrong orientation
+            return false;
+        }
+
+        linkCurr = linkNext;
+        linkNext = linkNextNext;
+        linkNextNext = mesh.links.getOnext(linkNext);
+    } while (linkCurr !== link);
+
+    return true;
+}
+
+/**
+ * Returns the closest distance between `link1` and `link2`
+ * or `undefined` if the links are equal or adjacent.
+ */
+export function mesh2LinkClosestDistance<S, F, E, V>(
+    mesh: Mesh2<S, F, E, V>,
+    link1: MeshLinkIdx,
+    link2: MeshLinkIdx,
+): number | undefined {
+    const vtx1 = mesh.links.getVertex(link1);
+    const vtx2 = mesh.links.getVertexSym(link1);
+    const vtx3 = mesh.links.getVertex(link2);
+    const vtx4 = mesh.links.getVertexSym(link2);
+
+    if (vtx1 === vtx3 || vtx1 === vtx4 || vtx2 === vtx3 || vtx2 === vtx4) {
+        // Links are equal or adjacent but not intersecting
+        return undefined;
+    }
+
+    const pos1 = mesh.vertices.getPos(vtx1);
+    const pos2 = mesh.vertices.getPos(vtx2);
+    const pos3 = mesh.vertices.getPos(vtx3);
+    const pos4 = mesh.vertices.getPos(vtx4);
+
+    const e1 = new Edge2(pos1, pos2);
+    const e2 = new Edge2(pos3, pos4);
+
+    return Edge2.getClosestDistance(e1, e2);
+}
+
 export function mesh2MergeEdgeAt<S, F, E, V>(
     mesh: Mesh2<S, F, E, V>,
     vertex: MeshVertexIdx,
@@ -3186,7 +3259,7 @@ export function mesh2UpdateInnerLoops<S, F, E, V>(
     // Skip `outerLoop` because its equivalent to `innerLoop` (but inverted)
     let currLoop = mesh.loops.getNext(outerLoop);
 
-    do {
+    while (currLoop !== outerLoop) {
         // Assign the next loop before the current loop is potentially moved to another face
         const nextLoop = mesh.loops.getNext(currLoop);
 
@@ -3195,7 +3268,7 @@ export function mesh2UpdateInnerLoops<S, F, E, V>(
         }
 
         currLoop = nextLoop;
-    } while (currLoop !== outerLoop);
+    }
 }
 
 export function mesh2WriteFaceToPath<S, F, E, V>(mesh: Mesh2<S, F, E, V>, idx: MeshFaceIdx, outPath: Path2): void {
