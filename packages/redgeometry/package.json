@@ -23,9 +23,6 @@
         "./src/*": "./src/*.ts"
     },
     "main": "dist/index.cjs",
-    "engines": {
-        "node": ">=14.17"
-    },
     "scripts": {
         "build": "rolldown -c"
     }
