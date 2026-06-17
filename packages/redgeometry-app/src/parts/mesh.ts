@@ -6,55 +6,54 @@ import { MinMaxBox2 } from "redgeometry/src/primitives/box";
 import type { ReadonlyVector2 } from "redgeometry/src/primitives/vector";
 import { RandomXSR128 } from "redgeometry/src/utility/random";
 import type { AppContextPlugin } from "../ecs-modules/app-context.ts";
-import type { AppInputData } from "../ecs-modules/app-input.ts";
-import { RangeInputElement } from "../ecs-modules/app-input.ts";
-import { AppMainModule, type AppStateData } from "../ecs-modules/app.ts";
+import { RangeInputElement, type AppInputData } from "../ecs-modules/app-input.ts";
+import { type AppStateData } from "../ecs-modules/app.ts";
 import type { DefaultSystemStage, WorldModule } from "../ecs/types.ts";
-import { WORLD_SCHEDULE_OPTIONS_DEFAULT, type World, type WorldOptions } from "../ecs/world.ts";
+import { type World } from "../ecs/world.ts";
 import { createRandomPoint } from "../utility/helper.ts";
 
 type AppPartMainData = {
-    dataId: "app-part-main";
+    dataId: "app-part-main-data";
     inputCount: RangeInputElement;
 };
 
 type AppPartRemoteData = {
-    dataId: "app-part-remote";
+    dataId: "app-part-remote-data";
     mesh: Mesh2;
     points: ReadonlyVector2[];
 };
 
 type AppPartStateData = {
-    dataId: "app-part-state";
+    dataId: "app-part-state-data";
     count: number;
 };
 
 function initMainSystem(world: World): void {
-    const { inputElements } = world.readData<AppInputData>("app-input");
+    const { inputElements } = world.readData<AppInputData>("app-input-data");
 
     const inputCount = new RangeInputElement("count", "0", "50", "1");
     inputCount.setStyle("width: 200px");
     inputElements.push(inputCount);
 
     world.writeData<AppPartMainData>({
-        dataId: "app-part-main",
+        dataId: "app-part-main-data",
         inputCount,
     });
 }
 
 function initRemoteSystem(world: World): void {
     world.writeData<AppPartRemoteData>({
-        dataId: "app-part-remote",
+        dataId: "app-part-remote-data",
         mesh: Mesh2.createEmpty(),
         points: [],
     });
 }
 
 function writeStateSystem(world: World): void {
-    const { inputCount } = world.readData<AppPartMainData>("app-part-main");
+    const { inputCount } = world.readData<AppPartMainData>("app-part-main-data");
 
     const stateData: AppPartStateData = {
-        dataId: "app-part-state",
+        dataId: "app-part-state-data",
         count: inputCount.getInt(),
     };
 
@@ -62,8 +61,8 @@ function writeStateSystem(world: World): void {
 }
 
 function updateSystem(world: World): void {
-    const { count } = world.readData<AppPartStateData>("app-part-state");
-    const { seed } = world.readData<AppStateData>("app-state");
+    const { count } = world.readData<AppPartStateData>("app-part-state-data");
+    const { seed } = world.readData<AppStateData>("app-state-data");
 
     const ctx = world.getPlugin<AppContextPlugin>("app-context");
 
@@ -102,15 +101,15 @@ function updateSystem(world: World): void {
     mesh.validate();
 
     world.writeData<AppPartRemoteData>({
-        dataId: "app-part-remote",
+        dataId: "app-part-remote-data",
         mesh,
         points,
     });
 }
 
 function renderSystem(world: World): void {
-    const { mesh, points } = world.readData<AppPartRemoteData>("app-part-remote");
-    const { seed } = world.readData<AppStateData>("app-state");
+    const { mesh, points } = world.readData<AppPartRemoteData>("app-part-remote-data");
+    const { seed } = world.readData<AppStateData>("app-state-data");
 
     const ctx = world.getPlugin<AppContextPlugin>("app-context");
 
@@ -122,8 +121,8 @@ function renderSystem(world: World): void {
     ctx.fillPoints(points, "#000000", 5);
 }
 
-class AppPartMainModule implements WorldModule {
-    public readonly moduleId = "app-part-main";
+export class MeshAppPartModule implements WorldModule {
+    public readonly moduleId = "app-part-main-data";
 
     public setup(world: World): void {
         world.addSystems<DefaultSystemStage>({ stage: "start", fns: [initMainSystem, writeStateSystem] });
@@ -137,10 +136,3 @@ class AppPartMainModule implements WorldModule {
         world.addDependency<DefaultSystemStage>({ stage: "update", seq: [updateSystem, renderSystem] });
     }
 }
-
-export const MESH_MAIN_WORLD: WorldOptions = {
-    id: "main",
-    modules: [new AppMainModule(), new AppPartMainModule()],
-    schedules: WORLD_SCHEDULE_OPTIONS_DEFAULT,
-    startupScheduleId: "start",
-};

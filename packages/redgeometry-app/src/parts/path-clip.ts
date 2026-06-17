@@ -4,17 +4,16 @@ import { PathClip2 } from "redgeometry/src/core/path-clip";
 import { PATH_QUALITY_OPTIONS_DEFAULT } from "redgeometry/src/core/path-options";
 import { Polygon2 } from "redgeometry/src/core/polygon";
 import { RandomXSR128 } from "redgeometry/src/utility/random";
-import type { AppContextPlugin } from "../ecs-modules/app-context.ts";
-import { AppContextModule } from "../ecs-modules/app-context.ts";
+import { AppContextPlugin } from "../ecs-modules/app-context.ts";
 import type { AppInputData } from "../ecs-modules/app-input.ts";
 import { ComboBoxInputElement, RangeInputElement } from "../ecs-modules/app-input.ts";
-import { AppMainModule, type AppStateData } from "../ecs-modules/app.ts";
+import { type AppStateData } from "../ecs-modules/app.ts";
 import type { DefaultSystemStage, WorldModule } from "../ecs/types.ts";
-import { WORLD_SCHEDULE_OPTIONS_DEFAULT, type World, type WorldOptions } from "../ecs/world.ts";
+import { type World } from "../ecs/world.ts";
 import { createRandomPolygonPair, getBooleanOperator, getWindingOperator } from "../utility/helper.ts";
 
 type AppPartMainData = {
-    dataId: "app-part-main";
+    dataId: "app-part-main-data";
     inputBoolOp: ComboBoxInputElement;
     inputParameter: RangeInputElement;
     inputWindA: ComboBoxInputElement;
@@ -22,7 +21,7 @@ type AppPartMainData = {
 };
 
 type AppPartRemoteData = {
-    dataId: "app-part-remote";
+    dataId: "app-part-remote-data";
     chains: Path2;
     faces: Path2;
     polygonA: Polygon2;
@@ -30,7 +29,7 @@ type AppPartRemoteData = {
 };
 
 type AppPartStateData = {
-    dataId: "app-part-state";
+    dataId: "app-part-state-data";
     parameter: number;
     boolOp: string;
     windA: string;
@@ -38,7 +37,7 @@ type AppPartStateData = {
 };
 
 function initMainSystem(world: World): void {
-    const { inputElements } = world.readData<AppInputData>("app-input");
+    const { inputElements } = world.readData<AppInputData>("app-input-data");
 
     const inputParameter = new RangeInputElement("parameter", "0", "200", "100");
     inputParameter.setStyle("width: 200px");
@@ -57,7 +56,7 @@ function initMainSystem(world: World): void {
     inputElements.push(inputWindB);
 
     world.writeData<AppPartMainData>({
-        dataId: "app-part-main",
+        dataId: "app-part-main-data",
         inputParameter,
         inputBoolOp,
         inputWindA,
@@ -67,7 +66,7 @@ function initMainSystem(world: World): void {
 
 function initRemoteSystem(world: World): void {
     world.writeData<AppPartRemoteData>({
-        dataId: "app-part-remote",
+        dataId: "app-part-remote-data",
         polygonA: Polygon2.createEmpty(),
         polygonB: Polygon2.createEmpty(),
         chains: Path2.createEmpty(),
@@ -76,10 +75,11 @@ function initRemoteSystem(world: World): void {
 }
 
 function writeStateSystem(world: World): void {
-    const { inputParameter, inputBoolOp, inputWindA, inputWindB } = world.readData<AppPartMainData>("app-part-main");
+    const { inputParameter, inputBoolOp, inputWindA, inputWindB } =
+        world.readData<AppPartMainData>("app-part-main-data");
 
     const stateData: AppPartStateData = {
-        dataId: "app-part-state",
+        dataId: "app-part-state-data",
         parameter: inputParameter.getInt(),
         boolOp: inputBoolOp.getValue(),
         windA: inputWindA.getValue(),
@@ -90,8 +90,8 @@ function writeStateSystem(world: World): void {
 }
 
 function updateSystem(world: World): void {
-    const { parameter, boolOp, windA, windB } = world.readData<AppPartStateData>("app-part-state");
-    const { seed, generator } = world.readData<AppStateData>("app-state");
+    const { parameter, boolOp, windA, windB } = world.readData<AppPartStateData>("app-part-state-data");
+    const { seed, generator } = world.readData<AppStateData>("app-state-data");
 
     const ctx = world.getPlugin<AppContextPlugin>("app-context");
 
@@ -120,7 +120,7 @@ function updateSystem(world: World): void {
     });
 
     world.writeData<AppPartRemoteData>({
-        dataId: "app-part-remote",
+        dataId: "app-part-remote-data",
         chains: mesh.getChainsPath(),
         faces: mesh.getFacesPath(),
         polygonA,
@@ -129,7 +129,7 @@ function updateSystem(world: World): void {
 }
 
 function renderSystem(world: World): void {
-    const { polygonA, polygonB, chains, faces } = world.readData<AppPartRemoteData>("app-part-remote");
+    const { polygonA, polygonB, chains, faces } = world.readData<AppPartRemoteData>("app-part-remote-data");
 
     const ctx = world.getPlugin<AppContextPlugin>("app-context");
 
@@ -144,8 +144,8 @@ function renderSystem(world: World): void {
     ctx.drawPath(chains, "#3333FF", 1.5);
 }
 
-class AppPartMainModule implements WorldModule {
-    public readonly moduleId = "app-part-main";
+export class PathClipAppPartModule implements WorldModule {
+    public readonly moduleId = "app-part-main-data";
 
     public setup(world: World): void {
         world.addSystems<DefaultSystemStage>({ stage: "start", fns: [initMainSystem, writeStateSystem] });
@@ -159,10 +159,3 @@ class AppPartMainModule implements WorldModule {
         world.addDependency<DefaultSystemStage>({ stage: "update", seq: [updateSystem, renderSystem] });
     }
 }
-
-export const PATH_CLIP_MAIN_WORLD: WorldOptions = {
-    id: "main",
-    modules: [new AppMainModule(), new AppPartMainModule(), new AppContextModule()],
-    schedules: WORLD_SCHEDULE_OPTIONS_DEFAULT,
-    startupScheduleId: "start",
-};

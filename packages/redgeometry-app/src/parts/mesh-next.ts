@@ -26,20 +26,18 @@ import { Edge2 } from "redgeometry/src/primitives/edge";
 import { Vector2, type ReadonlyVector2 } from "redgeometry/src/primitives/vector";
 import { log } from "redgeometry/src/utility/debug";
 import type { AppContextPlugin } from "../ecs-modules/app-context.ts";
-import type { AppInputData } from "../ecs-modules/app-input.ts";
-import { ButtonInputElement } from "../ecs-modules/app-input.ts";
-import { AppMainModule } from "../ecs-modules/app.ts";
+import { ButtonInputElement, type AppInputData } from "../ecs-modules/app-input.ts";
 import { KeyboardButtons, KeyboardPlugin, MouseButtons, MousePlugin } from "../ecs-modules/input.ts";
 import type { DefaultSystemStage, WorldModule } from "../ecs/types.ts";
-import { WORLD_SCHEDULE_OPTIONS_DEFAULT, type World, type WorldOptions } from "../ecs/world.ts";
+import { type World } from "../ecs/world.ts";
 
 type AppPartMainData = {
-    dataId: "app-part-main";
+    dataId: "app-part-main-data";
     inputPrint: ButtonInputElement;
 };
 
 type AppPartRemoteData = {
-    dataId: "app-part-remote";
+    dataId: "app-part-remote-data";
     mesh: Mesh2<unknown, unknown, unknown, unknown>;
     meshShell: MeshShellIdx | undefined;
     needsValidate: boolean;
@@ -48,37 +46,37 @@ type AppPartRemoteData = {
 };
 
 type AppPartStateData = {
-    dataId: "app-part-state";
+    dataId: "app-part-state-data";
 };
 
 type AppPartCommandEvent = {
-    eventId: "app-part-command";
+    eventId: "app-part-command-event";
     command: "print" | "stringify" | "clear";
 };
 
 function initMainSystem(world: World): void {
-    const { inputElements } = world.readData<AppInputData>("app-input");
+    const { inputElements } = world.readData<AppInputData>("app-input-data");
 
     const inputPrint = new ButtonInputElement("print", "print");
     inputPrint.addEventListener("click", () => {
-        world.writeEvent<AppPartCommandEvent>({ eventId: "app-part-command", command: "print" });
+        world.writeEvent<AppPartCommandEvent>({ eventId: "app-part-command-event", command: "print" });
     });
     inputElements.push(inputPrint);
 
     const inputStringify = new ButtonInputElement("stringify", "stringify");
     inputStringify.addEventListener("click", () => {
-        world.writeEvent<AppPartCommandEvent>({ eventId: "app-part-command", command: "stringify" });
+        world.writeEvent<AppPartCommandEvent>({ eventId: "app-part-command-event", command: "stringify" });
     });
     inputElements.push(inputStringify);
 
     const inputClear = new ButtonInputElement("clear", "clear");
     inputClear.addEventListener("click", () => {
-        world.writeEvent<AppPartCommandEvent>({ eventId: "app-part-command", command: "clear" });
+        world.writeEvent<AppPartCommandEvent>({ eventId: "app-part-command-event", command: "clear" });
     });
     inputElements.push(inputClear);
 
     world.writeData<AppPartMainData>({
-        dataId: "app-part-main",
+        dataId: "app-part-main-data",
         inputPrint,
     });
 
@@ -87,7 +85,7 @@ function initMainSystem(world: World): void {
 
 function initRemoteSystem(world: World): void {
     world.writeData<AppPartRemoteData>({
-        dataId: "app-part-remote",
+        dataId: "app-part-remote-data",
         mesh: Mesh.createEmpty(),
         meshShell: undefined,
         needsValidate: false,
@@ -98,7 +96,7 @@ function initRemoteSystem(world: World): void {
 
 function writeStateSystem(world: World): void {
     const stateData: AppPartStateData = {
-        dataId: "app-part-state",
+        dataId: "app-part-state-data",
     };
 
     world.writeData(stateData);
@@ -107,7 +105,7 @@ function writeStateSystem(world: World): void {
 function updateSystem(world: World): void {
     const keyboardPlugin = world.getPlugin<KeyboardPlugin>("keyboard");
     const mousePlugin = world.getPlugin<MousePlugin>("mouse");
-    const remoteData = world.readData<AppPartRemoteData>("app-part-remote");
+    const remoteData = world.readData<AppPartRemoteData>("app-part-remote-data");
 
     const pos = Vector2.fromObject(mousePlugin.getCursorPosition());
     const mesh = remoteData.mesh;
@@ -253,8 +251,8 @@ function updateSystem(world: World): void {
 }
 
 function commandEventSystem(world: World): void {
-    const commandEvents = world.readEvents<AppPartCommandEvent>("app-part-command");
-    const remoteData = world.readData<AppPartRemoteData>("app-part-remote");
+    const commandEvents = world.readEvents<AppPartCommandEvent>("app-part-command-event");
+    const remoteData = world.readData<AppPartRemoteData>("app-part-remote-data");
 
     const mesh = remoteData.mesh;
 
@@ -286,7 +284,7 @@ function commandEventSystem(world: World): void {
 
 function renderSystem(world: World): void {
     const ctx = world.getPlugin<AppContextPlugin>("app-context");
-    const { mesh } = world.readData<AppPartRemoteData>("app-part-remote");
+    const { mesh } = world.readData<AppPartRemoteData>("app-part-remote-data");
 
     ctx.clear();
     ctx.drawMesh2Next(mesh);
@@ -321,8 +319,8 @@ function isVertexClose<S, F, E, V>(
     return vtxPos.distance(pos) < threshold;
 }
 
-class AppPartMainModule implements WorldModule {
-    public readonly moduleId = "app-part-main";
+export class MeshNextAppPartModule implements WorldModule {
+    public readonly moduleId = "app-part-main-data";
 
     public setup(world: World): void {
         world.addSystems<DefaultSystemStage>({ stage: "start", fns: [initMainSystem, writeStateSystem] });
@@ -339,10 +337,3 @@ class AppPartMainModule implements WorldModule {
         world.addDependency<DefaultSystemStage>({ stage: "update", seq: [updateSystem, renderSystem] });
     }
 }
-
-export const MESH_NEXT_MAIN_WORLD: WorldOptions = {
-    id: "main",
-    modules: [new AppMainModule(), new AppPartMainModule()],
-    schedules: WORLD_SCHEDULE_OPTIONS_DEFAULT,
-    startupScheduleId: "start",
-};

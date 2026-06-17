@@ -3,33 +3,36 @@ import { Matrix4, type ReadonlyMatrix4 } from "redgeometry/src/primitives/matrix
 import { Quaternion, RotationOrder } from "redgeometry/src/primitives/quaternion";
 import { Vector2, Vector3 } from "redgeometry/src/primitives/vector";
 import type { AppContextPlugin } from "../ecs-modules/app-context.ts";
-import type { AppInputData } from "../ecs-modules/app-input.ts";
-import { ComboBoxInputElement, RangeInputElement, TextBoxInputElement } from "../ecs-modules/app-input.ts";
-import { AppMainModule } from "../ecs-modules/app.ts";
+import {
+    ComboBoxInputElement,
+    RangeInputElement,
+    TextBoxInputElement,
+    type AppInputData,
+} from "../ecs-modules/app-input.ts";
 import type { DefaultSystemStage, WorldModule } from "../ecs/types.ts";
-import { WORLD_SCHEDULE_OPTIONS_DEFAULT, type World, type WorldOptions } from "../ecs/world.ts";
+import { type World } from "../ecs/world.ts";
 
 type AppPartMainData = {
-    dataId: "app-part-main";
+    dataId: "app-part-main-data";
     inputCount: TextBoxInputElement;
     inputProjection: ComboBoxInputElement;
     inputRotation: RangeInputElement;
 };
 
 type AppPartRemoteData = {
-    dataId: "app-part-remote";
+    dataId: "app-part-remote-data";
     edges: Edge2[];
 };
 
 type AppPartStateData = {
-    dataId: "app-part-state";
+    dataId: "app-part-state-data";
     count: number;
     projection: string;
     rotation: number;
 };
 
 function initMainSystem(world: World): void {
-    const { inputElements } = world.readData<AppInputData>("app-input");
+    const { inputElements } = world.readData<AppInputData>("app-input-data");
 
     const inputCount = new TextBoxInputElement("count", "10");
     inputCount.setStyle("width: 80px");
@@ -44,7 +47,7 @@ function initMainSystem(world: World): void {
     inputElements.push(inputProjection);
 
     world.writeData<AppPartMainData>({
-        dataId: "app-part-main",
+        dataId: "app-part-main-data",
         inputCount,
         inputRotation,
         inputProjection,
@@ -53,16 +56,16 @@ function initMainSystem(world: World): void {
 
 function initRemoteSystem(world: World): void {
     world.writeData<AppPartRemoteData>({
-        dataId: "app-part-remote",
+        dataId: "app-part-remote-data",
         edges: [],
     });
 }
 
 function writeStateSystem(world: World): void {
-    const { inputCount, inputRotation, inputProjection } = world.readData<AppPartMainData>("app-part-main");
+    const { inputCount, inputRotation, inputProjection } = world.readData<AppPartMainData>("app-part-main-data");
 
     const stateData: AppPartStateData = {
-        dataId: "app-part-state",
+        dataId: "app-part-state-data",
         count: inputCount.getInt(),
         projection: inputProjection.getValue(),
         rotation: inputRotation.getInt(),
@@ -72,7 +75,7 @@ function writeStateSystem(world: World): void {
 }
 
 function updateSystem(world: World): void {
-    const { projection, rotation } = world.readData<AppPartStateData>("app-part-state");
+    const { projection, rotation } = world.readData<AppPartStateData>("app-part-state-data");
 
     const ctx = world.getPlugin<AppContextPlugin>("app-context");
 
@@ -109,13 +112,13 @@ function updateSystem(world: World): void {
     matView.setMul(matProj, matView);
 
     world.writeData<AppPartRemoteData>({
-        dataId: "app-part-remote",
+        dataId: "app-part-remote-data",
         edges: transformEdges(edges, matView),
     });
 }
 
 function renderSystem(world: World): void {
-    const { edges } = world.readData<AppPartRemoteData>("app-part-remote");
+    const { edges } = world.readData<AppPartRemoteData>("app-part-remote-data");
 
     const ctx = world.getPlugin<AppContextPlugin>("app-context");
 
@@ -167,8 +170,8 @@ function transformEdges(edges: ReadonlyEdge3[], mat: ReadonlyMatrix4): Edge2[] {
     return output;
 }
 
-class AppPartMainModule implements WorldModule {
-    public readonly moduleId = "app-part-main";
+export class MatrixAppPartModule implements WorldModule {
+    public readonly moduleId = "app-part-main-data";
 
     public setup(world: World): void {
         world.addSystems<DefaultSystemStage>({ stage: "start", fns: [initMainSystem, writeStateSystem] });
@@ -182,10 +185,3 @@ class AppPartMainModule implements WorldModule {
         world.addDependency<DefaultSystemStage>({ stage: "update", seq: [updateSystem, renderSystem] });
     }
 }
-
-export const MATRIX_MAIN_WORLD: WorldOptions = {
-    id: "main",
-    modules: [new AppMainModule(), new AppPartMainModule()],
-    schedules: WORLD_SCHEDULE_OPTIONS_DEFAULT,
-    startupScheduleId: "start",
-};

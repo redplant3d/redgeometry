@@ -1,54 +1,64 @@
 import { throwError } from "redgeometry/src/utility/debug";
-import { AppLauncherModule } from "../ecs-modules/app-launcher.ts";
-import type { DefaultWorldScheduleId } from "../ecs/types.ts";
-import { World, type WorldOptions } from "../ecs/world.ts";
+import { AppModule, type AppLauncherData } from "../ecs-modules/app.ts";
+import type { AnimationFrameEvent } from "../ecs-modules/time.ts";
+import type { DefaultWorldScheduleId, WorldModule } from "../ecs/types.ts";
+import { World, WORLD_SCHEDULE_OPTIONS_DEFAULT } from "../ecs/world.ts";
 
 export type AppPartId = string;
 
-export type AppPartEntry = {
-    options: WorldOptions;
-    startupScheduleId: DefaultWorldScheduleId;
-};
-
 export class AppLauncher {
-    private optionsMap: Map<AppPartId, WorldOptions>;
+    private worldModuleMap: Map<AppPartId, WorldModule>;
 
     public constructor() {
-        this.optionsMap = new Map();
+        this.worldModuleMap = new Map();
     }
 
-    public addPart(id: AppPartId, options: WorldOptions): void {
-        if (this.optionsMap.has(id)) {
-            throwError("App part id '{}' already exists", id);
+    public addPart(appPartId: AppPartId, worldModule: WorldModule): void {
+        if (this.worldModuleMap.has(appPartId)) {
+            throwError("App part id '{}' already exists", appPartId);
         }
 
-        this.optionsMap.set(id, options);
+        this.worldModuleMap.set(appPartId, worldModule);
     }
 
-    public run(defaultAppPartId: AppPartId): void {
+    public async run(defaultAppPartId: AppPartId): Promise<void> {
         // Collect app part ids
-        const appPartIds = [...this.optionsMap.keys()];
+        const appPartIds = [...this.worldModuleMap.keys()];
 
         // Get app part id to run
         const params = new URLSearchParams(window.location.search);
         const appPartId = params.get("app") ?? defaultAppPartId;
 
-        // Create app launcher module
-        const appLauncherModule = new AppLauncherModule(appPartIds, appPartId);
+        // Create and run world
+        const module = this.worldModuleMap.get(appPartId);
 
-        // Get world options
-        const options = this.optionsMap.get(appPartId);
-
-        if (options === undefined) {
+        if (module === undefined) {
             throwError("App part  id'{}' not found", appPartId);
         }
 
-        // Create and run world
         const world = new World();
-        world.addModules([...options.modules, appLauncherModule]);
-        world.addSchedules(options.schedules);
+        world.addModules([new AppModule(appPartIds, appPartId), module]);
+        world.addSchedules(WORLD_SCHEDULE_OPTIONS_DEFAULT);
         world.init();
 
-        void world.runSchedule(options.startupScheduleId);
+        let exitRequested = false;
+
+        await world.runSchedule<DefaultWorldScheduleId>("start");
+
+        while (!exitRequested) {
+            const time = await new Promise(requestAnimationFrame);
+
+            world.writeEvent<AnimationFrameEvent>({ eventId: "animation-frame-event", time });
+
+            await world.runSchedule<DefaultWorldScheduleId>("update");
+
+            const appLauncherData = world.readData<AppLauncherData>("app-launcher-data");
+
+            if (appLauncherData.requestExit) {
+                exitRequested = true;
+            }
+        }
+
+        await world.runSchedule<DefaultWorldScheduleId>("stop");
     }
 }

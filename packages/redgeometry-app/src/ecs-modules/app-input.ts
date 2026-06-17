@@ -3,13 +3,13 @@ import type { DefaultSystemStage, WorldModule } from "../ecs/types.ts";
 import type { World } from "../ecs/world.ts";
 
 export type AppInputData = {
-    dataId: "app-input";
+    dataId: "app-input-data";
     inputElements: AppInputElement[];
     paramsContainer: HTMLElement;
 };
 
 export function startInputElementsSystem(world: World): void {
-    const { inputElements, paramsContainer } = world.readData<AppInputData>("app-input");
+    const { inputElements, paramsContainer } = world.readData<AppInputData>("app-input-data");
 
     for (const inputElement of inputElements) {
         inputElement.register(paramsContainer);
@@ -17,7 +17,7 @@ export function startInputElementsSystem(world: World): void {
 }
 
 export function stopInputElementsSystem(world: World): void {
-    const { inputElements } = world.readData<AppInputData>("app-input");
+    const { inputElements } = world.readData<AppInputData>("app-input-data");
 
     for (const inputElement of inputElements) {
         inputElement.unregister();
@@ -25,7 +25,7 @@ export function stopInputElementsSystem(world: World): void {
 }
 
 export class AppInputModule implements WorldModule {
-    public readonly moduleId = "app-input";
+    public readonly moduleId = "app-input-data";
 
     public setup(world: World): void {
         world.addSystem<DefaultSystemStage>({ stage: "start-post", fn: startInputElementsSystem });

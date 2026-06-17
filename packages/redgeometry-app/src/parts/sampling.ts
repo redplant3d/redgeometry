@@ -5,9 +5,9 @@ import { clamp } from "redgeometry/src/utility/scalar";
 import type { AppContextPlugin } from "../ecs-modules/app-context.ts";
 import type { AppInputData } from "../ecs-modules/app-input.ts";
 import { ComboBoxInputElement, RangeInputElement } from "../ecs-modules/app-input.ts";
-import { AppMainModule, type AppStateData } from "../ecs-modules/app.ts";
+import { type AppStateData } from "../ecs-modules/app.ts";
 import type { DefaultSystemStage, WorldModule } from "../ecs/types.ts";
-import { WORLD_SCHEDULE_OPTIONS_DEFAULT, type World, type WorldOptions } from "../ecs/world.ts";
+import { type World } from "../ecs/world.ts";
 import { Image2 } from "../utility/image.ts";
 
 const SOBOL_XOR_1 = [
@@ -18,27 +18,27 @@ const SOBOL_XOR_1 = [
 ];
 
 type AppPartMainData = {
-    dataId: "app-part-main";
+    dataId: "app-part-main-data";
     inputCount: RangeInputElement;
     inputFormat: ComboBoxInputElement;
     inputSize: RangeInputElement;
 };
 
 type AppPartRemoteData = {
-    dataId: "app-part-remote";
+    dataId: "app-part-remote-data";
     boxes: ReadonlyMinMaxBox2[];
     image: Image2;
 };
 
 type AppPartStateData = {
-    dataId: "app-part-state";
+    dataId: "app-part-state-data";
     size: number;
     count: number;
     format: string;
 };
 
 function initMainSystem(world: World): void {
-    const { inputElements } = world.readData<AppInputData>("app-input");
+    const { inputElements } = world.readData<AppInputData>("app-input-data");
 
     const inputSize = new RangeInputElement("size", "16", "1024", "512");
     inputSize.setStyle("width: 200px");
@@ -53,7 +53,7 @@ function initMainSystem(world: World): void {
     inputElements.push(inputFormat);
 
     world.writeData<AppPartMainData>({
-        dataId: "app-part-main",
+        dataId: "app-part-main-data",
         inputSize,
         inputCount,
         inputFormat,
@@ -62,17 +62,17 @@ function initMainSystem(world: World): void {
 
 function initRemoteSystem(world: World): void {
     world.writeData<AppPartRemoteData>({
-        dataId: "app-part-remote",
+        dataId: "app-part-remote-data",
         boxes: [],
         image: new Image2(0, 0),
     });
 }
 
 function writeStateSystem(world: World): void {
-    const { inputSize, inputCount, inputFormat } = world.readData<AppPartMainData>("app-part-main");
+    const { inputSize, inputCount, inputFormat } = world.readData<AppPartMainData>("app-part-main-data");
 
     const stateData: AppPartStateData = {
-        dataId: "app-part-state",
+        dataId: "app-part-state-data",
         size: inputSize.getInt(),
         count: inputCount.getInt(),
         format: inputFormat.getValue(),
@@ -82,8 +82,8 @@ function writeStateSystem(world: World): void {
 }
 
 function updateSystem(world: World): void {
-    const { size, count, format } = world.readData<AppPartStateData>("app-part-state");
-    const { seed, generator } = world.readData<AppStateData>("app-state");
+    const { size, count, format } = world.readData<AppPartStateData>("app-part-state-data");
+    const { seed, generator } = world.readData<AppStateData>("app-state-data");
 
     const countP = 2 ** count;
 
@@ -132,15 +132,15 @@ function updateSystem(world: World): void {
     }
 
     world.writeData<AppPartRemoteData>({
-        dataId: "app-part-remote",
+        dataId: "app-part-remote-data",
         boxes,
         image,
     });
 }
 
 function renderSystem(world: World): void {
-    const { boxes, image } = world.readData<AppPartRemoteData>("app-part-remote");
-    const { size } = world.readData<AppPartStateData>("app-part-state");
+    const { boxes, image } = world.readData<AppPartRemoteData>("app-part-remote-data");
+    const { size } = world.readData<AppPartStateData>("app-part-state-data");
 
     const ctx = world.getPlugin<AppContextPlugin>("app-context");
 
@@ -281,8 +281,8 @@ function sampleWhiteNoise(random: Random, count: number, samples: number[]): voi
     }
 }
 
-class AppPartMainModule implements WorldModule {
-    public readonly moduleId = "app-part-main";
+export class SamplingAppPartModule implements WorldModule {
+    public readonly moduleId = "app-part-main-data";
 
     public setup(world: World): void {
         world.addSystems<DefaultSystemStage>({ stage: "start", fns: [initMainSystem, writeStateSystem] });
@@ -296,10 +296,3 @@ class AppPartMainModule implements WorldModule {
         world.addDependency<DefaultSystemStage>({ stage: "update", seq: [updateSystem, renderSystem] });
     }
 }
-
-export const SAMPLING_MAIN_WORLD: WorldOptions = {
-    id: "main",
-    modules: [new AppMainModule(), new AppPartMainModule()],
-    schedules: WORLD_SCHEDULE_OPTIONS_DEFAULT,
-    startupScheduleId: "start",
-};

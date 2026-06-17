@@ -1,30 +1,29 @@
 import { log } from "redgeometry/src/utility/debug";
 import { RandomXSR128 } from "redgeometry/src/utility/random";
 import type { AppContextPlugin } from "../ecs-modules/app-context.ts";
-import type { AppInputData } from "../ecs-modules/app-input.ts";
-import { RangeInputElement } from "../ecs-modules/app-input.ts";
-import { AppMainModule, type AppStateData } from "../ecs-modules/app.ts";
+import { RangeInputElement, type AppInputData } from "../ecs-modules/app-input.ts";
+import { type AppStateData } from "../ecs-modules/app.ts";
 import type { DefaultSystemStage, WorldModule } from "../ecs/types.ts";
-import { WORLD_SCHEDULE_OPTIONS_DEFAULT, type World, type WorldOptions } from "../ecs/world.ts";
+import { type World } from "../ecs/world.ts";
 
 type AppPartMainData = {
-    dataId: "app-part-main";
+    dataId: "app-part-main-data";
     inputParam1: RangeInputElement;
     inputParam2: RangeInputElement;
 };
 
 type AppPartRemoteData = {
-    dataId: "app-part-remote";
+    dataId: "app-part-remote-data";
 };
 
 type AppPartStateData = {
-    dataId: "app-part-state";
+    dataId: "app-part-state-data";
     param1: number;
     param2: number;
 };
 
 function initMainSystem(world: World): void {
-    const { inputElements } = world.readData<AppInputData>("app-input");
+    const { inputElements } = world.readData<AppInputData>("app-input-data");
 
     const inputParam1 = new RangeInputElement("param1", "1", "100", "50");
     inputParam1.setStyle("width: 200px");
@@ -35,7 +34,7 @@ function initMainSystem(world: World): void {
     inputElements.push(inputParam2);
 
     world.writeData<AppPartMainData>({
-        dataId: "app-part-main",
+        dataId: "app-part-main-data",
         inputParam1,
         inputParam2,
     });
@@ -43,15 +42,15 @@ function initMainSystem(world: World): void {
 
 function initRemoteSystem(world: World): void {
     world.writeData<AppPartRemoteData>({
-        dataId: "app-part-remote",
+        dataId: "app-part-remote-data",
     });
 }
 
 function writeStateSystem(world: World): void {
-    const { inputParam1, inputParam2 } = world.readData<AppPartMainData>("app-part-main");
+    const { inputParam1, inputParam2 } = world.readData<AppPartMainData>("app-part-main-data");
 
     const stateData: AppPartStateData = {
-        dataId: "app-part-state",
+        dataId: "app-part-state-data",
         param1: inputParam1.getInt(),
         param2: inputParam2.getInt(),
     };
@@ -60,15 +59,15 @@ function writeStateSystem(world: World): void {
 }
 
 function updateSystem(world: World): void {
-    const { param1, param2 } = world.readData<AppPartStateData>("app-part-state");
-    const { seed } = world.readData<AppStateData>("app-state");
+    const { param1, param2 } = world.readData<AppPartStateData>("app-part-state-data");
+    const { seed } = world.readData<AppStateData>("app-state-data");
 
     const random = RandomXSR128.fromSeedLcg(seed);
 
     log.infoDebug("param1 = {}, param2 = {}, random = {}", param1, param2, random.nextInt());
 
     world.writeData<AppPartRemoteData>({
-        dataId: "app-part-remote",
+        dataId: "app-part-remote-data",
     });
 }
 
@@ -78,8 +77,8 @@ function renderSystem(world: World): void {
     ctx.clear();
 }
 
-class AppPartMainModule implements WorldModule {
-    public readonly moduleId = "app-part-main";
+export class PlaygroundAppPartModule implements WorldModule {
+    public readonly moduleId = "app-part-main-data";
 
     public setup(world: World): void {
         world.addSystems<DefaultSystemStage>({ stage: "start", fns: [initMainSystem, writeStateSystem] });
@@ -93,10 +92,3 @@ class AppPartMainModule implements WorldModule {
         world.addDependency<DefaultSystemStage>({ stage: "update", seq: [updateSystem, renderSystem] });
     }
 }
-
-export const PLAYGROUND_MAIN_WORLD: WorldOptions = {
-    id: "main",
-    modules: [new AppMainModule(), new AppPartMainModule()],
-    schedules: WORLD_SCHEDULE_OPTIONS_DEFAULT,
-    startupScheduleId: "start",
-};

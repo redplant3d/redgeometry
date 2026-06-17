@@ -4,34 +4,33 @@ import { Matrix3A } from "redgeometry/src/primitives/matrix";
 import type { Vector2 } from "redgeometry/src/primitives/vector";
 import { RandomXSR128 } from "redgeometry/src/utility/random";
 import type { AppContextPlugin } from "../ecs-modules/app-context.ts";
-import type { AppInputData } from "../ecs-modules/app-input.ts";
-import { RangeInputElement } from "../ecs-modules/app-input.ts";
-import { AppMainModule, type AppStateData } from "../ecs-modules/app.ts";
+import { RangeInputElement, type AppInputData } from "../ecs-modules/app-input.ts";
+import { type AppStateData } from "../ecs-modules/app.ts";
 import type { DefaultSystemStage, WorldModule } from "../ecs/types.ts";
-import { WORLD_SCHEDULE_OPTIONS_DEFAULT, type World, type WorldOptions } from "../ecs/world.ts";
+import { type World } from "../ecs/world.ts";
 import { createRandomPolygonSimple } from "../utility/helper.ts";
 
 type AppPartMainData = {
-    dataId: "app-part-main";
+    dataId: "app-part-main-data";
     inputParameterA: RangeInputElement;
     inputParameterB: RangeInputElement;
 };
 
 type AppPartRemoteData = {
-    dataId: "app-part-remote";
+    dataId: "app-part-remote-data";
     polygonA: Polygon2;
     polygonB: Polygon2;
     polygonC: Polygon2;
 };
 
 type AppPartStateData = {
-    dataId: "app-part-state";
+    dataId: "app-part-state-data";
     parameterA: number;
     parameterB: number;
 };
 
 function initMainSystem(world: World): void {
-    const { inputElements } = world.readData<AppInputData>("app-input");
+    const { inputElements } = world.readData<AppInputData>("app-input-data");
 
     const inputParameterA = new RangeInputElement("countA", "3", "20", "5");
     inputParameterA.setStyle("width: 200px");
@@ -42,7 +41,7 @@ function initMainSystem(world: World): void {
     inputElements.push(inputParameterB);
 
     world.writeData<AppPartMainData>({
-        dataId: "app-part-main",
+        dataId: "app-part-main-data",
         inputParameterA,
         inputParameterB,
     });
@@ -50,7 +49,7 @@ function initMainSystem(world: World): void {
 
 function initRemoteSystem(world: World): void {
     world.writeData<AppPartRemoteData>({
-        dataId: "app-part-remote",
+        dataId: "app-part-remote-data",
         polygonA: Polygon2.createEmpty(),
         polygonB: Polygon2.createEmpty(),
         polygonC: Polygon2.createEmpty(),
@@ -58,10 +57,10 @@ function initRemoteSystem(world: World): void {
 }
 
 function writeStateSystem(world: World): void {
-    const { inputParameterA, inputParameterB } = world.readData<AppPartMainData>("app-part-main");
+    const { inputParameterA, inputParameterB } = world.readData<AppPartMainData>("app-part-main-data");
 
     const stateData: AppPartStateData = {
-        dataId: "app-part-state",
+        dataId: "app-part-state-data",
         parameterA: inputParameterA.getInt(),
         parameterB: inputParameterB.getInt(),
     };
@@ -70,8 +69,8 @@ function writeStateSystem(world: World): void {
 }
 
 function updateSystem(world: World): void {
-    const { parameterA, parameterB } = world.readData<AppPartStateData>("app-part-state");
-    const { seed } = world.readData<AppStateData>("app-state");
+    const { parameterA, parameterB } = world.readData<AppPartStateData>("app-part-state-data");
+    const { seed } = world.readData<AppStateData>("app-state-data");
 
     const random = RandomXSR128.fromSeedLcg(seed);
 
@@ -93,7 +92,7 @@ function updateSystem(world: World): void {
     const polygonC = Polygon2.createConvexHull(points);
 
     world.writeData<AppPartRemoteData>({
-        dataId: "app-part-remote",
+        dataId: "app-part-remote-data",
         polygonA,
         polygonB,
         polygonC,
@@ -101,7 +100,7 @@ function updateSystem(world: World): void {
 }
 
 function renderSystem(world: World): void {
-    const { polygonA, polygonB, polygonC } = world.readData<AppPartRemoteData>("app-part-remote");
+    const { polygonA, polygonB, polygonC } = world.readData<AppPartRemoteData>("app-part-remote-data");
 
     const ctx = world.getPlugin<AppContextPlugin>("app-context");
 
@@ -120,8 +119,8 @@ function renderSystem(world: World): void {
     ctx.fillPolygon(polygonC, "#0000FF");
 }
 
-class AppPartMainModule implements WorldModule {
-    public readonly moduleId = "app-part-main";
+export class PolygonMinkowskiAppPartModule implements WorldModule {
+    public readonly moduleId = "app-part-main-data";
 
     public setup(world: World): void {
         world.addSystems<DefaultSystemStage>({ stage: "start", fns: [initMainSystem, writeStateSystem] });
@@ -135,10 +134,3 @@ class AppPartMainModule implements WorldModule {
         world.addDependency<DefaultSystemStage>({ stage: "update", seq: [updateSystem, renderSystem] });
     }
 }
-
-export const POLYGON_MINKOWSKI_MAIN_WORLD: WorldOptions = {
-    id: "main",
-    modules: [new AppMainModule(), new AppPartMainModule()],
-    schedules: WORLD_SCHEDULE_OPTIONS_DEFAULT,
-    startupScheduleId: "start",
-};

@@ -19,7 +19,7 @@ import type { AppCanvasData } from "./app.ts";
 type CanvasStyle = string | CanvasGradient | CanvasPattern;
 
 export function initCanvasContextSystem(world: World): void {
-    const { canvas } = world.readData<AppCanvasData>("app-canvas");
+    const { canvas } = world.readData<AppCanvasData>("app-canvas-data");
 
     const context = canvas.getContext("2d");
 

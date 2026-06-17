@@ -3,47 +3,46 @@ import { WindingOperator } from "redgeometry/src/core/winding";
 import { MinMaxBox2 } from "redgeometry/src/primitives/box";
 import { RandomXSR128 } from "redgeometry/src/utility/random";
 import type { AppContextPlugin } from "../ecs-modules/app-context.ts";
-import type { AppInputData } from "../ecs-modules/app-input.ts";
-import { RangeInputElement } from "../ecs-modules/app-input.ts";
-import { AppMainModule, type AppStateData } from "../ecs-modules/app.ts";
+import { RangeInputElement, type AppInputData } from "../ecs-modules/app-input.ts";
+import { type AppStateData } from "../ecs-modules/app.ts";
 import type { DefaultSystemStage, WorldModule } from "../ecs/types.ts";
-import { WORLD_SCHEDULE_OPTIONS_DEFAULT, type World, type WorldOptions } from "../ecs/world.ts";
+import { type World } from "../ecs/world.ts";
 import { createRandomPolygonSimple } from "../utility/helper.ts";
 import { StraightSkeleton } from "../utility/straight-skeleton.ts";
 
 type AppPartMainData = {
-    dataId: "app-part-main";
+    dataId: "app-part-main-data";
     inputTime: RangeInputElement;
 };
 
 type AppPartRemoteData = {
-    dataId: "app-part-remote";
+    dataId: "app-part-remote-data";
     mesh: Mesh2;
     meshOriginal: Mesh2;
     skeleton: StraightSkeleton;
 };
 
 type AppPartStateData = {
-    dataId: "app-part-state";
+    dataId: "app-part-state-data";
     time: number;
 };
 
 function initMainSystem(world: World): void {
-    const { inputElements } = world.readData<AppInputData>("app-input");
+    const { inputElements } = world.readData<AppInputData>("app-input-data");
 
     const inputTime = new RangeInputElement("time", "0", "500", "50");
     inputTime.setStyle("width: 200px");
     inputElements.push(inputTime);
 
     world.writeData<AppPartMainData>({
-        dataId: "app-part-main",
+        dataId: "app-part-main-data",
         inputTime,
     });
 }
 
 function initRemoteSystem(world: World): void {
     world.writeData<AppPartRemoteData>({
-        dataId: "app-part-remote",
+        dataId: "app-part-remote-data",
         mesh: Mesh2.createEmpty(),
         meshOriginal: Mesh2.createEmpty(),
         skeleton: new StraightSkeleton(),
@@ -51,10 +50,10 @@ function initRemoteSystem(world: World): void {
 }
 
 function writeStateSystem(world: World): void {
-    const { inputTime } = world.readData<AppPartMainData>("app-part-main");
+    const { inputTime } = world.readData<AppPartMainData>("app-part-main-data");
 
     const stateData: AppPartStateData = {
-        dataId: "app-part-state",
+        dataId: "app-part-state-data",
         time: inputTime.getInt(),
     };
 
@@ -62,8 +61,8 @@ function writeStateSystem(world: World): void {
 }
 
 function updateSystem(world: World): void {
-    const { time } = world.readData<AppPartStateData>("app-part-state");
-    const { seed, generator } = world.readData<AppStateData>("app-state");
+    const { time } = world.readData<AppPartStateData>("app-part-state-data");
+    const { seed, generator } = world.readData<AppStateData>("app-state-data");
 
     const ctx = world.getPlugin<AppContextPlugin>("app-context");
 
@@ -98,7 +97,7 @@ function updateSystem(world: World): void {
     skeleton.createStraightSkeleton(mesh, tmax);
 
     world.writeData<AppPartRemoteData>({
-        dataId: "app-part-remote",
+        dataId: "app-part-remote-data",
         mesh,
         meshOriginal,
         skeleton,
@@ -106,7 +105,7 @@ function updateSystem(world: World): void {
 }
 
 function renderSystem(world: World): void {
-    const { skeleton, meshOriginal, mesh } = world.readData<AppPartRemoteData>("app-part-remote");
+    const { skeleton, meshOriginal, mesh } = world.readData<AppPartRemoteData>("app-part-remote-data");
 
     const ctx = world.getPlugin<AppContextPlugin>("app-context");
 
@@ -116,8 +115,8 @@ function renderSystem(world: World): void {
     ctx.drawMeshEdges(mesh, "#00FF00");
 }
 
-class AppPartMainModule implements WorldModule {
-    public readonly moduleId = "app-part-main";
+export class StraightSkeletonAppPartModule implements WorldModule {
+    public readonly moduleId = "app-part-main-data";
 
     public setup(world: World): void {
         world.addSystems<DefaultSystemStage>({ stage: "start", fns: [initMainSystem, writeStateSystem] });
@@ -131,10 +130,3 @@ class AppPartMainModule implements WorldModule {
         world.addDependency<DefaultSystemStage>({ stage: "update", seq: [updateSystem, renderSystem] });
     }
 }
-
-export const STRAIGHT_SKELETON_MAIN_WORLD: WorldOptions = {
-    id: "main",
-    modules: [new AppMainModule(), new AppPartMainModule()],
-    schedules: WORLD_SCHEDULE_OPTIONS_DEFAULT,
-    startupScheduleId: "start",
-};

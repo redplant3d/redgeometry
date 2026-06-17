@@ -4,13 +4,13 @@ import type { DefaultSystemStage, WorldModule, WorldPlugin } from "../ecs/types.
 import type { World } from "../ecs/world.ts";
 
 export type InputInitData = {
-    dataId: "input-init";
+    dataId: "input-init-data";
     keyboardEventHandler: GlobalEventHandlers | undefined;
     mouseEventHandler: GlobalEventHandlers | undefined;
 };
 
 type InputCaptureData = {
-    dataId: "input-capture";
+    dataId: "input-capture-data";
     keyboardButtonEvents: InputKeyboardButtonEvent[];
     mouseButtonEvents: InputMouseButtonEvent[];
     mouseMotionEvents: InputMouseMotionEvent[];
@@ -18,7 +18,7 @@ type InputCaptureData = {
 };
 
 export type InputKeyboardButtonEvent = {
-    eventId: "input-keyboard-button";
+    eventId: "input-keyboard-button-event";
     type: "keyup" | "keydown";
     code: string;
     isComposing: boolean;
@@ -28,7 +28,7 @@ export type InputKeyboardButtonEvent = {
 };
 
 export type InputMouseMotionEvent = {
-    eventId: "input-mouse-motion";
+    eventId: "input-mouse-motion-event";
     type: "mouseenter" | "mouseleave" | "mousemove" | "mouseout" | "mouseover";
     clientX: number;
     clientY: number;
@@ -43,13 +43,13 @@ export type InputMouseMotionEvent = {
 };
 
 export type InputMouseButtonEvent = {
-    eventId: "input-mouse-button";
+    eventId: "input-mouse-button-event";
     type: "mousedown" | "mouseup";
     button: number;
 };
 
 export type InputMouseWheelEvent = {
-    eventId: "input-mouse-wheel";
+    eventId: "input-mouse-wheel-event";
     type: "wheel";
     deltaX: number;
     deltaY: number;
@@ -174,7 +174,7 @@ const KEYBOARD_BUTTONS_LOOKUP: Record<string, KeyboardButtons> = {
 };
 
 export function startInputSystem(world: World): void {
-    const { keyboardEventHandler, mouseEventHandler } = world.readData<InputInitData>("input-init");
+    const { keyboardEventHandler, mouseEventHandler } = world.readData<InputInitData>("input-init-data");
 
     // Gather event data to avoid new input events triggering in the middle of schedules
     const keyboardButtonEvents: InputKeyboardButtonEvent[] = [];
@@ -185,7 +185,7 @@ export function startInputSystem(world: World): void {
     if (keyboardEventHandler !== undefined) {
         const keyboardButtonDownFn = (ev: KeyboardEvent): void => {
             keyboardButtonEvents.push({
-                eventId: "input-keyboard-button",
+                eventId: "input-keyboard-button-event",
                 type: "keydown",
                 code: ev.code,
                 isComposing: ev.isComposing,
@@ -199,7 +199,7 @@ export function startInputSystem(world: World): void {
 
         const keyboardButtonUpFn = (ev: KeyboardEvent): void => {
             keyboardButtonEvents.push({
-                eventId: "input-keyboard-button",
+                eventId: "input-keyboard-button-event",
                 type: "keyup",
                 code: ev.code,
                 isComposing: ev.isComposing,
@@ -215,7 +215,7 @@ export function startInputSystem(world: World): void {
     if (mouseEventHandler !== undefined) {
         const mouseButtonFn = (ev: MouseEvent): void => {
             mouseButtonEvents.push({
-                eventId: "input-mouse-button",
+                eventId: "input-mouse-button-event",
                 type: ev.type as "mousedown" | "mouseup",
                 button: ev.button,
             });
@@ -226,7 +226,7 @@ export function startInputSystem(world: World): void {
 
         const mouseMotionFn = (ev: MouseEvent): void => {
             mouseMotionEvents.push({
-                eventId: "input-mouse-motion",
+                eventId: "input-mouse-motion-event",
                 type: ev.type as "mouseenter" | "mouseleave" | "mousemove" | "mouseout" | "mouseover",
                 clientX: ev.clientX,
                 clientY: ev.clientY,
@@ -249,7 +249,7 @@ export function startInputSystem(world: World): void {
 
         const mouseWheelFn = (ev: WheelEvent): void => {
             mouseWheelEvents.push({
-                eventId: "input-mouse-wheel",
+                eventId: "input-mouse-wheel-event",
                 type: "wheel",
                 deltaX: ev.deltaX,
                 deltaY: ev.deltaY,
@@ -262,7 +262,7 @@ export function startInputSystem(world: World): void {
     }
 
     world.writeData<InputCaptureData>({
-        dataId: "input-capture",
+        dataId: "input-capture-data",
         keyboardButtonEvents,
         mouseButtonEvents,
         mouseMotionEvents,
@@ -279,7 +279,7 @@ export function startInputSystem(world: World): void {
 }
 
 export function updateInputSystem(world: World): void {
-    const captureData = world.readData<InputCaptureData>("input-capture");
+    const captureData = world.readData<InputCaptureData>("input-capture-data");
 
     // Write events
     world.writeEvents(captureData.keyboardButtonEvents);
@@ -295,15 +295,15 @@ export function updateInputSystem(world: World): void {
 
     // Update keyboard plugin
     const keyboardPlugin = world.getPlugin<KeyboardPlugin>("keyboard");
-    const keyboardButtonEvents = world.readEvents<InputKeyboardButtonEvent>("input-keyboard-button").toArray();
+    const keyboardButtonEvents = world.readEvents<InputKeyboardButtonEvent>("input-keyboard-button-event").toArray();
     keyboardPlugin.clear();
     keyboardPlugin.applyEvents(keyboardButtonEvents);
 
     // Update mouse plugin
     const mousePlugin = world.getPlugin<MousePlugin>("mouse");
-    const mouseButtonEvents = world.readEvents<InputMouseButtonEvent>("input-mouse-button").toArray();
-    const mouseMotionEvents = world.readEvents<InputMouseMotionEvent>("input-mouse-motion").toArray();
-    const mouseWheelEvents = world.readEvents<InputMouseWheelEvent>("input-mouse-wheel").toArray();
+    const mouseButtonEvents = world.readEvents<InputMouseButtonEvent>("input-mouse-button-event").toArray();
+    const mouseMotionEvents = world.readEvents<InputMouseMotionEvent>("input-mouse-motion-event").toArray();
+    const mouseWheelEvents = world.readEvents<InputMouseWheelEvent>("input-mouse-wheel-event").toArray();
     mousePlugin.clear();
     mousePlugin.applyEvents(mouseButtonEvents, mouseMotionEvents, mouseWheelEvents);
 }

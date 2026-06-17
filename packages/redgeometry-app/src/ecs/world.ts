@@ -16,7 +16,6 @@ import type {
     WorldDataIdOf,
     WorldEvent,
     WorldEventIdOf,
-    WorldId,
     WorldModule,
     WorldModuleId,
     WorldPlugin,
@@ -35,16 +34,6 @@ export type WorldScheduleOptions<
 
 export type WorldScheduleStage<T extends SystemStage> = {
     id: T;
-};
-
-export type WorldOptions<
-    T extends WorldScheduleId = DefaultWorldScheduleId,
-    U extends SystemStage = DefaultSystemStage,
-> = {
-    id: WorldId;
-    modules: WorldModule[];
-    schedules: WorldScheduleOptions<T, U>[];
-    startupScheduleId: WorldScheduleId;
 };
 
 export const ComponentFlags = {

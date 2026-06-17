@@ -3,40 +3,39 @@ import { Vector2, type ReadonlyVector2 } from "redgeometry/src/primitives/vector
 import { log } from "redgeometry/src/utility/debug";
 import { RandomXSR128, type Random } from "redgeometry/src/utility/random";
 import { type AppContextPlugin } from "../ecs-modules/app-context.ts";
-import type { AppInputData } from "../ecs-modules/app-input.ts";
-import { RangeInputElement } from "../ecs-modules/app-input.ts";
-import { AppMainModule, type AppStateData } from "../ecs-modules/app.ts";
+import { RangeInputElement, type AppInputData } from "../ecs-modules/app-input.ts";
+import { type AppStateData } from "../ecs-modules/app.ts";
 import type { TimeData } from "../ecs-modules/time.ts";
 import type { DefaultSystemStage, WorldModule } from "../ecs/types.ts";
-import { ComponentFlags, WORLD_SCHEDULE_OPTIONS_DEFAULT, type World, type WorldOptions } from "../ecs/world.ts";
+import { ComponentFlags, type World } from "../ecs/world.ts";
 
 type AppPartMainData = {
-    dataId: "app-part-main";
+    dataId: "app-part-main-data";
     inputCount: RangeInputElement;
 };
 
 type AppPartRemoteData = {
-    dataId: "app-part-remote";
+    dataId: "app-part-remote-data";
     count: number;
     json: string | undefined;
     random: Random;
 };
 
 type AppPartStateData = {
-    dataId: "app-part-state";
+    dataId: "app-part-state-data";
     count: number;
 };
 
 type CircleComponent = {
-    componentId: "circle";
+    componentId: "circle-component";
 };
 
 type RectangleComponent = {
-    componentId: "rectangle";
+    componentId: "rectangle-component";
 };
 
 type ObjectComponent = {
-    componentId: "object";
+    componentId: "object-component";
     color: string;
     position: ReadonlyVector2;
     size: number;
@@ -44,23 +43,23 @@ type ObjectComponent = {
 };
 
 function initMainSystem(world: World): void {
-    const { inputElements } = world.readData<AppInputData>("app-input");
+    const { inputElements } = world.readData<AppInputData>("app-input-data");
 
     const inputCount = new RangeInputElement("count", "0", "1000", "10");
     inputCount.setStyle("width: 200px");
     inputElements.push(inputCount);
 
     world.writeData<AppPartMainData>({
-        dataId: "app-part-main",
+        dataId: "app-part-main-data",
         inputCount,
     });
 }
 
 function initRemoteSystem(world: World): void {
-    const { seed } = world.readData<AppStateData>("app-state");
+    const { seed } = world.readData<AppStateData>("app-state-data");
 
     world.writeData<AppPartRemoteData>({
-        dataId: "app-part-remote",
+        dataId: "app-part-remote-data",
         count: 0,
         json: undefined,
         random: RandomXSR128.fromSeedLcg(seed),
@@ -68,10 +67,10 @@ function initRemoteSystem(world: World): void {
 }
 
 function writeStateSystem(world: World): void {
-    const inputData = world.readData<AppPartMainData>("app-part-main");
+    const inputData = world.readData<AppPartMainData>("app-part-main-data");
 
     const stateData: AppPartStateData = {
-        dataId: "app-part-state",
+        dataId: "app-part-state-data",
         count: inputData.inputCount.getInt(),
     };
 
@@ -79,8 +78,8 @@ function writeStateSystem(world: World): void {
 }
 
 function spawnSystem(world: World): void {
-    const appRemoteData = world.readData<AppPartRemoteData>("app-part-remote");
-    const appStateData = world.readData<AppPartStateData>("app-part-state");
+    const appRemoteData = world.readData<AppPartRemoteData>("app-part-remote-data");
+    const appStateData = world.readData<AppPartStateData>("app-part-state-data");
 
     const ctx = world.getPlugin<AppContextPlugin>("app-context");
 
@@ -91,7 +90,7 @@ function spawnSystem(world: World): void {
 
     if (currCount <= nextCount) {
         for (let i = currCount; i < nextCount; i++) {
-            const shape = random.nextFloat() < 0.8 ? "rectangle" : "circle";
+            const shape = random.nextFloat() < 0.8 ? "rectangle-component" : "circle-component";
             const size = random.nextFloatBetween(10, 100);
             const color = random.nextFloat() < 0.5 ? "red" : "blue";
             const position = new Vector2(
@@ -105,7 +104,7 @@ function spawnSystem(world: World): void {
                 componentId: shape,
             });
             world.addComponent<ObjectComponent>(entity, {
-                componentId: "object",
+                componentId: "object-component",
                 size,
                 color,
                 position,
@@ -113,7 +112,7 @@ function spawnSystem(world: World): void {
             });
         }
     } else {
-        const query = world.queryEntities<ObjectComponent>((q) => q.hasComponent("object"));
+        const query = world.queryEntities<ObjectComponent>((q) => q.hasComponent("object-component"));
 
         let i = nextCount;
 
@@ -131,17 +130,17 @@ function spawnSystem(world: World): void {
 }
 
 function movementSystem(world: World): void {
-    const { delta } = world.readData<TimeData>("time");
+    const { delta } = world.readData<TimeData>("time-data");
 
     const ctx = world.getPlugin<AppContextPlugin>("app-context");
 
     const { width, height } = ctx.canvas;
 
-    const query = world.queryEntities<ObjectComponent>((q) => q.hasComponent("object"));
+    const query = world.queryEntities<ObjectComponent>((q) => q.hasComponent("object-component"));
 
     while (query.next()) {
         const entityId = query.getEntityId();
-        const object = query.getComponent<ObjectComponent>("object");
+        const object = query.getComponent<ObjectComponent>("object-component");
 
         const p = object.position;
         const v = object.velocity;
@@ -171,7 +170,7 @@ function movementSystem(world: World): void {
         object.position = new Vector2(px, py);
         object.velocity = new Vector2(vx, vy);
 
-        world.updateComponent<ObjectComponent>(entityId, "object");
+        world.updateComponent<ObjectComponent>(entityId, "object-component");
     }
 }
 
@@ -185,14 +184,15 @@ function circleRenderSystem(world: World): void {
     const ctx = world.getPlugin<AppContextPlugin>("app-context");
 
     const query = world.queryEntities<CircleComponent | ObjectComponent>(
-        (q) => q.hasComponent<CircleComponent>("circle") && q.hasComponent<ObjectComponent>("object"),
+        (q) =>
+            q.hasComponent<CircleComponent>("circle-component") && q.hasComponent<ObjectComponent>("object-component"),
     );
 
     const red = Path2.createEmpty();
     const blue = Path2.createEmpty();
 
     while (query.next()) {
-        const object = query.getComponent<ObjectComponent>("object");
+        const object = query.getComponent<ObjectComponent>("object-component");
 
         const p = object.position;
         const d = object.size;
@@ -213,7 +213,9 @@ function rectangleRenderSystem(world: World): void {
     const ctx = world.getPlugin<AppContextPlugin>("app-context");
 
     const query = world.queryEntities<RectangleComponent | ObjectComponent>(
-        (q) => q.hasComponent<RectangleComponent>("rectangle") && q.hasComponent<ObjectComponent>("object"),
+        (q) =>
+            q.hasComponent<RectangleComponent>("rectangle-component") &&
+            q.hasComponent<ObjectComponent>("object-component"),
     );
 
     const red = Path2.createEmpty();
@@ -221,7 +223,7 @@ function rectangleRenderSystem(world: World): void {
 
     while (query.next()) {
         const entityId = query.getEntityId();
-        const object = world.findComponent<ObjectComponent>(entityId, "object");
+        const object = world.findComponent<ObjectComponent>(entityId, "object-component");
 
         if (object === undefined) {
             continue;
@@ -254,11 +256,11 @@ function notificationSystem(world: World): void {
     const query = world.queryEntities(() => true);
 
     while (query.next()) {
-        if (query.hasComponentFlags<ObjectComponent>("object", ComponentFlags.ADDED)) {
+        if (query.hasComponentFlags<ObjectComponent>("object-component", ComponentFlags.ADDED)) {
             createdCount += 1;
         }
 
-        if (query.hasComponentFlags<ObjectComponent>("object", ComponentFlags.DELETED)) {
+        if (query.hasComponentFlags<ObjectComponent>("object-component", ComponentFlags.DELETED)) {
             deletedCount += 1;
         }
     }
@@ -268,8 +270,8 @@ function notificationSystem(world: World): void {
     }
 }
 
-class AppPartMainModule implements WorldModule {
-    public readonly moduleId = "app-part-main";
+export class EcsBounceAppPartModule implements WorldModule {
+    public readonly moduleId = "app-part-main-data";
 
     public setup(world: World): void {
         world.addSystem<DefaultSystemStage>({ stage: "start", fn: initMainSystem });
@@ -310,10 +312,3 @@ class AppPartMainModule implements WorldModule {
         });
     }
 }
-
-export const ECS_MAIN_WORLD: WorldOptions = {
-    id: "main",
-    modules: [new AppMainModule(), new AppPartMainModule()],
-    schedules: WORLD_SCHEDULE_OPTIONS_DEFAULT,
-    startupScheduleId: "start",
-};

@@ -10,21 +10,22 @@ import { RandomXSR128 } from "redgeometry/src/utility/random";
 import type { AppContextPlugin } from "../ecs-modules/app-context.ts";
 import type { AppInputData } from "../ecs-modules/app-input.ts";
 import { ComboBoxInputElement, RangeInputElement } from "../ecs-modules/app-input.ts";
-import { AppMainModule, type AppStateData } from "../ecs-modules/app.ts";
+import { type AppStateData } from "../ecs-modules/app.ts";
 import type { DefaultSystemStage, WorldModule } from "../ecs/types.ts";
-import { WORLD_SCHEDULE_OPTIONS_DEFAULT, type World, type WorldOptions } from "../ecs/world.ts";
+import { type World } from "../ecs/world.ts";
 import { ColorRgba } from "../utility/color.ts";
 import { createRandomPolygonPair, getWindingOperator } from "../utility/helper.ts";
+
 type PathOverlayTagEntry = { tag: number[]; faces: MeshFace2[] };
 
 type AppPartMainData = {
-    dataId: "app-part-main";
+    dataId: "app-part-main-data";
     inputParameter: RangeInputElement;
     inputWind: ComboBoxInputElement;
 };
 
 type AppPartRemoteData = {
-    dataId: "app-part-remote";
+    dataId: "app-part-remote-data";
     mesh: Mesh2;
     polygonA: Polygon2;
     polygonB: Polygon2;
@@ -32,13 +33,13 @@ type AppPartRemoteData = {
 };
 
 type AppPartStateData = {
-    dataId: "app-part-state";
+    dataId: "app-part-state-data";
     parameter: number;
     wind: string;
 };
 
 function initMainSystem(world: World): void {
-    const { inputElements } = world.readData<AppInputData>("app-input");
+    const { inputElements } = world.readData<AppInputData>("app-input-data");
 
     const inputParameter = new RangeInputElement("parameter", "0", "200", "100");
     inputParameter.setStyle("width: 200px");
@@ -49,7 +50,7 @@ function initMainSystem(world: World): void {
     inputElements.push(inputWind);
 
     world.writeData<AppPartMainData>({
-        dataId: "app-part-main",
+        dataId: "app-part-main-data",
         inputParameter,
         inputWind,
     });
@@ -57,7 +58,7 @@ function initMainSystem(world: World): void {
 
 function initRemoteSystem(world: World): void {
     world.writeData<AppPartRemoteData>({
-        dataId: "app-part-remote",
+        dataId: "app-part-remote-data",
         polygonA: Polygon2.createEmpty(),
         polygonB: Polygon2.createEmpty(),
         mesh: Mesh2.createEmpty(),
@@ -66,10 +67,10 @@ function initRemoteSystem(world: World): void {
 }
 
 function writeStateSystem(world: World): void {
-    const { inputParameter, inputWind } = world.readData<AppPartMainData>("app-part-main");
+    const { inputParameter, inputWind } = world.readData<AppPartMainData>("app-part-main-data");
 
     const stateData: AppPartStateData = {
-        dataId: "app-part-state",
+        dataId: "app-part-state-data",
         parameter: inputParameter.getInt(),
         wind: inputWind.getValue(),
     };
@@ -78,8 +79,8 @@ function writeStateSystem(world: World): void {
 }
 
 function updateSystem(world: World): void {
-    const { parameter, wind } = world.readData<AppPartStateData>("app-part-state");
-    const { seed, generator } = world.readData<AppStateData>("app-state");
+    const { parameter, wind } = world.readData<AppPartStateData>("app-part-state-data");
+    const { seed, generator } = world.readData<AppStateData>("app-state-data");
 
     const ctx = world.getPlugin<AppContextPlugin>("app-context");
 
@@ -117,7 +118,7 @@ function updateSystem(world: World): void {
     const tagEntries = createTagEntries(mesh);
 
     world.writeData<AppPartRemoteData>({
-        dataId: "app-part-remote",
+        dataId: "app-part-remote-data",
         polygonA,
         polygonB,
         mesh,
@@ -126,7 +127,7 @@ function updateSystem(world: World): void {
 }
 
 function renderSystem(world: World): void {
-    const { mesh, tagEntries } = world.readData<AppPartRemoteData>("app-part-remote");
+    const { mesh, tagEntries } = world.readData<AppPartRemoteData>("app-part-remote-data");
 
     const ctx = world.getPlugin<AppContextPlugin>("app-context");
 
@@ -186,8 +187,8 @@ function createTagEntries(mesh: Mesh2): PathOverlayTagEntry[] {
     return entries;
 }
 
-class AppPartMainModule implements WorldModule {
-    public readonly moduleId = "app-part-main";
+export class PathOverlayAppPartModule implements WorldModule {
+    public readonly moduleId = "app-part-main-data";
 
     public setup(world: World): void {
         world.addSystems<DefaultSystemStage>({ stage: "start", fns: [initMainSystem, writeStateSystem] });
@@ -201,10 +202,3 @@ class AppPartMainModule implements WorldModule {
         world.addDependency<DefaultSystemStage>({ stage: "update", seq: [updateSystem, renderSystem] });
     }
 }
-
-export const PATH_OVERLAY_MAIN_WORLD: WorldOptions = {
-    id: "main",
-    modules: [new AppMainModule(), new AppPartMainModule()],
-    schedules: WORLD_SCHEDULE_OPTIONS_DEFAULT,
-    startupScheduleId: "start",
-};
