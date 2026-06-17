@@ -25,7 +25,7 @@ export function stopInputElementsSystem(world: World): void {
 }
 
 export class AppInputModule implements WorldModule {
-    public readonly moduleId = "app-input-data";
+    public readonly moduleId = "app-input-module";
 
     public setup(world: World): void {
         world.addSystem<DefaultSystemStage>({ stage: "start-post", fn: startInputElementsSystem });

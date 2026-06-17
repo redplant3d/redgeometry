@@ -320,7 +320,7 @@ function isVertexClose<S, F, E, V>(
 }
 
 export class MeshNextAppPartModule implements WorldModule {
-    public readonly moduleId = "app-part-main-data";
+    public readonly moduleId = "mesh-next-app-part-module";
 
     public setup(world: World): void {
         world.addSystems<DefaultSystemStage>({ stage: "start", fns: [initMainSystem, writeStateSystem] });

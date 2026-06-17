@@ -37,7 +37,7 @@ export function timeSystem(world: World): void {
 }
 
 export class TimeModule implements WorldModule {
-    public readonly moduleId = "time-data";
+    public readonly moduleId = "time-module";
 
     public setup(world: World): void {
         world.addSystem<DefaultSystemStage>({ stage: "start-post", fn: startTimeSystem });

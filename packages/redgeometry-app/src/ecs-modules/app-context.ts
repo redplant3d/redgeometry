@@ -648,7 +648,7 @@ export class AppContextPlugin implements WorldPlugin {
 }
 
 export class AppContextModule implements WorldModule {
-    public readonly moduleId = "app-context";
+    public readonly moduleId = "app-context-module";
 
     public setup(world: World): void {
         world.addSystem<DefaultSystemStage>({ stage: "start-pre", fn: initCanvasContextSystem });

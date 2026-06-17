@@ -260,7 +260,7 @@ function transformSegments(segments: EdgeSegment2[], scale: number): Edge2[] {
 }
 
 export class SnapRoundingAppPartModule implements WorldModule {
-    public readonly moduleId = "app-part-main-data";
+    public readonly moduleId = "snap-rounding-app-part-module";
 
     public setup(world: World): void {
         world.addSystems<DefaultSystemStage>({ stage: "start", fns: [initMainSystem, writeStateSystem] });

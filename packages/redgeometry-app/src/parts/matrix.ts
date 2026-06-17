@@ -171,7 +171,7 @@ function transformEdges(edges: ReadonlyEdge3[], mat: ReadonlyMatrix4): Edge2[] {
 }
 
 export class MatrixAppPartModule implements WorldModule {
-    public readonly moduleId = "app-part-main-data";
+    public readonly moduleId = "matrix-app-part-module";
 
     public setup(world: World): void {
         world.addSystems<DefaultSystemStage>({ stage: "start", fns: [initMainSystem, writeStateSystem] });

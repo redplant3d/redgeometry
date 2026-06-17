@@ -122,7 +122,7 @@ function renderSystem(world: World): void {
 }
 
 export class MeshAppPartModule implements WorldModule {
-    public readonly moduleId = "app-part-main-data";
+    public readonly moduleId = "mesh-app-part-module";
 
     public setup(world: World): void {
         world.addSystems<DefaultSystemStage>({ stage: "start", fns: [initMainSystem, writeStateSystem] });

@@ -282,7 +282,7 @@ function sampleWhiteNoise(random: Random, count: number, samples: number[]): voi
 }
 
 export class SamplingAppPartModule implements WorldModule {
-    public readonly moduleId = "app-part-main-data";
+    public readonly moduleId = "sampling-app-part-module";
 
     public setup(world: World): void {
         world.addSystems<DefaultSystemStage>({ stage: "start", fns: [initMainSystem, writeStateSystem] });

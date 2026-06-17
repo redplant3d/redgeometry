@@ -499,7 +499,7 @@ export class MousePlugin implements WorldPlugin {
 }
 
 export class InputModule implements WorldModule {
-    public readonly moduleId = "input-receiver";
+    public readonly moduleId = "input-module";
 
     public setup(world: World): void {
         world.addSystem<DefaultSystemStage>({ stage: "start-post", fn: startInputSystem });

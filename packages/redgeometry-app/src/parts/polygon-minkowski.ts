@@ -120,7 +120,7 @@ function renderSystem(world: World): void {
 }
 
 export class PolygonMinkowskiAppPartModule implements WorldModule {
-    public readonly moduleId = "app-part-main-data";
+    public readonly moduleId = "polygon-minkowski-app-part-module";
 
     public setup(world: World): void {
         world.addSystems<DefaultSystemStage>({ stage: "start", fns: [initMainSystem, writeStateSystem] });

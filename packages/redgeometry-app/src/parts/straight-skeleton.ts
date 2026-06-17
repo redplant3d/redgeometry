@@ -116,7 +116,7 @@ function renderSystem(world: World): void {
 }
 
 export class StraightSkeletonAppPartModule implements WorldModule {
-    public readonly moduleId = "app-part-main-data";
+    public readonly moduleId = "straight-skeleton-app-part-module";
 
     public setup(world: World): void {
         world.addSystems<DefaultSystemStage>({ stage: "start", fns: [initMainSystem, writeStateSystem] });

@@ -188,7 +188,7 @@ function createTagEntries(mesh: Mesh2): PathOverlayTagEntry[] {
 }
 
 export class PathOverlayAppPartModule implements WorldModule {
-    public readonly moduleId = "app-part-main-data";
+    public readonly moduleId = "path-overlay-app-part-module";
 
     public setup(world: World): void {
         world.addSystems<DefaultSystemStage>({ stage: "start", fns: [initMainSystem, writeStateSystem] });

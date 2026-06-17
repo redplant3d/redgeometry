@@ -197,7 +197,7 @@ function createElement<K extends keyof HTMLElementTagNameMap>(
 }
 
 export class AppModule implements WorldModule {
-    public readonly moduleId = "app-main-input-data";
+    public readonly moduleId = "app-module";
 
     private appPartIds: string[];
     private appPartId: string;

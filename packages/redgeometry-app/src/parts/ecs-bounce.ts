@@ -271,7 +271,7 @@ function notificationSystem(world: World): void {
 }
 
 export class EcsBounceAppPartModule implements WorldModule {
-    public readonly moduleId = "app-part-main-data";
+    public readonly moduleId = "ecs-bounce-app-part-module";
 
     public setup(world: World): void {
         world.addSystem<DefaultSystemStage>({ stage: "start", fn: initMainSystem });
