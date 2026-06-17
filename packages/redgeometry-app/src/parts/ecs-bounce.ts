@@ -7,9 +7,8 @@ import type { AppInputData } from "../ecs-modules/app-input.ts";
 import { RangeInputElement } from "../ecs-modules/app-input.ts";
 import { AppMainModule, type AppStateData } from "../ecs-modules/app.ts";
 import type { TimeData } from "../ecs-modules/time.ts";
-import type { WorldOptions } from "../ecs/app.ts";
 import type { DefaultSystemStage, WorldModule } from "../ecs/types.ts";
-import { ComponentFlags, WORLD_SCHEDULE_OPTIONS_DEFAULT, type World } from "../ecs/world.ts";
+import { ComponentFlags, WORLD_SCHEDULE_OPTIONS_DEFAULT, type World, type WorldOptions } from "../ecs/world.ts";
 
 type AppPartMainData = {
     dataId: "app-part-main";
@@ -316,4 +315,5 @@ export const ECS_MAIN_WORLD: WorldOptions = {
     id: "main",
     modules: [new AppMainModule(), new AppPartMainModule()],
     schedules: WORLD_SCHEDULE_OPTIONS_DEFAULT,
+    startupScheduleId: "start",
 };

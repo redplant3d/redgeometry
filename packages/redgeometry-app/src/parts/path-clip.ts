@@ -9,9 +9,8 @@ import { AppContextModule } from "../ecs-modules/app-context.ts";
 import type { AppInputData } from "../ecs-modules/app-input.ts";
 import { ComboBoxInputElement, RangeInputElement } from "../ecs-modules/app-input.ts";
 import { AppMainModule, type AppStateData } from "../ecs-modules/app.ts";
-import type { WorldOptions } from "../ecs/app.ts";
 import type { DefaultSystemStage, WorldModule } from "../ecs/types.ts";
-import { WORLD_SCHEDULE_OPTIONS_DEFAULT, type World } from "../ecs/world.ts";
+import { WORLD_SCHEDULE_OPTIONS_DEFAULT, type World, type WorldOptions } from "../ecs/world.ts";
 import { createRandomPolygonPair, getBooleanOperator, getWindingOperator } from "../utility/helper.ts";
 
 type AppPartMainData = {
@@ -165,4 +164,5 @@ export const PATH_CLIP_MAIN_WORLD: WorldOptions = {
     id: "main",
     modules: [new AppMainModule(), new AppPartMainModule(), new AppContextModule()],
     schedules: WORLD_SCHEDULE_OPTIONS_DEFAULT,
+    startupScheduleId: "start",
 };

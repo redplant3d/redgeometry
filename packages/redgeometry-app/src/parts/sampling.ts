@@ -6,9 +6,8 @@ import type { AppContextPlugin } from "../ecs-modules/app-context.ts";
 import type { AppInputData } from "../ecs-modules/app-input.ts";
 import { ComboBoxInputElement, RangeInputElement } from "../ecs-modules/app-input.ts";
 import { AppMainModule, type AppStateData } from "../ecs-modules/app.ts";
-import type { WorldOptions } from "../ecs/app.ts";
 import type { DefaultSystemStage, WorldModule } from "../ecs/types.ts";
-import { WORLD_SCHEDULE_OPTIONS_DEFAULT, type World } from "../ecs/world.ts";
+import { WORLD_SCHEDULE_OPTIONS_DEFAULT, type World, type WorldOptions } from "../ecs/world.ts";
 import { Image2 } from "../utility/image.ts";
 
 const SOBOL_XOR_1 = [
@@ -302,4 +301,5 @@ export const SAMPLING_MAIN_WORLD: WorldOptions = {
     id: "main",
     modules: [new AppMainModule(), new AppPartMainModule()],
     schedules: WORLD_SCHEDULE_OPTIONS_DEFAULT,
+    startupScheduleId: "start",
 };
