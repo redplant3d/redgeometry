@@ -81,7 +81,7 @@ function spawnSystem(world: World): void {
     const appRemoteData = world.readData<AppPartRemoteData>("app-part-remote-data");
     const appStateData = world.readData<AppPartStateData>("app-part-state-data");
 
-    const ctx = world.getPlugin<AppContextPlugin>("app-context");
+    const ctx = world.getPlugin<AppContextPlugin>("app-context-plugin");
 
     const { random } = appRemoteData;
 
@@ -132,7 +132,7 @@ function spawnSystem(world: World): void {
 function movementSystem(world: World): void {
     const { delta } = world.readData<TimeData>("time-data");
 
-    const ctx = world.getPlugin<AppContextPlugin>("app-context");
+    const ctx = world.getPlugin<AppContextPlugin>("app-context-plugin");
 
     const { width, height } = ctx.canvas;
 
@@ -175,13 +175,13 @@ function movementSystem(world: World): void {
 }
 
 function clearRenderSystem(world: World): void {
-    const ctx = world.getPlugin<AppContextPlugin>("app-context");
+    const ctx = world.getPlugin<AppContextPlugin>("app-context-plugin");
 
     ctx.clear();
 }
 
 function circleRenderSystem(world: World): void {
-    const ctx = world.getPlugin<AppContextPlugin>("app-context");
+    const ctx = world.getPlugin<AppContextPlugin>("app-context-plugin");
 
     const query = world.queryEntities<CircleComponent | ObjectComponent>(
         (q) =>
@@ -210,7 +210,7 @@ function circleRenderSystem(world: World): void {
 }
 
 function rectangleRenderSystem(world: World): void {
-    const ctx = world.getPlugin<AppContextPlugin>("app-context");
+    const ctx = world.getPlugin<AppContextPlugin>("app-context-plugin");
 
     const query = world.queryEntities<RectangleComponent | ObjectComponent>(
         (q) =>

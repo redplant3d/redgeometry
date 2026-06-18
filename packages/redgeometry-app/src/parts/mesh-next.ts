@@ -103,8 +103,8 @@ function writeStateSystem(world: World): void {
 }
 
 function updateSystem(world: World): void {
-    const keyboardPlugin = world.getPlugin<KeyboardPlugin>("keyboard");
-    const mousePlugin = world.getPlugin<MousePlugin>("mouse");
+    const keyboardPlugin = world.getPlugin<KeyboardPlugin>("keyboard-plugin");
+    const mousePlugin = world.getPlugin<MousePlugin>("mouse-plugin");
     const remoteData = world.readData<AppPartRemoteData>("app-part-remote-data");
 
     const pos = Vector2.fromObject(mousePlugin.getCursorPosition());
@@ -283,7 +283,7 @@ function commandEventSystem(world: World): void {
 }
 
 function renderSystem(world: World): void {
-    const ctx = world.getPlugin<AppContextPlugin>("app-context");
+    const ctx = world.getPlugin<AppContextPlugin>("app-context-plugin");
     const { mesh } = world.readData<AppPartRemoteData>("app-part-remote-data");
 
     ctx.clear();

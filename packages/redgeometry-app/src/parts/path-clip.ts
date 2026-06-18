@@ -93,7 +93,7 @@ function updateSystem(world: World): void {
     const { parameter, boolOp, windA, windB } = world.readData<AppPartStateData>("app-part-state-data");
     const { seed, generator } = world.readData<AppStateData>("app-state-data");
 
-    const ctx = world.getPlugin<AppContextPlugin>("app-context");
+    const ctx = world.getPlugin<AppContextPlugin>("app-context-plugin");
 
     const offset = 2 * (parameter - 100);
 
@@ -131,7 +131,7 @@ function updateSystem(world: World): void {
 function renderSystem(world: World): void {
     const { polygonA, polygonB, chains, faces } = world.readData<AppPartRemoteData>("app-part-remote-data");
 
-    const ctx = world.getPlugin<AppContextPlugin>("app-context");
+    const ctx = world.getPlugin<AppContextPlugin>("app-context-plugin");
 
     ctx.clear();
     ctx.fillPolygon(polygonA, "#00FF0022");

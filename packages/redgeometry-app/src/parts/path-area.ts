@@ -65,8 +65,8 @@ function updateSystem(world: World): void {
     const { count } = world.readData<AppPartStateData>("app-part-state-data");
     const { seed, generator } = world.readData<AppStateData>("app-state-data");
 
-    const ctx = world.getPlugin<AppContextPlugin>("app-context");
-    const mouse = world.getPlugin<MousePlugin>("mouse");
+    const ctx = world.getPlugin<AppContextPlugin>("app-context-plugin");
+    const mouse = world.getPlugin<MousePlugin>("mouse-plugin");
 
     const random = RandomXSR128.fromSeedLcg(seed);
     const [canvasWidth, canvasHeight] = ctx.getSize(false);
@@ -89,7 +89,7 @@ function updateSystem(world: World): void {
 function renderSystem(world: World): void {
     const { bounds, input, isInside } = world.readData<AppPartRemoteData>("app-part-remote-data");
 
-    const ctx = world.getPlugin<AppContextPlugin>("app-context");
+    const ctx = world.getPlugin<AppContextPlugin>("app-context-plugin");
 
     ctx.clear();
     ctx.fillBox(bounds, "#ADD8E644");

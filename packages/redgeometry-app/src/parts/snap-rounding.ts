@@ -71,7 +71,7 @@ function updateSystem(world: World): void {
     const { parameter } = world.readData<AppPartStateData>("app-part-state-data");
     const { seed, generator } = world.readData<AppStateData>("app-state-data");
 
-    const ctx = world.getPlugin<AppContextPlugin>("app-context");
+    const ctx = world.getPlugin<AppContextPlugin>("app-context-plugin");
 
     const scale = parameter;
     const precision = 1 / scale;
@@ -120,7 +120,7 @@ function renderSystem(world: World): void {
         world.readData<AppPartRemoteData>("app-part-remote-data");
     const { parameter } = world.readData<AppPartStateData>("app-part-state-data");
 
-    const ctx = world.getPlugin<AppContextPlugin>("app-context");
+    const ctx = world.getPlugin<AppContextPlugin>("app-context-plugin");
 
     ctx.clear();
     ctx.fillBoxes(magnets, "#E4E4E4");

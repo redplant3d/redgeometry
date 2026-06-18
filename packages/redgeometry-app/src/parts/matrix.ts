@@ -77,7 +77,7 @@ function writeStateSystem(world: World): void {
 function updateSystem(world: World): void {
     const { projection, rotation } = world.readData<AppPartStateData>("app-part-state-data");
 
-    const ctx = world.getPlugin<AppContextPlugin>("app-context");
+    const ctx = world.getPlugin<AppContextPlugin>("app-context-plugin");
 
     const [canvasWidth, canvasHeight] = ctx.getSize(true);
 
@@ -120,7 +120,7 @@ function updateSystem(world: World): void {
 function renderSystem(world: World): void {
     const { edges } = world.readData<AppPartRemoteData>("app-part-remote-data");
 
-    const ctx = world.getPlugin<AppContextPlugin>("app-context");
+    const ctx = world.getPlugin<AppContextPlugin>("app-context-plugin");
 
     ctx.clear();
     ctx.drawEdges(edges, "#000000");

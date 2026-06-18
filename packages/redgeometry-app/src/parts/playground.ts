@@ -72,7 +72,7 @@ function updateSystem(world: World): void {
 }
 
 function renderSystem(world: World): void {
-    const ctx = world.getPlugin<AppContextPlugin>("app-context");
+    const ctx = world.getPlugin<AppContextPlugin>("app-context-plugin");
 
     ctx.clear();
 }

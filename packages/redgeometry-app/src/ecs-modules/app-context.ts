@@ -35,7 +35,7 @@ export function initCanvasContextSystem(world: World): void {
 export class AppContextPlugin implements WorldPlugin {
     private context: CanvasRenderingContext2D;
 
-    public readonly pluginId = "app-context";
+    public readonly pluginId = "app-context-plugin";
 
     public constructor(context: CanvasRenderingContext2D) {
         this.context = context;

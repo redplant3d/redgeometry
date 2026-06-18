@@ -64,7 +64,7 @@ function updateSystem(world: World): void {
     const { time } = world.readData<AppPartStateData>("app-part-state-data");
     const { seed, generator } = world.readData<AppStateData>("app-state-data");
 
-    const ctx = world.getPlugin<AppContextPlugin>("app-context");
+    const ctx = world.getPlugin<AppContextPlugin>("app-context-plugin");
 
     const random = RandomXSR128.fromSeedLcg(seed);
     const [canvasWidth, canvasHeight] = ctx.getSize(false);
@@ -107,7 +107,7 @@ function updateSystem(world: World): void {
 function renderSystem(world: World): void {
     const { skeleton, meshOriginal, mesh } = world.readData<AppPartRemoteData>("app-part-remote-data");
 
-    const ctx = world.getPlugin<AppContextPlugin>("app-context");
+    const ctx = world.getPlugin<AppContextPlugin>("app-context-plugin");
 
     ctx.clear();
     ctx.drawEdges(skeleton.getVertexEdges(), "#FF0000");

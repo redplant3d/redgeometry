@@ -294,13 +294,13 @@ export function updateInputSystem(world: World): void {
     captureData.mouseWheelEvents.length = 0;
 
     // Update keyboard plugin
-    const keyboardPlugin = world.getPlugin<KeyboardPlugin>("keyboard");
+    const keyboardPlugin = world.getPlugin<KeyboardPlugin>("keyboard-plugin");
     const keyboardButtonEvents = world.readEvents<InputKeyboardButtonEvent>("input-keyboard-button-event").toArray();
     keyboardPlugin.clear();
     keyboardPlugin.applyEvents(keyboardButtonEvents);
 
     // Update mouse plugin
-    const mousePlugin = world.getPlugin<MousePlugin>("mouse");
+    const mousePlugin = world.getPlugin<MousePlugin>("mouse-plugin");
     const mouseButtonEvents = world.readEvents<InputMouseButtonEvent>("input-mouse-button-event").toArray();
     const mouseMotionEvents = world.readEvents<InputMouseMotionEvent>("input-mouse-motion-event").toArray();
     const mouseWheelEvents = world.readEvents<InputMouseWheelEvent>("input-mouse-wheel-event").toArray();
@@ -311,7 +311,7 @@ export function updateInputSystem(world: World): void {
 export class KeyboardPlugin implements WorldPlugin {
     private states: Map<KeyboardButtons, CodeState>;
 
-    public readonly pluginId = "keyboard";
+    public readonly pluginId = "keyboard-plugin";
 
     public constructor() {
         this.states = new Map();
@@ -399,7 +399,7 @@ export class MousePlugin implements WorldPlugin {
     private cursorPosition: InputMouseCursorPosition;
     private states: Map<MouseButtons, CodeState>;
 
-    public readonly pluginId = "mouse";
+    public readonly pluginId = "mouse-plugin";
 
     public constructor() {
         this.cursorPosition = { x: -1, y: -1 };

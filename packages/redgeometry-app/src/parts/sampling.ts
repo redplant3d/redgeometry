@@ -142,7 +142,7 @@ function renderSystem(world: World): void {
     const { boxes, image } = world.readData<AppPartRemoteData>("app-part-remote-data");
     const { size } = world.readData<AppPartStateData>("app-part-state-data");
 
-    const ctx = world.getPlugin<AppContextPlugin>("app-context");
+    const ctx = world.getPlugin<AppContextPlugin>("app-context-plugin");
 
     const w = image.getWidth();
 

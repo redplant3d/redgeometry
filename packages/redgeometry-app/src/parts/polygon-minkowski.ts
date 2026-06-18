@@ -102,7 +102,7 @@ function updateSystem(world: World): void {
 function renderSystem(world: World): void {
     const { polygonA, polygonB, polygonC } = world.readData<AppPartRemoteData>("app-part-remote-data");
 
-    const ctx = world.getPlugin<AppContextPlugin>("app-context");
+    const ctx = world.getPlugin<AppContextPlugin>("app-context-plugin");
 
     ctx.clear();
 

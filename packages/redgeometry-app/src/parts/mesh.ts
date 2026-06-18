@@ -64,7 +64,7 @@ function updateSystem(world: World): void {
     const { count } = world.readData<AppPartStateData>("app-part-state-data");
     const { seed } = world.readData<AppStateData>("app-state-data");
 
-    const ctx = world.getPlugin<AppContextPlugin>("app-context");
+    const ctx = world.getPlugin<AppContextPlugin>("app-context-plugin");
 
     const random = RandomXSR128.fromSeedLcg(seed);
     const [canvasWidth, canvasHeight] = ctx.getSize(false);
@@ -111,7 +111,7 @@ function renderSystem(world: World): void {
     const { mesh, points } = world.readData<AppPartRemoteData>("app-part-remote-data");
     const { seed } = world.readData<AppStateData>("app-state-data");
 
-    const ctx = world.getPlugin<AppContextPlugin>("app-context");
+    const ctx = world.getPlugin<AppContextPlugin>("app-context-plugin");
 
     const random = RandomXSR128.fromSeedLcg(seed);
 
