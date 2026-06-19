@@ -16,13 +16,13 @@
         "LICENSE"
     ],
     "exports": {
-        ".": {
-            "import": "./dist/index.js",
-            "require": "./dist/index.cjs"
-        },
+        ".": "./dist/index.js",
         "./src/*": "./src/*.ts"
     },
-    "main": "dist/index.cjs",
+    "main": "dist/index.js",
+    "engines": {
+        "node": ">=22"
+    },
     "scripts": {
         "build": "rolldown -c"
     }

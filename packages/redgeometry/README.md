@@ -4,7 +4,7 @@
 
 ## Usage
 
-This package provides optimized bundles for CJS and ESM via `redgeometry` imports, including type declarations and source maps.
+This package provides an optimized bundle for ES modules, including type declarations and source maps.
 
 ```typescript
 import { Vector2, log } from "redgeometry";
@@ -15,7 +15,7 @@ log.infoDebug("length = {}", v.length());
 
 ## Advanced
 
-For certain debugging scenarios it might be useful to import the source files directly with `redgeometry/src/*` and enable debugging asserts which are not present in the CJS/ESM bundles. However, the consuming application may not be compatible with the sources because of different TypeScript versions and/or configuration. Although direct source imports are mostly supported by the package, they are not recommended for the general use case.
+For certain debugging scenarios it might be useful to import the source files directly with `redgeometry/src/*` and enable debugging asserts which are not present in the bundle. However, the consuming application may not be compatible with the sources because of different TypeScript versions and/or configuration. Although direct source imports are mostly supported by the package, they are not recommended for the general use case.
 
 ```typescript
 /// <reference types="redgeometry/src/env" />
