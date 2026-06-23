@@ -1496,7 +1496,7 @@ export class Vector4 implements ReadonlyVector4 {
             eqApproxRel(this.x, v.x, eps) &&
             eqApproxRel(this.y, v.y, eps) &&
             eqApproxRel(this.z, v.z, eps) &&
-            eqApproxAbs(this.w, v.w, eps)
+            eqApproxRel(this.w, v.w, eps)
         );
     }
 
