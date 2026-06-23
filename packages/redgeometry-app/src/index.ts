@@ -1,6 +1,7 @@
 import { EcsBounceAppPartModule } from "./parts/ecs-bounce.ts";
 import { MatrixAppPartModule } from "./parts/matrix.ts";
 import { MeshNextAppPartModule } from "./parts/mesh-next.ts";
+import { MeshAppPartModule } from "./parts/mesh.ts";
 import { PathAreaAppPartModule } from "./parts/path-area.ts";
 import { PathClipAppPartModule } from "./parts/path-clip.ts";
 import { PathIntersectionAppPartModule } from "./parts/path-intersection.ts";
@@ -17,7 +18,7 @@ import { AppLauncher } from "./utility/app-launcher.ts";
 const launcher = new AppLauncher();
 launcher.addPart("ecs-bounce", new EcsBounceAppPartModule());
 launcher.addPart("matrix", new MatrixAppPartModule());
-launcher.addPart("mesh", new MeshNextAppPartModule());
+launcher.addPart("mesh", new MeshAppPartModule());
 launcher.addPart("mesh-next", new MeshNextAppPartModule());
 launcher.addPart("path-area", new PathAreaAppPartModule());
 launcher.addPart("path-clip", new PathClipAppPartModule());
