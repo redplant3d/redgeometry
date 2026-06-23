@@ -1,7 +1,8 @@
 import { MeshEdge2, type Mesh2, type MeshFace2 } from "redgeometry/src/core/mesh";
 import { Edge2 } from "redgeometry/src/primitives/edge";
 import { Vector2, type ReadonlyVector2 } from "redgeometry/src/primitives/vector";
-import { assertDebug, log } from "redgeometry/src/utility/debug";
+import { assert } from "redgeometry/src/utility/debug";
+import { log } from "redgeometry/src/utility/log";
 import { solveLinear, solveQuadratic, type Root1, type Root2 } from "redgeometry/src/utility/solve";
 import type { Enum } from "redgeometry/src/utility/types";
 
@@ -126,7 +127,7 @@ export class StraightSkeleton {
 
             const ev = faces[0].data as KineticEvent;
 
-            assertDebug(ev.t1 >= 0, "Parameter must be positve (t = {})", ev.t1);
+            assert(ev.t1 >= 0, "Parameter must be positve (t = {})", ev.t1);
 
             this.printEvents(faces, tmax);
 
@@ -178,7 +179,7 @@ export class StraightSkeleton {
             let curr = edge;
 
             do {
-                assertDebug(curr.data === undefined);
+                assert(curr.data === undefined);
 
                 curr.data = vtx;
                 curr = curr.onext;
@@ -479,9 +480,9 @@ export class StraightSkeleton {
         const vtx1 = e1.data as KineticVertex;
         const vtx2 = e2.data as KineticVertex;
 
-        assertDebug(e0.sym.face !== undefined);
-        assertDebug(e1.sym.face === undefined);
-        assertDebug(e2.sym.face !== undefined);
+        assert(e0.sym.face !== undefined);
+        assert(e1.sym.face === undefined);
+        assert(e2.sym.face !== undefined);
 
         const tv = this.getEdgeCrashParameter(vtx0, vtx1, vtx2);
         const te = this.getEdgeCollapseParameter(vtx1, vtx2);
@@ -551,12 +552,12 @@ export class StraightSkeleton {
     }
 
     private printEdgesLnext(edge: MeshEdge2, validate: boolean): void {
-        log.infoDebug("lnext");
+        log.info("lnext");
         let i = 0;
 
         for (const e of edge.getLnextIterator()) {
-            log.infoDebug("  [{}] p0: {}", i, e.p0);
-            log.infoDebug("      p1: {}", e.p1);
+            log.info("  [{}] p0: {}", i, e.p0);
+            log.info("      p1: {}", e.p1);
 
             if (validate) {
                 e.validate();
@@ -566,16 +567,16 @@ export class StraightSkeleton {
     }
 
     private printEdgesOnext(edge: MeshEdge2, validate: boolean): void {
-        log.infoDebug("onext");
+        log.info("onext");
         let i = 0;
 
         for (const e of edge.getOnextIterator()) {
-            log.infoDebug("  [{}] p0: {}", i, e.p0);
-            log.infoDebug("      p1: {}", e.p1);
-            log.infoDebug("      angle: {}", (e.p1.sub(e.p0).polarAngle() * 180) / Math.PI);
+            log.info("  [{}] p0: {}", i, e.p0);
+            log.info("      p1: {}", e.p1);
+            log.info("      angle: {}", (e.p1.sub(e.p0).polarAngle() * 180) / Math.PI);
 
             if (validate) {
-                assertDebug(e.data === edge.data);
+                assert(e.data === edge.data);
                 e.validate();
             }
 
@@ -584,36 +585,36 @@ export class StraightSkeleton {
     }
 
     private printEvents(faces: MeshFace2[], t: number): void {
-        log.infoDebug("******************************************************************");
-        log.infoDebug("Parameter = {}", t);
-        log.infoDebug("******************************************************************");
+        log.info("******************************************************************");
+        log.info("Parameter = {}", t);
+        log.info("******************************************************************");
         for (let i = 0; i < faces.length; i++) {
             const face = faces[i];
             const event = face.data as KineticEvent;
-            log.infoDebug("[{}] type = {}", i, this.getKineticEventTypeName(event.type));
-            log.infoDebug("    t = {}", event.t1);
-            log.infoDebug("    edge = {}", event.e.p0);
-            log.infoDebug("           {}", event.e.p1);
+            log.info("[{}] type = {}", i, this.getKineticEventTypeName(event.type));
+            log.info("    t = {}", event.t1);
+            log.info("    edge = {}", event.e.p0);
+            log.info("           {}", event.e.p1);
         }
     }
 
     private printFace(face: MeshFace2): void {
-        log.infoDebug("******************************************************************");
+        log.info("******************************************************************");
 
         const e0 = face.start;
         const e1 = e0.lnext;
         const e2 = e1.lnext;
 
-        log.infoDebug("Face: e0 = {}", e0.p0);
-        log.infoDebug("           {}", e0.p1);
-        log.infoDebug("      e1 = {}", e1.p0);
-        log.infoDebug("           {}", e1.p1);
-        log.infoDebug("      e2 = {}", e2.p0);
-        log.infoDebug("           {}", e2.p1);
+        log.info("Face: e0 = {}", e0.p0);
+        log.info("           {}", e0.p1);
+        log.info("      e1 = {}", e1.p0);
+        log.info("           {}", e1.p1);
+        log.info("      e2 = {}", e2.p0);
+        log.info("           {}", e2.p1);
     }
 
     private printVerticesAt(face: MeshFace2, t: number): void {
-        log.infoDebug("******************************************************************");
+        log.info("******************************************************************");
 
         const e0 = face.start;
         const e1 = e0.lnext;
@@ -623,18 +624,18 @@ export class StraightSkeleton {
         const vtx1 = e1.data as KineticVertex;
         const vtx2 = e2.data as KineticVertex;
 
-        log.infoDebug("vtx0: pos = {}", vtx0.getPositionAt(t));
-        log.infoDebug("      vel = {}", vtx0.vel);
-        log.infoDebug("       n1 = {}", vtx0.n1);
-        log.infoDebug("       n2 = {}", vtx0.n2);
-        log.infoDebug("vtx1: pos = {}", vtx1.getPositionAt(t));
-        log.infoDebug("      vel = {}", vtx1.vel);
-        log.infoDebug("       n1 = {}", vtx1.n1);
-        log.infoDebug("       n2 = {}", vtx1.n2);
-        log.infoDebug("vtx2: pos = {}", vtx2.getPositionAt(t));
-        log.infoDebug("      vel = {}", vtx2.vel);
-        log.infoDebug("       n1 = {}", vtx2.n1);
-        log.infoDebug("       n2 = {}", vtx2.n2);
+        log.info("vtx0: pos = {}", vtx0.getPositionAt(t));
+        log.info("      vel = {}", vtx0.vel);
+        log.info("       n1 = {}", vtx0.n1);
+        log.info("       n2 = {}", vtx0.n2);
+        log.info("vtx1: pos = {}", vtx1.getPositionAt(t));
+        log.info("      vel = {}", vtx1.vel);
+        log.info("       n1 = {}", vtx1.n1);
+        log.info("       n2 = {}", vtx1.n2);
+        log.info("vtx2: pos = {}", vtx2.getPositionAt(t));
+        log.info("      vel = {}", vtx2.vel);
+        log.info("       n1 = {}", vtx2.n1);
+        log.info("       n2 = {}", vtx2.n2);
     }
 
     private stopVertexAt(vtx: KineticVertex, t: number): void {

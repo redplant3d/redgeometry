@@ -5,7 +5,7 @@ import { PathOverlay2 } from "redgeometry/src/core/path-overlay";
 import { Polygon2 } from "redgeometry/src/core/polygon";
 import { Edge2 } from "redgeometry/src/primitives/edge";
 import { arrayEquals } from "redgeometry/src/utility/array";
-import { assertDebug } from "redgeometry/src/utility/debug";
+import { assert } from "redgeometry/src/utility/debug";
 import { RandomXSR128 } from "redgeometry/src/utility/random";
 import type { AppContextPlugin } from "../ecs-modules/app-context.ts";
 import type { AppInputData } from "../ecs-modules/app-input.ts";
@@ -166,7 +166,7 @@ function createTagEntries(mesh: Mesh2): PathOverlayTagEntry[] {
     const entries: PathOverlayTagEntry[] = [];
 
     for (const face of mesh.getFaces()) {
-        assertDebug(face.data !== undefined, "Face data must not be undefined");
+        assert(face.data !== undefined, "Face data must not be undefined");
 
         const tag = face.data as number[];
         const entry = entries.find((e) => arrayEquals(e.tag, tag));

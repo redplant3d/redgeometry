@@ -1,7 +1,8 @@
 import { Bezier1Curve2, type ReadonlyBezierCurve2 } from "../primitives/bezier.ts";
 import { Vector2, type ReadonlyVector2 } from "../primitives/vector.ts";
 import { ArrayMultiMap } from "../utility/array.ts";
-import { assertDebug, log } from "../utility/debug.ts";
+import { assert } from "../utility/debug.ts";
+import { log } from "../utility/log.ts";
 import { Path2 } from "./path.ts";
 
 type MeshStatus2 = {
@@ -262,7 +263,10 @@ export class Mesh2 {
             MeshFace2.updateEdgeFaces(f, e1.face);
 
             const success = this.destroyFace(f);
-            assertDebug(success, "Unable to destroy face");
+
+            if (REDGEOMETRY_DEBUG) {
+                assert(success, "Unable to destroy face");
+            }
         }
 
         // e1.validate();
@@ -303,7 +307,9 @@ export class Mesh2 {
         const success = this.destroyEdge(e);
         const successSym = this.destroyEdge(e.sym);
 
-        assertDebug(success && successSym, "Unable to destroy edges");
+        if (REDGEOMETRY_DEBUG) {
+            assert(success && successSym, "Unable to destroy edges");
+        }
     }
 
     /**
@@ -329,7 +335,10 @@ export class Mesh2 {
         } while (e0 !== es);
 
         const success = this.destroyFace(f);
-        assertDebug(success, "Unable to destroy face");
+
+        if (REDGEOMETRY_DEBUG) {
+            assert(success, "Unable to destroy face");
+        }
     }
 
     /**
@@ -382,7 +391,10 @@ export class Mesh2 {
         face.data = ch.data;
 
         const success = this.destroyChain(ch);
-        assertDebug(success, "Unable to destroy chain");
+
+        if (REDGEOMETRY_DEBUG) {
+            assert(success, "Unable to destroy chain");
+        }
 
         // Update edges
         for (const e of face.getEdgeIterator()) {
@@ -476,7 +488,7 @@ export class Mesh2 {
         }
         message += "}";
 
-        log.infoDebug("{}", message);
+        log.info("{}", message);
     }
 
     public triangulate(optimize = false): void {
@@ -562,10 +574,14 @@ export class Mesh2 {
         }
     }
 
-    public validate(): void {
+    public validate(): boolean {
+        let success = true;
+
         for (const edge of this.edges) {
-            edge.validate();
+            success &&= edge.validate();
         }
+
+        return success;
     }
 
     private chainAddHead(chain: MeshChain2, edge: MeshEdge2): void {
@@ -606,7 +622,10 @@ export class Mesh2 {
 
                 // Remove dangling chain
                 const success = this.destroyChain(chain);
-                assertDebug(success, "Unable to destroy chain");
+
+                if (REDGEOMETRY_DEBUG) {
+                    assert(success, "Unable to destroy chain");
+                }
 
                 if (refChain.isClosed()) {
                     MeshEdge2.join(refChain.head, refChain.tail);
@@ -628,7 +647,10 @@ export class Mesh2 {
 
                 // Remove dangling chain
                 const success = this.destroyChain(chain);
-                assertDebug(success, "Unable to destroy chain");
+
+                if (REDGEOMETRY_DEBUG) {
+                    assert(success, "Unable to destroy chain");
+                }
 
                 if (refChain.isClosed()) {
                     MeshEdge2.join(refChain.head, refChain.tail);
@@ -684,26 +706,26 @@ export class Mesh2 {
 
             if (cross > 0) {
                 if (p0.x >= p1.x && p1.x < p2.x) {
-                    // log.infoDebug("{} -> Start", p1);
+                    // Start
                     this.monotoneInsert(status, e1);
                     continue;
                 }
 
                 if (p0.x <= p1.x && p1.x > p2.x) {
-                    // log.infoDebug("{} -> End", p1);
+                    // End
                     this.monotoneDelete(status, e0, e1);
                     continue;
                 }
             } else if (cross < 0) {
                 if (p0.x > p1.x && p1.x <= p2.x) {
-                    // log.infoDebug("{} -> Split", p1);
+                    // Split
                     this.monotoneUpdate(status, e1, false, true);
                     this.monotoneInsert(status, e1);
                     continue;
                 }
 
                 if (p0.x < p1.x && p1.x >= p2.x) {
-                    // log.infoDebug("{} -> Merge", p1);
+                    // Merge
                     this.monotoneDelete(status, e0, e1);
                     this.monotoneUpdate(status, e1, true, false);
                     continue;
@@ -711,11 +733,11 @@ export class Mesh2 {
             }
 
             if (p1.x !== p2.x ? p1.x < p2.x : p1.y < p2.y) {
-                // log.infoDebug("{} -> Regular (Interior Above)", p1);
+                // Regular (Interior Above)
                 this.monotoneDelete(status, e0, e1);
                 this.monotoneInsert(status, e1);
             } else {
-                // log.infoDebug("{} -> Regular (Interior Below)", p1);
+                // Regular (Interior Below)
                 this.monotoneUpdate(status, e1, false, false);
             }
         }
@@ -1125,14 +1147,17 @@ export class MeshEdge2 {
         return "{p0: " + this.p0.toString() + ", p1: " + this.p1.toString() + "}";
     }
 
-    public validate(): void {
-        assertDebug(this.sym !== this);
-        assertDebug(this.sym.sym === this);
+    public validate(): boolean {
+        // TODO: Validation helper?
+        let success = true;
 
-        assertDebug(this.lnext.onext.sym === this);
-        assertDebug(this.onext.sym.lnext === this);
+        success &&= this.sym !== this;
+        success &&= this.sym.sym === this;
 
-        assertDebug((this.seg !== undefined) === (this.face !== undefined));
+        success &&= this.lnext.onext.sym === this;
+        success &&= this.onext.sym.lnext === this;
+
+        success &&= (this.seg !== undefined) === (this.face !== undefined);
 
         let curr = this.onext;
 
@@ -1141,12 +1166,14 @@ export class MeshEdge2 {
             const next = curr.onext;
 
             if (prev !== next) {
-                assertDebug(curr.p0.eq(prev.p0) && curr.p0.eq(next.p0));
-                assertDebug(Vector2.isBetweenCcw(curr.vector(), prev.vector(), next.vector()));
+                success &&= curr.p0.eq(prev.p0) && curr.p0.eq(next.p0);
+                success &&= Vector2.isBetweenCcw(curr.vector(), prev.vector(), next.vector());
             }
 
             curr = curr.onext;
         } while (curr !== this.onext);
+
+        return success;
     }
 
     public vector(): Vector2 {
@@ -1192,7 +1219,7 @@ export class MeshChain2 {
         }
         message += "}";
 
-        log.infoDebug("{}", message);
+        log.info("{}", message);
     }
 
     public writeToPath(path: Path2): void {
@@ -1307,7 +1334,7 @@ export class MeshFace2 {
 
         message += "}";
 
-        log.infoDebug("{}", message);
+        log.info("{}", message);
     }
 
     /**

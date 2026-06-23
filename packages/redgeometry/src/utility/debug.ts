@@ -1,12 +1,4 @@
-import { Log } from "./log.ts";
 import { formatString, type FormatParameters } from "./string.ts";
-
-// Global log object
-export const log: Log = new Log({
-    errorFn: console.error,
-    warnFn: console.warn,
-    infoFn: console.info,
-});
 
 export class ValidationHelper {
     public errors: string[];
@@ -64,13 +56,6 @@ export class ValidationHelper {
 
 export function assert(value: boolean, fmt?: string, ...params: FormatParameters): asserts value {
     if (!value) {
-        const message = formatString(fmt ?? "Assertion failed", ...params);
-        throw new Error(message);
-    }
-}
-
-export function assertDebug(value: boolean, fmt?: string, ...params: FormatParameters): asserts value {
-    if (REDGEOMETRY_DEBUG && !value) {
         const message = formatString(fmt ?? "Assertion failed", ...params);
         throw new Error(message);
     }

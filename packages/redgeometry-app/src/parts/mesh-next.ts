@@ -24,7 +24,7 @@ import {
 } from "redgeometry/src/internal/mesh-next";
 import { Edge2 } from "redgeometry/src/primitives/edge";
 import { Vector2, type ReadonlyVector2 } from "redgeometry/src/primitives/vector";
-import { log } from "redgeometry/src/utility/debug";
+import { log } from "redgeometry/src/utility/log";
 import type { AppContextPlugin } from "../ecs-modules/app-context.ts";
 import { ButtonInputElement, type AppInputData } from "../ecs-modules/app-input.ts";
 import { KeyboardButtons, KeyboardPlugin, MouseButtons, MousePlugin } from "../ecs-modules/input.ts";

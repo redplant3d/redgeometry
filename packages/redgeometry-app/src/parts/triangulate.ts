@@ -3,7 +3,8 @@ import { Path2 } from "redgeometry/src/core/path";
 import { PathClip2 } from "redgeometry/src/core/path-clip";
 import { PATH_QUALITY_OPTIONS_DEFAULT } from "redgeometry/src/core/path-options";
 import { Polygon2 } from "redgeometry/src/core/polygon";
-import { log } from "redgeometry/src/utility/debug";
+import { assert } from "redgeometry/src/utility/debug";
+import { log } from "redgeometry/src/utility/log";
 import { RandomXSR128 } from "redgeometry/src/utility/random";
 import type { AppContextPlugin } from "../ecs-modules/app-context.ts";
 import { ComboBoxInputElement, RangeInputElement, type AppInputData } from "../ecs-modules/app-input.ts";
@@ -142,7 +143,8 @@ function updateSystem(world: World): void {
         }
     }
 
-    mesh.validate();
+    const success = mesh.validate();
+    assert(success, "Mesh validation failed");
 
     const error = Path2.createEmpty();
 

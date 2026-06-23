@@ -1,7 +1,7 @@
 import type { BooleanOperator } from "../core/path-options.ts";
 import type { EdgeSegment2, SnapRound2 } from "../core/snapround.ts";
 import { Vector2, type ReadonlyVector2 } from "../primitives/vector.ts";
-import { log } from "../utility/debug.ts";
+import { log } from "../utility/log.ts";
 
 export class PathSweepEvent2 {
     public left: boolean;
@@ -66,7 +66,7 @@ export class PathSweepEvent2 {
     }
 
     public printDebug(): void {
-        log.infoDebug(
+        log.info(
             "{} -> {} ({}, id = {}, winding = {})",
             this.p0,
             this.p1,
@@ -80,7 +80,9 @@ export class PathSweepEvent2 {
 export function createSweepEventQueue(snapRound: SnapRound2): PathSweepEvent2[] {
     snapRound.process();
 
-    log.assertFnDebug(() => snapRound.validate(), "PathClip2: Validation failed");
+    if (REDGEOMETRY_DEBUG) {
+        log.assert(snapRound.validate(), "PathClip2: Validation failed");
+    }
 
     const edgeSegments: EdgeSegment2[] = [];
     snapRound.writeEdgeSegmentsTo(edgeSegments);

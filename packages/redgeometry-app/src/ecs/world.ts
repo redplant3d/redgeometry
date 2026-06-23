@@ -1,4 +1,5 @@
-import { log, throwError } from "redgeometry/src/utility/debug";
+import { throwError } from "redgeometry/src/utility/debug";
+import { log } from "redgeometry/src/utility/log";
 import { EntityComponentStorage } from "./entity-component.ts";
 import { WorldEventIterator, WorldEventStorage } from "./event.ts";
 import { SystemSchedule, type SystemDependencyOptions, type SystemOptions, type SystemsOptions } from "./schedule.ts";
@@ -220,10 +221,6 @@ export class World {
         for (const schedule of this.schedules.values()) {
             schedule.update();
         }
-
-        // for (const [id, schedule] of this.schedules) {
-        //     log.infoDebug("*** Schedule: {} ***\n{}", id, schedule);
-        // }
     }
 
     public isEntityAlive(entityId: EntityId): boolean {

@@ -4,7 +4,8 @@ import { Bezier1Curve2 } from "../primitives/bezier.ts";
 import { MinMaxBox2 } from "../primitives/box.ts";
 import { Edge2 } from "../primitives/edge.ts";
 import { Vector2, type ReadonlyVector2 } from "../primitives/vector.ts";
-import { assertDebug, log, throwError, ValidationHelper } from "../utility/debug.ts";
+import { assert, throwError, ValidationHelper } from "../utility/debug.ts";
+import { log } from "../utility/log.ts";
 import type { Nominal } from "../utility/types.ts";
 
 export type MeshVertexIdx = Nominal<number, "MeshVertexIdx">;
@@ -3006,7 +3007,7 @@ export function mesh2MoveLoopToFace<S, F, E, V>(mesh: Mesh2<S, F, E, V>, loop: M
 
     if (loop === loopFirstLoop) {
         const loopNextLoop = mesh.loops.getNext(loopFirstLoop);
-        assertDebug(loopFirstLoop !== loopNextLoop);
+        assert(loopFirstLoop !== loopNextLoop);
 
         mesh.faces.setFirstLoop(loopFace, loopNextLoop);
     }
@@ -3034,7 +3035,7 @@ export function mesh2RemoveEdge<S, F, E, V>(
     const linkSym = mesh.links.getSym(link);
 
     const edgeSym = mesh.links.getEdge(linkSym);
-    assertDebug(edgeSym !== -1);
+    assert(edgeSym !== -1);
 
     const loop = mesh.links.getLoop(link);
     const loopSym = mesh.links.getLoop(linkSym);
@@ -3120,7 +3121,7 @@ export function mesh2RemoveVertex<S, F, E, V>(mesh: Mesh2<S, F, E, V>, vertex: M
     const link = mesh.vertices.getFirstLink(vertex);
 
     const edge = mesh.links.getEdge(link);
-    assertDebug(edge === -1, "Vertex must have no edges");
+    assert(edge === -1, "Vertex must have no edges");
 
     const loop = mesh.links.getLoop(link);
     const face = mesh.loops.getFace(loop);

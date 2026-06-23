@@ -3,7 +3,8 @@ import { PathSweepEvent2, createSweepEventQueue } from "../internal/path-sweep.t
 import { Bezier1Curve2, type ReadonlyBezierCurve2 } from "../primitives/bezier.ts";
 import type { ReadonlyEdge2 } from "../primitives/edge.ts";
 import { ArrayMultiSet, arrayEquals } from "../utility/array.ts";
-import { assertDebug, log } from "../utility/debug.ts";
+import { assert } from "../utility/debug.ts";
+import { log } from "../utility/log.ts";
 import { MeshChain2, MeshEdge2, type Mesh2 } from "./mesh.ts";
 import { ApproximationMode, PATH_CLIP_OPTIONS_DEFAULT, type PathQualityOptions } from "./path-options.ts";
 import type { Path2 } from "./path.ts";
@@ -220,7 +221,10 @@ export class PathOverlay2 {
                 edge.chain.tail = chain.tail;
 
                 const success = output.destroyChain(chain);
-                assertDebug(success, "Unable to destroy chain");
+
+                if (REDGEOMETRY_DEBUG) {
+                    assert(success, "Unable to destroy chain");
+                }
             }
         }
 
@@ -235,7 +239,10 @@ export class PathOverlay2 {
                 edgeSym.chain.head = chainSym.head;
 
                 const success = output.destroyChain(chainSym);
-                assertDebug(success, "Unable to destroy chain");
+
+                if (REDGEOMETRY_DEBUG) {
+                    assert(success, "Unable to destroy chain");
+                }
             }
         }
     }

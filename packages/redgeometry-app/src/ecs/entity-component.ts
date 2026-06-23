@@ -1,4 +1,5 @@
-import { assertDebug, assertUnreachable, log, throwError } from "redgeometry/src/utility/debug";
+import { assert, assertUnreachable, throwError } from "redgeometry/src/utility/debug";
+import { log } from "redgeometry/src/utility/log";
 import type { Enum } from "redgeometry/src/utility/types";
 import type { Component, ComponentId, ComponentIdOf, EntityComponentQueryValue, EntityId } from "./types.ts";
 import { ComponentFlags, EntityFlags } from "./world.ts";
@@ -391,8 +392,7 @@ export class EntityComponentStorage {
         const nextCompState = setState.getNextComponenentState(componentId);
 
         const compFlagMask = ComponentFlags.DEFAULT | ComponentFlags.ADDED | ComponentFlags.UPDATED;
-
-        assertDebug(entState.flags !== EntityFlags.NONE, "Entity flags must not be 'None'");
+        assert(entState.flags !== EntityFlags.NONE, "Entity flags must not be 'None'");
 
         switch (type) {
             case ComponentTransitionType.ADD: {
@@ -490,7 +490,7 @@ export class EntityComponentStorage {
         const nextEntState = setState.getNextEntityState();
         let nextCompStates = setState.componentStates;
 
-        assertDebug(nextEntState.flags !== EntityFlags.NONE, "Entity flags must not be empty");
+        assert(nextEntState.flags !== EntityFlags.NONE, "Entity flags must not be empty");
 
         switch (type) {
             case EntityTransitionType.RESET: {
@@ -684,7 +684,7 @@ export class EntityComponentStorage {
         }
 
         const setStateDest = this.makeEntityTransition(set.state, EntityTransitionType.RESET);
-        assertDebug(set.state !== setStateDest, "Invalid reset transition");
+        assert(set.state !== setStateDest, "Invalid reset transition");
 
         const entFlags = setStateDest.getEntityFlags();
 
@@ -1123,7 +1123,7 @@ export class EntityComponentSetStorage {
         for (const id of storageKeys.components.keys()) {
             const compContainerSrc = storageSrc.components.get(id);
             const compContainerDest = this.components.get(id);
-            assertDebug(
+            assert(
                 compContainerSrc !== undefined && compContainerDest !== undefined,
                 "Containers must not be undefined",
             );
@@ -1148,7 +1148,7 @@ export class EntityComponentSetStorage {
         // Invalidate entry
         for (const id of this.components.keys()) {
             const compContainer = this.components.get(id);
-            assertDebug(compContainer !== undefined, "Container must not be undefined");
+            assert(compContainer !== undefined, "Container must not be undefined");
             compContainer[storageEntryRef] = null;
         }
 
@@ -1187,7 +1187,7 @@ export class EntityComponentSetStorage {
 
     public setComponent(storageEntryRef: EntityComponentSetStorageEntryRef, value: Component): void {
         const compContainer = this.components.get(value.componentId);
-        assertDebug(compContainer !== undefined, "Container must not be undefined");
+        assert(compContainer !== undefined, "Container must not be undefined");
         compContainer[storageEntryRef] = value;
     }
 }

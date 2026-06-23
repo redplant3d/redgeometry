@@ -1,4 +1,4 @@
-import { log } from "redgeometry/src/utility/debug";
+import { log } from "redgeometry/src/utility/log";
 import { RandomXSR128 } from "redgeometry/src/utility/random";
 import type { AppContextPlugin } from "../ecs-modules/app-context.ts";
 import { RangeInputElement, type AppInputData } from "../ecs-modules/app-input.ts";
@@ -64,7 +64,7 @@ function updateSystem(world: World): void {
 
     const random = RandomXSR128.fromSeedLcg(seed);
 
-    log.infoDebug("param1 = {}, param2 = {}, random = {}", param1, param2, random.nextInt());
+    log.info("param1 = {}, param2 = {}, random = {}", param1, param2, random.nextInt());
 
     world.writeData<AppPartRemoteData>({
         dataId: "app-part-remote-data",

@@ -7,7 +7,6 @@ import type {
 } from "../primitives/bezier.ts";
 import type { MinMaxBox2 } from "../primitives/box.ts";
 import { Vector2, type ReadonlyVector2, type ReadonlyVector3 } from "../primitives/vector.ts";
-import { log } from "../utility/debug.ts";
 import { Interval } from "../utility/interval.ts";
 import { lerp } from "../utility/scalar.ts";
 import { solveCubic, solveQuadratic } from "../utility/solve.ts";
@@ -118,10 +117,10 @@ export function checkIntervalQuadQuad(
 
     const iiNext = ii.clamp(i1.a, i1.b);
 
-    log.infoDebug("Intersection candidate: [{}, {}]", iiNext.a, iiNext.b);
+    // log.info("Intersection candidate: [{}, {}]", iiNext.a, iiNext.b);
 
     if (iiNext.diameter() < eps) {
-        log.infoDebug("Intersection found at t = {} (Diam: {})", iiNext.mid(), iiNext.diameter());
+        // log.info("Intersection found at t = {} (Diam: {})", iiNext.mid(), iiNext.diameter());
 
         output.push(c1.valueAt(iiNext.mid()));
     } else {

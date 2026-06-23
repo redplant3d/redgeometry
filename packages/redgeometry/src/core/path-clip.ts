@@ -2,7 +2,7 @@ import { PathSweepEvent2, createSweepEventQueue, isIncOutBoolean } from "../inte
 import { Bezier1Curve2, type ReadonlyBezierCurve2 } from "../primitives/bezier.ts";
 import type { ReadonlyEdge2 } from "../primitives/edge.ts";
 import { ArrayMultiSet } from "../utility/array.ts";
-import { log } from "../utility/debug.ts";
+import { log } from "../utility/log.ts";
 import type { Mesh2 } from "./mesh.ts";
 import {
     ApproximationMode,

@@ -4,6 +4,7 @@ import { PathClip2 } from "redgeometry/src/core/path-clip";
 import { PATH_CLIP_OPTIONS_DEFAULT, PATH_QUALITY_OPTIONS_DEFAULT } from "redgeometry/src/core/path-options";
 import { MinMaxBox2 } from "redgeometry/src/primitives/box";
 import type { ReadonlyVector2 } from "redgeometry/src/primitives/vector";
+import { assert } from "redgeometry/src/utility/debug";
 import { RandomXSR128 } from "redgeometry/src/utility/random";
 import type { AppContextPlugin } from "../ecs-modules/app-context.ts";
 import { RangeInputElement, type AppInputData } from "../ecs-modules/app-input.ts";
@@ -98,7 +99,9 @@ function updateSystem(world: World): void {
     }
 
     mesh.triangulateOptimize();
-    mesh.validate();
+
+    const success = mesh.validate();
+    assert(success, "Mesh validation failed");
 
     world.writeData<AppPartRemoteData>({
         dataId: "app-part-remote-data",

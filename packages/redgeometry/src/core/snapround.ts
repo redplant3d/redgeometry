@@ -2,8 +2,9 @@ import { type ReadonlyBezierCurve2 } from "../primitives/bezier.ts";
 import { Edge2, type ReadonlyEdge2 } from "../primitives/edge.ts";
 import { Vector2, type ReadonlyVector2 } from "../primitives/vector.ts";
 import { ArrayMultiSet } from "../utility/array.ts";
-import { assertDebug, log } from "../utility/debug.ts";
+import { assert } from "../utility/debug.ts";
 import { Float128 } from "../utility/float128.ts";
+import { log } from "../utility/log.ts";
 import { solveLinear } from "../utility/solve.ts";
 
 type PixelType = "magnet" | "pin";
@@ -156,7 +157,9 @@ export class SnapRound2 {
     }
 
     public addSegment(c: ReadonlyBezierCurve2, set: number, weight: number, snap: boolean, data: unknown): void {
-        log.assertFnDebug(() => c.isFinite(), "SnapRound2: BezierCurve2 is not finite");
+        if (REDGEOMETRY_DEBUG) {
+            assert(c.isFinite(), "SnapRound2: BezierCurve2 is not finite");
+        }
 
         if (c.type !== "bezier-1") {
             log.warn("SnapRound2: Not implemented yet");
@@ -337,7 +340,9 @@ export class SnapRound2 {
                 // Remove from sweepline
                 const success = status.remove(qe);
 
-                assertDebug(success, "SnapRound2: Status event not found\n{}", qe.seg);
+                if (REDGEOMETRY_DEBUG) {
+                    assert(success, "SnapRound2: Status event not found\n{}", qe.seg);
+                }
             }
         }
 

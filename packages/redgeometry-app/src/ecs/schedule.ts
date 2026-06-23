@@ -1,4 +1,5 @@
-import { assertDebug, log } from "redgeometry/src/utility/debug";
+import { assert } from "redgeometry/src/utility/debug";
+import { log } from "redgeometry/src/utility/log";
 import type { System, SystemAsync, SystemStage, SystemSync } from "./types.ts";
 import type { World } from "./world.ts";
 
@@ -90,7 +91,6 @@ export class SystemSchedule {
             // Wait for incoming dependencies
             for (const depAsync of entry.depsAsync) {
                 if (depAsync.promise !== undefined) {
-                    // log.infoDebug("Waiting for system '{}'", depAsync.options.fn.name);
                     await depAsync.promise;
                     depAsync.promise = undefined;
                 }
@@ -227,8 +227,8 @@ export class SystemSchedule {
 
         // TODO: Better reporting of cycles
         for (const node of nodes) {
-            assertDebug(node.depsIn.size === 0);
-            assertDebug(node.depsOut.size === 0);
+            assert(node.depsIn.size === 0);
+            assert(node.depsOut.size === 0);
         }
 
         this.entries = entries;

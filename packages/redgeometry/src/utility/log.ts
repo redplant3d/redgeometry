@@ -1,6 +1,5 @@
 import { formatString, type FormatParameters } from "./string.ts";
 
-export type AssertFn = () => boolean;
 export type LogFn = (message: string) => void;
 
 export type LogOptions = {
@@ -39,37 +38,9 @@ export class Log {
         }
     }
 
-    public assertDebug(value: boolean, fmt: string, ...params: FormatParameters): void {
-        if (REDGEOMETRY_DEBUG && !value) {
-            const message = formatString(fmt, ...params);
-            this.errorFn(message);
-        }
-    }
-
-    public assertFn(valueFn: AssertFn, fmt: string, ...params: FormatParameters): void {
-        if (!valueFn()) {
-            const message = formatString(fmt, ...params);
-            this.errorFn(message);
-        }
-    }
-
-    public assertFnDebug(valueFn: AssertFn, fmt: string, ...params: FormatParameters): void {
-        if (REDGEOMETRY_DEBUG && !valueFn()) {
-            const message = formatString(fmt, ...params);
-            this.errorFn(message);
-        }
-    }
-
     public error(fmt: string, ...params: FormatParameters): void {
         const message = formatString(fmt, ...params);
         this.errorFn(message);
-    }
-
-    public errorDebug(fmt: string, ...params: FormatParameters): void {
-        if (REDGEOMETRY_DEBUG) {
-            const message = formatString(fmt, ...params);
-            this.errorFn(message);
-        }
     }
 
     public info(fmt: string, ...params: FormatParameters): void {
@@ -77,22 +48,15 @@ export class Log {
         this.infoFn(message);
     }
 
-    public infoDebug(fmt: string, ...params: FormatParameters): void {
-        if (REDGEOMETRY_DEBUG) {
-            const message = formatString(fmt, ...params);
-            this.infoFn(message);
-        }
-    }
-
     public warn(fmt: string, ...params: FormatParameters): void {
         const message = formatString(fmt, ...params);
         this.warnFn(message);
     }
-
-    public warnDebug(fmt: string, ...params: FormatParameters): void {
-        if (REDGEOMETRY_DEBUG) {
-            const message = formatString(fmt, ...params);
-            this.warnFn(message);
-        }
-    }
 }
+
+// Global log object
+export const log: Log = new Log({
+    errorFn: console.error,
+    warnFn: console.warn,
+    infoFn: console.info,
+});

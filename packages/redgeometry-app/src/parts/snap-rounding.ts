@@ -3,7 +3,7 @@ import { Bezier1Curve2 } from "redgeometry/src/primitives/bezier";
 import { MinMaxBox2, type ReadonlyMinMaxBox2 } from "redgeometry/src/primitives/box";
 import { Edge2 } from "redgeometry/src/primitives/edge";
 import { Vector2, type ReadonlyVector2 } from "redgeometry/src/primitives/vector";
-import { log } from "redgeometry/src/utility/debug";
+import { log } from "redgeometry/src/utility/log";
 import { RandomXSR128 } from "redgeometry/src/utility/random";
 import type { AppContextPlugin } from "../ecs-modules/app-context.ts";
 import { RangeInputElement, type AppInputData } from "../ecs-modules/app-input.ts";
