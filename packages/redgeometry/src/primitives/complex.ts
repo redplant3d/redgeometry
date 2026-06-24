@@ -1,4 +1,5 @@
 import { COS_ACUTE, COS_OBTUSE } from "../core/consts.ts";
+import { assert } from "../utility/debug.ts";
 import { eqApproxAbs, eqApproxRel, lerp } from "../utility/scalar.ts";
 import { Vector2, type ReadonlyVector2 } from "./vector.ts";
 
@@ -337,8 +338,13 @@ export class Complex implements ReadonlyComplex {
     }
 
     public setUnit(z: ReadonlyComplex): void {
-        const s = z.length();
-        this.setDivS(z, s);
+        const len = z.length();
+
+        if (REDGEOMETRY_DEBUG) {
+            assert(len > 0, "Length must be greater than zero");
+        }
+
+        this.setDivS(z, len);
     }
 
     /**
@@ -380,17 +386,31 @@ export class Complex implements ReadonlyComplex {
         return "{a: " + this.a + ", b: " + this.b + "}";
     }
 
+    /**
+     * Returns a complex with a length of `1` from the current one.
+     *
+     * Note: The current complex is assumed to be of nonzero length.
+     */
     public unit(): Complex {
-        return this.divS(this.length());
+        const len = this.length();
+
+        if (REDGEOMETRY_DEBUG) {
+            assert(len > 0, "Length must be greater than zero");
+        }
+
+        return this.divS(len);
     }
 
+    /**
+     * Returns a complex with a length of `1` from the current one or an indentity complex if the length is `0`.
+     */
     public unitOrIdentity(): Complex {
-        const s = this.length();
+        const len = this.length();
 
-        if (s === 0) {
+        if (len === 0) {
             return Complex.createIdentity();
         }
 
-        return this.divS(s);
+        return this.divS(len);
     }
 }

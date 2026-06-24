@@ -1,3 +1,4 @@
+import { assert } from "../utility/debug.ts";
 import { clamp, eqApproxAbs, eqApproxRel, lerp, roundToPrecision } from "../utility/scalar.ts";
 
 export type Vector2Like = {
@@ -541,7 +542,13 @@ export class Vector2 implements ReadonlyVector2 {
      * Note: `v` is assumed to be of nonzero length.
      */
     public project(v: ReadonlyVector2): Vector2 {
-        const s = this.dot(v) / v.lengthSq();
+        const lenSq = v.lengthSq();
+
+        if (REDGEOMETRY_DEBUG) {
+            assert(lenSq > 0, "Length must be greater than zero");
+        }
+
+        const s = this.dot(v) / lenSq;
 
         return v.mulS(s);
     }
@@ -552,7 +559,13 @@ export class Vector2 implements ReadonlyVector2 {
      * Note: `v` is assumed to be of nonzero length.
      */
     public reject(v: ReadonlyVector2): Vector2 {
-        const s = this.dot(v) / v.lengthSq();
+        const lenSq = v.lengthSq();
+
+        if (REDGEOMETRY_DEBUG) {
+            assert(lenSq > 0, "Length must be greater than zero");
+        }
+
+        const s = this.dot(v) / lenSq;
 
         return this.subMulS(v, s);
     }
@@ -641,9 +654,14 @@ export class Vector2 implements ReadonlyVector2 {
     }
 
     public setUnit(v: ReadonlyVector2): void {
-        const s = v.length();
-        this.x = v.x / s;
-        this.y = v.y / s;
+        const len = v.length();
+
+        if (REDGEOMETRY_DEBUG) {
+            assert(len > 0, "Length must be greater than zero");
+        }
+
+        this.x = v.x / len;
+        this.y = v.y / len;
     }
 
     /**
@@ -713,18 +731,32 @@ export class Vector2 implements ReadonlyVector2 {
         return "{x: " + this.x + ", y: " + this.y + "}";
     }
 
+    /**
+     * Returns a vector with a length of `1` from the current one.
+     *
+     * Note: The current vector is assumed to be of nonzero length.
+     */
     public unit(): Vector2 {
-        return this.divS(this.length());
+        const len = this.length();
+
+        if (REDGEOMETRY_DEBUG) {
+            assert(len > 0, "Length must be greater than zero");
+        }
+
+        return this.divS(len);
     }
 
+    /**
+     * Returns a vector with a length of `1` from the current one or a zero vector if the length is `0`.
+     */
     public unitOrZero(): Vector2 {
-        const s = this.length();
+        const len = this.length();
 
-        if (s === 0) {
+        if (len === 0) {
             return Vector2.createZero();
         }
 
-        return this.divS(s);
+        return this.divS(len);
     }
 
     /**
@@ -1079,7 +1111,13 @@ export class Vector3 implements ReadonlyVector3 {
      * Note: `v` is assumed to be of nonzero length.
      */
     public project(v: ReadonlyVector3): Vector3 {
-        const s = this.dot(v) / v.lengthSq();
+        const lenSq = v.lengthSq();
+
+        if (REDGEOMETRY_DEBUG) {
+            assert(lenSq > 0, "Length must be greater than zero");
+        }
+
+        const s = this.dot(v) / lenSq;
 
         return v.mulS(s);
     }
@@ -1090,7 +1128,13 @@ export class Vector3 implements ReadonlyVector3 {
      * Note: `v` is assumed to be of nonzero length.
      */
     public reject(v: ReadonlyVector3): Vector3 {
-        const s = this.dot(v) / v.lengthSq();
+        const lenSq = v.lengthSq();
+
+        if (REDGEOMETRY_DEBUG) {
+            assert(lenSq > 0, "Length must be greater than zero");
+        }
+
+        const s = this.dot(v) / lenSq;
 
         return this.subMulS(v, s);
     }
@@ -1202,10 +1246,15 @@ export class Vector3 implements ReadonlyVector3 {
     }
 
     public setUnit(v: ReadonlyVector3): void {
-        const s = v.length();
-        this.x = v.x / s;
-        this.y = v.y / s;
-        this.z = v.z / s;
+        const len = v.length();
+
+        if (REDGEOMETRY_DEBUG) {
+            assert(len > 0, "Length must be greater than zero");
+        }
+
+        this.x = v.x / len;
+        this.y = v.y / len;
+        this.z = v.z / len;
     }
 
     /**
@@ -1279,18 +1328,32 @@ export class Vector3 implements ReadonlyVector3 {
         return "{x: " + this.x + ", y: " + this.y + ", z: " + this.z + "}";
     }
 
+    /**
+     * Returns a vector with a length of `1` from the current one.
+     *
+     * Note: The current vector is assumed to be of nonzero length.
+     */
     public unit(): Vector3 {
-        return this.divS(this.length());
+        const len = this.length();
+
+        if (REDGEOMETRY_DEBUG) {
+            assert(len > 0, "Length must be greater than zero");
+        }
+
+        return this.divS(len);
     }
 
+    /**
+     * Returns a vector with a length of `1` from the current one or a zero vector if the length is `0`.
+     */
     public unitOrZero(): Vector3 {
-        const s = this.length();
+        const len = this.length();
 
-        if (s === 0) {
+        if (len === 0) {
             return Vector3.createZero();
         }
 
-        return this.divS(s);
+        return this.divS(len);
     }
 
     /**
@@ -1604,7 +1667,13 @@ export class Vector4 implements ReadonlyVector4 {
      * Note: `v` is assumed to be of nonzero length.
      */
     public project(v: ReadonlyVector4): Vector4 {
-        const s = this.dot(v) / v.lengthSq();
+        const lenSq = v.lengthSq();
+
+        if (REDGEOMETRY_DEBUG) {
+            assert(lenSq > 0, "Length must be greater than zero");
+        }
+
+        const s = this.dot(v) / lenSq;
 
         return v.mulS(s);
     }
@@ -1615,7 +1684,13 @@ export class Vector4 implements ReadonlyVector4 {
      * Note: `v` is assumed to be of nonzero length.
      */
     public reject(v: ReadonlyVector4): Vector4 {
-        const s = this.dot(v) / v.lengthSq();
+        const lenSq = v.lengthSq();
+
+        if (REDGEOMETRY_DEBUG) {
+            assert(lenSq > 0, "Length must be greater than zero");
+        }
+
+        const s = this.dot(v) / lenSq;
 
         return this.subMulS(v, s);
     }
@@ -1734,11 +1809,16 @@ export class Vector4 implements ReadonlyVector4 {
     }
 
     public setUnit(v: ReadonlyVector4): void {
-        const s = v.length();
-        this.x = v.x / s;
-        this.y = v.y / s;
-        this.z = v.z / s;
-        this.w = v.w / s;
+        const len = v.length();
+
+        if (REDGEOMETRY_DEBUG) {
+            assert(len > 0, "Length must be greater than zero");
+        }
+
+        this.x = v.x / len;
+        this.y = v.y / len;
+        this.z = v.z / len;
+        this.w = v.w / len;
     }
 
     /**
@@ -1770,18 +1850,32 @@ export class Vector4 implements ReadonlyVector4 {
         return "{x: " + this.x + ", y: " + this.y + ", z: " + this.z + ", w: " + this.w + "}";
     }
 
+    /**
+     * Returns a vector with a length of `1` from the current one.
+     *
+     * Note: The current vector is assumed to be of nonzero length.
+     */
     public unit(): Vector4 {
-        return this.divS(this.length());
+        const len = this.length();
+
+        if (REDGEOMETRY_DEBUG) {
+            assert(len > 0, "Length must be greater than zero");
+        }
+
+        return this.divS(len);
     }
 
+    /**
+     * Returns a vector with a length of `1` from the current one or a zero vector if the length is `0`.
+     */
     public unitOrZero(): Vector4 {
-        const s = this.length();
+        const len = this.length();
 
-        if (s === 0) {
+        if (len === 0) {
             return Vector4.createZero();
         }
 
-        return this.divS(s);
+        return this.divS(len);
     }
 
     /**

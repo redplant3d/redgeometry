@@ -1,5 +1,5 @@
 import { COS_ACUTE, COS_OBTUSE } from "../core/consts.ts";
-import { assertUnreachable } from "../utility/debug.ts";
+import { assert, assertUnreachable } from "../utility/debug.ts";
 import { clamp, eqApproxAbs, eqApproxRel, lerp } from "../utility/scalar.ts";
 import type { Enum } from "../utility/types.ts";
 import { Vector3, type ReadonlyVector3 } from "./vector.ts";
@@ -899,8 +899,13 @@ export class Quaternion implements ReadonlyQuaternion {
     }
 
     public setUnit(q: ReadonlyQuaternion): void {
-        const s = q.length();
-        this.setDivS(q, s);
+        const len = q.length();
+
+        if (REDGEOMETRY_DEBUG) {
+            assert(len > 0, "Length must be greater than zero");
+        }
+
+        this.setDivS(q, len);
     }
 
     /**
@@ -944,17 +949,31 @@ export class Quaternion implements ReadonlyQuaternion {
         return "{a: " + this.a + ", b: " + this.b + ", c: " + this.c + ", d: " + this.d + "}";
     }
 
+    /**
+     * Returns a quaternion with a length of `1` from the current one.
+     *
+     * Note: The current quaternion is assumed to be of nonzero length.
+     */
     public unit(): Quaternion {
-        return this.divS(this.length());
+        const len = this.length();
+
+        if (REDGEOMETRY_DEBUG) {
+            assert(len > 0, "Length must be greater than zero");
+        }
+
+        return this.divS(len);
     }
 
+    /**
+     * Returns a quaternion with a length of `1` from the current one or an indentity quaternion if the length is `0`.
+     */
     public unitOrIdentity(): Quaternion {
-        const s = this.length();
+        const len = this.length();
 
-        if (s === 0) {
+        if (len === 0) {
             return Quaternion.createIdentity();
         }
 
-        return this.divS(s);
+        return this.divS(len);
     }
 }
