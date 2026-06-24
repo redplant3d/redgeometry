@@ -44,7 +44,7 @@ export interface ReadonlyVector2 {
     extendZW(z: number, w: number): Vector4;
     floor(): Vector2;
     isFinite(): boolean;
-    isOne(): boolean;
+    isUnitApprox(eps: number): boolean;
     isZero(): boolean;
     length(): number;
     lengthSq(): number;
@@ -100,7 +100,7 @@ export interface ReadonlyVector3 {
     extendW(w: number): Vector4;
     floor(): Vector3;
     isFinite(): boolean;
-    isOne(): boolean;
+    isUnitApprox(eps: number): boolean;
     isZero(): boolean;
     length(): number;
     lengthSq(): number;
@@ -158,6 +158,7 @@ export interface ReadonlyVector4 {
     floor(): Vector4;
     isFinite(): boolean;
     isOne(): boolean;
+    isUnitApprox(eps: number): boolean;
     isZero(): boolean;
     length(): number;
     lengthSq(): number;
@@ -444,6 +445,10 @@ export class Vector2 implements ReadonlyVector2 {
 
     public isOne(): boolean {
         return this.x === 1 && this.y === 1;
+    }
+
+    public isUnitApprox(eps: number): boolean {
+        return eqApproxAbs(this.lengthSq(), 1, eps);
     }
 
     public isZero(): boolean {
@@ -985,6 +990,10 @@ export class Vector3 implements ReadonlyVector3 {
 
     public isOne(): boolean {
         return this.x === 1 && this.y === 1 && this.z === 1;
+    }
+
+    public isUnitApprox(eps: number): boolean {
+        return eqApproxAbs(this.lengthSq(), 1, eps);
     }
 
     public isZero(): boolean {
@@ -1578,6 +1587,10 @@ export class Vector4 implements ReadonlyVector4 {
 
     public isOne(): boolean {
         return this.x === 1 && this.y === 1 && this.z === 1 && this.w === 1;
+    }
+
+    public isUnitApprox(eps: number): boolean {
+        return eqApproxAbs(this.lengthSq(), 1, eps);
     }
 
     public isZero(): boolean {

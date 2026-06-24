@@ -24,6 +24,7 @@ export interface ReadonlyComplex {
     inverse(): Complex;
     isFinite(): boolean;
     isIdentity(): boolean;
+    isUnitApprox(eps: number): boolean;
     length(): number;
     lengthSq(): number;
     lerp(z: ReadonlyComplex, t: number): Complex;
@@ -187,12 +188,16 @@ export class Complex implements ReadonlyComplex {
         return new Complex(this.a / s, -this.b / s);
     }
 
+    public isFinite(): boolean {
+        return Number.isFinite(this.a) && Number.isFinite(this.b);
+    }
+
     public isIdentity(): boolean {
         return this.a === 1 && this.b === 0;
     }
 
-    public isFinite(): boolean {
-        return Number.isFinite(this.a) && Number.isFinite(this.b);
+    public isUnitApprox(eps: number): boolean {
+        return eqApproxAbs(this.lengthSq(), 1, eps);
     }
 
     public length(): number {

@@ -32,6 +32,7 @@ export interface ReadonlyQuaternion {
     inverse(): Quaternion;
     isFinite(): boolean;
     isIdentity(): boolean;
+    isUnitApprox(eps: number): boolean;
     length(): number;
     lengthSq(): number;
     lerp(q: ReadonlyQuaternion, t: number): Quaternion;
@@ -466,12 +467,15 @@ export class Quaternion implements ReadonlyQuaternion {
         return new Quaternion(this.a / s, -this.b / s, -this.c / s, -this.d / s);
     }
 
+    public isFinite(): boolean {
+        return Number.isFinite(this.a) && Number.isFinite(this.b) && Number.isFinite(this.c) && Number.isFinite(this.d);
+    }
+
     public isIdentity(): boolean {
         return this.a === 1 && this.b === 0 && this.c === 0 && this.d === 0;
     }
-
-    public isFinite(): boolean {
-        return Number.isFinite(this.a) && Number.isFinite(this.b) && Number.isFinite(this.c) && Number.isFinite(this.d);
+    public isUnitApprox(eps: number): boolean {
+        return eqApproxAbs(this.lengthSq(), 1, eps);
     }
 
     public length(): number {
