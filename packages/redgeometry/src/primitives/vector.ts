@@ -44,6 +44,7 @@ export interface ReadonlyVector2 {
     extendZW(z: number, w: number): Vector4;
     floor(): Vector2;
     isFinite(): boolean;
+    isOne(): boolean;
     isUnitApprox(eps: number): boolean;
     isZero(): boolean;
     length(): number;
@@ -100,6 +101,7 @@ export interface ReadonlyVector3 {
     extendW(w: number): Vector4;
     floor(): Vector3;
     isFinite(): boolean;
+    isOne(): boolean;
     isUnitApprox(eps: number): boolean;
     isZero(): boolean;
     length(): number;
