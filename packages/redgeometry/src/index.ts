@@ -25,7 +25,6 @@ export * from "./utility/array.ts";
 export * from "./utility/debug.ts";
 export * from "./utility/float128.ts";
 export * from "./utility/interval.ts";
-export * from "./utility/log.ts";
 export * from "./utility/random.ts";
 export * from "./utility/scalar.ts";
 export * from "./utility/solve.ts";

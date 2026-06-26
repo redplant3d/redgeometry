@@ -1,8 +1,8 @@
 import { MeshEdge2, type Mesh2, type MeshFace2 } from "redgeometry/src/core/mesh";
+import { log } from "redgeometry/src/internal/log";
 import { Edge2 } from "redgeometry/src/primitives/edge";
 import { Vector2, type ReadonlyVector2 } from "redgeometry/src/primitives/vector";
 import { assert } from "redgeometry/src/utility/debug";
-import { log } from "redgeometry/src/utility/log";
 import { solveLinear, solveQuadratic, type Root1, type Root2 } from "redgeometry/src/utility/solve";
 import type { Enum } from "redgeometry/src/utility/types";
 

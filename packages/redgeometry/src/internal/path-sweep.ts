@@ -1,7 +1,7 @@
 import type { BooleanOperator } from "../core/path-options.ts";
 import type { EdgeSegment2, SnapRound2 } from "../core/snapround.ts";
+import { log } from "../internal/log.ts";
 import { Vector2, type ReadonlyVector2 } from "../primitives/vector.ts";
-import { log } from "../utility/log.ts";
 
 export class PathSweepEvent2 {
     public left: boolean;

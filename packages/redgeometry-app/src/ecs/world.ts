@@ -1,5 +1,5 @@
+import { log } from "redgeometry/src/internal/log";
 import { throwError } from "redgeometry/src/utility/debug";
-import { log } from "redgeometry/src/utility/log";
 import { EntityComponentStorage } from "./entity-component.ts";
 import { WorldEventIterator, WorldEventStorage } from "./event.ts";
 import { SystemSchedule, type SystemDependencyOptions, type SystemOptions, type SystemsOptions } from "./schedule.ts";

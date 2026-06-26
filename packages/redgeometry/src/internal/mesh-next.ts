@@ -1,11 +1,11 @@
 import type { Path2 } from "../core/path.ts";
 import { isWindingInside, WindingOperator, type CustomWindingOperator } from "../core/winding.ts";
+import { log } from "../internal/log.ts";
 import { Bezier1Curve2 } from "../primitives/bezier.ts";
 import { MinMaxBox2 } from "../primitives/box.ts";
 import { Edge2 } from "../primitives/edge.ts";
 import { Vector2, type ReadonlyVector2 } from "../primitives/vector.ts";
 import { assert, throwError, ValidationHelper } from "../utility/debug.ts";
-import { log } from "../utility/log.ts";
 import type { Nominal } from "../utility/types.ts";
 
 export type MeshVertexIdx = Nominal<number, "MeshVertexIdx">;

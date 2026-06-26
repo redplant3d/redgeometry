@@ -1,4 +1,4 @@
-import { formatString, type FormatParameters } from "./string.ts";
+import { formatString, type FormatParameters } from "../utility/string.js";
 
 export type LogFn = (message: string) => void;
 

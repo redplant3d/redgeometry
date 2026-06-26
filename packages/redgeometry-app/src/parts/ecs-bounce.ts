@@ -1,6 +1,6 @@
 import { Path2 } from "redgeometry/src/core/path";
+import { log } from "redgeometry/src/internal/log";
 import { Vector2, type ReadonlyVector2 } from "redgeometry/src/primitives/vector";
-import { log } from "redgeometry/src/utility/log";
 import { RandomXSR128, type Random } from "redgeometry/src/utility/random";
 import { type AppContextPlugin } from "../ecs-modules/app-context.ts";
 import { RangeInputElement, type AppInputData } from "../ecs-modules/app-input.ts";

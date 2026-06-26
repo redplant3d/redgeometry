@@ -1,5 +1,5 @@
+import { log } from "redgeometry/src/internal/log";
 import { assert } from "redgeometry/src/utility/debug";
-import { log } from "redgeometry/src/utility/log";
 import type { System, SystemAsync, SystemStage, SystemSync } from "./types.ts";
 import type { World } from "./world.ts";
 

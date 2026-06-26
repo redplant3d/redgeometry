@@ -1,4 +1,4 @@
-import { log } from "redgeometry/src/utility/log";
+import { log } from "redgeometry/src/internal/log";
 import { RandomXSR128 } from "redgeometry/src/utility/random";
 import type { AppContextPlugin } from "../ecs-modules/app-context.ts";
 import { RangeInputElement, type AppInputData } from "../ecs-modules/app-input.ts";

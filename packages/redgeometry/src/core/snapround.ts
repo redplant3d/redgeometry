@@ -1,10 +1,10 @@
+import { log } from "../internal/log.ts";
 import { type ReadonlyBezierCurve2 } from "../primitives/bezier.ts";
 import { Edge2, type ReadonlyEdge2 } from "../primitives/edge.ts";
 import { Vector2, type ReadonlyVector2 } from "../primitives/vector.ts";
 import { ArrayMultiSet } from "../utility/array.ts";
 import { assert } from "../utility/debug.ts";
 import { Float128 } from "../utility/float128.ts";
-import { log } from "../utility/log.ts";
 import { solveLinear } from "../utility/solve.ts";
 
 type PixelType = "magnet" | "pin";

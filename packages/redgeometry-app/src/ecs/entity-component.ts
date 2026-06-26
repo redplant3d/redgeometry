@@ -1,5 +1,5 @@
+import { log } from "redgeometry/src/internal/log";
 import { assert, assertUnreachable, throwError } from "redgeometry/src/utility/debug";
-import { log } from "redgeometry/src/utility/log";
 import type { Enum } from "redgeometry/src/utility/types";
 import type { Component, ComponentId, ComponentIdOf, EntityComponentQueryValue, EntityId } from "./types.ts";
 import { ComponentFlags, EntityFlags } from "./world.ts";
