@@ -254,13 +254,13 @@ export class PathOffsetIncremental2 implements PathOffset2 {
     }
 
     private offsetLinear(p1: ReadonlyVector2, m: ReadonlyVector2): void {
-        const v = m.unit().perp().mulS(this.d);
+        const v = m.unit().perpCW().mulS(this.d);
 
         this.buffer.lineTo(p1.add(v));
     }
 
     private offsetMove(p0: ReadonlyVector2, m: ReadonlyVector2): void {
-        const v = m.unit().perp().mulS(this.d);
+        const v = m.unit().perpCW().mulS(this.d);
 
         this.buffer.moveTo(p0.add(v));
     }
@@ -544,13 +544,13 @@ export class PathOffsetRecursive2 implements PathOffset2 {
     }
 
     private offsetLinear(p1: ReadonlyVector2, m: ReadonlyVector2): void {
-        const v = m.unit().perp().mulS(this.d);
+        const v = m.unit().perpCW().mulS(this.d);
 
         this.buffer.lineTo(p1.add(v));
     }
 
     private offsetMove(p0: ReadonlyVector2, m: ReadonlyVector2): void {
-        const v = m.unit().perp().mulS(this.d);
+        const v = m.unit().perpCW().mulS(this.d);
 
         this.buffer.moveTo(p0.add(v));
     }

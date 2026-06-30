@@ -57,7 +57,8 @@ export interface ReadonlyVector2 {
     mulSAdd(s: number, v: ReadonlyVector2): Vector2;
     neg(): Vector2;
     nlerp(v: ReadonlyVector2, t: number): Vector2;
-    perp(): Vector2;
+    perpCCW(): Vector2;
+    perpCW(): Vector2;
     polarAngle(): number;
     project(v: ReadonlyVector2): Vector2;
     reject(v: ReadonlyVector2): Vector2;
@@ -529,10 +530,20 @@ export class Vector2 implements ReadonlyVector2 {
     /**
      * Returns a vector that is perpendicular to the current vector.
      *
-     * The result is defined by the cross product in 3D: \
-     * `(x, y, 0) cross (0, 0, 1) == (y, -x, 0)`
+     * The result is 90 degrees counterclockwise rotation in an y-up coordinate system: \
+     * `(-y, x, 0)`
      */
-    public perp(): Vector2 {
+    public perpCCW(): Vector2 {
+        return new Vector2(-this.y, this.x);
+    }
+
+    /**
+     * Returns a vector that is perpendicular to the current vector.
+     *
+     * The result is 90 degrees clockwise rotation in an y-up coordinate system: \
+     * `(y, -x, 0)`
+     */
+    public perpCW(): Vector2 {
         return new Vector2(this.y, -this.x);
     }
 
