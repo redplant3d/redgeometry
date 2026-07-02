@@ -1,4 +1,5 @@
 import { COS_ACUTE, COS_OBTUSE } from "../core/consts.ts";
+import { DEFAULT_PRECISION_THRESHOLD } from "../internal/consts.ts";
 import { assert } from "../utility/debug.ts";
 import { eqApproxAbs, eqApproxRel, lerp } from "../utility/scalar.ts";
 import { Vector2, type ReadonlyVector2 } from "./vector.ts";
@@ -80,6 +81,11 @@ export class Complex implements ReadonlyComplex {
      * Note: `v1` and `v2` are assumed to be of unit length.
      */
     public static fromRotationBetweenVectors(v1: ReadonlyVector2, v2: ReadonlyVector2): Complex {
+        if (REDGEOMETRY_DEBUG) {
+            assert(v1.isUnitApprox(DEFAULT_PRECISION_THRESHOLD), "Vector `v1` must be of unit length");
+            assert(v2.isUnitApprox(DEFAULT_PRECISION_THRESHOLD), "Vector `v2` must be of unit length");
+        }
+
         // This angle is double of the complex rotation
         const cos = v1.dot(v2);
 
@@ -266,6 +272,10 @@ export class Complex implements ReadonlyComplex {
      * Note: The current complex is assumed to be of unit length.
      */
     public orthonormalBasis(): { v1: Vector2; v2: Vector2 } {
+        if (REDGEOMETRY_DEBUG) {
+            assert(this.isUnitApprox(DEFAULT_PRECISION_THRESHOLD), "Complex must be of unit length");
+        }
+
         const zaa = this.a * this.a;
         const zbb = this.b * this.b;
         const zab = this.a * this.b;

@@ -1,3 +1,4 @@
+import { DEFAULT_PRECISION_THRESHOLD } from "../internal/consts.ts";
 import { assert } from "../utility/debug.ts";
 import { clamp, eqApproxAbs, eqApproxRel, lerp, roundToPrecision } from "../utility/scalar.ts";
 
@@ -1097,6 +1098,10 @@ export class Vector3 implements ReadonlyVector3 {
      *   Journal of Computer Graphics Techniques Vol. 6, No. 1, 2017.
      */
     public orthonormalBasis(): { v1: Vector3; v2: Vector3; v3: Vector3 } {
+        if (REDGEOMETRY_DEBUG) {
+            assert(this.isUnitApprox(DEFAULT_PRECISION_THRESHOLD), "Vector must be of unit length");
+        }
+
         const sign = this.z >= 0 ? 1 : -1;
         const a = -1 / (sign + this.z);
         const b = this.x * this.y * a;

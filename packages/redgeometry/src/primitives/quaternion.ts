@@ -1,4 +1,5 @@
 import { COS_ACUTE, COS_OBTUSE } from "../core/consts.ts";
+import { DEFAULT_PRECISION_THRESHOLD } from "../internal/consts.ts";
 import { assert, assertUnreachable } from "../utility/debug.ts";
 import { clamp, eqApproxAbs, eqApproxRel, lerp } from "../utility/scalar.ts";
 import type { Enum } from "../utility/types.ts";
@@ -105,6 +106,10 @@ export class Quaternion implements ReadonlyQuaternion {
      * Note: `axis` is assumed to be of unit length.
      */
     public static fromRotationAngleAround(angle: number, axis: ReadonlyVector3): Quaternion {
+        if (REDGEOMETRY_DEBUG) {
+            assert(axis.isUnitApprox(DEFAULT_PRECISION_THRESHOLD), "Vector 'axis' must be of unit length");
+        }
+
         const sin = Math.sin(0.5 * angle);
         const cos = Math.cos(0.5 * angle);
         return new Quaternion(cos, sin * axis.x, sin * axis.y, sin * axis.z);
@@ -134,6 +139,11 @@ export class Quaternion implements ReadonlyQuaternion {
      * Note: `v1` and `v2` are assumed to be of unit length.
      */
     public static fromRotationBetweenVectors(v1: ReadonlyVector3, v2: ReadonlyVector3): Quaternion {
+        if (REDGEOMETRY_DEBUG) {
+            assert(v1.isUnitApprox(DEFAULT_PRECISION_THRESHOLD), "Vector `v1` must be of unit length");
+            assert(v2.isUnitApprox(DEFAULT_PRECISION_THRESHOLD), "Vector `v2` must be of unit length");
+        }
+
         // This angle is double of the quaternion rotation
         const cos = v1.dot(v2);
 
@@ -168,6 +178,10 @@ export class Quaternion implements ReadonlyQuaternion {
         v2: ReadonlyVector3,
         axis: ReadonlyVector3,
     ): Quaternion {
+        if (REDGEOMETRY_DEBUG) {
+            assert(axis.isUnitApprox(DEFAULT_PRECISION_THRESHOLD), "Vector 'axis' must be of unit length");
+        }
+
         const v1a = v1.reject(axis);
         const v2a = v2.reject(axis);
 
@@ -353,6 +367,10 @@ export class Quaternion implements ReadonlyQuaternion {
      * Note: The current quaternion is assumed to be of unit length.
      */
     public axisAngle(): number {
+        if (REDGEOMETRY_DEBUG) {
+            assert(this.isUnitApprox(DEFAULT_PRECISION_THRESHOLD), "Quaternion must be of unit length");
+        }
+
         return 2 * Math.acos(this.a);
     }
 
@@ -563,6 +581,10 @@ export class Quaternion implements ReadonlyQuaternion {
      * Note: The current quaternion is assumed to be of unit length.
      */
     public orthonormalBasis(): { v1: Vector3; v2: Vector3; v3: Vector3 } {
+        if (REDGEOMETRY_DEBUG) {
+            assert(this.isUnitApprox(DEFAULT_PRECISION_THRESHOLD), "Quaternion must be of unit length");
+        }
+
         const qaa = this.a * this.a;
         const qbb = this.b * this.b;
         const qcc = this.c * this.c;
