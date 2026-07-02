@@ -37,8 +37,8 @@ export class KineticVertex {
         const e1 = KineticVertex.getWavefrontEdgeCw(e);
         const e2 = KineticVertex.getWavefrontEdgeCcw(e);
 
-        const n1 = e1.p0.sub(e1.p1).unit().perp();
-        const n2 = e2.p1.sub(e2.p0).unit().perp();
+        const n1 = e1.p0.sub(e1.p1).unit().perpCW();
+        const n2 = e2.p1.sub(e2.p0).unit().perpCW();
 
         return new KineticVertex(orig, n1, n2, 0);
     }
@@ -307,7 +307,7 @@ export class StraightSkeleton {
 
         const v1 = p1.sub(p0);
         const v2 = p2.sub(p1);
-        const n2 = v2.unit().perp();
+        const n2 = v2.unit().perpCW();
 
         return v1.dot(n2) / (1 + v0.dot(n2));
     }

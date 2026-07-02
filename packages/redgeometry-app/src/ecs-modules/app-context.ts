@@ -185,7 +185,7 @@ export class AppContextPlugin implements WorldPlugin {
             const p1 = meshVertices.getPos(vtx1);
 
             const vu = p1.sub(p0).unit();
-            const vn = vu.neg().perp();
+            const vn = vu.perpCCW();
 
             const pp0 = p0.addMulS(vu, 4 * pointWidth).addMulS(vn, 4 * linkWidth);
             const pp1 = p1.subMulS(vu, 4 * pointWidth).addMulS(vn, 4 * linkWidth);
@@ -258,7 +258,7 @@ export class AppContextPlugin implements WorldPlugin {
                 path.lineTo(pp2);
             } else {
                 const vu = p1.sub(p0).unit();
-                const vn = vu.neg().perp();
+                const vn = vu.perpCCW();
 
                 const pp0 = p0.addMulS(vu, 2 * pointWidth).addMulS(vn, 1.5 * linkWidth);
                 const pp1 = p1.subMulS(vu, 2 * pointWidth).addMulS(vn, 1.5 * linkWidth);
