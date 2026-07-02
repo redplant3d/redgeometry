@@ -242,6 +242,8 @@ export interface ReadonlyOrientedBox3 {
 }
 
 export class MinMaxBox2 implements ReadonlyMinMaxBox2 {
+    public static readonly EMPTY: ReadonlyMinMaxBox2 = MinMaxBox2.createEmpty();
+
     public maxX: number;
     public maxY: number;
     public minX: number;
@@ -506,6 +508,8 @@ export class MinMaxBox2 implements ReadonlyMinMaxBox2 {
 }
 
 export class MinMaxBox3 implements ReadonlyMinMaxBox3 {
+    public static readonly EMPTY: ReadonlyMinMaxBox3 = MinMaxBox3.createEmpty();
+
     public maxX: number;
     public maxY: number;
     public maxZ: number;
@@ -865,6 +869,8 @@ export class MinMaxBox3 implements ReadonlyMinMaxBox3 {
 }
 
 export class AxisAlignedBox2 implements ReadonlyAxisAlignedBox2 {
+    public static readonly EMPTY: ReadonlyAxisAlignedBox2 = AxisAlignedBox2.createEmpty();
+
     public center: ReadonlyVector2;
     public extents: ReadonlyVector2;
 
@@ -1099,6 +1105,8 @@ export class AxisAlignedBox2 implements ReadonlyAxisAlignedBox2 {
 }
 
 export class AxisAlignedBox3 implements ReadonlyAxisAlignedBox3 {
+    public static readonly EMPTY: ReadonlyAxisAlignedBox3 = AxisAlignedBox3.createEmpty();
+
     public center: ReadonlyVector3;
     public extents: ReadonlyVector3;
 
@@ -1364,6 +1372,8 @@ export class AxisAlignedBox3 implements ReadonlyAxisAlignedBox3 {
 }
 
 export class OrientedBox2 implements ReadonlyOrientedBox2 {
+    public static readonly EMPTY: ReadonlyOrientedBox2 = OrientedBox2.createEmpty();
+
     public center: ReadonlyVector2;
     public extents: ReadonlyVector2;
     public rotation: ReadonlyComplex;
@@ -1622,6 +1632,8 @@ export class OrientedBox2 implements ReadonlyOrientedBox2 {
 }
 
 export class OrientedBox3 implements ReadonlyOrientedBox3 {
+    public static readonly EMPTY: ReadonlyOrientedBox3 = OrientedBox3.createEmpty();
+
     public center: ReadonlyVector3;
     public extents: ReadonlyVector3;
     public rotation: ReadonlyQuaternion;
