@@ -7,10 +7,10 @@
 This package provides an optimized bundle for ES modules, including type declarations and source maps.
 
 ```typescript
-import { Vector2, log } from "redgeometry";
+import { Vector2 } from "redgeometry";
 
 const v = new Vector2(1, 2);
-log.info("length = {}", v.length());
+console.log("length = ", v.length());
 ```
 
 ## Advanced
@@ -20,10 +20,9 @@ For certain debugging scenarios it might be useful to import the source files di
 ```typescript
 /// <reference types="redgeometry/src/env" />
 import { Vector2 } from "redgeometry/src/primitives/vector";
-import { log } from "redgeometry/src/utility/debug";
 
 const v = new Vector2(1, 2);
-log.info("length = {}", v.length());
+console.log("length = ", v.length());
 ```
 
 The behavior is controlled by global environment variables, which can be replaced at compile time, e.g. by esbuild with [defines](https://esbuild.github.io/api/#define):
