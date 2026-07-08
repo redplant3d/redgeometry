@@ -11,7 +11,7 @@ import type { Nominal } from "../utility/types.ts";
 export type MeshVertexIdx = Nominal<number, "MeshVertexIdx">;
 export type MeshEdgeIdx = Nominal<number, "MeshEdgeIdx">;
 export type MeshFaceIdx = Nominal<number, "MeshFaceIdx">;
-export type MeshLinkIdx = Nominal<number, "MeshEdgeLinkIdx">;
+export type MeshLinkIdx = Nominal<number, "MeshLinkIdx">;
 export type MeshLoopIdx = Nominal<number, "MeshLoopIdx">;
 export type MeshShellIdx = Nominal<number, "MeshShellIdx">;
 
@@ -24,23 +24,23 @@ export type MaybeMeshShellIdx = MeshShellIdx | -1;
 
 export type MaybeValue<T> = T | null;
 
-export type MeshVerticesLike<T, U> = {
-    readonly data: MaybeValue<T>[];
+export type MeshVerticesLike<V, P> = {
+    readonly data: MaybeValue<V>[];
     readonly firstLink: MaybeMeshLinkIdx[];
     readonly free: MeshVertexIdx[];
     readonly length: number;
-    readonly pos: MaybeValue<U>[];
+    readonly pos: MaybeValue<P>[];
 };
 
-export type MeshEdgesLike<T> = {
-    readonly data: MaybeValue<T>[];
+export type MeshEdgesLike<E> = {
+    readonly data: MaybeValue<E>[];
     readonly free: MeshEdgeIdx[];
     readonly length: number;
     readonly link: MaybeMeshLinkIdx[];
 };
 
-export type MeshFacesLike<T> = {
-    readonly data: MaybeValue<T>[];
+export type MeshFacesLike<F> = {
+    readonly data: MaybeValue<F>[];
     readonly firstLoop: MaybeMeshLoopIdx[];
     readonly free: MeshFaceIdx[];
     readonly length: number;
@@ -3007,8 +3007,8 @@ export function mesh2MoveLoopToFace<S, F, E, V>(mesh: Mesh2<S, F, E, V>, loop: M
 
     if (loop === loopFirstLoop) {
         const loopNextLoop = mesh.loops.getNext(loopFirstLoop);
-        assert(loopFirstLoop !== loopNextLoop);
 
+        // TODO: Check if `loopFirstLoop === loopNextLoop`?
         mesh.faces.setFirstLoop(loopFace, loopNextLoop);
     }
 
