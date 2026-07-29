@@ -31,9 +31,9 @@ type StraightSkeletonStateData = {
     skeleton: StraightSkeleton;
 };
 
-const APP_PART_START_SYSTEM_ID = "straight-skeleton-start-system";
-const APP_PART_UPDATE_SYSTEM_ID = "straight-skeleton-update-system";
-const APP_PART_RENDER_SYSTEM_ID = "straight-skeleton-render-system";
+const STRAIGHT_SKELETON_START_SYSTEM_ID = "straight-skeleton-start-system";
+const STRAIGHT_SKELETON_UPDATE_SYSTEM_ID = "straight-skeleton-update-system";
+const STRAIGHT_SKELETON_RENDER_SYSTEM_ID = "straight-skeleton-render-system";
 
 function straightSkeletonStartSystem(world: World): void {
     const { inputElements } = world.getData<AppInputData>("app-input-data");
@@ -114,6 +114,8 @@ function straightSkeletonRenderSystem(world: World): void {
     ctx.drawMeshEdges(mesh, "#00FF00");
 }
 
+export const STRAIGHT_SKELETON_APP_PART_MODULE_ID = "straight-skeleton-app-part-module";
+
 export function straightSkeletonAppPartModule(context: WorldContext): void {
     context.addModule({
         id: APP_MODULE_ID,
@@ -124,32 +126,32 @@ export function straightSkeletonAppPartModule(context: WorldContext): void {
     context.addData<StraightSkeletonStateData>("straight-skeleton-state-data");
 
     context.addSystem({
-        id: APP_PART_START_SYSTEM_ID,
+        id: STRAIGHT_SKELETON_START_SYSTEM_ID,
         fn: straightSkeletonStartSystem,
         mode: "sync",
         scheduleId: START_SCHEDULE_ID,
     });
 
     context.addSystem({
-        id: APP_PART_UPDATE_SYSTEM_ID,
+        id: STRAIGHT_SKELETON_UPDATE_SYSTEM_ID,
         fn: straightSkeletonUpdateSystem,
         mode: "sync",
         scheduleId: UPDATE_SCHEDULE_ID,
     });
     context.addSystem({
-        id: APP_PART_RENDER_SYSTEM_ID,
+        id: STRAIGHT_SKELETON_RENDER_SYSTEM_ID,
         fn: straightSkeletonRenderSystem,
         mode: "sync",
         scheduleId: UPDATE_SCHEDULE_ID,
     });
 
     context.addSystemDepedency({
-        seq: [APP_START_SYSTEM_ID, APP_PART_START_SYSTEM_ID, APP_INPUT_START_SYSTEM_ID],
+        seq: [APP_START_SYSTEM_ID, STRAIGHT_SKELETON_START_SYSTEM_ID, APP_INPUT_START_SYSTEM_ID],
         scheduleId: START_SCHEDULE_ID,
     });
 
     context.addSystemDepedency({
-        seq: [APP_UPDATE_SYSTEM_ID, APP_PART_UPDATE_SYSTEM_ID, APP_PART_RENDER_SYSTEM_ID],
+        seq: [APP_UPDATE_SYSTEM_ID, STRAIGHT_SKELETON_UPDATE_SYSTEM_ID, STRAIGHT_SKELETON_RENDER_SYSTEM_ID],
         scheduleId: UPDATE_SCHEDULE_ID,
     });
 }

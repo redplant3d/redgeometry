@@ -36,9 +36,9 @@ type PathClipStateData = {
     polygonB: Polygon2;
 };
 
-const APP_PART_START_SYSTEM_ID = "path-clip-start-system";
-const APP_PART_UPDATE_SYSTEM_ID = "path-clip-update-system";
-const APP_PART_RENDER_SYSTEM_ID = "path-clip-render-system";
+const PATH_CLIP_START_SYSTEM_ID = "path-clip-start-system";
+const PATH_CLIP_UPDATE_SYSTEM_ID = "path-clip-update-system";
+const PATH_CLIP_RENDER_SYSTEM_ID = "path-clip-render-system";
 
 function appPartStartSystem(world: World): void {
     const { inputElements } = world.getData<AppInputData>("app-input-data");
@@ -139,6 +139,8 @@ function appPartRenderSystem(world: World): void {
     ctx.drawPath(chains, "#3333FF", 1.5);
 }
 
+export const PATH_CLIP_APP_PART_MODULE_ID = "pathClipAppPartModule";
+
 export function pathClipAppPartModule(context: WorldContext): void {
     context.addModule({
         id: APP_MODULE_ID,
@@ -149,32 +151,32 @@ export function pathClipAppPartModule(context: WorldContext): void {
     context.addData<PathClipStateData>("path-clip-state-data");
 
     context.addSystem({
-        id: APP_PART_START_SYSTEM_ID,
+        id: PATH_CLIP_START_SYSTEM_ID,
         fn: appPartStartSystem,
         mode: "sync",
         scheduleId: START_SCHEDULE_ID,
     });
 
     context.addSystem({
-        id: APP_PART_UPDATE_SYSTEM_ID,
+        id: PATH_CLIP_UPDATE_SYSTEM_ID,
         fn: appPartUpdateSystem,
         mode: "sync",
         scheduleId: UPDATE_SCHEDULE_ID,
     });
     context.addSystem({
-        id: APP_PART_RENDER_SYSTEM_ID,
+        id: PATH_CLIP_RENDER_SYSTEM_ID,
         fn: appPartRenderSystem,
         mode: "sync",
         scheduleId: UPDATE_SCHEDULE_ID,
     });
 
     context.addSystemDepedency({
-        seq: [APP_START_SYSTEM_ID, APP_PART_START_SYSTEM_ID, APP_INPUT_START_SYSTEM_ID],
+        seq: [APP_START_SYSTEM_ID, PATH_CLIP_START_SYSTEM_ID, APP_INPUT_START_SYSTEM_ID],
         scheduleId: START_SCHEDULE_ID,
     });
 
     context.addSystemDepedency({
-        seq: [APP_UPDATE_SYSTEM_ID, APP_PART_UPDATE_SYSTEM_ID, APP_PART_RENDER_SYSTEM_ID],
+        seq: [APP_UPDATE_SYSTEM_ID, PATH_CLIP_UPDATE_SYSTEM_ID, PATH_CLIP_RENDER_SYSTEM_ID],
         scheduleId: UPDATE_SCHEDULE_ID,
     });
 }

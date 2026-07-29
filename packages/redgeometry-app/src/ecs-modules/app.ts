@@ -16,7 +16,7 @@ import {
     inputModule,
     type InputInitData,
 } from "./input.ts";
-import { TIME_MODULE_ID, TIME_START_SYSTEM, TIME_UPDATE_SYSTEM, timeModule } from "./time.ts";
+import { TIME_MODULE_ID, TIME_START_SYSTEM_ID, TIME_UPDATE_SYSTEM_ID, timeModule } from "./time.ts";
 
 export const START_SCHEDULE_ID = "start-schedule";
 export const UPDATE_SCHEDULE_ID = "update-schedule";
@@ -244,13 +244,13 @@ export function appModule(context: WorldContext): void {
             APP_PRE_START_SYSTEM_ID,
             APP_CONTEXT_START_SYSTEM_ID,
             INPUT_START_SYSTEM_ID,
-            TIME_START_SYSTEM,
+            TIME_START_SYSTEM_ID,
             APP_START_SYSTEM_ID,
         ],
     });
 
     context.addSystemDepedency({
         scheduleId: UPDATE_SCHEDULE_ID,
-        seq: [INPUT_UPDATE_SYSTEM_ID, TIME_UPDATE_SYSTEM, APP_UPDATE_SYSTEM_ID],
+        seq: [INPUT_UPDATE_SYSTEM_ID, TIME_UPDATE_SYSTEM_ID, APP_UPDATE_SYSTEM_ID],
     });
 }

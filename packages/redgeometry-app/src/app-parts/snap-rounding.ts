@@ -35,9 +35,9 @@ type SnapRoundingStateData = {
     pins: ReadonlyVector2[];
 };
 
-const APP_PART_START_SYSTEM_ID = "snap-rounding-start-system";
-const APP_PART_UPDATE_SYSTEM_ID = "snap-rounding-update-system";
-const APP_PART_RENDER_SYSTEM_ID = "snap-rounding-render-system";
+const SNAP_ROUNDING_START_SYSTEM_ID = "snap-rounding-start-system";
+const SNAP_ROUNDING_UPDATE_SYSTEM_ID = "snap-rounding-update-system";
+const SNAP_ROUNDING_RENDER_SYSTEM_ID = "snap-rounding-render-system";
 
 function snapRoundingStartSystem(world: World): void {
     const { inputElements } = world.getData<AppInputData>("app-input-data");
@@ -259,6 +259,8 @@ function transformSegments(segments: EdgeSegment2[], scale: number): Edge2[] {
     return result;
 }
 
+export const SNAP_ROUNDING_APP_PART_MODULE_ID = "snap-rounding-app-part-module";
+
 export function snapRoundingAppPartModule(context: WorldContext): void {
     context.addModule({
         id: APP_MODULE_ID,
@@ -269,32 +271,32 @@ export function snapRoundingAppPartModule(context: WorldContext): void {
     context.addData<SnapRoundingStateData>("snap-rounding-state-data");
 
     context.addSystem({
-        id: APP_PART_START_SYSTEM_ID,
+        id: SNAP_ROUNDING_START_SYSTEM_ID,
         fn: snapRoundingStartSystem,
         mode: "sync",
         scheduleId: START_SCHEDULE_ID,
     });
 
     context.addSystem({
-        id: APP_PART_UPDATE_SYSTEM_ID,
+        id: SNAP_ROUNDING_UPDATE_SYSTEM_ID,
         fn: snapRoundingUpdateSystem,
         mode: "sync",
         scheduleId: UPDATE_SCHEDULE_ID,
     });
     context.addSystem({
-        id: APP_PART_RENDER_SYSTEM_ID,
+        id: SNAP_ROUNDING_RENDER_SYSTEM_ID,
         fn: snapRoundingRenderSystem,
         mode: "sync",
         scheduleId: UPDATE_SCHEDULE_ID,
     });
 
     context.addSystemDepedency({
-        seq: [APP_START_SYSTEM_ID, APP_PART_START_SYSTEM_ID, APP_INPUT_START_SYSTEM_ID],
+        seq: [APP_START_SYSTEM_ID, SNAP_ROUNDING_START_SYSTEM_ID, APP_INPUT_START_SYSTEM_ID],
         scheduleId: START_SCHEDULE_ID,
     });
 
     context.addSystemDepedency({
-        seq: [APP_UPDATE_SYSTEM_ID, APP_PART_UPDATE_SYSTEM_ID, APP_PART_RENDER_SYSTEM_ID],
+        seq: [APP_UPDATE_SYSTEM_ID, SNAP_ROUNDING_UPDATE_SYSTEM_ID, SNAP_ROUNDING_RENDER_SYSTEM_ID],
         scheduleId: UPDATE_SCHEDULE_ID,
     });
 }

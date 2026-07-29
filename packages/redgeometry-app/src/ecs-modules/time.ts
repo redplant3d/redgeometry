@@ -13,8 +13,8 @@ export type TimeData = {
     time: number;
 };
 
-export const TIME_START_SYSTEM = "time-start-system";
-export const TIME_UPDATE_SYSTEM = "time-update-system";
+export const TIME_START_SYSTEM_ID = "time-start-system";
+export const TIME_UPDATE_SYSTEM_ID = "time-update-system";
 
 function timeStartSystem(world: World): void {
     world.setData<TimeData>({
@@ -47,14 +47,14 @@ export function timeModule(context: WorldContext): void {
     context.addEvent<AnimationFrameEvent>("animation-frame-event");
 
     context.addSystem({
-        id: TIME_START_SYSTEM,
+        id: TIME_START_SYSTEM_ID,
         fn: timeStartSystem,
         mode: "sync",
         scheduleId: START_SCHEDULE_ID,
     });
 
     context.addSystem({
-        id: TIME_UPDATE_SYSTEM,
+        id: TIME_UPDATE_SYSTEM_ID,
         fn: timeappPartUpdateSystem,
         mode: "sync",
         scheduleId: UPDATE_SCHEDULE_ID,

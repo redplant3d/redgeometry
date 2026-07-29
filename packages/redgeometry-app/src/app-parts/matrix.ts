@@ -159,6 +159,8 @@ function transformEdges(edges: ReadonlyEdge3[], mat: ReadonlyMatrix4): Edge2[] {
     return output;
 }
 
+export const MATRIX_APP_PART_MODULE_ID = "matrix-app-part-module";
+
 export function matrixAppPartModule(context: WorldContext): void {
     context.addModule({
         id: APP_MODULE_ID,

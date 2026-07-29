@@ -32,9 +32,9 @@ type PolygonMinkowskiStateData = {
     polygonC: Polygon2;
 };
 
-const APP_PART_START_SYSTEM_ID = "polygon-minkowski-start-system";
-const APP_PART_UPDATE_SYSTEM_ID = "polygon-minkowski-update-system";
-const APP_PART_RENDER_SYSTEM_ID = "polygon-minkowski-render-system";
+const POLYGON_MINKOWSKI_START_SYSTEM_ID = "polygon-minkowski-start-system";
+const POLYGON_MINKOWSKI_UPDATE_SYSTEM_ID = "polygon-minkowski-update-system";
+const POLYGON_MINKOWSKI_RENDER_SYSTEM_ID = "polygon-minkowski-render-system";
 
 function polygonMinkowskiStartSystem(world: World): void {
     const { inputElements } = world.getData<AppInputData>("app-input-data");
@@ -117,6 +117,8 @@ function polygonMinkowskiRenderSystem(world: World): void {
     ctx.fillPolygon(polygonC, "#0000FF");
 }
 
+export const POLYGON_MINKOWSKI_APP_PART_MODULE_ID = "polygon-minkowski-app-part-module";
+
 export function polygonMinkowskiAppPartModule(context: WorldContext): void {
     context.addModule({
         id: APP_MODULE_ID,
@@ -127,32 +129,32 @@ export function polygonMinkowskiAppPartModule(context: WorldContext): void {
     context.addData<PolygonMinkowskiStateData>("polygon-minkowski-state-data");
 
     context.addSystem({
-        id: APP_PART_START_SYSTEM_ID,
+        id: POLYGON_MINKOWSKI_START_SYSTEM_ID,
         fn: polygonMinkowskiStartSystem,
         mode: "sync",
         scheduleId: START_SCHEDULE_ID,
     });
 
     context.addSystem({
-        id: APP_PART_UPDATE_SYSTEM_ID,
+        id: POLYGON_MINKOWSKI_UPDATE_SYSTEM_ID,
         fn: polygonMinkowskiUpdateSystem,
         mode: "sync",
         scheduleId: UPDATE_SCHEDULE_ID,
     });
     context.addSystem({
-        id: APP_PART_RENDER_SYSTEM_ID,
+        id: POLYGON_MINKOWSKI_RENDER_SYSTEM_ID,
         fn: polygonMinkowskiRenderSystem,
         mode: "sync",
         scheduleId: UPDATE_SCHEDULE_ID,
     });
 
     context.addSystemDepedency({
-        seq: [APP_START_SYSTEM_ID, APP_PART_START_SYSTEM_ID, APP_INPUT_START_SYSTEM_ID],
+        seq: [APP_START_SYSTEM_ID, POLYGON_MINKOWSKI_START_SYSTEM_ID, APP_INPUT_START_SYSTEM_ID],
         scheduleId: START_SCHEDULE_ID,
     });
 
     context.addSystemDepedency({
-        seq: [APP_UPDATE_SYSTEM_ID, APP_PART_UPDATE_SYSTEM_ID, APP_PART_RENDER_SYSTEM_ID],
+        seq: [APP_UPDATE_SYSTEM_ID, POLYGON_MINKOWSKI_UPDATE_SYSTEM_ID, POLYGON_MINKOWSKI_RENDER_SYSTEM_ID],
         scheduleId: UPDATE_SCHEDULE_ID,
     });
 }

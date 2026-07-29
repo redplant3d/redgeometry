@@ -25,9 +25,9 @@ type PlaygroundStateData = {
     dataId: "playground-state-data";
 };
 
-const APP_PART_START_SYSTEM_ID = "playground-start-system";
-const APP_PART_UPDATE_SYSTEM_ID = "playground-update-system";
-const APP_PART_RENDER_SYSTEM_ID = "playground-render-system";
+const PLAYGROUND_START_SYSTEM_ID = "playground-start-system";
+const PLAYGROUND_UPDATE_SYSTEM_ID = "playground-update-system";
+const PLAYGROUND_RENDER_SYSTEM_ID = "playground-render-system";
 
 function playgroundStartSystem(world: World): void {
     const { inputElements } = world.getData<AppInputData>("app-input-data");
@@ -74,6 +74,8 @@ function playgroundRenderSystem(world: World): void {
     ctx.clear();
 }
 
+export const PLAYGROUND_APP_PART_MODULE_ID = "playground-app-part-module";
+
 export function playgroundAppPartModule(context: WorldContext): void {
     context.addModule({
         id: APP_MODULE_ID,
@@ -84,32 +86,32 @@ export function playgroundAppPartModule(context: WorldContext): void {
     context.addData<PlaygroundStateData>("playground-state-data");
 
     context.addSystem({
-        id: APP_PART_START_SYSTEM_ID,
+        id: PLAYGROUND_START_SYSTEM_ID,
         fn: playgroundStartSystem,
         mode: "sync",
         scheduleId: START_SCHEDULE_ID,
     });
 
     context.addSystem({
-        id: APP_PART_UPDATE_SYSTEM_ID,
+        id: PLAYGROUND_UPDATE_SYSTEM_ID,
         fn: playgroundUpdateSystem,
         mode: "sync",
         scheduleId: UPDATE_SCHEDULE_ID,
     });
     context.addSystem({
-        id: APP_PART_RENDER_SYSTEM_ID,
+        id: PLAYGROUND_RENDER_SYSTEM_ID,
         fn: playgroundRenderSystem,
         mode: "sync",
         scheduleId: UPDATE_SCHEDULE_ID,
     });
 
     context.addSystemDepedency({
-        seq: [APP_START_SYSTEM_ID, APP_PART_START_SYSTEM_ID, APP_INPUT_START_SYSTEM_ID],
+        seq: [APP_START_SYSTEM_ID, PLAYGROUND_START_SYSTEM_ID, APP_INPUT_START_SYSTEM_ID],
         scheduleId: START_SCHEDULE_ID,
     });
 
     context.addSystemDepedency({
-        seq: [APP_UPDATE_SYSTEM_ID, APP_PART_UPDATE_SYSTEM_ID, APP_PART_RENDER_SYSTEM_ID],
+        seq: [APP_UPDATE_SYSTEM_ID, PLAYGROUND_UPDATE_SYSTEM_ID, PLAYGROUND_RENDER_SYSTEM_ID],
         scheduleId: UPDATE_SCHEDULE_ID,
     });
 }

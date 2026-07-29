@@ -38,9 +38,9 @@ type SamplingStateData = {
     image: Image2;
 };
 
-const APP_PART_START_SYSTEM_ID = "sampling-start-system";
-const APP_PART_UPDATE_SYSTEM_ID = "sampling-update-system";
-const APP_PART_RENDER_SYSTEM_ID = "sampling-render-system";
+const SAMPLING_START_SYSTEM_ID = "sampling-start-system";
+const SAMPLING_UPDATE_SYSTEM_ID = "sampling-update-system";
+const SAMPLING_RENDER_SYSTEM_ID = "sampling-render-system";
 
 function samplingStartSystem(world: World): void {
     const { inputElements } = world.getData<AppInputData>("app-input-data");
@@ -278,6 +278,8 @@ function sampleWhiteNoise(random: Random, count: number, samples: number[]): voi
     }
 }
 
+export const SAMPLING_APP_PART_MODULE_ID = "sampling-app-part-module";
+
 export function samplingAppPartModule(context: WorldContext): void {
     context.addModule({
         id: APP_MODULE_ID,
@@ -288,32 +290,32 @@ export function samplingAppPartModule(context: WorldContext): void {
     context.addData<SamplingStateData>("sampling-state-data");
 
     context.addSystem({
-        id: APP_PART_START_SYSTEM_ID,
+        id: SAMPLING_START_SYSTEM_ID,
         fn: samplingStartSystem,
         mode: "sync",
         scheduleId: START_SCHEDULE_ID,
     });
 
     context.addSystem({
-        id: APP_PART_UPDATE_SYSTEM_ID,
+        id: SAMPLING_UPDATE_SYSTEM_ID,
         fn: samplingUpdateSystem,
         mode: "sync",
         scheduleId: UPDATE_SCHEDULE_ID,
     });
     context.addSystem({
-        id: APP_PART_RENDER_SYSTEM_ID,
+        id: SAMPLING_RENDER_SYSTEM_ID,
         fn: samplingRenderSystem,
         mode: "sync",
         scheduleId: UPDATE_SCHEDULE_ID,
     });
 
     context.addSystemDepedency({
-        seq: [APP_START_SYSTEM_ID, APP_PART_START_SYSTEM_ID, APP_INPUT_START_SYSTEM_ID],
+        seq: [APP_START_SYSTEM_ID, SAMPLING_START_SYSTEM_ID, APP_INPUT_START_SYSTEM_ID],
         scheduleId: START_SCHEDULE_ID,
     });
 
     context.addSystemDepedency({
-        seq: [APP_UPDATE_SYSTEM_ID, APP_PART_UPDATE_SYSTEM_ID, APP_PART_RENDER_SYSTEM_ID],
+        seq: [APP_UPDATE_SYSTEM_ID, SAMPLING_UPDATE_SYSTEM_ID, SAMPLING_RENDER_SYSTEM_ID],
         scheduleId: UPDATE_SCHEDULE_ID,
     });
 }

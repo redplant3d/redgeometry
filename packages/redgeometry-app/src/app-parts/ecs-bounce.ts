@@ -270,6 +270,8 @@ function ecsBounceNotificationSystem(world: World): void {
     }
 }
 
+export const ECS_BOUNCE_APP_PART_MODULE_ID = "ecs-bounce-app-part-module";
+
 export function ecsBounceAppPartModule(context: WorldContext): void {
     context.addModule({
         id: APP_MODULE_ID,

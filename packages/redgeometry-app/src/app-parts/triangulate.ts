@@ -39,9 +39,9 @@ type TriangulateStateData = {
     polygonB: Polygon2;
 };
 
-const APP_PART_START_SYSTEM_ID = "triangulate-start-system";
-const APP_PART_UPDATE_SYSTEM_ID = "triangulate-update-system";
-const APP_PART_RENDER_SYSTEM_ID = "triangulate-render-system";
+const TRIANGULATE_START_SYSTEM_ID = "triangulate-start-system";
+const TRIANGULATE_UPDATE_SYSTEM_ID = "triangulate-update-system";
+const TRIANGULATE_RENDER_SYSTEM_ID = "triangulate-render-system";
 
 function triangulateStartSystem(world: World): void {
     const { inputElements } = world.getData<AppInputData>("app-input-data");
@@ -183,6 +183,8 @@ function triangulateRenderSystem(world: World): void {
     ctx.drawMeshEdges(mesh, "#AAAAAA", 1.5);
 }
 
+export const TRIANGULATE_APP_PART_MODULE_ID = "triangulate-app-part-module";
+
 export function triangulateAppPartModule(context: WorldContext): void {
     context.addModule({
         id: APP_MODULE_ID,
@@ -193,32 +195,32 @@ export function triangulateAppPartModule(context: WorldContext): void {
     context.addData<TriangulateStateData>("triangulate-state-data");
 
     context.addSystem({
-        id: APP_PART_START_SYSTEM_ID,
+        id: TRIANGULATE_START_SYSTEM_ID,
         fn: triangulateStartSystem,
         mode: "sync",
         scheduleId: START_SCHEDULE_ID,
     });
 
     context.addSystem({
-        id: APP_PART_UPDATE_SYSTEM_ID,
+        id: TRIANGULATE_UPDATE_SYSTEM_ID,
         fn: triangulateUpdateSystem,
         mode: "sync",
         scheduleId: UPDATE_SCHEDULE_ID,
     });
     context.addSystem({
-        id: APP_PART_RENDER_SYSTEM_ID,
+        id: TRIANGULATE_RENDER_SYSTEM_ID,
         fn: triangulateRenderSystem,
         mode: "sync",
         scheduleId: UPDATE_SCHEDULE_ID,
     });
 
     context.addSystemDepedency({
-        seq: [APP_START_SYSTEM_ID, APP_PART_START_SYSTEM_ID, APP_INPUT_START_SYSTEM_ID],
+        seq: [APP_START_SYSTEM_ID, TRIANGULATE_START_SYSTEM_ID, APP_INPUT_START_SYSTEM_ID],
         scheduleId: START_SCHEDULE_ID,
     });
 
     context.addSystemDepedency({
-        seq: [APP_UPDATE_SYSTEM_ID, APP_PART_UPDATE_SYSTEM_ID, APP_PART_RENDER_SYSTEM_ID],
+        seq: [APP_UPDATE_SYSTEM_ID, TRIANGULATE_UPDATE_SYSTEM_ID, TRIANGULATE_RENDER_SYSTEM_ID],
         scheduleId: UPDATE_SCHEDULE_ID,
     });
 }

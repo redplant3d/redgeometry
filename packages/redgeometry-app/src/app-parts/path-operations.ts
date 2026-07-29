@@ -32,9 +32,9 @@ type PathOperationStateData = {
     output: Path2;
 };
 
-const APP_PART_START_SYSTEM_ID = "path-operation-start-system";
-const APP_PART_UPDATE_SYSTEM_ID = "path-operation-update-system";
-const APP_PART_RENDER_SYSTEM_ID = "path-operation-render-system";
+const PATH_OPERATION_START_SYSTEM_ID = "path-operation-start-system";
+const PATH_OPERATION_UPDATE_SYSTEM_ID = "path-operation-update-system";
+const PATH_OPERATION_RENDER_SYSTEM_ID = "path-operation-render-system";
 
 function pathOperationStartSystem(world: World): void {
     const { inputElements } = world.getData<AppInputData>("app-input-data");
@@ -170,6 +170,8 @@ function pathOperationRenderSystem(world: World): void {
     ctx.fillPoints(output.getPoints(), "#FF000088", 5);
 }
 
+export const PATH_OPERATION_APP_PART_MODULE_ID = "path-operation-app-part-module";
+
 export function pathOperationAppPartModule(context: WorldContext): void {
     context.addModule({
         id: APP_MODULE_ID,
@@ -180,32 +182,32 @@ export function pathOperationAppPartModule(context: WorldContext): void {
     context.addData<PathOperationStateData>("path-operation-state-data");
 
     context.addSystem({
-        id: APP_PART_START_SYSTEM_ID,
+        id: PATH_OPERATION_START_SYSTEM_ID,
         fn: pathOperationStartSystem,
         mode: "sync",
         scheduleId: START_SCHEDULE_ID,
     });
 
     context.addSystem({
-        id: APP_PART_UPDATE_SYSTEM_ID,
+        id: PATH_OPERATION_UPDATE_SYSTEM_ID,
         fn: pathOperationUpdateSystem,
         mode: "sync",
         scheduleId: UPDATE_SCHEDULE_ID,
     });
     context.addSystem({
-        id: APP_PART_RENDER_SYSTEM_ID,
+        id: PATH_OPERATION_RENDER_SYSTEM_ID,
         fn: pathOperationRenderSystem,
         mode: "sync",
         scheduleId: UPDATE_SCHEDULE_ID,
     });
 
     context.addSystemDepedency({
-        seq: [APP_START_SYSTEM_ID, APP_PART_START_SYSTEM_ID, APP_INPUT_START_SYSTEM_ID],
+        seq: [APP_START_SYSTEM_ID, PATH_OPERATION_START_SYSTEM_ID, APP_INPUT_START_SYSTEM_ID],
         scheduleId: START_SCHEDULE_ID,
     });
 
     context.addSystemDepedency({
-        seq: [APP_UPDATE_SYSTEM_ID, APP_PART_UPDATE_SYSTEM_ID, APP_PART_RENDER_SYSTEM_ID],
+        seq: [APP_UPDATE_SYSTEM_ID, PATH_OPERATION_UPDATE_SYSTEM_ID, PATH_OPERATION_RENDER_SYSTEM_ID],
         scheduleId: UPDATE_SCHEDULE_ID,
     });
 }

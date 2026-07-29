@@ -32,9 +32,9 @@ type PathAreaStateData = {
     isInside: boolean;
 };
 
-const APP_PART_START_SYSTEM_ID = "path-area-start-system";
-const APP_PART_UPDATE_SYSTEM_ID = "path-area-update-system";
-const APP_PART_RENDER_SYSTEM_ID = "path-area-render-system";
+const PATH_AREA_START_SYSTEM_ID = "path-area-start-system";
+const PATH_AREA_UPDATE_SYSTEM_ID = "path-area-update-system";
+const PATH_AREA_RENDER_SYSTEM_ID = "path-area-render-system";
 
 function pathAreaStartSystem(world: World): void {
     const { inputElements } = world.getData<AppInputData>("app-input-data");
@@ -97,6 +97,8 @@ function pathAreaRenderSystem(world: World): void {
     ctx.fillPoints(input.getPoints(), "#000000", 5);
 }
 
+export const PATH_AREA_APP_PART_MODULE_ID = "path-area-app-part-module";
+
 export function pathAreaAppPartModule(context: WorldContext): void {
     context.addModule({
         id: APP_MODULE_ID,
@@ -107,32 +109,32 @@ export function pathAreaAppPartModule(context: WorldContext): void {
     context.addData<PathAreaStateData>("path-area-state-data");
 
     context.addSystem({
-        id: APP_PART_START_SYSTEM_ID,
+        id: PATH_AREA_START_SYSTEM_ID,
         fn: pathAreaStartSystem,
         mode: "sync",
         scheduleId: START_SCHEDULE_ID,
     });
 
     context.addSystem({
-        id: APP_PART_UPDATE_SYSTEM_ID,
+        id: PATH_AREA_UPDATE_SYSTEM_ID,
         fn: pathAreaUpdateSystem,
         mode: "sync",
         scheduleId: UPDATE_SCHEDULE_ID,
     });
     context.addSystem({
-        id: APP_PART_RENDER_SYSTEM_ID,
+        id: PATH_AREA_RENDER_SYSTEM_ID,
         fn: pathAreaRenderSystem,
         mode: "sync",
         scheduleId: UPDATE_SCHEDULE_ID,
     });
 
     context.addSystemDepedency({
-        seq: [APP_START_SYSTEM_ID, APP_PART_START_SYSTEM_ID, APP_INPUT_START_SYSTEM_ID],
+        seq: [APP_START_SYSTEM_ID, PATH_AREA_START_SYSTEM_ID, APP_INPUT_START_SYSTEM_ID],
         scheduleId: START_SCHEDULE_ID,
     });
 
     context.addSystemDepedency({
-        seq: [APP_UPDATE_SYSTEM_ID, APP_PART_UPDATE_SYSTEM_ID, APP_PART_RENDER_SYSTEM_ID],
+        seq: [APP_UPDATE_SYSTEM_ID, PATH_AREA_UPDATE_SYSTEM_ID, PATH_AREA_RENDER_SYSTEM_ID],
         scheduleId: UPDATE_SCHEDULE_ID,
     });
 }

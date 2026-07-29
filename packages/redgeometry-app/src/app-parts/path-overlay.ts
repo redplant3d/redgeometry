@@ -40,9 +40,9 @@ type PathOverlayStateData = {
     tagEntries: PathOverlayTagEntry[];
 };
 
-const APP_PART_START_SYSTEM_ID = "path-overlay-start-system";
-const APP_PART_UPDATE_SYSTEM_ID = "path-overlay-update-system";
-const APP_PART_RENDER_SYSTEM_ID = "path-overlay-render-system";
+const PATH_OVERLAY_START_SYSTEM_ID = "path-overlay-start-system";
+const PATH_OVERLAY_UPDATE_SYSTEM_ID = "path-overlay-update-system";
+const PATH_OVERLAY_RENDER_SYSTEM_ID = "path-overlay-render-system";
 
 function pathOverlayStartSystem(world: World): void {
     const { inputElements } = world.getData<AppInputData>("app-input-data");
@@ -184,6 +184,8 @@ function createTagEntries(mesh: Mesh2): PathOverlayTagEntry[] {
     return entries;
 }
 
+export const PATH_OVERLAY_APP_PART_MODULE_ID = "path-overlay-app-part-module";
+
 export function pathOverlayAppPartModule(context: WorldContext): void {
     context.addModule({
         id: APP_MODULE_ID,
@@ -194,32 +196,32 @@ export function pathOverlayAppPartModule(context: WorldContext): void {
     context.addData<PathOverlayStateData>("path-overlay-state-data");
 
     context.addSystem({
-        id: APP_PART_START_SYSTEM_ID,
+        id: PATH_OVERLAY_START_SYSTEM_ID,
         fn: pathOverlayStartSystem,
         mode: "sync",
         scheduleId: START_SCHEDULE_ID,
     });
 
     context.addSystem({
-        id: APP_PART_UPDATE_SYSTEM_ID,
+        id: PATH_OVERLAY_UPDATE_SYSTEM_ID,
         fn: pathOverlayUpdateSystem,
         mode: "sync",
         scheduleId: UPDATE_SCHEDULE_ID,
     });
     context.addSystem({
-        id: APP_PART_RENDER_SYSTEM_ID,
+        id: PATH_OVERLAY_RENDER_SYSTEM_ID,
         fn: pathOverlayRenderSystem,
         mode: "sync",
         scheduleId: UPDATE_SCHEDULE_ID,
     });
 
     context.addSystemDepedency({
-        seq: [APP_START_SYSTEM_ID, APP_PART_START_SYSTEM_ID, APP_INPUT_START_SYSTEM_ID],
+        seq: [APP_START_SYSTEM_ID, PATH_OVERLAY_START_SYSTEM_ID, APP_INPUT_START_SYSTEM_ID],
         scheduleId: START_SCHEDULE_ID,
     });
 
     context.addSystemDepedency({
-        seq: [APP_UPDATE_SYSTEM_ID, APP_PART_UPDATE_SYSTEM_ID, APP_PART_RENDER_SYSTEM_ID],
+        seq: [APP_UPDATE_SYSTEM_ID, PATH_OVERLAY_UPDATE_SYSTEM_ID, PATH_OVERLAY_RENDER_SYSTEM_ID],
         scheduleId: UPDATE_SCHEDULE_ID,
     });
 }
