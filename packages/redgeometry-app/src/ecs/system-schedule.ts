@@ -127,7 +127,7 @@ export class SystemScheduleStorage {
                 continue;
             }
 
-            str += "*** " + scheduleId + "***\n";
+            str += "*** " + scheduleId + " ***\n";
 
             for (let i = 0; i < schedule.entries.length; i++) {
                 const entry = schedule.entries[i];
