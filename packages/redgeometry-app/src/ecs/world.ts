@@ -385,9 +385,6 @@ export class WorldStorage {
 
         systemScheduleStorage.initialize();
 
-        const str = systemScheduleStorage.printSchedules();
-        console.log(str);
-
         return new World(entityComponentStorage, systemScheduleStorage, dataStorage, eventStorage, pluginStorage);
     }
 
