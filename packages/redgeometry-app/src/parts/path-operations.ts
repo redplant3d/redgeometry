@@ -2,19 +2,23 @@ import { Path2 } from "redgeometry/src/core/path";
 import { ROUND_CAPS } from "redgeometry/src/core/path-options";
 import { RandomXSR128 } from "redgeometry/src/utility/random";
 import type { AppContextPlugin } from "../ecs-modules/app-context.ts";
+import { APP_INPUT_START_SYSTEM_ID } from "../ecs-modules/app-input.ts";
 import {
-    ComboBoxInputElement,
-    RangeInputElement,
-    TextBoxInputElement,
+    APP_MODULE_ID,
+    APP_START_SYSTEM_ID,
+    APP_UPDATE_SYSTEM_ID,
+    appModule,
+    START_SCHEDULE_ID,
+    UPDATE_SCHEDULE_ID,
     type AppInputData,
-} from "../ecs-modules/app-input.ts";
-import { type AppStateData } from "../ecs-modules/app.ts";
-import type { DefaultSystemStage, WorldModule } from "../ecs/types.ts";
-import { type World } from "../ecs/world.ts";
+    type AppMainInputData,
+} from "../ecs-modules/app.ts";
+import { WorldContext, type World } from "../ecs/world.ts";
 import { createRandomPath, getJoinType } from "../utility/helper.ts";
+import { ComboBoxInputElement, RangeInputElement, TextBoxInputElement } from "../utility/html-element.ts";
 
-type AppPartMainData = {
-    dataId: "app-part-main-data";
+type PathOperationInputData = {
+    dataId: "path-operation-input-data";
     inputCount: TextBoxInputElement;
     inputJoin: ComboBoxInputElement;
     inputOp: ComboBoxInputElement;
@@ -22,23 +26,18 @@ type AppPartMainData = {
     inputParam2: RangeInputElement;
 };
 
-type AppPartRemoteData = {
-    dataId: "app-part-remote-data";
+type PathOperationStateData = {
+    dataId: "path-operation-state-data";
     input: Path2;
     output: Path2;
 };
 
-type AppPartStateData = {
-    dataId: "app-part-state-data";
-    count: number;
-    op: string;
-    param1: number;
-    param2: number;
-    join: string;
-};
+const APP_PART_START_SYSTEM_ID = "path-operation-start-system";
+const APP_PART_UPDATE_SYSTEM_ID = "path-operation-update-system";
+const APP_PART_RENDER_SYSTEM_ID = "path-operation-render-system";
 
-function initMainSystem(world: World): void {
-    const { inputElements } = world.readData<AppInputData>("app-input-data");
+function pathOperationStartSystem(world: World): void {
+    const { inputElements } = world.getData<AppInputData>("app-input-data");
 
     const inputCount = new TextBoxInputElement("count", "10");
     inputCount.setStyle("width: 80px");
@@ -60,43 +59,34 @@ function initMainSystem(world: World): void {
     inputJoin.setOptionValues("bevel", "miter", "miterclip", "round");
     inputElements.push(inputJoin);
 
-    world.writeData<AppPartMainData>({
-        dataId: "app-part-main-data",
+    world.setData<PathOperationInputData>({
+        dataId: "path-operation-input-data",
         inputCount,
         inputOp,
         inputParam1,
         inputParam2,
         inputJoin,
     });
-}
 
-function initRemoteSystem(world: World): void {
-    world.writeData<AppPartRemoteData>({
-        dataId: "app-part-remote-data",
+    world.setData<PathOperationStateData>({
+        dataId: "path-operation-state-data",
         input: Path2.createEmpty(),
         output: Path2.createEmpty(),
     });
 }
 
-function writeStateSystem(world: World): void {
+function pathOperationUpdateSystem(world: World): void {
     const { inputCount, inputOp, inputParam1, inputParam2, inputJoin } =
-        world.readData<AppPartMainData>("app-part-main-data");
+        world.getData<PathOperationInputData>("path-operation-input-data");
+    const count = inputCount.getInt();
+    const op = inputOp.getValue();
+    const param1 = inputParam1.getInt();
+    const param2 = inputParam2.getInt();
+    const join = inputJoin.getValue();
 
-    const stateData: AppPartStateData = {
-        dataId: "app-part-state-data",
-        count: inputCount.getInt(),
-        op: inputOp.getValue(),
-        param1: inputParam1.getInt(),
-        param2: inputParam2.getInt(),
-        join: inputJoin.getValue(),
-    };
-
-    world.writeData(stateData);
-}
-
-function updateSystem(world: World): void {
-    const { count, op, param1, param2, join } = world.readData<AppPartStateData>("app-part-state-data");
-    const { seed, generator } = world.readData<AppStateData>("app-state-data");
+    const { generatorTextBox, seedTextBox } = world.getData<AppMainInputData>("app-main-input-data");
+    const seed = seedTextBox.getInt();
+    const generator = generatorTextBox.getInt();
 
     const ctx = world.getPlugin<AppContextPlugin>("app-context-plugin");
 
@@ -161,15 +151,15 @@ function updateSystem(world: World): void {
         }
     }
 
-    world.writeData<AppPartRemoteData>({
-        dataId: "app-part-remote-data",
+    world.setData<PathOperationStateData>({
+        dataId: "path-operation-state-data",
         input: path,
         output,
     });
 }
 
-function renderSystem(world: World): void {
-    const { input, output } = world.readData<AppPartRemoteData>("app-part-remote-data");
+function pathOperationRenderSystem(world: World): void {
+    const { input, output } = world.getData<PathOperationStateData>("path-operation-state-data");
 
     const ctx = world.getPlugin<AppContextPlugin>("app-context-plugin");
 
@@ -180,18 +170,42 @@ function renderSystem(world: World): void {
     ctx.fillPoints(output.getPoints(), "#FF000088", 5);
 }
 
-export class PathOperationAppPartModule implements WorldModule {
-    public readonly moduleId = "path-operation-app-part-module";
+export function pathOperationAppPartModule(context: WorldContext): void {
+    context.addModule({
+        id: APP_MODULE_ID,
+        fn: appModule,
+    });
 
-    public setup(world: World): void {
-        world.addSystems<DefaultSystemStage>({ stage: "start", fns: [initMainSystem, writeStateSystem] });
-        world.addSystems<DefaultSystemStage>({ stage: "update", fns: [writeStateSystem] });
+    context.addData<PathOperationInputData>("path-operation-input-data");
+    context.addData<PathOperationStateData>("path-operation-state-data");
 
-        world.addDependency<DefaultSystemStage>({ stage: "start", seq: [initMainSystem, writeStateSystem] });
+    context.addSystem({
+        id: APP_PART_START_SYSTEM_ID,
+        fn: pathOperationStartSystem,
+        mode: "sync",
+        scheduleId: START_SCHEDULE_ID,
+    });
 
-        world.addSystems<DefaultSystemStage>({ stage: "start", fns: [initRemoteSystem] });
-        world.addSystems<DefaultSystemStage>({ stage: "update", fns: [updateSystem, renderSystem] });
+    context.addSystem({
+        id: APP_PART_UPDATE_SYSTEM_ID,
+        fn: pathOperationUpdateSystem,
+        mode: "sync",
+        scheduleId: UPDATE_SCHEDULE_ID,
+    });
+    context.addSystem({
+        id: APP_PART_RENDER_SYSTEM_ID,
+        fn: pathOperationRenderSystem,
+        mode: "sync",
+        scheduleId: UPDATE_SCHEDULE_ID,
+    });
 
-        world.addDependency<DefaultSystemStage>({ stage: "update", seq: [updateSystem, renderSystem] });
-    }
+    context.addSystemDepedency({
+        seq: [APP_START_SYSTEM_ID, APP_PART_START_SYSTEM_ID, APP_INPUT_START_SYSTEM_ID],
+        scheduleId: START_SCHEDULE_ID,
+    });
+
+    context.addSystemDepedency({
+        seq: [APP_UPDATE_SYSTEM_ID, APP_PART_UPDATE_SYSTEM_ID, APP_PART_RENDER_SYSTEM_ID],
+        scheduleId: UPDATE_SCHEDULE_ID,
+    });
 }

@@ -9,17 +9,18 @@ import type { ReadonlyRay2 } from "redgeometry/src/primitives/ray";
 import { Vector2, type ReadonlyVector2 } from "redgeometry/src/primitives/vector";
 import { assertUnreachable, throwError } from "redgeometry/src/utility/debug";
 import type { Random } from "redgeometry/src/utility/random";
-import type { DefaultSystemStage, WorldModule, WorldPlugin } from "../ecs/types.ts";
-import type { World } from "../ecs/world.ts";
+import type { World, WorldContext } from "../ecs/world.ts";
 import { ColorRgba } from "../utility/color.ts";
 import { createRandomColor } from "../utility/helper.ts";
 import type { Image2 } from "../utility/image.ts";
-import type { AppCanvasData } from "./app.ts";
+import { START_SCHEDULE_ID, type AppCanvasData } from "./app.ts";
 
 type CanvasStyle = string | CanvasGradient | CanvasPattern;
 
-export function initCanvasContextSystem(world: World): void {
-    const { canvas } = world.readData<AppCanvasData>("app-canvas-data");
+export const APP_CONTEXT_START_SYSTEM_ID = "app-context-start-system";
+
+function appContextStartSystem(world: World): void {
+    const { canvas } = world.getData<AppCanvasData>("app-canvas-data");
 
     const context = canvas.getContext("2d");
 
@@ -32,7 +33,7 @@ export function initCanvasContextSystem(world: World): void {
     world.setPlugin<AppContextPlugin>(plugin);
 }
 
-export class AppContextPlugin implements WorldPlugin {
+export class AppContextPlugin {
     private context: CanvasRenderingContext2D;
 
     public readonly pluginId = "app-context-plugin";
@@ -647,10 +648,17 @@ export class AppContextPlugin implements WorldPlugin {
     }
 }
 
-export class AppContextModule implements WorldModule {
-    public readonly moduleId = "app-context-module";
+export const APP_CONTEXT_MODULE_ID = "app-context-module";
 
-    public setup(world: World): void {
-        world.addSystem<DefaultSystemStage>({ stage: "start-pre", fn: initCanvasContextSystem });
-    }
+export function appContextModule(context: WorldContext): void {
+    context.addPlugin<AppContextPlugin>("app-context-plugin");
+
+    context.addSystem({
+        id: APP_CONTEXT_START_SYSTEM_ID,
+        fn: appContextStartSystem,
+        mode: "sync",
+        scheduleId: START_SCHEDULE_ID,
+    });
+
+    context.requireData<AppCanvasData>("app-canvas-data");
 }

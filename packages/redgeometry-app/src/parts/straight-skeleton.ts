@@ -3,66 +3,65 @@ import { WindingOperator } from "redgeometry/src/core/winding";
 import { MinMaxBox2 } from "redgeometry/src/primitives/box";
 import { RandomXSR128 } from "redgeometry/src/utility/random";
 import type { AppContextPlugin } from "../ecs-modules/app-context.ts";
-import { RangeInputElement, type AppInputData } from "../ecs-modules/app-input.ts";
-import { type AppStateData } from "../ecs-modules/app.ts";
-import type { DefaultSystemStage, WorldModule } from "../ecs/types.ts";
-import { type World } from "../ecs/world.ts";
+import { APP_INPUT_START_SYSTEM_ID } from "../ecs-modules/app-input.ts";
+import {
+    APP_MODULE_ID,
+    APP_START_SYSTEM_ID,
+    APP_UPDATE_SYSTEM_ID,
+    appModule,
+    START_SCHEDULE_ID,
+    UPDATE_SCHEDULE_ID,
+    type AppInputData,
+    type AppMainInputData,
+} from "../ecs-modules/app.ts";
+import { WorldContext, type World } from "../ecs/world.ts";
 import { createRandomPolygonSimple } from "../utility/helper.ts";
+import { RangeInputElement } from "../utility/html-element.ts";
 import { StraightSkeleton } from "../utility/straight-skeleton.ts";
 
-type AppPartMainData = {
-    dataId: "app-part-main-data";
+type StraightSkeletonInputData = {
+    dataId: "straight-skeleton-input-data";
     inputTime: RangeInputElement;
 };
 
-type AppPartRemoteData = {
-    dataId: "app-part-remote-data";
+type StraightSkeletonStateData = {
+    dataId: "straight-skeleton-state-data";
     mesh: Mesh2;
     meshOriginal: Mesh2;
     skeleton: StraightSkeleton;
 };
 
-type AppPartStateData = {
-    dataId: "app-part-state-data";
-    time: number;
-};
+const APP_PART_START_SYSTEM_ID = "straight-skeleton-start-system";
+const APP_PART_UPDATE_SYSTEM_ID = "straight-skeleton-update-system";
+const APP_PART_RENDER_SYSTEM_ID = "straight-skeleton-render-system";
 
-function initMainSystem(world: World): void {
-    const { inputElements } = world.readData<AppInputData>("app-input-data");
+function straightSkeletonStartSystem(world: World): void {
+    const { inputElements } = world.getData<AppInputData>("app-input-data");
 
     const inputTime = new RangeInputElement("time", "0", "500", "50");
     inputTime.setStyle("width: 200px");
     inputElements.push(inputTime);
 
-    world.writeData<AppPartMainData>({
-        dataId: "app-part-main-data",
+    world.setData<StraightSkeletonInputData>({
+        dataId: "straight-skeleton-input-data",
         inputTime,
     });
-}
 
-function initRemoteSystem(world: World): void {
-    world.writeData<AppPartRemoteData>({
-        dataId: "app-part-remote-data",
+    world.setData<StraightSkeletonStateData>({
+        dataId: "straight-skeleton-state-data",
         mesh: Mesh2.createEmpty(),
         meshOriginal: Mesh2.createEmpty(),
         skeleton: new StraightSkeleton(),
     });
 }
 
-function writeStateSystem(world: World): void {
-    const { inputTime } = world.readData<AppPartMainData>("app-part-main-data");
+function straightSkeletonUpdateSystem(world: World): void {
+    const { inputTime } = world.getData<StraightSkeletonInputData>("straight-skeleton-input-data");
+    const time = inputTime.getInt();
 
-    const stateData: AppPartStateData = {
-        dataId: "app-part-state-data",
-        time: inputTime.getInt(),
-    };
-
-    world.writeData(stateData);
-}
-
-function updateSystem(world: World): void {
-    const { time } = world.readData<AppPartStateData>("app-part-state-data");
-    const { seed, generator } = world.readData<AppStateData>("app-state-data");
+    const { generatorTextBox, seedTextBox } = world.getData<AppMainInputData>("app-main-input-data");
+    const seed = seedTextBox.getInt();
+    const generator = generatorTextBox.getInt();
 
     const ctx = world.getPlugin<AppContextPlugin>("app-context-plugin");
 
@@ -96,16 +95,16 @@ function updateSystem(world: World): void {
     skeleton.initializeMesh(mesh);
     skeleton.createStraightSkeleton(mesh, tmax);
 
-    world.writeData<AppPartRemoteData>({
-        dataId: "app-part-remote-data",
+    world.setData<StraightSkeletonStateData>({
+        dataId: "straight-skeleton-state-data",
         mesh,
         meshOriginal,
         skeleton,
     });
 }
 
-function renderSystem(world: World): void {
-    const { skeleton, meshOriginal, mesh } = world.readData<AppPartRemoteData>("app-part-remote-data");
+function straightSkeletonRenderSystem(world: World): void {
+    const { skeleton, meshOriginal, mesh } = world.getData<StraightSkeletonStateData>("straight-skeleton-state-data");
 
     const ctx = world.getPlugin<AppContextPlugin>("app-context-plugin");
 
@@ -115,18 +114,42 @@ function renderSystem(world: World): void {
     ctx.drawMeshEdges(mesh, "#00FF00");
 }
 
-export class StraightSkeletonAppPartModule implements WorldModule {
-    public readonly moduleId = "straight-skeleton-app-part-module";
+export function straightSkeletonAppPartModule(context: WorldContext): void {
+    context.addModule({
+        id: APP_MODULE_ID,
+        fn: appModule,
+    });
 
-    public setup(world: World): void {
-        world.addSystems<DefaultSystemStage>({ stage: "start", fns: [initMainSystem, writeStateSystem] });
-        world.addSystems<DefaultSystemStage>({ stage: "update", fns: [writeStateSystem] });
+    context.addData<StraightSkeletonInputData>("straight-skeleton-input-data");
+    context.addData<StraightSkeletonStateData>("straight-skeleton-state-data");
 
-        world.addDependency<DefaultSystemStage>({ stage: "start", seq: [initMainSystem, writeStateSystem] });
+    context.addSystem({
+        id: APP_PART_START_SYSTEM_ID,
+        fn: straightSkeletonStartSystem,
+        mode: "sync",
+        scheduleId: START_SCHEDULE_ID,
+    });
 
-        world.addSystems<DefaultSystemStage>({ stage: "start", fns: [initRemoteSystem] });
-        world.addSystems<DefaultSystemStage>({ stage: "update", fns: [updateSystem, renderSystem] });
+    context.addSystem({
+        id: APP_PART_UPDATE_SYSTEM_ID,
+        fn: straightSkeletonUpdateSystem,
+        mode: "sync",
+        scheduleId: UPDATE_SCHEDULE_ID,
+    });
+    context.addSystem({
+        id: APP_PART_RENDER_SYSTEM_ID,
+        fn: straightSkeletonRenderSystem,
+        mode: "sync",
+        scheduleId: UPDATE_SCHEDULE_ID,
+    });
 
-        world.addDependency<DefaultSystemStage>({ stage: "update", seq: [updateSystem, renderSystem] });
-    }
+    context.addSystemDepedency({
+        seq: [APP_START_SYSTEM_ID, APP_PART_START_SYSTEM_ID, APP_INPUT_START_SYSTEM_ID],
+        scheduleId: START_SCHEDULE_ID,
+    });
+
+    context.addSystemDepedency({
+        seq: [APP_UPDATE_SYSTEM_ID, APP_PART_UPDATE_SYSTEM_ID, APP_PART_RENDER_SYSTEM_ID],
+        scheduleId: UPDATE_SCHEDULE_ID,
+    });
 }

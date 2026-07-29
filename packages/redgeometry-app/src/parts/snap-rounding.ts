@@ -6,18 +6,27 @@ import { Edge2 } from "redgeometry/src/primitives/edge";
 import { Vector2, type ReadonlyVector2 } from "redgeometry/src/primitives/vector";
 import { RandomXSR128 } from "redgeometry/src/utility/random";
 import type { AppContextPlugin } from "../ecs-modules/app-context.ts";
-import { RangeInputElement, type AppInputData } from "../ecs-modules/app-input.ts";
-import { type AppStateData } from "../ecs-modules/app.ts";
-import type { DefaultSystemStage, WorldModule } from "../ecs/types.ts";
-import { type World } from "../ecs/world.ts";
+import { APP_INPUT_START_SYSTEM_ID } from "../ecs-modules/app-input.ts";
+import {
+    APP_MODULE_ID,
+    APP_START_SYSTEM_ID,
+    APP_UPDATE_SYSTEM_ID,
+    appModule,
+    START_SCHEDULE_ID,
+    UPDATE_SCHEDULE_ID,
+    type AppInputData,
+    type AppMainInputData,
+} from "../ecs-modules/app.ts";
+import { WorldContext, type World } from "../ecs/world.ts";
+import { RangeInputElement } from "../utility/html-element.ts";
 
-type AppPartMainData = {
-    dataId: "app-part-main-data";
+type SnapRoundingInputData = {
+    dataId: "snap-rounding-input-data";
     inputParameter: RangeInputElement;
 };
 
-type AppPartRemoteData = {
-    dataId: "app-part-remote-data";
+type SnapRoundingStateData = {
+    dataId: "snap-rounding-state-data";
     errors: ReadonlyMinMaxBox2[];
     inputSegments: Edge2[];
     intersections: ReadonlyVector2[];
@@ -26,27 +35,24 @@ type AppPartRemoteData = {
     pins: ReadonlyVector2[];
 };
 
-type AppPartStateData = {
-    dataId: "app-part-state-data";
-    parameter: number;
-};
+const APP_PART_START_SYSTEM_ID = "snap-rounding-start-system";
+const APP_PART_UPDATE_SYSTEM_ID = "snap-rounding-update-system";
+const APP_PART_RENDER_SYSTEM_ID = "snap-rounding-render-system";
 
-function initMainSystem(world: World): void {
-    const { inputElements } = world.readData<AppInputData>("app-input-data");
+function snapRoundingStartSystem(world: World): void {
+    const { inputElements } = world.getData<AppInputData>("app-input-data");
 
     const inputParameter = new RangeInputElement("parameter", "1", "200", "50");
     inputParameter.setStyle("width: 200px");
     inputElements.push(inputParameter);
 
-    world.writeData<AppPartMainData>({
-        dataId: "app-part-main-data",
+    world.setData<SnapRoundingInputData>({
+        dataId: "snap-rounding-input-data",
         inputParameter,
     });
-}
 
-function initRemoteSystem(world: World): void {
-    world.writeData<AppPartRemoteData>({
-        dataId: "app-part-remote-data",
+    world.setData<SnapRoundingStateData>({
+        dataId: "snap-rounding-state-data",
         inputSegments: [],
         outputSegments: [],
         intersections: [],
@@ -56,20 +62,13 @@ function initRemoteSystem(world: World): void {
     });
 }
 
-function writeStateSystem(world: World): void {
-    const { inputParameter } = world.readData<AppPartMainData>("app-part-main-data");
+function snapRoundingUpdateSystem(world: World): void {
+    const { inputParameter } = world.getData<SnapRoundingInputData>("snap-rounding-input-data");
+    const parameter = inputParameter.getInt();
 
-    const stateData: AppPartStateData = {
-        dataId: "app-part-state-data",
-        parameter: inputParameter.getInt(),
-    };
-
-    world.writeData(stateData);
-}
-
-function updateSystem(world: World): void {
-    const { parameter } = world.readData<AppPartStateData>("app-part-state-data");
-    const { seed, generator } = world.readData<AppStateData>("app-state-data");
+    const { generatorTextBox, seedTextBox } = world.getData<AppMainInputData>("app-main-input-data");
+    const seed = seedTextBox.getInt();
+    const generator = generatorTextBox.getInt();
 
     const ctx = world.getPlugin<AppContextPlugin>("app-context-plugin");
 
@@ -104,8 +103,8 @@ function updateSystem(world: World): void {
         log.error("*** {} errors ***", errors.length);
     }
 
-    world.writeData<AppPartRemoteData>({
-        dataId: "app-part-remote-data",
+    world.setData<SnapRoundingStateData>({
+        dataId: "snap-rounding-state-data",
         inputSegments,
         outputSegments,
         intersections,
@@ -115,10 +114,11 @@ function updateSystem(world: World): void {
     });
 }
 
-function renderSystem(world: World): void {
+function snapRoundingRenderSystem(world: World): void {
     const { errors, inputSegments, intersections, magnets, outputSegments, pins } =
-        world.readData<AppPartRemoteData>("app-part-remote-data");
-    const { parameter } = world.readData<AppPartStateData>("app-part-state-data");
+        world.getData<SnapRoundingStateData>("snap-rounding-state-data");
+    const { inputParameter } = world.getData<SnapRoundingInputData>("snap-rounding-input-data");
+    const parameter = inputParameter.getInt();
 
     const ctx = world.getPlugin<AppContextPlugin>("app-context-plugin");
 
@@ -259,18 +259,42 @@ function transformSegments(segments: EdgeSegment2[], scale: number): Edge2[] {
     return result;
 }
 
-export class SnapRoundingAppPartModule implements WorldModule {
-    public readonly moduleId = "snap-rounding-app-part-module";
+export function snapRoundingAppPartModule(context: WorldContext): void {
+    context.addModule({
+        id: APP_MODULE_ID,
+        fn: appModule,
+    });
 
-    public setup(world: World): void {
-        world.addSystems<DefaultSystemStage>({ stage: "start", fns: [initMainSystem, writeStateSystem] });
-        world.addSystems<DefaultSystemStage>({ stage: "update", fns: [writeStateSystem] });
+    context.addData<SnapRoundingInputData>("snap-rounding-input-data");
+    context.addData<SnapRoundingStateData>("snap-rounding-state-data");
 
-        world.addDependency<DefaultSystemStage>({ stage: "start", seq: [initMainSystem, writeStateSystem] });
+    context.addSystem({
+        id: APP_PART_START_SYSTEM_ID,
+        fn: snapRoundingStartSystem,
+        mode: "sync",
+        scheduleId: START_SCHEDULE_ID,
+    });
 
-        world.addSystems<DefaultSystemStage>({ stage: "start", fns: [initRemoteSystem] });
-        world.addSystems<DefaultSystemStage>({ stage: "update", fns: [updateSystem, renderSystem] });
+    context.addSystem({
+        id: APP_PART_UPDATE_SYSTEM_ID,
+        fn: snapRoundingUpdateSystem,
+        mode: "sync",
+        scheduleId: UPDATE_SCHEDULE_ID,
+    });
+    context.addSystem({
+        id: APP_PART_RENDER_SYSTEM_ID,
+        fn: snapRoundingRenderSystem,
+        mode: "sync",
+        scheduleId: UPDATE_SCHEDULE_ID,
+    });
 
-        world.addDependency<DefaultSystemStage>({ stage: "update", seq: [updateSystem, renderSystem] });
-    }
+    context.addSystemDepedency({
+        seq: [APP_START_SYSTEM_ID, APP_PART_START_SYSTEM_ID, APP_INPUT_START_SYSTEM_ID],
+        scheduleId: START_SCHEDULE_ID,
+    });
+
+    context.addSystemDepedency({
+        seq: [APP_UPDATE_SYSTEM_ID, APP_PART_UPDATE_SYSTEM_ID, APP_PART_RENDER_SYSTEM_ID],
+        scheduleId: UPDATE_SCHEDULE_ID,
+    });
 }

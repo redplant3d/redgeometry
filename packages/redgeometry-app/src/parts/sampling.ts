@@ -3,11 +3,19 @@ import { assertUnreachable } from "redgeometry/src/utility/debug";
 import { RandomXSR128, type Random } from "redgeometry/src/utility/random";
 import { clamp } from "redgeometry/src/utility/scalar";
 import type { AppContextPlugin } from "../ecs-modules/app-context.ts";
-import type { AppInputData } from "../ecs-modules/app-input.ts";
-import { ComboBoxInputElement, RangeInputElement } from "../ecs-modules/app-input.ts";
-import { type AppStateData } from "../ecs-modules/app.ts";
-import type { DefaultSystemStage, WorldModule } from "../ecs/types.ts";
-import { type World } from "../ecs/world.ts";
+import { APP_INPUT_START_SYSTEM_ID } from "../ecs-modules/app-input.ts";
+import {
+    APP_MODULE_ID,
+    APP_START_SYSTEM_ID,
+    APP_UPDATE_SYSTEM_ID,
+    appModule,
+    START_SCHEDULE_ID,
+    UPDATE_SCHEDULE_ID,
+    type AppInputData,
+    type AppMainInputData,
+} from "../ecs-modules/app.ts";
+import { WorldContext, type World } from "../ecs/world.ts";
+import { ComboBoxInputElement, RangeInputElement } from "../utility/html-element.ts";
 import { Image2 } from "../utility/image.ts";
 
 const SOBOL_XOR_1 = [
@@ -17,28 +25,25 @@ const SOBOL_XOR_1 = [
     0x070f0f0f, 0x01111111, 0x13333333,
 ];
 
-type AppPartMainData = {
-    dataId: "app-part-main-data";
+type SamplingInputData = {
+    dataId: "sampling-input-data";
     inputCount: RangeInputElement;
     inputFormat: ComboBoxInputElement;
     inputSize: RangeInputElement;
 };
 
-type AppPartRemoteData = {
-    dataId: "app-part-remote-data";
+type SamplingStateData = {
+    dataId: "sampling-state-data";
     boxes: ReadonlyMinMaxBox2[];
     image: Image2;
 };
 
-type AppPartStateData = {
-    dataId: "app-part-state-data";
-    size: number;
-    count: number;
-    format: string;
-};
+const APP_PART_START_SYSTEM_ID = "sampling-start-system";
+const APP_PART_UPDATE_SYSTEM_ID = "sampling-update-system";
+const APP_PART_RENDER_SYSTEM_ID = "sampling-render-system";
 
-function initMainSystem(world: World): void {
-    const { inputElements } = world.readData<AppInputData>("app-input-data");
+function samplingStartSystem(world: World): void {
+    const { inputElements } = world.getData<AppInputData>("app-input-data");
 
     const inputSize = new RangeInputElement("size", "16", "1024", "512");
     inputSize.setStyle("width: 200px");
@@ -52,38 +57,29 @@ function initMainSystem(world: World): void {
     inputFormat.setOptionValues("none", "u8", "u16", "u32", "f32");
     inputElements.push(inputFormat);
 
-    world.writeData<AppPartMainData>({
-        dataId: "app-part-main-data",
+    world.setData<SamplingInputData>({
+        dataId: "sampling-input-data",
         inputSize,
         inputCount,
         inputFormat,
     });
-}
 
-function initRemoteSystem(world: World): void {
-    world.writeData<AppPartRemoteData>({
-        dataId: "app-part-remote-data",
+    world.setData<SamplingStateData>({
+        dataId: "sampling-state-data",
         boxes: [],
         image: new Image2(0, 0),
     });
 }
 
-function writeStateSystem(world: World): void {
-    const { inputSize, inputCount, inputFormat } = world.readData<AppPartMainData>("app-part-main-data");
+function samplingUpdateSystem(world: World): void {
+    const { inputSize, inputCount, inputFormat } = world.getData<SamplingInputData>("sampling-input-data");
+    const size = inputSize.getInt();
+    const count = inputCount.getInt();
+    const format = inputFormat.getValue();
 
-    const stateData: AppPartStateData = {
-        dataId: "app-part-state-data",
-        size: inputSize.getInt(),
-        count: inputCount.getInt(),
-        format: inputFormat.getValue(),
-    };
-
-    world.writeData(stateData);
-}
-
-function updateSystem(world: World): void {
-    const { size, count, format } = world.readData<AppPartStateData>("app-part-state-data");
-    const { seed, generator } = world.readData<AppStateData>("app-state-data");
+    const { generatorTextBox, seedTextBox } = world.getData<AppMainInputData>("app-main-input-data");
+    const seed = seedTextBox.getInt();
+    const generator = generatorTextBox.getInt();
 
     const countP = 2 ** count;
 
@@ -131,16 +127,17 @@ function updateSystem(world: World): void {
         }
     }
 
-    world.writeData<AppPartRemoteData>({
-        dataId: "app-part-remote-data",
+    world.setData<SamplingStateData>({
+        dataId: "sampling-state-data",
         boxes,
         image,
     });
 }
 
-function renderSystem(world: World): void {
-    const { boxes, image } = world.readData<AppPartRemoteData>("app-part-remote-data");
-    const { size } = world.readData<AppPartStateData>("app-part-state-data");
+function samplingRenderSystem(world: World): void {
+    const { boxes, image } = world.getData<SamplingStateData>("sampling-state-data");
+    const { inputSize } = world.getData<SamplingInputData>("sampling-input-data");
+    const size = inputSize.getInt();
 
     const ctx = world.getPlugin<AppContextPlugin>("app-context-plugin");
 
@@ -281,18 +278,42 @@ function sampleWhiteNoise(random: Random, count: number, samples: number[]): voi
     }
 }
 
-export class SamplingAppPartModule implements WorldModule {
-    public readonly moduleId = "sampling-app-part-module";
+export function samplingAppPartModule(context: WorldContext): void {
+    context.addModule({
+        id: APP_MODULE_ID,
+        fn: appModule,
+    });
 
-    public setup(world: World): void {
-        world.addSystems<DefaultSystemStage>({ stage: "start", fns: [initMainSystem, writeStateSystem] });
-        world.addSystems<DefaultSystemStage>({ stage: "update", fns: [writeStateSystem] });
+    context.addData<SamplingInputData>("sampling-input-data");
+    context.addData<SamplingStateData>("sampling-state-data");
 
-        world.addDependency<DefaultSystemStage>({ stage: "start", seq: [initMainSystem, writeStateSystem] });
+    context.addSystem({
+        id: APP_PART_START_SYSTEM_ID,
+        fn: samplingStartSystem,
+        mode: "sync",
+        scheduleId: START_SCHEDULE_ID,
+    });
 
-        world.addSystems<DefaultSystemStage>({ stage: "start", fns: [initRemoteSystem] });
-        world.addSystems<DefaultSystemStage>({ stage: "update", fns: [updateSystem, renderSystem] });
+    context.addSystem({
+        id: APP_PART_UPDATE_SYSTEM_ID,
+        fn: samplingUpdateSystem,
+        mode: "sync",
+        scheduleId: UPDATE_SCHEDULE_ID,
+    });
+    context.addSystem({
+        id: APP_PART_RENDER_SYSTEM_ID,
+        fn: samplingRenderSystem,
+        mode: "sync",
+        scheduleId: UPDATE_SCHEDULE_ID,
+    });
 
-        world.addDependency<DefaultSystemStage>({ stage: "update", seq: [updateSystem, renderSystem] });
-    }
+    context.addSystemDepedency({
+        seq: [APP_START_SYSTEM_ID, APP_PART_START_SYSTEM_ID, APP_INPUT_START_SYSTEM_ID],
+        scheduleId: START_SCHEDULE_ID,
+    });
+
+    context.addSystemDepedency({
+        seq: [APP_UPDATE_SYSTEM_ID, APP_PART_UPDATE_SYSTEM_ID, APP_PART_RENDER_SYSTEM_ID],
+        scheduleId: UPDATE_SCHEDULE_ID,
+    });
 }

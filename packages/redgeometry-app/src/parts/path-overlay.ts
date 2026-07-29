@@ -8,38 +8,44 @@ import { arrayEquals } from "redgeometry/src/utility/array";
 import { assert } from "redgeometry/src/utility/debug";
 import { RandomXSR128 } from "redgeometry/src/utility/random";
 import type { AppContextPlugin } from "../ecs-modules/app-context.ts";
-import type { AppInputData } from "../ecs-modules/app-input.ts";
-import { ComboBoxInputElement, RangeInputElement } from "../ecs-modules/app-input.ts";
-import { type AppStateData } from "../ecs-modules/app.ts";
-import type { DefaultSystemStage, WorldModule } from "../ecs/types.ts";
-import { type World } from "../ecs/world.ts";
+import { APP_INPUT_START_SYSTEM_ID } from "../ecs-modules/app-input.ts";
+import {
+    APP_MODULE_ID,
+    APP_START_SYSTEM_ID,
+    APP_UPDATE_SYSTEM_ID,
+    appModule,
+    START_SCHEDULE_ID,
+    UPDATE_SCHEDULE_ID,
+    type AppInputData,
+    type AppMainInputData,
+} from "../ecs-modules/app.ts";
+import { WorldContext, type World } from "../ecs/world.ts";
 import { ColorRgba } from "../utility/color.ts";
 import { createRandomPolygonPair, getWindingOperator } from "../utility/helper.ts";
+import { ComboBoxInputElement, RangeInputElement } from "../utility/html-element.ts";
 
 type PathOverlayTagEntry = { tag: number[]; faces: MeshFace2[] };
 
-type AppPartMainData = {
-    dataId: "app-part-main-data";
+type PathOverlayInputData = {
+    dataId: "path-overlay-input-data";
     inputParameter: RangeInputElement;
     inputWind: ComboBoxInputElement;
 };
 
-type AppPartRemoteData = {
-    dataId: "app-part-remote-data";
+type PathOverlayStateData = {
+    dataId: "path-overlay-state-data";
     mesh: Mesh2;
     polygonA: Polygon2;
     polygonB: Polygon2;
     tagEntries: PathOverlayTagEntry[];
 };
 
-type AppPartStateData = {
-    dataId: "app-part-state-data";
-    parameter: number;
-    wind: string;
-};
+const APP_PART_START_SYSTEM_ID = "path-overlay-start-system";
+const APP_PART_UPDATE_SYSTEM_ID = "path-overlay-update-system";
+const APP_PART_RENDER_SYSTEM_ID = "path-overlay-render-system";
 
-function initMainSystem(world: World): void {
-    const { inputElements } = world.readData<AppInputData>("app-input-data");
+function pathOverlayStartSystem(world: World): void {
+    const { inputElements } = world.getData<AppInputData>("app-input-data");
 
     const inputParameter = new RangeInputElement("parameter", "0", "200", "100");
     inputParameter.setStyle("width: 200px");
@@ -49,16 +55,14 @@ function initMainSystem(world: World): void {
     inputWind.setOptionValues("nonzero", "evenodd", "positive", "negative", "absgeqtwo");
     inputElements.push(inputWind);
 
-    world.writeData<AppPartMainData>({
-        dataId: "app-part-main-data",
+    world.setData<PathOverlayInputData>({
+        dataId: "path-overlay-input-data",
         inputParameter,
         inputWind,
     });
-}
 
-function initRemoteSystem(world: World): void {
-    world.writeData<AppPartRemoteData>({
-        dataId: "app-part-remote-data",
+    world.setData<PathOverlayStateData>({
+        dataId: "path-overlay-state-data",
         polygonA: Polygon2.createEmpty(),
         polygonB: Polygon2.createEmpty(),
         mesh: Mesh2.createEmpty(),
@@ -66,21 +70,14 @@ function initRemoteSystem(world: World): void {
     });
 }
 
-function writeStateSystem(world: World): void {
-    const { inputParameter, inputWind } = world.readData<AppPartMainData>("app-part-main-data");
+function pathOverlayUpdateSystem(world: World): void {
+    const { inputParameter, inputWind } = world.getData<PathOverlayInputData>("path-overlay-input-data");
+    const parameter = inputParameter.getInt();
+    const wind = inputWind.getValue();
 
-    const stateData: AppPartStateData = {
-        dataId: "app-part-state-data",
-        parameter: inputParameter.getInt(),
-        wind: inputWind.getValue(),
-    };
-
-    world.writeData(stateData);
-}
-
-function updateSystem(world: World): void {
-    const { parameter, wind } = world.readData<AppPartStateData>("app-part-state-data");
-    const { seed, generator } = world.readData<AppStateData>("app-state-data");
+    const { generatorTextBox, seedTextBox } = world.getData<AppMainInputData>("app-main-input-data");
+    const seed = seedTextBox.getInt();
+    const generator = generatorTextBox.getInt();
 
     const ctx = world.getPlugin<AppContextPlugin>("app-context-plugin");
 
@@ -117,8 +114,8 @@ function updateSystem(world: World): void {
 
     const tagEntries = createTagEntries(mesh);
 
-    world.writeData<AppPartRemoteData>({
-        dataId: "app-part-remote-data",
+    world.setData<PathOverlayStateData>({
+        dataId: "path-overlay-state-data",
         polygonA,
         polygonB,
         mesh,
@@ -126,8 +123,8 @@ function updateSystem(world: World): void {
     });
 }
 
-function renderSystem(world: World): void {
-    const { mesh, tagEntries } = world.readData<AppPartRemoteData>("app-part-remote-data");
+function pathOverlayRenderSystem(world: World): void {
+    const { mesh, tagEntries } = world.getData<PathOverlayStateData>("path-overlay-state-data");
 
     const ctx = world.getPlugin<AppContextPlugin>("app-context-plugin");
 
@@ -187,18 +184,42 @@ function createTagEntries(mesh: Mesh2): PathOverlayTagEntry[] {
     return entries;
 }
 
-export class PathOverlayAppPartModule implements WorldModule {
-    public readonly moduleId = "path-overlay-app-part-module";
+export function pathOverlayAppPartModule(context: WorldContext): void {
+    context.addModule({
+        id: APP_MODULE_ID,
+        fn: appModule,
+    });
 
-    public setup(world: World): void {
-        world.addSystems<DefaultSystemStage>({ stage: "start", fns: [initMainSystem, writeStateSystem] });
-        world.addSystems<DefaultSystemStage>({ stage: "update", fns: [writeStateSystem] });
+    context.addData<PathOverlayInputData>("path-overlay-input-data");
+    context.addData<PathOverlayStateData>("path-overlay-state-data");
 
-        world.addDependency<DefaultSystemStage>({ stage: "start", seq: [initMainSystem, writeStateSystem] });
+    context.addSystem({
+        id: APP_PART_START_SYSTEM_ID,
+        fn: pathOverlayStartSystem,
+        mode: "sync",
+        scheduleId: START_SCHEDULE_ID,
+    });
 
-        world.addSystems<DefaultSystemStage>({ stage: "start", fns: [initRemoteSystem] });
-        world.addSystems<DefaultSystemStage>({ stage: "update", fns: [updateSystem, renderSystem] });
+    context.addSystem({
+        id: APP_PART_UPDATE_SYSTEM_ID,
+        fn: pathOverlayUpdateSystem,
+        mode: "sync",
+        scheduleId: UPDATE_SCHEDULE_ID,
+    });
+    context.addSystem({
+        id: APP_PART_RENDER_SYSTEM_ID,
+        fn: pathOverlayRenderSystem,
+        mode: "sync",
+        scheduleId: UPDATE_SCHEDULE_ID,
+    });
 
-        world.addDependency<DefaultSystemStage>({ stage: "update", seq: [updateSystem, renderSystem] });
-    }
+    context.addSystemDepedency({
+        seq: [APP_START_SYSTEM_ID, APP_PART_START_SYSTEM_ID, APP_INPUT_START_SYSTEM_ID],
+        scheduleId: START_SCHEDULE_ID,
+    });
+
+    context.addSystemDepedency({
+        seq: [APP_UPDATE_SYSTEM_ID, APP_PART_UPDATE_SYSTEM_ID, APP_PART_RENDER_SYSTEM_ID],
+        scheduleId: UPDATE_SCHEDULE_ID,
+    });
 }

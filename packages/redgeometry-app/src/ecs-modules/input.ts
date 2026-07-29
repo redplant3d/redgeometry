@@ -1,7 +1,8 @@
 import { assertUnreachable } from "redgeometry/src/utility/debug";
 import type { Enum } from "redgeometry/src/utility/types";
-import type { DefaultSystemStage, WorldModule, WorldPlugin } from "../ecs/types.ts";
-import type { World } from "../ecs/world.ts";
+import type { WorldPlugin } from "../ecs/plugin.ts";
+import type { World, WorldContext } from "../ecs/world.ts";
+import { START_SCHEDULE_ID, UPDATE_SCHEDULE_ID } from "./app.ts";
 
 export type InputInitData = {
     dataId: "input-init-data";
@@ -66,6 +67,9 @@ type CodeState = {
     code: string;
     state: ButtonState;
 };
+
+export const INPUT_START_SYSTEM_ID = "input-start-system";
+export const INPUT_UPDATE_SYSTEM_ID = "input-update-system";
 
 export const KeyboardButtons = {
     DIGIT_1: 0,
@@ -173,8 +177,8 @@ const KEYBOARD_BUTTONS_LOOKUP: Record<string, KeyboardButtons> = {
     Space: KeyboardButtons.SPACE,
 };
 
-export function startInputSystem(world: World): void {
-    const { keyboardEventHandler, mouseEventHandler } = world.readData<InputInitData>("input-init-data");
+export function inputStartSystem(world: World): void {
+    const { keyboardEventHandler, mouseEventHandler } = world.getData<InputInitData>("input-init-data");
 
     // Gather event data to avoid new input events triggering in the middle of schedules
     const keyboardButtonEvents: InputKeyboardButtonEvent[] = [];
@@ -261,7 +265,7 @@ export function startInputSystem(world: World): void {
         mouseEventHandler.addEventListener("wheel", mouseWheelFn);
     }
 
-    world.writeData<InputCaptureData>({
+    world.setData<InputCaptureData>({
         dataId: "input-capture-data",
         keyboardButtonEvents,
         mouseButtonEvents,
@@ -278,14 +282,14 @@ export function startInputSystem(world: World): void {
     world.setPlugin<MousePlugin>(mousePlugin);
 }
 
-export function updateInputSystem(world: World): void {
-    const captureData = world.readData<InputCaptureData>("input-capture-data");
+export function inputUpdateSystem(world: World): void {
+    const captureData = world.getData<InputCaptureData>("input-capture-data");
 
     // Write events
-    world.writeEvents(captureData.keyboardButtonEvents);
-    world.writeEvents(captureData.mouseButtonEvents);
-    world.writeEvents(captureData.mouseMotionEvents);
-    world.writeEvents(captureData.mouseWheelEvents);
+    world.addEvents(captureData.keyboardButtonEvents);
+    world.addEvents(captureData.mouseButtonEvents);
+    world.addEvents(captureData.mouseMotionEvents);
+    world.addEvents(captureData.mouseWheelEvents);
 
     // Reset event capture data
     captureData.keyboardButtonEvents.length = 0;
@@ -295,15 +299,15 @@ export function updateInputSystem(world: World): void {
 
     // Update keyboard plugin
     const keyboardPlugin = world.getPlugin<KeyboardPlugin>("keyboard-plugin");
-    const keyboardButtonEvents = world.readEvents<InputKeyboardButtonEvent>("input-keyboard-button-event").toArray();
+    const keyboardButtonEvents = world.getEvents<InputKeyboardButtonEvent>("input-keyboard-button-event").toArray();
     keyboardPlugin.clear();
     keyboardPlugin.applyEvents(keyboardButtonEvents);
 
     // Update mouse plugin
     const mousePlugin = world.getPlugin<MousePlugin>("mouse-plugin");
-    const mouseButtonEvents = world.readEvents<InputMouseButtonEvent>("input-mouse-button-event").toArray();
-    const mouseMotionEvents = world.readEvents<InputMouseMotionEvent>("input-mouse-motion-event").toArray();
-    const mouseWheelEvents = world.readEvents<InputMouseWheelEvent>("input-mouse-wheel-event").toArray();
+    const mouseButtonEvents = world.getEvents<InputMouseButtonEvent>("input-mouse-button-event").toArray();
+    const mouseMotionEvents = world.getEvents<InputMouseMotionEvent>("input-mouse-motion-event").toArray();
+    const mouseWheelEvents = world.getEvents<InputMouseWheelEvent>("input-mouse-wheel-event").toArray();
     mousePlugin.clear();
     mousePlugin.applyEvents(mouseButtonEvents, mouseMotionEvents, mouseWheelEvents);
 }
@@ -498,11 +502,20 @@ export class MousePlugin implements WorldPlugin {
     }
 }
 
-export class InputModule implements WorldModule {
-    public readonly moduleId = "input-module";
+export const INPUT_MODULE_ID = "input-module";
 
-    public setup(world: World): void {
-        world.addSystem<DefaultSystemStage>({ stage: "start-post", fn: startInputSystem });
-        world.addSystem<DefaultSystemStage>({ stage: "update-pre", fn: updateInputSystem });
-    }
+export function inputModule(context: WorldContext): void {
+    context.addSystem({
+        id: INPUT_START_SYSTEM_ID,
+        fn: inputStartSystem,
+        mode: "sync",
+        scheduleId: START_SCHEDULE_ID,
+    });
+
+    context.addSystem({
+        id: INPUT_UPDATE_SYSTEM_ID,
+        fn: inputUpdateSystem,
+        mode: "sync",
+        scheduleId: UPDATE_SCHEDULE_ID,
+    });
 }

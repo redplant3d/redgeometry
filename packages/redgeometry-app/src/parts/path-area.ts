@@ -4,66 +4,65 @@ import { MinMaxBox2, type ReadonlyMinMaxBox2 } from "redgeometry/src/primitives/
 import { Vector2 } from "redgeometry/src/primitives/vector";
 import { RandomXSR128 } from "redgeometry/src/utility/random";
 import type { AppContextPlugin } from "../ecs-modules/app-context.ts";
-import { TextBoxInputElement, type AppInputData } from "../ecs-modules/app-input.ts";
-import { type AppStateData } from "../ecs-modules/app.ts";
+import { APP_INPUT_START_SYSTEM_ID } from "../ecs-modules/app-input.ts";
+import {
+    APP_MODULE_ID,
+    APP_START_SYSTEM_ID,
+    APP_UPDATE_SYSTEM_ID,
+    appModule,
+    START_SCHEDULE_ID,
+    UPDATE_SCHEDULE_ID,
+    type AppInputData,
+    type AppMainInputData,
+} from "../ecs-modules/app.ts";
 import type { MousePlugin } from "../ecs-modules/input.ts";
-import type { DefaultSystemStage, WorldModule } from "../ecs/types.ts";
-import { type World } from "../ecs/world.ts";
+import { WorldContext, type World } from "../ecs/world.ts";
 import { createRandomPath } from "../utility/helper.ts";
+import { TextBoxInputElement } from "../utility/html-element.ts";
 
-type AppPartMainData = {
-    dataId: "app-part-main-data";
+type PathAreaInputData = {
+    dataId: "path-area-input-data";
     inputCount: TextBoxInputElement;
 };
 
-type AppPartRemoteData = {
-    dataId: "app-part-remote-data";
+type PathAreaStateData = {
+    dataId: "path-area-state-data";
     bounds: ReadonlyMinMaxBox2;
     input: Path2;
     isInside: boolean;
 };
 
-type AppPartStateData = {
-    dataId: "app-part-state-data";
-    count: number;
-};
+const APP_PART_START_SYSTEM_ID = "path-area-start-system";
+const APP_PART_UPDATE_SYSTEM_ID = "path-area-update-system";
+const APP_PART_RENDER_SYSTEM_ID = "path-area-render-system";
 
-function initMainSystem(world: World): void {
-    const { inputElements } = world.readData<AppInputData>("app-input-data");
+function pathAreaStartSystem(world: World): void {
+    const { inputElements } = world.getData<AppInputData>("app-input-data");
 
     const inputCount = new TextBoxInputElement("count", "100");
     inputCount.setStyle("width: 80px");
     inputElements.push(inputCount);
 
-    world.writeData<AppPartMainData>({
-        dataId: "app-part-main-data",
+    world.setData<PathAreaInputData>({
+        dataId: "path-area-input-data",
         inputCount,
     });
-}
 
-function initRemoteSystem(world: World): void {
-    world.writeData<AppPartRemoteData>({
-        dataId: "app-part-remote-data",
+    world.setData<PathAreaStateData>({
+        dataId: "path-area-state-data",
         bounds: MinMaxBox2.createEmpty(),
         input: Path2.createEmpty(),
         isInside: false,
     });
 }
 
-function writeStateSystem(world: World): void {
-    const { inputCount: countTextBox } = world.readData<AppPartMainData>("app-part-main-data");
+function pathAreaUpdateSystem(world: World): void {
+    const { inputCount } = world.getData<PathAreaInputData>("path-area-input-data");
+    const count = inputCount.getInt();
 
-    const stateData: AppPartStateData = {
-        dataId: "app-part-state-data",
-        count: countTextBox.getInt(),
-    };
-
-    world.writeData(stateData);
-}
-
-function updateSystem(world: World): void {
-    const { count } = world.readData<AppPartStateData>("app-part-state-data");
-    const { seed, generator } = world.readData<AppStateData>("app-state-data");
+    const { generatorTextBox, seedTextBox } = world.getData<AppMainInputData>("app-main-input-data");
+    const seed = seedTextBox.getInt();
+    const generator = generatorTextBox.getInt();
 
     const ctx = world.getPlugin<AppContextPlugin>("app-context-plugin");
     const mouse = world.getPlugin<MousePlugin>("mouse-plugin");
@@ -76,8 +75,8 @@ function updateSystem(world: World): void {
 
     const p = Vector2.fromObject(mouse.getCursorPosition());
 
-    world.writeData<AppPartRemoteData>({
-        dataId: "app-part-remote-data",
+    world.setData<PathAreaStateData>({
+        dataId: "path-area-state-data",
         input: path,
         bounds: path.bounds(),
         isInside: path.hasPointInside(p, WindingOperator.EVEN_ODD),
@@ -86,8 +85,8 @@ function updateSystem(world: World): void {
     // log.info("Path area = {}", path.signedArea());
 }
 
-function renderSystem(world: World): void {
-    const { bounds, input, isInside } = world.readData<AppPartRemoteData>("app-part-remote-data");
+function pathAreaRenderSystem(world: World): void {
+    const { bounds, input, isInside } = world.getData<PathAreaStateData>("path-area-state-data");
 
     const ctx = world.getPlugin<AppContextPlugin>("app-context-plugin");
 
@@ -98,18 +97,42 @@ function renderSystem(world: World): void {
     ctx.fillPoints(input.getPoints(), "#000000", 5);
 }
 
-export class PathAreaAppPartModule implements WorldModule {
-    public readonly moduleId = "path-area-app-part-module";
+export function pathAreaAppPartModule(context: WorldContext): void {
+    context.addModule({
+        id: APP_MODULE_ID,
+        fn: appModule,
+    });
 
-    public setup(world: World): void {
-        world.addSystems<DefaultSystemStage>({ stage: "start", fns: [initMainSystem, writeStateSystem] });
-        world.addSystems<DefaultSystemStage>({ stage: "update", fns: [writeStateSystem] });
+    context.addData<PathAreaInputData>("path-area-input-data");
+    context.addData<PathAreaStateData>("path-area-state-data");
 
-        world.addDependency<DefaultSystemStage>({ stage: "start", seq: [initMainSystem, writeStateSystem] });
+    context.addSystem({
+        id: APP_PART_START_SYSTEM_ID,
+        fn: pathAreaStartSystem,
+        mode: "sync",
+        scheduleId: START_SCHEDULE_ID,
+    });
 
-        world.addSystems<DefaultSystemStage>({ stage: "start", fns: [initRemoteSystem] });
-        world.addSystems<DefaultSystemStage>({ stage: "update", fns: [updateSystem, renderSystem] });
+    context.addSystem({
+        id: APP_PART_UPDATE_SYSTEM_ID,
+        fn: pathAreaUpdateSystem,
+        mode: "sync",
+        scheduleId: UPDATE_SCHEDULE_ID,
+    });
+    context.addSystem({
+        id: APP_PART_RENDER_SYSTEM_ID,
+        fn: pathAreaRenderSystem,
+        mode: "sync",
+        scheduleId: UPDATE_SCHEDULE_ID,
+    });
 
-        world.addDependency<DefaultSystemStage>({ stage: "update", seq: [updateSystem, renderSystem] });
-    }
+    context.addSystemDepedency({
+        seq: [APP_START_SYSTEM_ID, APP_PART_START_SYSTEM_ID, APP_INPUT_START_SYSTEM_ID],
+        scheduleId: START_SCHEDULE_ID,
+    });
+
+    context.addSystemDepedency({
+        seq: [APP_UPDATE_SYSTEM_ID, APP_PART_UPDATE_SYSTEM_ID, APP_PART_RENDER_SYSTEM_ID],
+        scheduleId: UPDATE_SCHEDULE_ID,
+    });
 }

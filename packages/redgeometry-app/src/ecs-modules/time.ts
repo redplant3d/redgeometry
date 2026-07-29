@@ -1,5 +1,5 @@
-import type { DefaultSystemStage, WorldModule } from "../ecs/types.ts";
-import type { World } from "../ecs/world.ts";
+import type { World, WorldContext } from "../ecs/world.ts";
+import { START_SCHEDULE_ID, UPDATE_SCHEDULE_ID } from "./app.ts";
 
 export type AnimationFrameEvent = {
     eventId: "animation-frame-event";
@@ -13,8 +13,11 @@ export type TimeData = {
     time: number;
 };
 
-export function startTimeSystem(world: World): void {
-    world.writeData<TimeData>({
+export const TIME_START_SYSTEM = "time-start-system";
+export const TIME_UPDATE_SYSTEM = "time-update-system";
+
+function timeStartSystem(world: World): void {
+    world.setData<TimeData>({
         dataId: "time-data",
         delta: 0,
         frame: 0,
@@ -22,10 +25,10 @@ export function startTimeSystem(world: World): void {
     });
 }
 
-export function timeSystem(world: World): void {
-    const animationFrameEvents = world.readEvents<AnimationFrameEvent>("animation-frame-event").toArray();
+function timeappPartUpdateSystem(world: World): void {
+    const animationFrameEvents = world.getEvents<AnimationFrameEvent>("animation-frame-event").toArray();
 
-    let { delta, frame, time } = world.readData<TimeData>("time-data");
+    let { delta, frame, time } = world.getData<TimeData>("time-data");
 
     for (const ev of animationFrameEvents) {
         delta = ev.time - time;
@@ -33,14 +36,27 @@ export function timeSystem(world: World): void {
         time = ev.time;
     }
 
-    world.writeData<TimeData>({ dataId: "time-data", delta, frame, time });
+    world.setData<TimeData>({ dataId: "time-data", delta, frame, time });
 }
 
-export class TimeModule implements WorldModule {
-    public readonly moduleId = "time-module";
+export const TIME_MODULE_ID = "time-module";
 
-    public setup(world: World): void {
-        world.addSystem<DefaultSystemStage>({ stage: "start-post", fn: startTimeSystem });
-        world.addSystem<DefaultSystemStage>({ stage: "update-pre", fn: timeSystem });
-    }
+export function timeModule(context: WorldContext): void {
+    context.addData<TimeData>("time-data");
+
+    context.addEvent<AnimationFrameEvent>("animation-frame-event");
+
+    context.addSystem({
+        id: TIME_START_SYSTEM,
+        fn: timeStartSystem,
+        mode: "sync",
+        scheduleId: START_SCHEDULE_ID,
+    });
+
+    context.addSystem({
+        id: TIME_UPDATE_SYSTEM,
+        fn: timeappPartUpdateSystem,
+        mode: "sync",
+        scheduleId: UPDATE_SCHEDULE_ID,
+    });
 }

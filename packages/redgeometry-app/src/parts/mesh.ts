@@ -7,63 +7,61 @@ import type { ReadonlyVector2 } from "redgeometry/src/primitives/vector";
 import { assert } from "redgeometry/src/utility/debug";
 import { RandomXSR128 } from "redgeometry/src/utility/random";
 import type { AppContextPlugin } from "../ecs-modules/app-context.ts";
-import { RangeInputElement, type AppInputData } from "../ecs-modules/app-input.ts";
-import { type AppStateData } from "../ecs-modules/app.ts";
-import type { DefaultSystemStage, WorldModule } from "../ecs/types.ts";
-import { type World } from "../ecs/world.ts";
+import { APP_INPUT_START_SYSTEM_ID } from "../ecs-modules/app-input.ts";
+import {
+    APP_MODULE_ID,
+    APP_START_SYSTEM_ID,
+    APP_UPDATE_SYSTEM_ID,
+    appModule,
+    START_SCHEDULE_ID,
+    UPDATE_SCHEDULE_ID,
+    type AppInputData,
+    type AppMainInputData,
+} from "../ecs-modules/app.ts";
+import { WorldContext, type World } from "../ecs/world.ts";
 import { createRandomPoint } from "../utility/helper.ts";
+import { RangeInputElement } from "../utility/html-element.ts";
 
-type AppPartMainData = {
-    dataId: "app-part-main-data";
+type MeshInputData = {
+    dataId: "mesh-input-data";
     inputCount: RangeInputElement;
 };
 
-type AppPartRemoteData = {
-    dataId: "app-part-remote-data";
+type MeshStateData = {
+    dataId: "mesh-state-data";
     mesh: Mesh2;
     points: ReadonlyVector2[];
 };
 
-type AppPartStateData = {
-    dataId: "app-part-state-data";
-    count: number;
-};
+const APP_PART_START_SYSTEM_ID = "mesh-start-system";
+const APP_PART_UPDATE_SYSTEM_ID = "mesh-update-system";
+const APP_PART_RENDER_SYSTEM_ID = "mesh-render-system";
 
-function initMainSystem(world: World): void {
-    const { inputElements } = world.readData<AppInputData>("app-input-data");
+function meshStartSystem(world: World): void {
+    const { inputElements } = world.getData<AppInputData>("app-input-data");
 
     const inputCount = new RangeInputElement("count", "0", "50", "1");
     inputCount.setStyle("width: 200px");
     inputElements.push(inputCount);
 
-    world.writeData<AppPartMainData>({
-        dataId: "app-part-main-data",
+    world.setData<MeshInputData>({
+        dataId: "mesh-input-data",
         inputCount,
     });
-}
 
-function initRemoteSystem(world: World): void {
-    world.writeData<AppPartRemoteData>({
-        dataId: "app-part-remote-data",
+    world.setData<MeshStateData>({
+        dataId: "mesh-state-data",
         mesh: Mesh2.createEmpty(),
         points: [],
     });
 }
 
-function writeStateSystem(world: World): void {
-    const { inputCount } = world.readData<AppPartMainData>("app-part-main-data");
+function meshUpdateSystem(world: World): void {
+    const { inputCount } = world.getData<MeshInputData>("mesh-input-data");
+    const count = inputCount.getInt();
 
-    const stateData: AppPartStateData = {
-        dataId: "app-part-state-data",
-        count: inputCount.getInt(),
-    };
-
-    world.writeData(stateData);
-}
-
-function updateSystem(world: World): void {
-    const { count } = world.readData<AppPartStateData>("app-part-state-data");
-    const { seed } = world.readData<AppStateData>("app-state-data");
+    const { seedTextBox } = world.getData<AppMainInputData>("app-main-input-data");
+    const seed = seedTextBox.getInt();
 
     const ctx = world.getPlugin<AppContextPlugin>("app-context-plugin");
 
@@ -103,16 +101,17 @@ function updateSystem(world: World): void {
     const success = mesh.validate();
     assert(success, "Mesh validation failed");
 
-    world.writeData<AppPartRemoteData>({
-        dataId: "app-part-remote-data",
+    world.setData<MeshStateData>({
+        dataId: "mesh-state-data",
         mesh,
         points,
     });
 }
 
-function renderSystem(world: World): void {
-    const { mesh, points } = world.readData<AppPartRemoteData>("app-part-remote-data");
-    const { seed } = world.readData<AppStateData>("app-state-data");
+function meshRenderSystem(world: World): void {
+    const { mesh, points } = world.getData<MeshStateData>("mesh-state-data");
+    const { seedTextBox } = world.getData<AppMainInputData>("app-main-input-data");
+    const seed = seedTextBox.getInt();
 
     const ctx = world.getPlugin<AppContextPlugin>("app-context-plugin");
 
@@ -124,18 +123,42 @@ function renderSystem(world: World): void {
     ctx.fillPoints(points, "#000000", 5);
 }
 
-export class MeshAppPartModule implements WorldModule {
-    public readonly moduleId = "mesh-app-part-module";
+export function meshAppPartModule(context: WorldContext): void {
+    context.addModule({
+        id: APP_MODULE_ID,
+        fn: appModule,
+    });
 
-    public setup(world: World): void {
-        world.addSystems<DefaultSystemStage>({ stage: "start", fns: [initMainSystem, writeStateSystem] });
-        world.addSystems<DefaultSystemStage>({ stage: "update", fns: [writeStateSystem] });
+    context.addData<MeshInputData>("mesh-input-data");
+    context.addData<MeshStateData>("mesh-state-data");
 
-        world.addDependency<DefaultSystemStage>({ stage: "start", seq: [initMainSystem, writeStateSystem] });
+    context.addSystem({
+        id: APP_PART_START_SYSTEM_ID,
+        fn: meshStartSystem,
+        mode: "sync",
+        scheduleId: START_SCHEDULE_ID,
+    });
 
-        world.addSystems<DefaultSystemStage>({ stage: "start", fns: [initRemoteSystem] });
-        world.addSystems<DefaultSystemStage>({ stage: "update", fns: [updateSystem, renderSystem] });
+    context.addSystem({
+        id: APP_PART_UPDATE_SYSTEM_ID,
+        fn: meshUpdateSystem,
+        mode: "sync",
+        scheduleId: UPDATE_SCHEDULE_ID,
+    });
+    context.addSystem({
+        id: APP_PART_RENDER_SYSTEM_ID,
+        fn: meshRenderSystem,
+        mode: "sync",
+        scheduleId: UPDATE_SCHEDULE_ID,
+    });
 
-        world.addDependency<DefaultSystemStage>({ stage: "update", seq: [updateSystem, renderSystem] });
-    }
+    context.addSystemDepedency({
+        seq: [APP_START_SYSTEM_ID, APP_PART_START_SYSTEM_ID, APP_INPUT_START_SYSTEM_ID],
+        scheduleId: START_SCHEDULE_ID,
+    });
+
+    context.addSystemDepedency({
+        seq: [APP_UPDATE_SYSTEM_ID, APP_PART_UPDATE_SYSTEM_ID, APP_PART_RENDER_SYSTEM_ID],
+        scheduleId: UPDATE_SCHEDULE_ID,
+    });
 }

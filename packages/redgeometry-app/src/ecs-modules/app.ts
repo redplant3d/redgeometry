@@ -1,16 +1,26 @@
-import type { DefaultSystemStage, WorldModule } from "../ecs/types.ts";
-import type { World } from "../ecs/world.ts";
+import type { World, WorldContext } from "../ecs/world.ts";
 import { createRandomSeed } from "../utility/helper.ts";
-import { AppContextModule } from "./app-context.ts";
 import {
-    AppInputModule,
     ButtonInputElement,
     ComboBoxInputElement,
+    createElement,
     TextBoxInputElement,
-    type AppInputData,
-} from "./app-input.ts";
-import { InputModule, type InputInitData } from "./input.ts";
-import { TimeModule } from "./time.ts";
+    type AppInputElement,
+} from "../utility/html-element.ts";
+import { APP_CONTEXT_MODULE_ID, APP_CONTEXT_START_SYSTEM_ID, appContextModule } from "./app-context.ts";
+import { APP_INPUT_MODULE_ID, appInputModule } from "./app-input.ts";
+import {
+    INPUT_MODULE_ID,
+    INPUT_START_SYSTEM_ID,
+    INPUT_UPDATE_SYSTEM_ID,
+    inputModule,
+    type InputInitData,
+} from "./input.ts";
+import { TIME_MODULE_ID, TIME_START_SYSTEM, TIME_UPDATE_SYSTEM, timeModule } from "./time.ts";
+
+export const START_SCHEDULE_ID = "start-schedule";
+export const UPDATE_SCHEDULE_ID = "update-schedule";
+export const STOP_SCHEDULE_ID = "stop-schedule";
 
 export type AppLauncherData = {
     dataId: "app-launcher-data";
@@ -35,15 +45,15 @@ export type AppMainInputData = {
     updateButton: ButtonInputElement;
 };
 
+export type AppInputData = {
+    dataId: "app-input-data";
+    inputElements: AppInputElement[];
+    paramsContainer: HTMLElement;
+};
+
 export type AppCanvasData = {
     dataId: "app-canvas-data";
     canvas: HTMLCanvasElement;
-};
-
-export type AppStateData = {
-    dataId: "app-state-data";
-    generator: number;
-    seed: number;
 };
 
 export type AppCommandEvent = {
@@ -57,7 +67,11 @@ export type WindowResizeEvent = {
     height: number;
 };
 
-export function initAppMainPreSystem(world: World): void {
+export const APP_PRE_START_SYSTEM_ID = "app-pre-start-system";
+export const APP_START_SYSTEM_ID = "app-start-system";
+export const APP_UPDATE_SYSTEM_ID = "app-update-system";
+
+function appMainPreStartSystem(world: World): void {
     const urlSearchParams = new URLSearchParams(window.location.search);
     const parent = document.body;
 
@@ -76,54 +90,54 @@ export function initAppMainPreSystem(world: World): void {
 
     const canvas = createElement("canvas", { id: "canvas2D" });
 
-    world.writeData<AppCanvasData>({
+    world.setData<AppCanvasData>({
         dataId: "app-canvas-data",
         canvas,
     });
 
     canvasContainer.appendChild(canvas);
 
-    world.writeData<AppMainData>({
+    world.setData<AppMainData>({
         dataId: "app-main-data",
         canvas,
         canvasContainer,
         urlSearchParams,
     });
 
-    world.writeData<AppInputData>({
+    world.setData<AppInputData>({
         dataId: "app-input-data",
         paramsContainer,
         inputElements: [],
     });
 
-    world.writeEvent<WindowResizeEvent>({
+    world.addEvent<WindowResizeEvent>({
         eventId: "window-resize-event",
         width: canvasContainer.clientWidth,
         height: canvasContainer.clientHeight,
     });
 
     window.addEventListener("resize", () => {
-        const { canvasContainer } = world.readData<AppMainData>("app-main-data");
+        const { canvasContainer } = world.getData<AppMainData>("app-main-data");
 
-        world.writeEvent<WindowResizeEvent>({
+        world.addEvent<WindowResizeEvent>({
             eventId: "window-resize-event",
             width: canvasContainer.clientWidth,
             height: canvasContainer.clientHeight,
         });
     });
 
-    world.writeData<InputInitData>({
+    world.setData<InputInitData>({
         dataId: "input-init-data",
         keyboardEventHandler: self,
         mouseEventHandler: canvas,
     });
 }
 
-export function addAppInputsSystem(world: World): void {
+function appMainStartSystem(world: World): void {
     const seed = createRandomSeed();
 
-    const { inputElements } = world.readData<AppInputData>("app-input-data");
-    const { appPartIds, appPartId } = world.readData<AppLauncherData>("app-launcher-data");
+    const { inputElements } = world.getData<AppInputData>("app-input-data");
+    const { appPartIds, appPartId } = world.getData<AppLauncherData>("app-launcher-data");
 
     const inputAppComboBox = new ComboBoxInputElement("app-main-data", appPartId);
     inputAppComboBox.setOptionValues(...appPartIds);
@@ -134,7 +148,7 @@ export function addAppInputsSystem(world: World): void {
 
     const randomizeButton = new ButtonInputElement("randomize", "randomize");
     randomizeButton.addEventListener("click", () => {
-        world.writeEvent<AppCommandEvent>({ eventId: "app-command-event", command: "randomize" });
+        world.addEvent<AppCommandEvent>({ eventId: "app-command-event", command: "randomize" });
     });
     inputElements.push(randomizeButton);
 
@@ -148,11 +162,11 @@ export function addAppInputsSystem(world: World): void {
 
     const updateButton = new ButtonInputElement("update", "update");
     updateButton.addEventListener("click", () => {
-        world.writeEvent<AppCommandEvent>({ eventId: "app-command-event", command: "update" });
+        world.addEvent<AppCommandEvent>({ eventId: "app-command-event", command: "update" });
     });
     inputElements.push(updateButton);
 
-    world.writeData<AppMainInputData>({
+    world.setData<AppMainInputData>({
         dataId: "app-main-input-data",
         appComboBox: inputAppComboBox,
         randomizeButton,
@@ -162,71 +176,81 @@ export function addAppInputsSystem(world: World): void {
     });
 }
 
-export function writeAppStateSystem(world: World): void {
-    const { generatorTextBox, seedTextBox } = world.readData<AppMainInputData>("app-main-input-data");
-
-    world.writeData<AppStateData>({
-        dataId: "app-state-data",
-        seed: seedTextBox.getInt(),
-        generator: generatorTextBox.getInt(),
-    });
-}
-
-export function resizeCanvasSystem(world: World): void {
-    const windowResizeEvent = world.readLatestEvent<WindowResizeEvent>("window-resize-event");
+function appUpdateSystem(world: World): void {
+    const windowResizeEvent = world.findLastEvent<WindowResizeEvent>("window-resize-event");
 
     if (windowResizeEvent !== undefined) {
-        const { canvas } = world.readData<AppCanvasData>("app-canvas-data");
+        const { canvas } = world.getData<AppCanvasData>("app-canvas-data");
 
         canvas.width = windowResizeEvent.width;
         canvas.height = windowResizeEvent.height;
     }
 }
 
-function createElement<K extends keyof HTMLElementTagNameMap>(
-    tagName: K,
-    attributes?: Record<string, string>,
-): HTMLElementTagNameMap[K] {
-    const element = document.createElement(tagName);
+export const APP_MODULE_ID = "app-module";
 
-    for (const qualifiedName in attributes) {
-        element.setAttribute(qualifiedName, attributes[qualifiedName]);
-    }
+export function appModule(context: WorldContext): void {
+    context.addModule({
+        id: TIME_MODULE_ID,
+        fn: timeModule,
+    });
+    context.addModule({
+        id: INPUT_MODULE_ID,
+        fn: inputModule,
+    });
+    context.addModule({
+        id: APP_INPUT_MODULE_ID,
+        fn: appInputModule,
+    });
+    context.addModule({
+        id: APP_CONTEXT_MODULE_ID,
+        fn: appContextModule,
+    });
 
-    return element;
-}
+    context.addData<AppLauncherData>("app-launcher-data");
+    context.addData<AppMainData>("app-main-data");
+    context.addData<AppMainInputData>("app-main-input-data");
+    context.addData<AppInputData>("app-input-data");
+    context.addData<AppCanvasData>("app-canvas-data");
 
-export class AppModule implements WorldModule {
-    public readonly moduleId = "app-module";
+    context.addSchedule(START_SCHEDULE_ID);
+    context.addSchedule(UPDATE_SCHEDULE_ID);
+    context.addSchedule(STOP_SCHEDULE_ID);
 
-    private appPartIds: string[];
-    private appPartId: string;
+    context.addSystem({
+        id: APP_PRE_START_SYSTEM_ID,
+        fn: appMainPreStartSystem,
+        mode: "sync",
+        scheduleId: START_SCHEDULE_ID,
+    });
 
-    public constructor(appPartIds: string[], appPartId: string) {
-        this.appPartIds = appPartIds;
-        this.appPartId = appPartId;
-    }
+    context.addSystem({
+        id: APP_START_SYSTEM_ID,
+        fn: appMainStartSystem,
+        mode: "sync",
+        scheduleId: START_SCHEDULE_ID,
+    });
 
-    public setup(world: World): void {
-        world.addModules([new TimeModule(), new InputModule(), new AppInputModule(), new AppContextModule()]);
+    context.addSystem({
+        id: APP_UPDATE_SYSTEM_ID,
+        fn: appUpdateSystem,
+        mode: "sync",
+        scheduleId: UPDATE_SCHEDULE_ID,
+    });
 
-        world.addSystem<DefaultSystemStage>({ stage: "start-pre", fn: initAppMainPreSystem });
-        world.addSystem<DefaultSystemStage>({ stage: "start-pre", fn: addAppInputsSystem });
-        world.addSystem<DefaultSystemStage>({ stage: "start-pre", fn: writeAppStateSystem });
-        world.addSystem<DefaultSystemStage>({ stage: "update-pre", fn: writeAppStateSystem });
+    context.addSystemDepedency({
+        scheduleId: START_SCHEDULE_ID,
+        seq: [
+            APP_PRE_START_SYSTEM_ID,
+            APP_CONTEXT_START_SYSTEM_ID,
+            INPUT_START_SYSTEM_ID,
+            TIME_START_SYSTEM,
+            APP_START_SYSTEM_ID,
+        ],
+    });
 
-        world.addDependency({
-            stage: "start-pre",
-            seq: [initAppMainPreSystem, addAppInputsSystem, writeAppStateSystem],
-        });
-
-        world.addSystem<DefaultSystemStage>({ stage: "update-pre", fn: resizeCanvasSystem });
-
-        world.writeData<AppLauncherData>({
-            dataId: "app-launcher-data",
-            appPartIds: this.appPartIds,
-            appPartId: this.appPartId,
-            requestExit: false,
-        });
-    }
+    context.addSystemDepedency({
+        scheduleId: UPDATE_SCHEDULE_ID,
+        seq: [INPUT_UPDATE_SYSTEM_ID, TIME_UPDATE_SYSTEM, APP_UPDATE_SYSTEM_ID],
+    });
 }

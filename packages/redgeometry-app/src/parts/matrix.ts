@@ -3,36 +3,37 @@ import { Matrix4, type ReadonlyMatrix4 } from "redgeometry/src/primitives/matrix
 import { Quaternion, RotationOrder } from "redgeometry/src/primitives/quaternion";
 import { Vector2, Vector3 } from "redgeometry/src/primitives/vector";
 import type { AppContextPlugin } from "../ecs-modules/app-context.ts";
+import { APP_INPUT_START_SYSTEM_ID } from "../ecs-modules/app-input.ts";
 import {
-    ComboBoxInputElement,
-    RangeInputElement,
-    TextBoxInputElement,
+    APP_MODULE_ID,
+    APP_START_SYSTEM_ID,
+    APP_UPDATE_SYSTEM_ID,
+    appModule,
+    START_SCHEDULE_ID,
+    UPDATE_SCHEDULE_ID,
     type AppInputData,
-} from "../ecs-modules/app-input.ts";
-import type { DefaultSystemStage, WorldModule } from "../ecs/types.ts";
-import { type World } from "../ecs/world.ts";
+} from "../ecs-modules/app.ts";
+import { WorldContext, type World } from "../ecs/world.ts";
+import { ComboBoxInputElement, RangeInputElement, TextBoxInputElement } from "../utility/html-element.ts";
 
-type AppPartMainData = {
-    dataId: "app-part-main-data";
+type MatrixInputData = {
+    dataId: "matrix-input-data";
     inputCount: TextBoxInputElement;
     inputProjection: ComboBoxInputElement;
     inputRotation: RangeInputElement;
 };
 
-type AppPartRemoteData = {
-    dataId: "app-part-remote-data";
+type MatrixStateData = {
+    dataId: "matrix-state-data";
     edges: Edge2[];
 };
 
-type AppPartStateData = {
-    dataId: "app-part-state-data";
-    count: number;
-    projection: string;
-    rotation: number;
-};
+const MATRIX_START_SYSTEM_ID = "matrix-start-system";
+const MATRIX_UPDATE_SYSTEM_ID = "matrix-update-system";
+const MATRIX_RENDER_SYSTEM_ID = "matrix-render-system";
 
-function initMainSystem(world: World): void {
-    const { inputElements } = world.readData<AppInputData>("app-input-data");
+function matrixStartSystem(world: World): void {
+    const { inputElements } = world.getData<AppInputData>("app-input-data");
 
     const inputCount = new TextBoxInputElement("count", "10");
     inputCount.setStyle("width: 80px");
@@ -46,36 +47,24 @@ function initMainSystem(world: World): void {
     inputProjection.setOptionValues("orthographic", "perspective");
     inputElements.push(inputProjection);
 
-    world.writeData<AppPartMainData>({
-        dataId: "app-part-main-data",
+    world.setData<MatrixInputData>({
+        dataId: "matrix-input-data",
         inputCount,
         inputRotation,
         inputProjection,
     });
-}
 
-function initRemoteSystem(world: World): void {
-    world.writeData<AppPartRemoteData>({
-        dataId: "app-part-remote-data",
+    world.setData<MatrixStateData>({
+        dataId: "matrix-state-data",
         edges: [],
     });
 }
 
-function writeStateSystem(world: World): void {
-    const { inputCount, inputRotation, inputProjection } = world.readData<AppPartMainData>("app-part-main-data");
+function matrixUpdateSystem(world: World): void {
+    const { inputProjection, inputRotation } = world.getData<MatrixInputData>("matrix-input-data");
 
-    const stateData: AppPartStateData = {
-        dataId: "app-part-state-data",
-        count: inputCount.getInt(),
-        projection: inputProjection.getValue(),
-        rotation: inputRotation.getInt(),
-    };
-
-    world.writeData(stateData);
-}
-
-function updateSystem(world: World): void {
-    const { projection, rotation } = world.readData<AppPartStateData>("app-part-state-data");
+    const projection = inputProjection.getValue();
+    const rotation = inputRotation.getFloat();
 
     const ctx = world.getPlugin<AppContextPlugin>("app-context-plugin");
 
@@ -111,14 +100,14 @@ function updateSystem(world: World): void {
     // View to screen coordinates
     matView.setMul(matProj, matView);
 
-    world.writeData<AppPartRemoteData>({
-        dataId: "app-part-remote-data",
+    world.setData<MatrixStateData>({
+        dataId: "matrix-state-data",
         edges: transformEdges(edges, matView),
     });
 }
 
-function renderSystem(world: World): void {
-    const { edges } = world.readData<AppPartRemoteData>("app-part-remote-data");
+function matrixRenderSystem(world: World): void {
+    const { edges } = world.getData<MatrixStateData>("matrix-state-data");
 
     const ctx = world.getPlugin<AppContextPlugin>("app-context-plugin");
 
@@ -170,18 +159,42 @@ function transformEdges(edges: ReadonlyEdge3[], mat: ReadonlyMatrix4): Edge2[] {
     return output;
 }
 
-export class MatrixAppPartModule implements WorldModule {
-    public readonly moduleId = "matrix-app-part-module";
+export function matrixAppPartModule(context: WorldContext): void {
+    context.addModule({
+        id: APP_MODULE_ID,
+        fn: appModule,
+    });
 
-    public setup(world: World): void {
-        world.addSystems<DefaultSystemStage>({ stage: "start", fns: [initMainSystem, writeStateSystem] });
-        world.addSystems<DefaultSystemStage>({ stage: "update", fns: [writeStateSystem] });
+    context.addData<MatrixInputData>("matrix-input-data");
+    context.addData<MatrixStateData>("matrix-state-data");
 
-        world.addDependency<DefaultSystemStage>({ stage: "start", seq: [initMainSystem, writeStateSystem] });
+    context.addSystem({
+        id: MATRIX_START_SYSTEM_ID,
+        fn: matrixStartSystem,
+        mode: "sync",
+        scheduleId: START_SCHEDULE_ID,
+    });
 
-        world.addSystems<DefaultSystemStage>({ stage: "start", fns: [initRemoteSystem] });
-        world.addSystems<DefaultSystemStage>({ stage: "update", fns: [updateSystem, renderSystem] });
+    context.addSystem({
+        id: MATRIX_UPDATE_SYSTEM_ID,
+        fn: matrixUpdateSystem,
+        mode: "sync",
+        scheduleId: UPDATE_SCHEDULE_ID,
+    });
+    context.addSystem({
+        id: MATRIX_RENDER_SYSTEM_ID,
+        fn: matrixRenderSystem,
+        mode: "sync",
+        scheduleId: UPDATE_SCHEDULE_ID,
+    });
 
-        world.addDependency<DefaultSystemStage>({ stage: "update", seq: [updateSystem, renderSystem] });
-    }
+    context.addSystemDepedency({
+        seq: [APP_START_SYSTEM_ID, MATRIX_START_SYSTEM_ID, APP_INPUT_START_SYSTEM_ID],
+        scheduleId: START_SCHEDULE_ID,
+    });
+
+    context.addSystemDepedency({
+        seq: [APP_UPDATE_SYSTEM_ID, MATRIX_UPDATE_SYSTEM_ID, MATRIX_RENDER_SYSTEM_ID],
+        scheduleId: UPDATE_SCHEDULE_ID,
+    });
 }

@@ -3,27 +3,31 @@ import { log } from "redgeometry/src/internal/log";
 import { Vector2, type ReadonlyVector2 } from "redgeometry/src/primitives/vector";
 import { RandomXSR128, type Random } from "redgeometry/src/utility/random";
 import { type AppContextPlugin } from "../ecs-modules/app-context.ts";
-import { RangeInputElement, type AppInputData } from "../ecs-modules/app-input.ts";
-import { type AppStateData } from "../ecs-modules/app.ts";
+import { APP_INPUT_START_SYSTEM_ID } from "../ecs-modules/app-input.ts";
+import {
+    APP_MODULE_ID,
+    APP_START_SYSTEM_ID,
+    APP_UPDATE_SYSTEM_ID,
+    appModule,
+    START_SCHEDULE_ID,
+    UPDATE_SCHEDULE_ID,
+    type AppInputData,
+    type AppMainInputData,
+} from "../ecs-modules/app.ts";
 import type { TimeData } from "../ecs-modules/time.ts";
-import type { DefaultSystemStage, WorldModule } from "../ecs/types.ts";
-import { ComponentFlags, type World } from "../ecs/world.ts";
+import { ComponentFlags, WorldContext, type World } from "../ecs/world.ts";
+import { RangeInputElement } from "../utility/html-element.ts";
 
-type AppPartMainData = {
-    dataId: "app-part-main-data";
+type EcsBounceInputData = {
+    dataId: "ecs-bounce-input-data";
     inputCount: RangeInputElement;
 };
 
-type AppPartRemoteData = {
-    dataId: "app-part-remote-data";
+type EcsBounceStateData = {
+    dataId: "ecs-bounce-state-data";
     count: number;
     json: string | undefined;
     random: Random;
-};
-
-type AppPartStateData = {
-    dataId: "app-part-state-data";
-    count: number;
 };
 
 type CircleComponent = {
@@ -42,51 +46,47 @@ type ObjectComponent = {
     velocity: ReadonlyVector2;
 };
 
-function initMainSystem(world: World): void {
-    const { inputElements } = world.readData<AppInputData>("app-input-data");
+const ECS_BOUNCE_START_SYSTEM_ID = "ecs-bounce-start-system";
+const ECS_BOUNCE_SPAWN_SYSTEM_ID = "ecs-bounce-spawn-system";
+const ECS_BOUNCE_MOVEMENT_SYSTEM_ID = "ecs-bounce-movement-system";
+const ECS_BOUNCE_CLEAR_RENDER_SYSTEM_ID = "ecs-bounce-clear-render-system";
+const ECS_BOUNCE_CIRCLE_RENDER_SYSTEM_ID = "ecs-bounce-circle-render-system";
+const ECS_BOUNCE_RECTANGLE_RENDER_SYSTEM_ID = "ecs-bounce-rectangle-render-system";
+const ECS_BOUNCE_NOTIFICATION_SYSTEM_ID = "ecs-bounce-notification-system";
+
+function ecsBounceStartSystem(world: World): void {
+    const { inputElements } = world.getData<AppInputData>("app-input-data");
 
     const inputCount = new RangeInputElement("count", "0", "1000", "10");
     inputCount.setStyle("width: 200px");
     inputElements.push(inputCount);
 
-    world.writeData<AppPartMainData>({
-        dataId: "app-part-main-data",
+    world.setData<EcsBounceInputData>({
+        dataId: "ecs-bounce-input-data",
         inputCount,
     });
-}
 
-function initRemoteSystem(world: World): void {
-    const { seed } = world.readData<AppStateData>("app-state-data");
+    const { seedTextBox } = world.getData<AppMainInputData>("app-main-input-data");
+    const seed = seedTextBox.getInt();
 
-    world.writeData<AppPartRemoteData>({
-        dataId: "app-part-remote-data",
+    world.setData<EcsBounceStateData>({
+        dataId: "ecs-bounce-state-data",
         count: 0,
         json: undefined,
         random: RandomXSR128.fromSeedLcg(seed),
     });
 }
 
-function writeStateSystem(world: World): void {
-    const inputData = world.readData<AppPartMainData>("app-part-main-data");
-
-    const stateData: AppPartStateData = {
-        dataId: "app-part-state-data",
-        count: inputData.inputCount.getInt(),
-    };
-
-    world.writeData(stateData);
-}
-
-function spawnSystem(world: World): void {
-    const appRemoteData = world.readData<AppPartRemoteData>("app-part-remote-data");
-    const appStateData = world.readData<AppPartStateData>("app-part-state-data");
+function ecsBounceSpawnSystem(world: World): void {
+    const appStateData = world.getData<EcsBounceStateData>("ecs-bounce-state-data");
+    const appPartInputData = world.getData<EcsBounceInputData>("ecs-bounce-input-data");
 
     const ctx = world.getPlugin<AppContextPlugin>("app-context-plugin");
 
-    const { random } = appRemoteData;
+    const { random } = appStateData;
 
-    const currCount = appRemoteData.count;
-    const nextCount = appStateData.count;
+    const currCount = appStateData.count;
+    const nextCount = appPartInputData.inputCount.getInt();
 
     if (currCount <= nextCount) {
         for (let i = currCount; i < nextCount; i++) {
@@ -126,11 +126,11 @@ function spawnSystem(world: World): void {
         }
     }
 
-    appRemoteData.count = nextCount;
+    appStateData.count = nextCount;
 }
 
-function movementSystem(world: World): void {
-    const { delta } = world.readData<TimeData>("time-data");
+function ecsBounceMovementSystem(world: World): void {
+    const { delta } = world.getData<TimeData>("time-data");
 
     const ctx = world.getPlugin<AppContextPlugin>("app-context-plugin");
 
@@ -174,13 +174,13 @@ function movementSystem(world: World): void {
     }
 }
 
-function clearRenderSystem(world: World): void {
+function ecsBounceClearRenderSystem(world: World): void {
     const ctx = world.getPlugin<AppContextPlugin>("app-context-plugin");
 
     ctx.clear();
 }
 
-function circleRenderSystem(world: World): void {
+function ecsBounceCircleRenderSystem(world: World): void {
     const ctx = world.getPlugin<AppContextPlugin>("app-context-plugin");
 
     const query = world.queryEntities<CircleComponent | ObjectComponent>(
@@ -209,7 +209,7 @@ function circleRenderSystem(world: World): void {
     ctx.fillPath(blue, "blue");
 }
 
-function rectangleRenderSystem(world: World): void {
+function ecsBounceRectangleRenderSystem(world: World): void {
     const ctx = world.getPlugin<AppContextPlugin>("app-context-plugin");
 
     const query = world.queryEntities<RectangleComponent | ObjectComponent>(
@@ -249,7 +249,7 @@ function rectangleRenderSystem(world: World): void {
     ctx.fillPath(blue, "blue");
 }
 
-function notificationSystem(world: World): void {
+function ecsBounceNotificationSystem(world: World): void {
     let createdCount = 0;
     let deletedCount = 0;
 
@@ -270,45 +270,82 @@ function notificationSystem(world: World): void {
     }
 }
 
-export class EcsBounceAppPartModule implements WorldModule {
-    public readonly moduleId = "ecs-bounce-app-part-module";
+export function ecsBounceAppPartModule(context: WorldContext): void {
+    context.addModule({
+        id: APP_MODULE_ID,
+        fn: appModule,
+    });
 
-    public setup(world: World): void {
-        world.addSystem<DefaultSystemStage>({ stage: "start", fn: initMainSystem });
-        world.addSystem<DefaultSystemStage>({ stage: "start", fn: writeStateSystem });
+    context.addData<EcsBounceInputData>("ecs-bounce-input-data");
+    context.addData<EcsBounceStateData>("ecs-bounce-state-data");
 
-        world.addSystem<DefaultSystemStage>({ stage: "update", fn: writeStateSystem });
+    context.addSystem({
+        id: ECS_BOUNCE_START_SYSTEM_ID,
+        fn: ecsBounceStartSystem,
+        mode: "sync",
+        scheduleId: START_SCHEDULE_ID,
+    });
 
-        world.addDependency<DefaultSystemStage>({
-            stage: "start",
-            seq: [initMainSystem, writeStateSystem],
-        });
+    context.addSystem({
+        id: ECS_BOUNCE_SPAWN_SYSTEM_ID,
+        fn: ecsBounceSpawnSystem,
+        mode: "sync",
+        scheduleId: UPDATE_SCHEDULE_ID,
+    });
+    context.addSystem({
+        id: ECS_BOUNCE_MOVEMENT_SYSTEM_ID,
+        fn: ecsBounceMovementSystem,
+        mode: "sync",
+        scheduleId: UPDATE_SCHEDULE_ID,
+    });
+    context.addSystem({
+        id: ECS_BOUNCE_CLEAR_RENDER_SYSTEM_ID,
+        fn: ecsBounceClearRenderSystem,
+        mode: "sync",
+        scheduleId: UPDATE_SCHEDULE_ID,
+    });
+    context.addSystem({
+        id: ECS_BOUNCE_CIRCLE_RENDER_SYSTEM_ID,
+        fn: ecsBounceCircleRenderSystem,
+        mode: "sync",
+        scheduleId: UPDATE_SCHEDULE_ID,
+    });
+    context.addSystem({
+        id: ECS_BOUNCE_RECTANGLE_RENDER_SYSTEM_ID,
+        fn: ecsBounceRectangleRenderSystem,
+        mode: "sync",
+        scheduleId: UPDATE_SCHEDULE_ID,
+    });
+    context.addSystem({
+        id: ECS_BOUNCE_NOTIFICATION_SYSTEM_ID,
+        fn: ecsBounceNotificationSystem,
+        mode: "sync",
+        scheduleId: UPDATE_SCHEDULE_ID,
+    });
 
-        world.addSystem<DefaultSystemStage>({ stage: "start", fn: initRemoteSystem });
+    context.addSystemDepedency({
+        seq: [APP_START_SYSTEM_ID, ECS_BOUNCE_START_SYSTEM_ID, APP_INPUT_START_SYSTEM_ID],
+        scheduleId: START_SCHEDULE_ID,
+    });
 
-        world.addSystems<DefaultSystemStage>({
-            stage: "update",
-            fns: [
-                spawnSystem,
-                movementSystem,
-                clearRenderSystem,
-                circleRenderSystem,
-                rectangleRenderSystem,
-                notificationSystem,
-            ],
-        });
-
-        world.addDependency<DefaultSystemStage>({
-            stage: "update",
-            seq: [spawnSystem, movementSystem, clearRenderSystem],
-        });
-        world.addDependency<DefaultSystemStage>({
-            stage: "update",
-            seq: [clearRenderSystem, rectangleRenderSystem, circleRenderSystem],
-        });
-        world.addDependency<DefaultSystemStage>({
-            stage: "update",
-            seq: [spawnSystem, notificationSystem],
-        });
-    }
+    context.addSystemDepedency({
+        seq: [APP_UPDATE_SYSTEM_ID, ECS_BOUNCE_SPAWN_SYSTEM_ID],
+        scheduleId: UPDATE_SCHEDULE_ID,
+    });
+    context.addSystemDepedency({
+        seq: [ECS_BOUNCE_SPAWN_SYSTEM_ID, ECS_BOUNCE_MOVEMENT_SYSTEM_ID, ECS_BOUNCE_CLEAR_RENDER_SYSTEM_ID],
+        scheduleId: UPDATE_SCHEDULE_ID,
+    });
+    context.addSystemDepedency({
+        seq: [
+            ECS_BOUNCE_CLEAR_RENDER_SYSTEM_ID,
+            ECS_BOUNCE_RECTANGLE_RENDER_SYSTEM_ID,
+            ECS_BOUNCE_CIRCLE_RENDER_SYSTEM_ID,
+        ],
+        scheduleId: UPDATE_SCHEDULE_ID,
+    });
+    context.addSystemDepedency({
+        seq: [ECS_BOUNCE_SPAWN_SYSTEM_ID, ECS_BOUNCE_NOTIFICATION_SYSTEM_ID],
+        scheduleId: UPDATE_SCHEDULE_ID,
+    });
 }

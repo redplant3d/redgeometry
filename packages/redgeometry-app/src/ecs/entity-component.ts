@@ -1,8 +1,14 @@
 import { log } from "redgeometry/src/internal/log";
 import { assert, assertUnreachable, throwError } from "redgeometry/src/utility/debug";
-import type { Enum } from "redgeometry/src/utility/types";
-import type { Component, ComponentId, ComponentIdOf, EntityComponentQueryValue, EntityId } from "./types.ts";
+import type { Enum, Nominal } from "redgeometry/src/utility/types";
 import { ComponentFlags, EntityFlags } from "./world.ts";
+
+export type EntityId = Nominal<number, "EntityId">;
+
+export type ComponentId = string;
+export type Component = { readonly componentId: ComponentId };
+export type ComponentIdOf<T extends Component> = T["componentId"];
+export type ComponentIdsOf<T extends Component[]> = { [P in keyof T]: ComponentIdOf<T[P]> };
 
 export type EntityRef = number;
 export type EntityVersion = number;
@@ -34,6 +40,22 @@ export type ComponentTransition = {
     componentId: ComponentId;
     setState: EntityComponentSetState;
 };
+
+export interface EntityComponentQueryValue<U extends Component> {
+    /**
+     * Equivalent to `hasComponentFlagsAny(componentId,
+     * ComponentFlags.Default | ComponentFlags.Added | ComponentFlags.Updated)`
+     */
+    hasComponent<T extends U>(componentId: ComponentIdOf<T>): boolean;
+    hasComponentFlags<T extends U>(componentId: ComponentIdOf<T>, flagMask: ComponentFlags): boolean;
+    hasComponentFlagsAny<T extends U>(componentId: ComponentIdOf<T>, flagMask: ComponentFlags): boolean;
+    hasEntityFlags(flagMask: EntityFlags): boolean;
+    hasEntityFlagsAny(flagMask: EntityFlags): boolean;
+    /**
+     * Equivalent to `hasEntityFlagsAny(EntityFlags.Default | EntityFlags.Created)`
+     */
+    isEntityAlive(): boolean;
+}
 
 export const EntityTransitionType = {
     RESET: 0,

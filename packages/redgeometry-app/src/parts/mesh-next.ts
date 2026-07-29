@@ -26,18 +26,27 @@ import {
 import { Edge2 } from "redgeometry/src/primitives/edge";
 import { Vector2, type ReadonlyVector2 } from "redgeometry/src/primitives/vector";
 import type { AppContextPlugin } from "../ecs-modules/app-context.ts";
-import { ButtonInputElement, type AppInputData } from "../ecs-modules/app-input.ts";
+import { APP_INPUT_START_SYSTEM_ID } from "../ecs-modules/app-input.ts";
+import {
+    APP_MODULE_ID,
+    APP_START_SYSTEM_ID,
+    APP_UPDATE_SYSTEM_ID,
+    appModule,
+    START_SCHEDULE_ID,
+    UPDATE_SCHEDULE_ID,
+    type AppInputData,
+} from "../ecs-modules/app.ts";
 import { KeyboardButtons, KeyboardPlugin, MouseButtons, MousePlugin } from "../ecs-modules/input.ts";
-import type { DefaultSystemStage, WorldModule } from "../ecs/types.ts";
-import { type World } from "../ecs/world.ts";
+import { WorldContext, type World } from "../ecs/world.ts";
+import { ButtonInputElement } from "../utility/html-element.ts";
 
-type AppPartMainData = {
-    dataId: "app-part-main-data";
+type MeshNextInputData = {
+    dataId: "mesh-next-input-data";
     inputPrint: ButtonInputElement;
 };
 
-type AppPartRemoteData = {
-    dataId: "app-part-remote-data";
+type MeshNextStateData = {
+    dataId: "mesh-next-state-data";
     mesh: Mesh2<unknown, unknown, unknown, unknown>;
     meshShell: MeshShellIdx | undefined;
     needsValidate: boolean;
@@ -45,47 +54,44 @@ type AppPartRemoteData = {
     edgeFrom: MeshEdgeIdx | undefined;
 };
 
-type AppPartStateData = {
-    dataId: "app-part-state-data";
-};
-
-type AppPartCommandEvent = {
-    eventId: "app-part-command-event";
+type MeshNextCommandEvent = {
+    eventId: "mesh-next-command-event";
     command: "print" | "stringify" | "clear";
 };
 
-function initMainSystem(world: World): void {
-    const { inputElements } = world.readData<AppInputData>("app-input-data");
+const APP_PART_START_SYSTEM_ID = "mesh-next-start-system";
+const APP_PART_UPDATE_SYSTEM_ID = "mesh-next-update-system";
+const COMMAND_EVENT_SYSTEM_ID = "command-event-system";
+const APP_PART_RENDER_SYSTEM_ID = "mesh-next-render-system";
+
+function meshNextStartSystem(world: World): void {
+    const { inputElements } = world.getData<AppInputData>("app-input-data");
 
     const inputPrint = new ButtonInputElement("print", "print");
     inputPrint.addEventListener("click", () => {
-        world.writeEvent<AppPartCommandEvent>({ eventId: "app-part-command-event", command: "print" });
+        world.addEvent<MeshNextCommandEvent>({ eventId: "mesh-next-command-event", command: "print" });
     });
     inputElements.push(inputPrint);
 
     const inputStringify = new ButtonInputElement("stringify", "stringify");
     inputStringify.addEventListener("click", () => {
-        world.writeEvent<AppPartCommandEvent>({ eventId: "app-part-command-event", command: "stringify" });
+        world.addEvent<MeshNextCommandEvent>({ eventId: "mesh-next-command-event", command: "stringify" });
     });
     inputElements.push(inputStringify);
 
     const inputClear = new ButtonInputElement("clear", "clear");
     inputClear.addEventListener("click", () => {
-        world.writeEvent<AppPartCommandEvent>({ eventId: "app-part-command-event", command: "clear" });
+        world.addEvent<MeshNextCommandEvent>({ eventId: "mesh-next-command-event", command: "clear" });
     });
     inputElements.push(inputClear);
 
-    world.writeData<AppPartMainData>({
-        dataId: "app-part-main-data",
+    world.setData<MeshNextInputData>({
+        dataId: "mesh-next-input-data",
         inputPrint,
     });
 
-    console.clear();
-}
-
-function initRemoteSystem(world: World): void {
-    world.writeData<AppPartRemoteData>({
-        dataId: "app-part-remote-data",
+    world.setData<MeshNextStateData>({
+        dataId: "mesh-next-state-data",
         mesh: Mesh.createEmpty(),
         meshShell: undefined,
         needsValidate: false,
@@ -94,24 +100,16 @@ function initRemoteSystem(world: World): void {
     });
 }
 
-function writeStateSystem(world: World): void {
-    const stateData: AppPartStateData = {
-        dataId: "app-part-state-data",
-    };
-
-    world.writeData(stateData);
-}
-
-function updateSystem(world: World): void {
+function meshNextUpdateSystem(world: World): void {
     const keyboardPlugin = world.getPlugin<KeyboardPlugin>("keyboard-plugin");
     const mousePlugin = world.getPlugin<MousePlugin>("mouse-plugin");
-    const remoteData = world.readData<AppPartRemoteData>("app-part-remote-data");
+    const StateData = world.getData<MeshNextStateData>("mesh-next-state-data");
 
     const pos = Vector2.fromObject(mousePlugin.getCursorPosition());
-    const mesh = remoteData.mesh;
-    const vtxFrom = remoteData.vtxFrom;
-    const edgeFrom = remoteData.edgeFrom;
-    const shell = remoteData.meshShell;
+    const mesh = StateData.mesh;
+    const vtxFrom = StateData.vtxFrom;
+    const edgeFrom = StateData.edgeFrom;
+    const shell = StateData.meshShell;
 
     if (keyboardPlugin.isPressed(KeyboardButtons.KEY_A)) {
         if (shell !== undefined) {
@@ -120,9 +118,9 @@ function updateSystem(world: World): void {
             mesh2AddVertex(mesh, pos, face !== undefined ? face : firstFace);
         } else {
             const vfs = mesh2AddVertexFaceShell(mesh, pos);
-            remoteData.meshShell = vfs.shell;
+            StateData.meshShell = vfs.shell;
         }
-        remoteData.needsValidate = true;
+        StateData.needsValidate = true;
     }
 
     if (keyboardPlugin.isPressed(KeyboardButtons.KEY_Q)) {
@@ -132,12 +130,12 @@ function updateSystem(world: World): void {
 
             if (!mesh.shells.isValid(shell)) {
                 mesh.truncate();
-                remoteData.meshShell = undefined;
+                StateData.meshShell = undefined;
                 log.info("Truncating mesh");
             }
 
-            remoteData.vtxFrom = undefined;
-            remoteData.needsValidate = true;
+            StateData.vtxFrom = undefined;
+            StateData.needsValidate = true;
         }
     }
 
@@ -145,7 +143,7 @@ function updateSystem(world: World): void {
         const edge = mesh2FindClosestEdgeAt(mesh, pos);
         if (edge !== undefined && isEdgeClose(mesh, edge, pos, 10)) {
             mesh2SplitEdgeAt(mesh, edge, pos);
-            remoteData.needsValidate = true;
+            StateData.needsValidate = true;
         }
     }
 
@@ -156,7 +154,7 @@ function updateSystem(world: World): void {
             if (!success) {
                 log.warn("Unable to merge edges at vertex");
             }
-            remoteData.needsValidate = true;
+            StateData.needsValidate = true;
         }
     }
 
@@ -165,16 +163,16 @@ function updateSystem(world: World): void {
         if (shell !== undefined && edge !== undefined && isEdgeClose(mesh, edge, pos, 10)) {
             const face = mesh.shells.getFirstFace(shell);
             mesh2RemoveEdge(mesh, edge, face);
-            remoteData.needsValidate = true;
+            StateData.needsValidate = true;
         }
     }
 
     if (mousePlugin.isPressed(MouseButtons.MOUSE_1)) {
         const vtx = mesh2FindClosestVertexAt(mesh, pos);
         if (vtx !== undefined && isVertexClose(mesh, vtx, pos, 10)) {
-            remoteData.vtxFrom = vtx;
+            StateData.vtxFrom = vtx;
         } else {
-            remoteData.vtxFrom = undefined;
+            StateData.vtxFrom = undefined;
         }
     }
 
@@ -189,8 +187,8 @@ function updateSystem(world: World): void {
             } else {
                 mesh.vertices.setPos(vtxFrom, pos);
             }
-            remoteData.vtxFrom = undefined;
-            remoteData.needsValidate = true;
+            StateData.vtxFrom = undefined;
+            StateData.needsValidate = true;
         }
     }
 
@@ -204,16 +202,16 @@ function updateSystem(world: World): void {
 
             if (nextVtx === undefined) {
                 const vtx = mesh.links.getVertex(link);
-                remoteData.vtxFrom = vtx;
+                StateData.vtxFrom = vtx;
             } else {
-                remoteData.vtxFrom = nextVtx;
+                StateData.vtxFrom = nextVtx;
             }
 
-            remoteData.edgeFrom = edge;
+            StateData.edgeFrom = edge;
             console.log("Found edge");
         } else {
-            remoteData.vtxFrom = undefined;
-            remoteData.edgeFrom = undefined;
+            StateData.vtxFrom = undefined;
+            StateData.edgeFrom = undefined;
         }
     }
 
@@ -229,13 +227,13 @@ function updateSystem(world: World): void {
             } else {
                 mesh.vertices.setPos(vtxFrom, pos);
             }
-            remoteData.vtxFrom = undefined;
-            remoteData.edgeFrom = undefined;
-            remoteData.needsValidate = true;
+            StateData.vtxFrom = undefined;
+            StateData.edgeFrom = undefined;
+            StateData.needsValidate = true;
         }
     }
 
-    if (remoteData.needsValidate) {
+    if (StateData.needsValidate) {
         const vh = meshValidate(mesh);
 
         for (const error of vh.errors) {
@@ -246,15 +244,15 @@ function updateSystem(world: World): void {
             meshPrint(mesh);
         }
 
-        remoteData.needsValidate = false;
+        StateData.needsValidate = false;
     }
 }
 
 function commandEventSystem(world: World): void {
-    const commandEvents = world.readEvents<AppPartCommandEvent>("app-part-command-event");
-    const remoteData = world.readData<AppPartRemoteData>("app-part-remote-data");
+    const commandEvents = world.getEvents<MeshNextCommandEvent>("mesh-next-command-event");
+    const StateData = world.getData<MeshNextStateData>("mesh-next-state-data");
 
-    const mesh = remoteData.mesh;
+    const mesh = StateData.mesh;
 
     while (commandEvents.next()) {
         const ev = commandEvents.getEvent();
@@ -270,11 +268,11 @@ function commandEventSystem(world: World): void {
                 break;
             }
             case "clear": {
-                if (remoteData.meshShell !== undefined) {
-                    mesh2RemoveShell(mesh, remoteData.meshShell);
+                if (StateData.meshShell !== undefined) {
+                    mesh2RemoveShell(mesh, StateData.meshShell);
                     mesh.truncate();
-                    remoteData.meshShell = undefined;
-                    remoteData.needsValidate = true;
+                    StateData.meshShell = undefined;
+                    StateData.needsValidate = true;
                 }
                 break;
             }
@@ -282,9 +280,9 @@ function commandEventSystem(world: World): void {
     }
 }
 
-function renderSystem(world: World): void {
+function meshNextRenderSystem(world: World): void {
     const ctx = world.getPlugin<AppContextPlugin>("app-context-plugin");
-    const { mesh } = world.readData<AppPartRemoteData>("app-part-remote-data");
+    const { mesh } = world.getData<MeshNextStateData>("mesh-next-state-data");
 
     ctx.clear();
     ctx.drawMesh2Next(mesh);
@@ -319,21 +317,48 @@ function isVertexClose<S, F, E, V>(
     return vtxPos.distance(pos) < threshold;
 }
 
-export class MeshNextAppPartModule implements WorldModule {
-    public readonly moduleId = "mesh-next-app-part-module";
+export function meshNextAppPartModule(context: WorldContext): void {
+    context.addModule({
+        id: APP_MODULE_ID,
+        fn: appModule,
+    });
 
-    public setup(world: World): void {
-        world.addSystems<DefaultSystemStage>({ stage: "start", fns: [initMainSystem, writeStateSystem] });
-        world.addSystems<DefaultSystemStage>({ stage: "update", fns: [writeStateSystem] });
+    context.addData<MeshNextInputData>("mesh-next-input-data");
+    context.addData<MeshNextStateData>("mesh-next-state-data");
 
-        world.addDependency<DefaultSystemStage>({ stage: "start", seq: [initMainSystem, writeStateSystem] });
+    context.addSystem({
+        id: APP_PART_START_SYSTEM_ID,
+        fn: meshNextStartSystem,
+        mode: "sync",
+        scheduleId: START_SCHEDULE_ID,
+    });
 
-        world.addSystems<DefaultSystemStage>({ stage: "start", fns: [initRemoteSystem] });
-        world.addSystems<DefaultSystemStage>({
-            stage: "update",
-            fns: [updateSystem, commandEventSystem, renderSystem],
-        });
+    context.addSystem({
+        id: APP_PART_UPDATE_SYSTEM_ID,
+        fn: meshNextUpdateSystem,
+        mode: "sync",
+        scheduleId: UPDATE_SCHEDULE_ID,
+    });
+    context.addSystem({
+        id: COMMAND_EVENT_SYSTEM_ID,
+        fn: commandEventSystem,
+        mode: "sync",
+        scheduleId: UPDATE_SCHEDULE_ID,
+    });
+    context.addSystem({
+        id: APP_PART_RENDER_SYSTEM_ID,
+        fn: meshNextRenderSystem,
+        mode: "sync",
+        scheduleId: UPDATE_SCHEDULE_ID,
+    });
 
-        world.addDependency<DefaultSystemStage>({ stage: "update", seq: [updateSystem, renderSystem] });
-    }
+    context.addSystemDepedency({
+        seq: [APP_START_SYSTEM_ID, APP_PART_START_SYSTEM_ID, APP_INPUT_START_SYSTEM_ID],
+        scheduleId: START_SCHEDULE_ID,
+    });
+
+    context.addSystemDepedency({
+        seq: [APP_UPDATE_SYSTEM_ID, APP_PART_UPDATE_SYSTEM_ID, APP_PART_RENDER_SYSTEM_ID],
+        scheduleId: UPDATE_SCHEDULE_ID,
+    });
 }

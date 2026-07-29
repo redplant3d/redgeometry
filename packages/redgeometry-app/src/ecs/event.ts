@@ -1,5 +1,8 @@
-import { throwError } from "redgeometry/src/utility/debug";
-import type { WorldEvent, WorldEventId, WorldEventIdOf, WorldEventIdsOf, WorldEventUnion } from "./types.ts";
+import { assert, throwError } from "redgeometry/src/utility/debug";
+
+export type WorldEventId = string;
+export type WorldEvent = { readonly eventId: WorldEventId };
+export type WorldEventIdOf<T extends WorldEvent> = T["eventId"];
 
 type WorldEventJournalEntry = {
     event: WorldEvent;
@@ -7,9 +10,23 @@ type WorldEventJournalEntry = {
 
 export class WorldEventStorage {
     public eventJournalEntries: WorldEventJournalEntry[];
+    private events: Set<WorldEventId>;
 
     public constructor() {
         this.eventJournalEntries = [];
+        this.events = new Set();
+    }
+
+    public register(eventId: WorldEventId): void {
+        const hasEvent = this.events.has(eventId);
+        assert(!hasEvent, "World event id '{}' is already registered", eventId);
+
+        this.events.add(eventId);
+    }
+
+    public require(eventId: WorldEventId): void {
+        const hasEvent = this.events.has(eventId);
+        assert(hasEvent, "World event id '{}' is required but missing", eventId);
     }
 
     public addEvent<T extends WorldEvent>(event: T): void {
@@ -52,10 +69,6 @@ export class WorldEventStorage {
         }
 
         return events;
-    }
-
-    public getEventsUnion<T extends WorldEvent[]>(eventIds: WorldEventIdsOf<T>): WorldEventUnionIterator<T> {
-        return new WorldEventUnionIterator(this.eventJournalEntries, eventIds);
     }
 
     public hasEvent<T extends WorldEvent>(eventId: WorldEventIdOf<T>): boolean {
@@ -125,61 +138,6 @@ export class WorldEventIterator<T extends WorldEvent> {
         while (this.next()) {
             const ev = this.getEvent();
             events.push(ev);
-        }
-
-        return events;
-    }
-}
-
-export class WorldEventUnionIterator<T extends WorldEvent[]> {
-    private currIdx: number;
-    private eventIds: WorldEventId[];
-    private eventJournalEntries: WorldEventJournalEntry[];
-
-    public constructor(eventJournalEntries: WorldEventJournalEntry[], eventIds: WorldEventIdsOf<T>) {
-        this.eventJournalEntries = eventJournalEntries;
-        this.eventIds = eventIds;
-        this.currIdx = -1;
-    }
-
-    public getEvent(): WorldEventUnion<T> {
-        const currIdx = this.currIdx;
-
-        if (currIdx < 0) {
-            throwError("Invalid event entry '{}'", currIdx);
-        }
-
-        return this.eventJournalEntries[currIdx].event;
-    }
-
-    public next(): boolean {
-        let nextIdx = this.currIdx + 1;
-
-        while (nextIdx < this.eventJournalEntries.length) {
-            const ev = this.eventJournalEntries[nextIdx].event;
-
-            for (const id of this.eventIds) {
-                if (ev.eventId === id) {
-                    this.currIdx = nextIdx;
-                    return true;
-                }
-            }
-
-            nextIdx += 1;
-        }
-
-        return false;
-    }
-
-    public reset(): void {
-        this.currIdx = -1;
-    }
-
-    public toArray(): WorldEventUnion<T>[] {
-        const events: WorldEventUnion<T>[] = [];
-
-        while (this.next()) {
-            events.push(this.getEvent());
         }
 
         return events;

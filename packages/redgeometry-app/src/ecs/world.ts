@@ -1,41 +1,88 @@
+import { assert } from "redgeometry/src/index";
 import { log } from "redgeometry/src/internal/log";
-import { throwError } from "redgeometry/src/utility/debug";
-import { EntityComponentStorage } from "./entity-component.ts";
-import { WorldEventIterator, WorldEventStorage } from "./event.ts";
-import { SystemSchedule, type SystemDependencyOptions, type SystemOptions, type SystemsOptions } from "./schedule.ts";
-import type {
-    Component,
-    ComponentIdOf,
-    DefaultSystemStage,
-    DefaultWorldScheduleId,
+import { WorldDataStorage, type WorldData, type WorldDataId, type WorldDataIdOf } from "./data.js";
+import {
     EntityComponentIterator,
-    EntityComponentQueryValue,
-    EntityId,
-    SystemStage,
-    WorldData,
-    WorldDataId,
-    WorldDataIdOf,
-    WorldEvent,
-    WorldEventIdOf,
-    WorldModule,
-    WorldModuleId,
-    WorldPlugin,
-    WorldPluginId,
-    WorldPluginIdOf,
-    WorldScheduleId,
-} from "./types.ts";
+    EntityComponentStorage,
+    type Component,
+    type ComponentIdOf,
+    type EntityComponentQueryValue,
+    type EntityId,
+} from "./entity-component.ts";
+import {
+    WorldEventIterator,
+    WorldEventStorage,
+    type WorldEvent,
+    type WorldEventId,
+    type WorldEventIdOf,
+} from "./event.ts";
+import { WorldPluginStorage, type WorldPlugin, type WorldPluginId, type WorldPluginIdOf } from "./plugin.js";
+import {
+    SystemScheduleStorage,
+    type SystemDependencyOptions,
+    type SystemOptions,
+    type SystemScheduleId,
+} from "./system-schedule.js";
 
-export type WorldScheduleOptions<
-    T extends WorldScheduleId = DefaultWorldScheduleId,
-    U extends SystemStage = DefaultSystemStage,
-> = {
-    id: T;
-    stages: WorldScheduleStage<U>[];
+export type WorldId = string;
+export type WorldModuleId = string;
+
+export type WorldModuleOptions = {
+    id: WorldModuleId;
+    fn: (context: WorldContext) => void;
 };
 
-export type WorldScheduleStage<T extends SystemStage> = {
-    id: T;
+type WorldContextEntryData = {
+    type: "data";
+    dataId: WorldDataId;
 };
+type WorldContextEntryEvent = {
+    type: "event";
+    eventId: WorldDataId;
+};
+type WorldContextEntryModule = {
+    type: "module";
+    options: WorldModuleOptions;
+};
+type WorldContextEntryPlugin = {
+    type: "plugin";
+    pluginId: WorldPluginId;
+};
+type WorldContextEntryRequireData = {
+    type: "require-data";
+    dataId: WorldDataId;
+};
+type WorldContextEntryRequireEvent = {
+    type: "require-event";
+    eventId: WorldEventId;
+};
+type WorldContextEntryRequirePlugin = {
+    type: "require-plugin";
+    pluginId: WorldPluginId;
+};
+type WorldContextEntrySchedule = {
+    type: "schedule";
+    scheduleId: SystemScheduleId;
+};
+type WorldContextEntrySystem = {
+    type: "system";
+    options: SystemOptions;
+};
+type WorldContextEntrySystemDependency = {
+    type: "system-dependency";
+    options: SystemDependencyOptions;
+};
+type WorldContextEntry =
+    | WorldContextEntryData
+    | WorldContextEntryEvent
+    | WorldContextEntryModule
+    | WorldContextEntryPlugin
+    | WorldContextEntryRequireData
+    | WorldContextEntryRequireEvent
+    | WorldContextEntryRequirePlugin
+    | WorldContextEntrySchedule
+    | WorldContextEntrySystem
+    | WorldContextEntrySystemDependency;
 
 export const ComponentFlags = {
     NONE: 0,
@@ -56,133 +103,85 @@ export const EntityFlags = {
 } as const;
 export type EntityFlags = number;
 
-export const WORLD_SCHEDULE_OPTIONS_DEFAULT: WorldScheduleOptions<DefaultWorldScheduleId, DefaultSystemStage>[] = [
-    {
-        id: "start",
-        stages: [{ id: "start-pre" }, { id: "start" }, { id: "start-post" }],
-    },
-    {
-        id: "update",
-        stages: [{ id: "update-pre" }, { id: "update" }, { id: "update-post" }],
-    },
-    {
-        id: "stop",
-        stages: [{ id: "stop-pre" }, { id: "stop" }, { id: "stop-post" }],
-    },
-];
-
 export class World {
-    private data: Map<WorldDataId, WorldData | undefined>;
-    private ecStorage: EntityComponentStorage;
-    private evStorage: WorldEventStorage;
-    private modules: Map<WorldModuleId, WorldModule>;
-    private plugins: Map<WorldPluginId, WorldPlugin | undefined>;
-    private schedules: Map<SystemStage, SystemSchedule>;
-    private stages: Map<WorldScheduleId, SystemSchedule[]>;
+    private entityComponentStorage: EntityComponentStorage;
+    private systemScheduleStorage: SystemScheduleStorage;
+    private dataStorage: WorldDataStorage;
+    private eventStorage: WorldEventStorage;
+    private pluginStorage: WorldPluginStorage;
 
-    public constructor() {
-        this.data = new Map();
-        this.ecStorage = new EntityComponentStorage();
-        this.evStorage = new WorldEventStorage();
-        this.modules = new Map();
-        this.plugins = new Map();
-        this.schedules = new Map();
-        this.stages = new Map();
+    constructor(
+        entityComponentStorage: EntityComponentStorage,
+        systemScheduleStorage: SystemScheduleStorage,
+        dataStorage: WorldDataStorage,
+        eventStorage: WorldEventStorage,
+        pluginStorage: WorldPluginStorage,
+    ) {
+        this.entityComponentStorage = entityComponentStorage;
+        this.systemScheduleStorage = systemScheduleStorage;
+        this.dataStorage = dataStorage;
+        this.eventStorage = eventStorage;
+        this.pluginStorage = pluginStorage;
     }
 
     public addComponent<T extends Component>(entityId: EntityId, component: T): void {
-        this.ecStorage.addComponent(entityId, component);
+        this.entityComponentStorage.addComponent(entityId, component);
     }
 
-    public addDependency<T extends SystemStage>(dep: SystemDependencyOptions<T>): void {
-        const schedule = this.getSchedule(dep.stage);
-        schedule.addDepedency(dep);
+    public addEvent<T extends WorldEvent>(event: T): void {
+        this.eventStorage.addEvent(event);
     }
 
-    public addModules<T extends WorldModule>(modules: T[]): void {
-        for (const module of modules) {
-            this.modules.set(module.moduleId, module);
-        }
-    }
-
-    public addSchedules<T extends WorldScheduleId, U extends SystemStage>(
-        WorldScheduleOptions: WorldScheduleOptions<T, U>[],
-    ): void {
-        for (const option of WorldScheduleOptions) {
-            const schedules: SystemSchedule[] = [];
-
-            for (const stage of option.stages) {
-                const schedule = new SystemSchedule();
-
-                schedules.push(schedule);
-
-                this.schedules.set(stage.id, schedule);
-            }
-
-            this.stages.set(option.id, schedules);
-        }
-    }
-
-    public addSystem<T extends SystemStage = DefaultSystemStage>(options: SystemOptions<T>): void {
-        const schedule = this.getSchedule(options.stage);
-        schedule.addSystem(options);
-    }
-
-    public addSystems<T extends SystemStage>(options: SystemsOptions<T>): void {
-        const schedule = this.getSchedule(options.stage);
-        schedule.addSystems(options);
+    public addEvents<T extends WorldEvent>(events: T[]): void {
+        this.eventStorage.addEvents(events);
     }
 
     public clearEntities(): void {
-        this.ecStorage.clear();
+        this.entityComponentStorage.clear();
     }
 
     public createEntity(): EntityId {
-        return this.ecStorage.createEntity();
+        return this.entityComponentStorage.createEntity();
     }
 
     public deleteComponent<T extends Component>(entity: EntityId, componentId: ComponentIdOf<T>): void {
-        this.ecStorage.deleteComponent(entity, componentId);
+        this.entityComponentStorage.deleteComponent(entity, componentId);
     }
 
     public destroyEntity(entity: EntityId): void {
-        this.ecStorage.destroyEntity(entity);
+        this.entityComponentStorage.destroyEntity(entity);
     }
 
     public findComponent<T extends Component>(entity: EntityId, componentId: ComponentIdOf<T>): T | undefined {
-        return this.ecStorage.findComponent(entity, componentId);
+        return this.entityComponentStorage.findComponent(entity, componentId);
+    }
+
+    public findLastEvent<T extends WorldEvent>(eventId: WorldEventIdOf<T>): T | undefined {
+        return this.eventStorage.findLastEvent(eventId);
     }
 
     public getComponentFlags<T extends Component>(entityId: EntityId, componentId: ComponentIdOf<T>): ComponentFlags {
-        return this.ecStorage.getComponentFlags(entityId, componentId);
+        return this.entityComponentStorage.getComponentFlags(entityId, componentId);
+    }
+
+    public getData<T extends WorldData>(dataId: WorldDataIdOf<T>): T {
+        return this.dataStorage.get(dataId);
     }
 
     public getEntityFlags(entityId: EntityId): EntityFlags {
-        return this.ecStorage.getEntityFlags(entityId);
+        return this.entityComponentStorage.getEntityFlags(entityId);
+    }
+
+    public getEvents<T extends WorldEvent>(eventId: WorldEventIdOf<T>): WorldEventIterator<T> {
+        return this.eventStorage.getEvents(eventId);
     }
 
     public getPlugin<T extends WorldPlugin>(pluginId: WorldPluginIdOf<T>): T {
-        const context = this.plugins.get(pluginId);
-
-        if (context === undefined) {
-            throwError("World plugin '{}' not available", pluginId);
-        }
-
-        return context as T;
-    }
-
-    public getSchedule(stage: SystemStage): SystemSchedule {
-        const schedule = this.schedules.get(stage);
-
-        if (schedule === undefined) {
-            throwError("Stage '{}' not found", stage);
-        }
-
-        return schedule;
+        return this.pluginStorage.get(pluginId);
     }
 
     public hasComponent<T extends Component>(entityId: EntityId, componentId: ComponentIdOf<T>): boolean {
-        return this.ecStorage.hasComponent(entityId, componentId);
+        return this.entityComponentStorage.hasComponent(entityId, componentId);
     }
 
     public hasComponentFlags<T extends Component>(
@@ -190,7 +189,7 @@ export class World {
         componentId: ComponentIdOf<T>,
         flagMask: ComponentFlags,
     ): boolean {
-        return this.ecStorage.hasComponentFlags(entityId, componentId, flagMask);
+        return this.entityComponentStorage.hasComponentFlags(entityId, componentId, flagMask);
     }
 
     public hasComponentFlagsAny<T extends Component>(
@@ -198,117 +197,219 @@ export class World {
         componentId: ComponentIdOf<T>,
         flagMask: ComponentFlags,
     ): boolean {
-        return this.ecStorage.hasComponentFlagsAny(entityId, componentId, flagMask);
+        return this.entityComponentStorage.hasComponentFlagsAny(entityId, componentId, flagMask);
     }
 
     public hasEntityFlags(entityId: EntityId, flagMask: EntityFlags): boolean {
-        return this.ecStorage.hasEntityFlags(entityId, flagMask);
+        return this.entityComponentStorage.hasEntityFlags(entityId, flagMask);
     }
 
     public hasEntityFlagsAny(entityId: EntityId, flagMask: EntityFlags): boolean {
-        return this.ecStorage.hasEntityFlagsAny(entityId, flagMask);
+        return this.entityComponentStorage.hasEntityFlagsAny(entityId, flagMask);
     }
 
     public hasEvents<T extends WorldEvent>(eventId: WorldEventIdOf<T>): boolean {
-        return this.evStorage.hasEvent(eventId);
-    }
-
-    public init(): void {
-        for (const module of this.modules.values()) {
-            module.setup(this);
-        }
-
-        for (const schedule of this.schedules.values()) {
-            schedule.update();
-        }
+        return this.eventStorage.hasEvent(eventId);
     }
 
     public isEntityAlive(entityId: EntityId): boolean {
-        return this.ecStorage.isEntityAlive(entityId);
+        return this.entityComponentStorage.isEntityAlive(entityId);
     }
 
     public queryEntities<T extends Component = Component>(
         predicate: (q: EntityComponentQueryValue<T>) => boolean,
     ): EntityComponentIterator<T> {
-        return this.ecStorage.queryEntities(predicate);
+        return this.entityComponentStorage.queryEntities(predicate);
     }
 
-    public readData<T extends WorldData>(type: WorldDataIdOf<T>): T {
-        const data = this.data.get(type);
-
-        if (data === undefined) {
-            throwError("Cannot read data '{}'", type);
-        }
-
-        return data as T;
+    public reset(): void {
+        this.entityComponentStorage.reset();
+        this.eventStorage.reset();
     }
 
-    public readEvents<T extends WorldEvent>(eventId: WorldEventIdOf<T>): WorldEventIterator<T> {
-        return this.evStorage.getEvents(eventId);
-    }
-
-    public readLatestEvent<T extends WorldEvent>(eventId: WorldEventIdOf<T>): T | undefined {
-        return this.evStorage.findLastEvent(eventId);
-    }
-
-    public async runSchedule<T extends WorldScheduleId>(scheduleId: T): Promise<void> {
-        const schedules = this.stages.get(scheduleId);
-
-        if (schedules === undefined) {
-            throwError("World stage '{}' unavailable", scheduleId);
-        }
-
-        for (const schedule of schedules) {
-            await schedule.execute(this);
-        }
-
-        if (scheduleId === "start") {
-            this.validate();
-        } else if (scheduleId === "update") {
-            this.cleanup();
-        }
+    public runSchedule(scheduleId: SystemScheduleId): Promise<void> {
+        return this.systemScheduleStorage.runSchedule(scheduleId, this);
     }
 
     public setComponent<T extends Component>(entityId: EntityId, component: T): void {
-        this.ecStorage.setComponent(entityId, component);
+        this.entityComponentStorage.setComponent(entityId, component);
+    }
+
+    public setData<T extends WorldData>(data: T): void {
+        this.dataStorage.set(data);
     }
 
     public setPlugin<T extends WorldPlugin>(plugin: T): void {
-        this.plugins.set(plugin.pluginId, plugin);
+        this.pluginStorage.set(plugin);
     }
 
     public updateComponent<T extends Component>(entityId: EntityId, componentId: ComponentIdOf<T>): void {
-        this.ecStorage.updateComponent(entityId, componentId);
+        this.entityComponentStorage.updateComponent(entityId, componentId);
+    }
+}
+
+export class WorldContext {
+    private entries: WorldContextEntry[];
+
+    constructor(entries: WorldContextEntry[]) {
+        this.entries = entries;
     }
 
-    public validate(): boolean {
-        let success = true;
+    public addData<T extends WorldData>(dataId: WorldDataIdOf<T>): void {
+        this.entries.push({ type: "data", dataId });
+    }
 
-        // World data
-        for (const [id, data] of this.data) {
-            if (data === undefined) {
-                log.warn("World data '{}' has not been initialized", id);
-                success = false;
+    public addEvent<T extends WorldEvent>(eventId: WorldEventIdOf<T>): void {
+        this.entries.push({ type: "event", eventId });
+    }
+
+    public addModule(options: WorldModuleOptions): void {
+        this.entries.push({ type: "module", options });
+    }
+
+    public addPlugin<T extends WorldPlugin>(pluginId: WorldPluginIdOf<T>): void {
+        this.entries.push({ type: "plugin", pluginId });
+    }
+
+    public addSchedule(scheduleId: SystemScheduleId): void {
+        this.entries.push({ type: "schedule", scheduleId });
+    }
+
+    public addSystem(options: SystemOptions): void {
+        this.entries.push({ type: "system", options });
+    }
+
+    public addSystemDepedency(options: SystemDependencyOptions): void {
+        this.entries.push({ type: "system-dependency", options });
+    }
+
+    public requireData<T extends WorldData>(dataId: WorldDataIdOf<T>): void {
+        this.entries.push({ type: "require-data", dataId });
+    }
+
+    public requireEvent<T extends WorldEvent>(eventId: WorldEventIdOf<T>): void {
+        this.entries.push({ type: "require-event", eventId });
+    }
+
+    public requirePlugin<T extends WorldPlugin>(pluginId: WorldPluginIdOf<T>): void {
+        this.entries.push({ type: "require-plugin", pluginId });
+    }
+}
+
+export class WorldStorage {
+    private worlds: Map<WorldId, World>;
+
+    constructor() {
+        this.worlds = new Map();
+    }
+
+    public add(worldId: WorldId, options: WorldModuleOptions): World {
+        const hasWorld = this.worlds.has(worldId);
+        assert(!hasWorld, "World id '{}' already exists", worldId);
+
+        const world = this.createWorld({ type: "module", options });
+        this.worlds.set(worldId, world);
+
+        return world;
+    }
+
+    public get(worldId: WorldId): World {
+        const world = this.worlds.get(worldId);
+        assert(world !== undefined, "World id '{}' not found", worldId);
+
+        return world;
+    }
+
+    private createWorld(entry: WorldContextEntryModule): World {
+        const modules = new Map<WorldModuleId, WorldContextEntry[]>();
+
+        this.iterateEntry(entry, modules);
+
+        const entityComponentStorage = new EntityComponentStorage();
+        const systemScheduleStorage = new SystemScheduleStorage();
+        const dataStorage = new WorldDataStorage();
+        const eventStorage = new WorldEventStorage();
+        const pluginStorage = new WorldPluginStorage();
+
+        // First pass
+        for (const entries of modules.values()) {
+            for (const entry of entries) {
+                switch (entry.type) {
+                    case "data": {
+                        dataStorage.register(entry.dataId);
+                        break;
+                    }
+                    case "event": {
+                        eventStorage.register(entry.eventId);
+                        break;
+                    }
+                    case "plugin": {
+                        pluginStorage.register(entry.pluginId);
+                        break;
+                    }
+                    case "schedule": {
+                        systemScheduleStorage.registerSchedule(entry.scheduleId);
+                        break;
+                    }
+                }
             }
         }
 
-        return success;
+        // Second pass
+        for (const entries of modules.values()) {
+            for (const entry of entries) {
+                switch (entry.type) {
+                    case "require-data": {
+                        dataStorage.require(entry.dataId);
+                        break;
+                    }
+                    case "require-event": {
+                        eventStorage.require(entry.eventId);
+                        break;
+                    }
+                    case "require-plugin": {
+                        pluginStorage.require(entry.pluginId);
+                        break;
+                    }
+                    case "system": {
+                        systemScheduleStorage.registerSystem(entry.options);
+                        break;
+                    }
+                    case "system-dependency": {
+                        systemScheduleStorage.registerSystemDependency(entry.options);
+                        break;
+                    }
+                }
+            }
+        }
+
+        systemScheduleStorage.initialize();
+
+        const str = systemScheduleStorage.printSchedules();
+        console.log(str);
+
+        return new World(entityComponentStorage, systemScheduleStorage, dataStorage, eventStorage, pluginStorage);
     }
 
-    public writeData<T extends WorldData>(data: T): void {
-        this.data.set(data.dataId, data);
-    }
+    private iterateEntry(entry: WorldContextEntryModule, outModules: Map<WorldModuleId, WorldContextEntry[]>): void {
+        const subEntries: WorldContextEntry[] = [];
+        const ctx = new WorldContext(subEntries);
 
-    public writeEvent<T extends WorldEvent>(event: T): void {
-        this.evStorage.addEvent(event);
-    }
+        entry.options.fn(ctx);
+        outModules.set(entry.options.id, subEntries);
 
-    public writeEvents<T extends WorldEvent>(events: T[]): void {
-        this.evStorage.addEvents(events);
-    }
+        for (const subEntry of subEntries) {
+            if (subEntry.type !== "module") {
+                continue;
+            }
 
-    private cleanup(): void {
-        this.ecStorage.reset();
-        this.evStorage.reset();
+            if (outModules.has(subEntry.options.id)) {
+                log.warn("Ignoring duplicate app module '{}' (addded in '{}')", subEntry.options.id, entry.options.id);
+                continue;
+            }
+
+            // Initialize modules recursively
+            this.iterateEntry(subEntry, outModules);
+        }
     }
 }
