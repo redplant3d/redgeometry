@@ -129,11 +129,11 @@ export class World {
     }
 
     public addEvent<T extends WorldEvent>(event: T): void {
-        this.eventStorage.addEvent(event);
+        this.eventStorage.add(event);
     }
 
-    public addEvents<T extends WorldEvent>(events: T[]): void {
-        this.eventStorage.addEvents(events);
+    public addEventArray<T extends WorldEvent>(events: T[]): void {
+        this.eventStorage.addArray(events);
     }
 
     public clearEntities(): void {
@@ -157,7 +157,7 @@ export class World {
     }
 
     public findLastEvent<T extends WorldEvent>(eventId: WorldEventIdOf<T>): T | undefined {
-        return this.eventStorage.findLastEvent(eventId);
+        return this.eventStorage.findLast(eventId);
     }
 
     public getComponentFlags<T extends Component>(entityId: EntityId, componentId: ComponentIdOf<T>): ComponentFlags {
@@ -173,7 +173,7 @@ export class World {
     }
 
     public getEvents<T extends WorldEvent>(eventId: WorldEventIdOf<T>): WorldEventIterator<T> {
-        return this.eventStorage.getEvents(eventId);
+        return this.eventStorage.get(eventId);
     }
 
     public getPlugin<T extends WorldPlugin>(pluginId: WorldPluginIdOf<T>): T {
@@ -206,10 +206,6 @@ export class World {
 
     public hasEntityFlagsAny(entityId: EntityId, flagMask: EntityFlags): boolean {
         return this.entityComponentStorage.hasEntityFlagsAny(entityId, flagMask);
-    }
-
-    public hasEvents<T extends WorldEvent>(eventId: WorldEventIdOf<T>): boolean {
-        return this.eventStorage.hasEvent(eventId);
     }
 
     public isEntityAlive(entityId: EntityId): boolean {

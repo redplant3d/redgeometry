@@ -44,9 +44,9 @@ type SystemSchedule = {
 };
 
 export class SystemScheduleStorage {
-    private options: SystemOptions[];
-    private dependencyOptions: SystemDependencyOptions[];
-    private schedules: Map<SystemScheduleId, SystemSchedule | undefined>;
+    public options: SystemOptions[];
+    public dependencyOptions: SystemDependencyOptions[];
+    public schedules: Map<SystemScheduleId, SystemSchedule | undefined>;
 
     constructor() {
         this.dependencyOptions = [];

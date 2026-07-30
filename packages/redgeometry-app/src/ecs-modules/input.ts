@@ -286,10 +286,10 @@ export function inputUpdateSystem(world: World): void {
     const captureData = world.getData<InputCaptureData>("input-capture-data");
 
     // Write events
-    world.addEvents(captureData.keyboardButtonEvents);
-    world.addEvents(captureData.mouseButtonEvents);
-    world.addEvents(captureData.mouseMotionEvents);
-    world.addEvents(captureData.mouseWheelEvents);
+    world.addEventArray(captureData.keyboardButtonEvents);
+    world.addEventArray(captureData.mouseButtonEvents);
+    world.addEventArray(captureData.mouseMotionEvents);
+    world.addEventArray(captureData.mouseWheelEvents);
 
     // Reset event capture data
     captureData.keyboardButtonEvents.length = 0;
@@ -321,7 +321,7 @@ export class KeyboardPlugin implements WorldPlugin {
         this.states = new Map();
     }
 
-    public applyEvents(buttonEvents: InputKeyboardButtonEvent[]): void {
+    public applyEvents(buttonEvents: ReadonlyArray<InputKeyboardButtonEvent>): void {
         for (const ev of buttonEvents) {
             const code = KEYBOARD_BUTTONS_LOOKUP[ev.code] as KeyboardButtons | undefined;
 
@@ -412,9 +412,9 @@ export class MousePlugin implements WorldPlugin {
     }
 
     public applyEvents(
-        buttonEvents: InputMouseButtonEvent[],
-        motionEvents: InputMouseMotionEvent[],
-        _wheelEvents: InputMouseWheelEvent[],
+        buttonEvents: ReadonlyArray<InputMouseButtonEvent>,
+        motionEvents: ReadonlyArray<InputMouseMotionEvent>,
+        _wheelEvents: ReadonlyArray<InputMouseWheelEvent>,
     ): void {
         for (const ev of buttonEvents) {
             const code = MOUSE_BUTTONS_LOOKUP[ev.button] as MouseButtons | undefined;
@@ -505,7 +505,7 @@ export class MousePlugin implements WorldPlugin {
 export const INPUT_MODULE_ID = "input-module";
 
 export function inputModule(context: WorldContext): void {
-context.addData<InputInitData>("input-init-data");
+    context.addData<InputInitData>("input-init-data");
     context.addData<InputCaptureData>("input-capture-data");
 
     context.addEvent<InputKeyboardButtonEvent>("input-keyboard-button-event");
