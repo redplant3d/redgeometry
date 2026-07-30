@@ -213,6 +213,9 @@ export function appModule(context: WorldContext): void {
     context.addData<AppInputData>("app-input-data");
     context.addData<AppCanvasData>("app-canvas-data");
 
+    context.addEvent<WindowResizeEvent>("window-resize-event");
+    context.addEvent<AppCommandEvent>("app-command-event");
+
     context.addSchedule(START_SCHEDULE_ID);
     context.addSchedule(UPDATE_SCHEDULE_ID);
     context.addSchedule(STOP_SCHEDULE_ID);

@@ -328,6 +328,8 @@ export function meshNextAppPartModule(context: WorldContext): void {
     context.addData<MeshNextInputData>("mesh-next-input-data");
     context.addData<MeshNextStateData>("mesh-next-state-data");
 
+    context.addEvent<MeshNextCommandEvent>("mesh-next-command-event");
+
     context.addSystem({
         id: MESH_NEXT_START_SYSTEM_ID,
         fn: meshNextStartSystem,

@@ -505,6 +505,17 @@ export class MousePlugin implements WorldPlugin {
 export const INPUT_MODULE_ID = "input-module";
 
 export function inputModule(context: WorldContext): void {
+context.addData<InputInitData>("input-init-data");
+    context.addData<InputCaptureData>("input-capture-data");
+
+    context.addEvent<InputKeyboardButtonEvent>("input-keyboard-button-event");
+    context.addEvent<InputMouseMotionEvent>("input-mouse-motion-event");
+    context.addEvent<InputMouseButtonEvent>("input-mouse-button-event");
+    context.addEvent<InputMouseWheelEvent>("input-mouse-wheel-event");
+
+    context.addPlugin<MousePlugin>("mouse-plugin");
+    context.addPlugin<KeyboardPlugin>("keyboard-plugin");
+
     context.addSystem({
         id: INPUT_START_SYSTEM_ID,
         fn: inputStartSystem,
