@@ -1,5 +1,5 @@
 import { log } from "redgeometry/src/internal/log";
-import { assert } from "redgeometry/src/utility/debug";
+import { assert, throwError } from "redgeometry/src/utility/debug";
 import type { World, WorldModuleId } from "./world.ts";
 
 export type SystemId = string;
@@ -26,16 +26,14 @@ export type SystemDependencyOptions = {
 
 type SystemScheduleEntry = {
     depsAsync: SystemScheduleEntry[];
-    idx: number;
     options: SystemOptions;
     promise: Promise<void> | undefined;
 };
 
 type SystemNode = {
     depsAsync: SystemScheduleEntry[];
-    depsIn: Set<number>;
-    depsOut: Set<number>;
-    idx: number;
+    depsIn: Set<SystemNode>;
+    depsOut: Set<SystemNode>;
     options: SystemOptions;
 };
 
@@ -69,8 +67,38 @@ export class SystemScheduleStorage {
             const nodes = this.createNodes(scheduleId);
             const entries = this.createEntries(nodes);
 
+            this.validateNodes(scheduleId, nodes);
+
             this.schedules.set(scheduleId, { entries });
         }
+    }
+
+    public printSchedules(): string {
+        let str = "";
+
+        for (const [scheduleId, schedule] of this.schedules) {
+            if (schedule === undefined) {
+                continue;
+            }
+
+            str += "*** " + scheduleId + " ***\n";
+
+            for (let i = 0; i < schedule.entries.length; i++) {
+                const entry = schedule.entries[i];
+                const mode = entry.options.mode;
+                const id = entry.options.id;
+
+                str += "#" + i + " " + id + " (" + mode + ")\n";
+
+                for (const dep of entry.depsAsync) {
+                    str += "  ^ " + dep.options.id + "\n";
+                }
+            }
+
+            str += "\n";
+        }
+
+        return str;
     }
 
     public registerSchedule(scheduleId: SystemScheduleId, moduleId: WorldModuleId): void {
@@ -119,7 +147,7 @@ export class SystemScheduleStorage {
 
     public async runSchedule(id: SystemScheduleId, world: World): Promise<void> {
         const schedule = this.schedules.get(id);
-        assert(schedule !== undefined, "System schedule id '{}' not found", id);
+        assert(schedule !== undefined, "System schedule id '{}' has not been registered in a world module", id);
 
         for (const entry of schedule.entries) {
             // Wait for incoming dependencies
@@ -137,35 +165,6 @@ export class SystemScheduleStorage {
                 entry.options.fn(world);
             }
         }
-    }
-
-    public printSchedules(): string {
-        let str = "";
-
-        for (const [scheduleId, schedule] of this.schedules) {
-            if (schedule === undefined) {
-                continue;
-            }
-
-            str += "*** " + scheduleId + " ***\n";
-
-            for (let i = 0; i < schedule.entries.length; i++) {
-                const entry = schedule.entries[i];
-                const mode = entry.options.mode;
-                const id = entry.options.id;
-                const idx = entry.idx;
-
-                str += "#" + i + " - " + id + " (#" + idx + ", " + mode + ")\n";
-
-                for (const dep of entry.depsAsync) {
-                    str += "    ^ " + dep.options.fn.name + "\n";
-                }
-            }
-
-            str += "\n";
-        }
-
-        return str;
     }
 
     private createEntries(nodes: SystemNode[]): SystemScheduleEntry[] {
@@ -186,17 +185,13 @@ export class SystemScheduleStorage {
         while (node !== undefined) {
             const entry: SystemScheduleEntry = {
                 depsAsync: node.depsAsync,
-                idx: node.idx,
                 options: node.options,
                 promise: undefined,
             };
 
-            for (const nodeDepIdx of node.depsOut) {
-                const nodeDep = nodes[nodeDepIdx];
-                const nodeIdx = nodes.indexOf(node);
-
-                node.depsOut.delete(nodeDepIdx);
-                nodeDep.depsIn.delete(nodeIdx);
+            for (const nodeDep of node.depsOut) {
+                node.depsOut.delete(nodeDep);
+                nodeDep.depsIn.delete(node);
 
                 if (node.options.mode === "async") {
                     nodeDep.depsAsync.push(entry);
@@ -210,12 +205,6 @@ export class SystemScheduleStorage {
             entries.push(entry);
 
             node = queue.shift();
-        }
-
-        // TODO: Better reporting of cycles
-        for (const node of nodes) {
-            assert(node.depsIn.size === 0);
-            assert(node.depsOut.size === 0);
         }
 
         return entries;
@@ -232,7 +221,6 @@ export class SystemScheduleStorage {
             }
 
             nodes.push({
-                idx: i,
                 options: this.options[i],
                 depsIn: new Set(),
                 depsOut: new Set(),
@@ -280,13 +268,62 @@ export class SystemScheduleStorage {
             for (let i = 1; i < seqNodes.length; i++) {
                 const node0 = seqNodes[i - 1];
                 const node1 = seqNodes[i - 0];
-                const nodeIdx0 = nodes.indexOf(node0);
-                const nodeIdx1 = nodes.indexOf(node1);
-                node0.depsOut.add(nodeIdx1);
-                node1.depsIn.add(nodeIdx0);
+                node0.depsOut.add(node1);
+                node1.depsIn.add(node0);
             }
         }
 
         return nodes;
+    }
+
+    private validateNodes(scheduleId: SystemScheduleId, nodes: SystemNode[]) {
+        let foundCycle = false;
+
+        for (const node of nodes) {
+            if (node.depsIn.size > 0 || node.depsOut.size > 0) {
+                foundCycle = true;
+                break;
+            }
+        }
+
+        if (!foundCycle) {
+            return;
+        }
+
+        const nodeEdges: { nodeIn: SystemNode; nodeOut: SystemNode }[] = [];
+
+        for (const node of nodes) {
+            for (const nodeDep of node.depsIn) {
+                const nodeIn = nodeDep;
+                const nodeOut = node;
+
+                // Avoid duplicate edges
+                if (nodeEdges.some((e) => e.nodeIn === nodeIn && e.nodeOut === nodeOut)) {
+                    continue;
+                }
+
+                nodeEdges.push({ nodeIn, nodeOut });
+            }
+
+            for (const nodeDep of node.depsOut) {
+                const nodeIn = node;
+                const nodeOut = nodeDep;
+
+                // Avoid duplicate edges
+                if (nodeEdges.some((e) => e.nodeIn === nodeIn && e.nodeOut === nodeOut)) {
+                    continue;
+                }
+
+                nodeEdges.push({ nodeIn, nodeOut });
+            }
+        }
+
+        let cycle = "";
+
+        for (const e of nodeEdges) {
+            cycle += "\n  " + e.nodeIn.options.id + " -> " + e.nodeOut.options.id;
+        }
+
+        throwError("At least one system cycle was found in system schedule id '{}':{}", scheduleId, cycle);
     }
 }
