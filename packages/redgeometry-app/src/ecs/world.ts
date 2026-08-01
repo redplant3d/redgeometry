@@ -32,57 +32,57 @@ export type WorldModuleOptions = {
     fn: (context: WorldContext) => void;
 };
 
-type WorldContextEntryData = {
-    type: "data";
+export type WorldContextRegisterDataEntry = {
+    type: "register-data";
     dataId: WorldDataId;
 };
-type WorldContextEntryEvent = {
-    type: "event";
+export type WorldContextRegisterEventEntry = {
+    type: "register-event";
     eventId: WorldDataId;
 };
-type WorldContextEntryModule = {
-    type: "module";
+export type WorldContextRegisterModuleEntry = {
+    type: "register-module";
     options: WorldModuleOptions;
 };
-type WorldContextEntryPlugin = {
-    type: "plugin";
+export type WorldContextRegisterPluginEntry = {
+    type: "register-plugin";
     pluginId: WorldPluginId;
 };
-type WorldContextEntryRequireData = {
+export type WorldContextRegisterScheduleEntry = {
+    type: "register-schedule";
+    scheduleId: SystemScheduleId;
+};
+export type WorldContextRegisterSystemEntry = {
+    type: "register-system";
+    options: SystemOptions;
+};
+export type WorldContextRegisterSystemDependencyEntry = {
+    type: "register-system-dependency";
+    options: SystemDependencyOptions;
+};
+export type WorldContextRequireDataEntry = {
     type: "require-data";
     dataId: WorldDataId;
 };
-type WorldContextEntryRequireEvent = {
+export type WorldContextRequireEventEntry = {
     type: "require-event";
     eventId: WorldEventId;
 };
-type WorldContextEntryRequirePlugin = {
+export type WorldContextRequirePluginEntry = {
     type: "require-plugin";
     pluginId: WorldPluginId;
 };
-type WorldContextEntrySchedule = {
-    type: "schedule";
-    scheduleId: SystemScheduleId;
-};
-type WorldContextEntrySystem = {
-    type: "system";
-    options: SystemOptions;
-};
-type WorldContextEntrySystemDependency = {
-    type: "system-dependency";
-    options: SystemDependencyOptions;
-};
-type WorldContextEntry =
-    | WorldContextEntryData
-    | WorldContextEntryEvent
-    | WorldContextEntryModule
-    | WorldContextEntryPlugin
-    | WorldContextEntryRequireData
-    | WorldContextEntryRequireEvent
-    | WorldContextEntryRequirePlugin
-    | WorldContextEntrySchedule
-    | WorldContextEntrySystem
-    | WorldContextEntrySystemDependency;
+export type WorldContextEntry =
+    | WorldContextRegisterDataEntry
+    | WorldContextRegisterEventEntry
+    | WorldContextRegisterModuleEntry
+    | WorldContextRegisterPluginEntry
+    | WorldContextRegisterScheduleEntry
+    | WorldContextRegisterSystemEntry
+    | WorldContextRegisterSystemDependencyEntry
+    | WorldContextRequireDataEntry
+    | WorldContextRequireEventEntry
+    | WorldContextRequirePluginEntry;
 
 export const ComponentFlags = {
     NONE: 0,
@@ -252,31 +252,31 @@ export class WorldContext {
     }
 
     public addData<T extends WorldData>(dataId: WorldDataIdOf<T>): void {
-        this.entries.push({ type: "data", dataId });
+        this.entries.push({ type: "register-data", dataId });
     }
 
     public addEvent<T extends WorldEvent>(eventId: WorldEventIdOf<T>): void {
-        this.entries.push({ type: "event", eventId });
+        this.entries.push({ type: "register-event", eventId });
     }
 
     public addModule(options: WorldModuleOptions): void {
-        this.entries.push({ type: "module", options });
+        this.entries.push({ type: "register-module", options });
     }
 
     public addPlugin<T extends WorldPlugin>(pluginId: WorldPluginIdOf<T>): void {
-        this.entries.push({ type: "plugin", pluginId });
+        this.entries.push({ type: "register-plugin", pluginId });
     }
 
     public addSchedule(scheduleId: SystemScheduleId): void {
-        this.entries.push({ type: "schedule", scheduleId });
+        this.entries.push({ type: "register-schedule", scheduleId });
     }
 
     public addSystem(options: SystemOptions): void {
-        this.entries.push({ type: "system", options });
+        this.entries.push({ type: "register-system", options });
     }
 
     public addSystemDepedency(options: SystemDependencyOptions): void {
-        this.entries.push({ type: "system-dependency", options });
+        this.entries.push({ type: "register-system-dependency", options });
     }
 
     public requireData<T extends WorldData>(dataId: WorldDataIdOf<T>): void {
@@ -303,7 +303,7 @@ export class WorldStorage {
         const hasWorld = this.worlds.has(worldId);
         assert(!hasWorld, "World id '{}' already exists", worldId);
 
-        const world = this.createWorld({ type: "module", options });
+        const world = this.createWorld({ type: "register-module", options });
         this.worlds.set(worldId, world);
 
         return world;
@@ -316,7 +316,7 @@ export class WorldStorage {
         return world;
     }
 
-    private createWorld(entry: WorldContextEntryModule): World {
+    private createWorld(entry: WorldContextRegisterModuleEntry): World {
         const modules = new Map<WorldModuleId, WorldContextEntry[]>();
 
         this.iterateEntry(entry, modules);
@@ -328,23 +328,23 @@ export class WorldStorage {
         const pluginStorage = new WorldPluginStorage();
 
         // First pass
-        for (const entries of modules.values()) {
+        for (const [moduleId, entries] of modules) {
             for (const entry of entries) {
                 switch (entry.type) {
-                    case "data": {
-                        dataStorage.register(entry.dataId);
+                    case "register-data": {
+                        dataStorage.register(entry.dataId, moduleId);
                         break;
                     }
-                    case "event": {
-                        eventStorage.register(entry.eventId);
+                    case "register-event": {
+                        eventStorage.register(entry.eventId, moduleId);
                         break;
                     }
-                    case "plugin": {
-                        pluginStorage.register(entry.pluginId);
+                    case "register-plugin": {
+                        pluginStorage.register(entry.pluginId, moduleId);
                         break;
                     }
-                    case "schedule": {
-                        systemScheduleStorage.registerSchedule(entry.scheduleId);
+                    case "register-schedule": {
+                        systemScheduleStorage.registerSchedule(entry.scheduleId, moduleId);
                         break;
                     }
                 }
@@ -352,27 +352,27 @@ export class WorldStorage {
         }
 
         // Second pass
-        for (const entries of modules.values()) {
+        for (const [moduleId, entries] of modules) {
             for (const entry of entries) {
                 switch (entry.type) {
                     case "require-data": {
-                        dataStorage.require(entry.dataId);
+                        dataStorage.require(entry.dataId, moduleId);
                         break;
                     }
                     case "require-event": {
-                        eventStorage.require(entry.eventId);
+                        eventStorage.require(entry.eventId, moduleId);
                         break;
                     }
                     case "require-plugin": {
-                        pluginStorage.require(entry.pluginId);
+                        pluginStorage.require(entry.pluginId, moduleId);
                         break;
                     }
-                    case "system": {
-                        systemScheduleStorage.registerSystem(entry.options);
+                    case "register-system": {
+                        systemScheduleStorage.registerSystem(entry.options, moduleId);
                         break;
                     }
-                    case "system-dependency": {
-                        systemScheduleStorage.registerSystemDependency(entry.options);
+                    case "register-system-dependency": {
+                        systemScheduleStorage.registerSystemDependency(entry.options, moduleId);
                         break;
                     }
                 }
@@ -384,7 +384,10 @@ export class WorldStorage {
         return new World(entityComponentStorage, systemScheduleStorage, dataStorage, eventStorage, pluginStorage);
     }
 
-    private iterateEntry(entry: WorldContextEntryModule, outModules: Map<WorldModuleId, WorldContextEntry[]>): void {
+    private iterateEntry(
+        entry: WorldContextRegisterModuleEntry,
+        outModules: Map<WorldModuleId, WorldContextEntry[]>,
+    ): void {
         const subEntries: WorldContextEntry[] = [];
         const ctx = new WorldContext(subEntries);
 
@@ -392,7 +395,7 @@ export class WorldStorage {
         outModules.set(entry.options.id, subEntries);
 
         for (const subEntry of subEntries) {
-            if (subEntry.type !== "module") {
+            if (subEntry.type !== "register-module") {
                 continue;
             }
 

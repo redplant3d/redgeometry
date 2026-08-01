@@ -1,4 +1,5 @@
 import { assert, throwError } from "redgeometry/src/utility/debug";
+import type { WorldModuleId } from "./world.ts";
 
 export type WorldEventId = string;
 export type WorldEvent = { readonly eventId: WorldEventId };
@@ -17,7 +18,11 @@ export class WorldEventStorage {
 
     public add<T extends WorldEvent>(event: T): void {
         const eventEntry = this.eventEntries.get(event.eventId);
-        assert(eventEntry !== undefined, "World event id '{}' is not registered", event.eventId);
+        assert(
+            eventEntry !== undefined,
+            "World event id '{}' has not been registered in a world module",
+            event.eventId,
+        );
 
         eventEntry.events.push(event);
     }
@@ -31,7 +36,7 @@ export class WorldEventStorage {
         const eventId = eventArray[0].eventId;
 
         const eventEntry = this.eventEntries.get(eventId);
-        assert(eventEntry !== undefined, "World event id '{}' is not registered", eventId);
+        assert(eventEntry !== undefined, "World event id '{}' has not been registered in a world module", eventId);
 
         for (const event of eventArray) {
             assert(event.eventId === eventId, "World event id '{}' does not match '{}'", event.eventId, eventId);
@@ -63,16 +68,26 @@ export class WorldEventStorage {
         return new WorldEventIterator(events);
     }
 
-    public register(eventId: WorldEventId): void {
-        const hasEvent = this.eventEntries.has(eventId);
-        assert(!hasEvent, "World event id '{}' is already registered", eventId);
+    public register(eventId: WorldEventId, moduleId: WorldModuleId): void {
+        assert(
+            !this.eventEntries.has(eventId),
+            "World event id '{}' is registered in world module id '{}' " +
+                "but has already been registered in a world module",
+            eventId,
+            moduleId,
+        );
 
         this.eventEntries.set(eventId, { events: [] });
     }
 
-    public require(eventId: WorldEventId): void {
-        const hasEvent = this.eventEntries.has(eventId);
-        assert(hasEvent, "World event id '{}' is required but missing", eventId);
+    public require(eventId: WorldEventId, moduleId: WorldModuleId): void {
+        assert(
+            this.eventEntries.has(eventId),
+            "World event id '{}' is required in world module id '{}' " +
+                "but has not been registered in a world module",
+            eventId,
+            moduleId,
+        );
     }
 
     public reset(): void {

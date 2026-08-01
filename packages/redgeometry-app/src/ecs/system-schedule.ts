@@ -1,6 +1,6 @@
 import { log } from "redgeometry/src/internal/log";
 import { assert } from "redgeometry/src/utility/debug";
-import type { World } from "./world.ts";
+import type { World, WorldModuleId } from "./world.ts";
 
 export type SystemId = string;
 export type SystemScheduleId = string;
@@ -73,26 +73,46 @@ export class SystemScheduleStorage {
         }
     }
 
-    public registerSchedule(scheduleId: SystemScheduleId): void {
-        const hasSchedule = this.schedules.has(scheduleId);
-        assert(!hasSchedule, "System schedule id '{}' is already registered", scheduleId);
+    public registerSchedule(scheduleId: SystemScheduleId, moduleId: WorldModuleId): void {
+        assert(
+            !this.schedules.has(scheduleId),
+            "System schedule id '{}' is registered in world module id '{}' " +
+                "but has already been registered in a world module",
+            scheduleId,
+            moduleId,
+        );
 
         this.schedules.set(scheduleId, undefined);
     }
 
-    public registerSystem(options: SystemOptions): void {
-        const hasSchedule = this.schedules.has(options.scheduleId);
-        assert(hasSchedule, "System schedule id '{}' is required but missing", options.scheduleId);
-
-        const hasSystem = this.options.some((o) => o.id === options.id && o.scheduleId === options.scheduleId);
-        assert(!hasSystem, "System id '{}' is already registered", options.id);
+    public registerSystem(options: SystemOptions, moduleId: WorldModuleId): void {
+        assert(
+            this.schedules.has(options.scheduleId),
+            "System schedule id '{}' is required for system id '{}' in world module id '{}' " +
+                "but has not been registered in a world module",
+            options.scheduleId,
+            options.id,
+            moduleId,
+        );
+        assert(
+            !this.options.some((o) => o.id === options.id && o.scheduleId === options.scheduleId),
+            "System id '{}' is registered in world module id '{}' " +
+                "but has already been registered in a world module",
+            options.id,
+            moduleId,
+        );
 
         this.options.push(options);
     }
 
-    public registerSystemDependency(options: SystemDependencyOptions): void {
-        const hasSchedule = this.schedules.has(options.scheduleId);
-        assert(hasSchedule, "System schedule id '{}' is required but missing", options.scheduleId);
+    public registerSystemDependency(options: SystemDependencyOptions, moduleId: WorldModuleId): void {
+        assert(
+            this.schedules.has(options.scheduleId),
+            "System schedule id '{}' is required for a system dependency in world module id '{}' " +
+                "but has not been registered in a world module",
+            options.scheduleId,
+            moduleId,
+        );
 
         this.dependencyOptions.push(options);
     }

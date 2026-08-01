@@ -1,4 +1,5 @@
 import { assert } from "redgeometry/src/index";
+import type { WorldModuleId } from "./world.ts";
 
 export type WorldPluginId = string;
 export type WorldPlugin = { readonly pluginId: WorldPluginId };
@@ -11,21 +12,34 @@ export class WorldPluginStorage {
         this.pluginEntries = new Map();
     }
 
-    public register(pluginId: WorldPluginId): void {
-        const hasPlugin = this.pluginEntries.has(pluginId);
-        assert(!hasPlugin, "World plugin id '{}' is already registered", pluginId);
+    public register(pluginId: WorldPluginId, moduleId: WorldModuleId): void {
+        assert(
+            !this.pluginEntries.has(pluginId),
+            "World plugin id '{}' is registered in world module id '{}' " +
+                "but has already been registered in a world module",
+            pluginId,
+            moduleId,
+        );
 
         this.pluginEntries.set(pluginId, undefined);
     }
 
-    public require(pluginId: WorldPluginId): void {
-        const hasPlugin = this.pluginEntries.has(pluginId);
-        assert(hasPlugin, "World plugin id '{}' is required but missing", pluginId);
+    public require(pluginId: WorldPluginId, moduleId: WorldModuleId): void {
+        assert(
+            this.pluginEntries.has(pluginId),
+            "World plugin id '{}' is required in world module id '{}' " +
+                "but has not been registered in a world module",
+            pluginId,
+            moduleId,
+        );
     }
 
     public set<T extends WorldPlugin>(plugin: T): void {
-        const hasPlugin = this.pluginEntries.has(plugin.pluginId);
-        assert(hasPlugin, "World plugin id '{}' is not registered", plugin.pluginId);
+        assert(
+            this.pluginEntries.has(plugin.pluginId),
+            "World plugin id '{}' has not been registered in a world module",
+            plugin.pluginId,
+        );
 
         this.pluginEntries.set(plugin.pluginId, plugin);
     }
