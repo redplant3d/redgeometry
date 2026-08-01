@@ -213,15 +213,13 @@ export class SystemScheduleStorage {
     private createNodes(scheduleId: SystemScheduleId): SystemNode[] {
         const nodes: SystemNode[] = [];
 
-        for (let i = 0; i < this.options.length; i++) {
-            const options = this.options[i];
-
+        for (const options of this.options) {
             if (options.scheduleId !== scheduleId) {
                 continue;
             }
 
             nodes.push({
-                options: this.options[i],
+                options,
                 depsIn: new Set(),
                 depsOut: new Set(),
                 depsAsync: [],
