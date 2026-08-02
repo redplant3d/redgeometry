@@ -288,40 +288,15 @@ export class SystemScheduleStorage {
             return;
         }
 
-        const nodeEdges: { nodeIn: SystemNode; nodeOut: SystemNode }[] = [];
+        let nodeDepsStr = "";
 
         for (const node of nodes) {
-            for (const nodeDep of node.depsIn) {
-                const nodeIn = nodeDep;
-                const nodeOut = node;
-
-                // Avoid duplicate edges
-                if (nodeEdges.some((e) => e.nodeIn === nodeIn && e.nodeOut === nodeOut)) {
-                    continue;
-                }
-
-                nodeEdges.push({ nodeIn, nodeOut });
-            }
-
+            // We don't need to go over both `depsOut` and `depsIn` (otherwise every dependency would be duplicate)
             for (const nodeDep of node.depsOut) {
-                const nodeIn = node;
-                const nodeOut = nodeDep;
-
-                // Avoid duplicate edges
-                if (nodeEdges.some((e) => e.nodeIn === nodeIn && e.nodeOut === nodeOut)) {
-                    continue;
-                }
-
-                nodeEdges.push({ nodeIn, nodeOut });
+                nodeDepsStr += "\n  " + node.options.id + " -> " + nodeDep.options.id;
             }
         }
 
-        let cycle = "";
-
-        for (const e of nodeEdges) {
-            cycle += "\n  " + e.nodeIn.options.id + " -> " + e.nodeOut.options.id;
-        }
-
-        throwError("At least one system cycle was found in system schedule id '{}':{}", scheduleId, cycle);
+        throwError("At least one system cycle was found in system schedule id '{}':{}", scheduleId, nodeDepsStr);
     }
 }
