@@ -1,5 +1,5 @@
 import { expect, test } from "vitest";
-import { formatString } from "../../src/utility/string.ts";
+import { formatString } from "../../src/internal/string.ts";
 
 test("formatString", () => {
     expect(formatString("{} {}", 0, 1)).toEqual("0 1");

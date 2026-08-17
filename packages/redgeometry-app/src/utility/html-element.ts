@@ -1,4 +1,4 @@
-import { throwError } from "redgeometry/src/utility/debug";
+import { throwError } from "redgeometry/src/internal/debug";
 
 type InputElementEvent = {
     type: string;

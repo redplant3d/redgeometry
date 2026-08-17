@@ -1,5 +1,5 @@
+import { assertUnreachable } from "redgeometry/src/internal/debug";
 import { MinMaxBox2, type ReadonlyMinMaxBox2 } from "redgeometry/src/primitives/box";
-import { assertUnreachable } from "redgeometry/src/utility/debug";
 import { RandomXSR128, type Random } from "redgeometry/src/utility/random";
 import { clamp } from "redgeometry/src/utility/scalar";
 import type { AppContextPlugin } from "../ecs-modules/app-context.ts";

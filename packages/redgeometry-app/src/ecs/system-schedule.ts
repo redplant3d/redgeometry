@@ -1,5 +1,5 @@
+import { assert, throwError } from "redgeometry/src/internal/debug";
 import { log } from "redgeometry/src/internal/log";
-import { assert, throwError } from "redgeometry/src/utility/debug";
 import type { World, WorldModuleId } from "./world.ts";
 
 export type SystemId = string;

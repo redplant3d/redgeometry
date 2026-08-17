@@ -1,3 +1,4 @@
+import { assertUnreachable } from "../internal/debug.ts";
 import {
     isSimpleConic,
     simplifyConic,
@@ -14,7 +15,6 @@ import {
     type ReadonlyBezierRCurve2,
 } from "../primitives/bezier.ts";
 import { Vector2 } from "../primitives/vector.ts";
-import { assertUnreachable } from "../utility/debug.ts";
 import type { PathQualityOptions } from "./path-options.ts";
 import { type Path2 } from "./path.ts";
 

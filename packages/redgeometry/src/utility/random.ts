@@ -1,4 +1,4 @@
-import { assert } from "./debug.ts";
+import { assert } from "../internal/debug.ts";
 import { betweenFloat, betweenInt } from "./scalar.ts";
 
 export interface Random {

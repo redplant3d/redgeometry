@@ -1,4 +1,4 @@
-import { assert } from "redgeometry/src/index";
+import { assert } from "redgeometry/src/internal/debug";
 import type { WorldModuleId } from "./world.ts";
 
 export type WorldPluginId = string;

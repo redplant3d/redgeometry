@@ -1,3 +1,4 @@
+import { assertUnreachable } from "../internal/debug.ts";
 import { insertOffsetJoin, offsetQuadraticDegenerate, offsetQuadraticSimple } from "../internal/path-offset.ts";
 import {
     isDegenerateQuad,
@@ -20,7 +21,6 @@ import {
     type ReadonlyBezierRCurve2,
 } from "../primitives/bezier.ts";
 import { Vector2, type ReadonlyVector2 } from "../primitives/vector.ts";
-import { assertUnreachable } from "../utility/debug.ts";
 import { MAX_PARAMETER } from "./consts.ts";
 import { JoinType, type PathOffsetOptions, type PathQualityOptions } from "./path-options.ts";
 import { Path2 } from "./path.ts";

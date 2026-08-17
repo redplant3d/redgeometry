@@ -1,3 +1,4 @@
+import { assertUnreachable } from "../internal/debug.ts";
 import { copyCommandsReversed } from "../internal/path.ts";
 import {
     Bezier1Curve2,
@@ -12,7 +13,6 @@ import { Complex } from "../primitives/complex.ts";
 import { Matrix3A, type ReadonlyMatrix3, type ReadonlyMatrix3A } from "../primitives/matrix.ts";
 import { Vector2, type ReadonlyVector2, type Vector2Like } from "../primitives/vector.ts";
 import { copyArray, copyArrayReversed } from "../utility/array.ts";
-import { assertUnreachable } from "../utility/debug.ts";
 import type { Enum } from "../utility/types.ts";
 import { Mesh2 } from "./mesh.ts";
 import { PathClip2 } from "./path-clip.ts";

@@ -1,3 +1,4 @@
+import { assertUnreachable } from "../internal/debug.ts";
 import {
     isDegenerateQuad,
     isSimpleConic,
@@ -20,7 +21,6 @@ import {
     type ReadonlyBezierRCurve2,
 } from "../primitives/bezier.ts";
 import { Vector2 } from "../primitives/vector.ts";
-import { assertUnreachable } from "../utility/debug.ts";
 import { MAX_PARAMETER } from "./consts.ts";
 import { type PathQualityOptions, type PathStrokeOptions } from "./path-options.ts";
 import { PathCommandType, type Path2 } from "./path.ts";

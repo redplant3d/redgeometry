@@ -19,7 +19,3 @@ export type KeyValue<K, V> = {
 export type Nominal<T, U> = T & {
     readonly __brand: U;
 };
-
-export type ValueRef<T> = {
-    value: T;
-};

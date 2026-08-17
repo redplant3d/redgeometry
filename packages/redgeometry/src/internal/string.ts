@@ -1,6 +1,8 @@
-import type { ValueRef } from "./types.ts";
-
 export type FormatParameters = unknown[];
+
+type ValueRef<T> = {
+    value: T;
+};
 
 const OPEN_SYMBOL = "{";
 const CLOSE_SYMBOL = "}";

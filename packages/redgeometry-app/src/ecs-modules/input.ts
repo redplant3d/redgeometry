@@ -1,4 +1,4 @@
-import { assertUnreachable } from "redgeometry/src/utility/debug";
+import { assertUnreachable } from "redgeometry/src/internal/debug";
 import type { Enum } from "redgeometry/src/utility/types";
 import type { WorldPlugin } from "../ecs/plugin.ts";
 import type { World, WorldContext } from "../ecs/world.ts";

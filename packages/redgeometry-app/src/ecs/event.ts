@@ -1,4 +1,4 @@
-import { assert, throwError } from "redgeometry/src/utility/debug";
+import { assert, throwError } from "redgeometry/src/internal/debug";
 import type { WorldModuleId } from "./world.ts";
 
 export type WorldEventId = string;

@@ -1,6 +1,6 @@
 import { COS_ACUTE, COS_OBTUSE } from "../core/consts.ts";
 import { DEFAULT_PRECISION_THRESHOLD } from "../internal/consts.ts";
-import { assert } from "../utility/debug.ts";
+import { assert } from "../internal/debug.ts";
 import { eqApproxAbs, eqApproxRel, lerp } from "../utility/scalar.ts";
 import { Vector2, type ReadonlyVector2 } from "./vector.ts";
 

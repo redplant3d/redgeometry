@@ -1,4 +1,4 @@
-import { assert } from "redgeometry/src/index";
+import { assert } from "redgeometry/src/internal/debug";
 import { log } from "redgeometry/src/internal/log";
 import { WorldDataStorage, type WorldData, type WorldDataId, type WorldDataIdOf } from "./data.js";
 import {

@@ -1,13 +1,13 @@
 import type { Mesh2, MeshFace2 } from "redgeometry/src/core/mesh";
 import { Path2 } from "redgeometry/src/core/path";
 import { Polygon2 } from "redgeometry/src/core/polygon";
+import { assertUnreachable, throwError } from "redgeometry/src/internal/debug";
 import type { Mesh2 as Mesh2Next, MeshFaceIdx as MeshNextFaceIdx } from "redgeometry/src/internal/mesh-next";
 import type { ReadonlyMinMaxBox2 } from "redgeometry/src/primitives/box";
 import type { Edge2, ReadonlyEdge2 } from "redgeometry/src/primitives/edge";
 import type { ReadonlyMatrix3A } from "redgeometry/src/primitives/matrix";
 import type { ReadonlyRay2 } from "redgeometry/src/primitives/ray";
 import { Vector2, type ReadonlyVector2 } from "redgeometry/src/primitives/vector";
-import { assertUnreachable, throwError } from "redgeometry/src/utility/debug";
 import type { Random } from "redgeometry/src/utility/random";
 import type { World, WorldContext } from "../ecs/world.ts";
 import { ColorRgba } from "../utility/color.ts";

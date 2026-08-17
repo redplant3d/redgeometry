@@ -1,5 +1,5 @@
 import { DEFAULT_PRECISION_THRESHOLD } from "../internal/consts.ts";
-import { assert } from "../utility/debug.ts";
+import { assert } from "../internal/debug.ts";
 import { clamp, eqApproxAbs, eqApproxRel, lerp, roundToPrecision } from "../utility/scalar.ts";
 
 export type Vector2Like = {

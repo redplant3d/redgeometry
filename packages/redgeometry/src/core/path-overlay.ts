@@ -1,10 +1,10 @@
+import { assert } from "../internal/debug.ts";
 import { log } from "../internal/log.ts";
 import { PathOverlayState2 } from "../internal/path-overlay.ts";
 import { PathSweepEvent2, createSweepEventQueue } from "../internal/path-sweep.ts";
 import { Bezier1Curve2, type ReadonlyBezierCurve2 } from "../primitives/bezier.ts";
 import type { ReadonlyEdge2 } from "../primitives/edge.ts";
 import { ArrayMultiSet, arrayEquals } from "../utility/array.ts";
-import { assert } from "../utility/debug.ts";
 import { MeshChain2, MeshEdge2, type Mesh2 } from "./mesh.ts";
 import { ApproximationMode, PATH_CLIP_OPTIONS_DEFAULT, type PathQualityOptions } from "./path-options.ts";
 import type { Path2 } from "./path.ts";

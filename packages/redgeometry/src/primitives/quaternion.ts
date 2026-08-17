@@ -1,6 +1,6 @@
 import { COS_ACUTE, COS_OBTUSE } from "../core/consts.ts";
 import { DEFAULT_PRECISION_THRESHOLD } from "../internal/consts.ts";
-import { assert, assertUnreachable } from "../utility/debug.ts";
+import { assert, assertUnreachable } from "../internal/debug.ts";
 import { clamp, eqApproxAbs, eqApproxRel, lerp } from "../utility/scalar.ts";
 import type { Enum } from "../utility/types.ts";
 import { Vector3, type ReadonlyVector3 } from "./vector.ts";
