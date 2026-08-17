@@ -53,7 +53,14 @@ export function formatString(fmt: string, ...params: FormatParameters): string {
 
     if (error || open) {
         // Syntax error
-        throw new Error("Invalid format string");
+        let message = "Invalid format string '" + fmt + "'";
+
+        if (params.length > 0) {
+            const paramsStr = params.map((p) => "'" + String(p) + "'").join(", ");
+            message += " with params: " + paramsStr;
+        }
+
+        throw new Error(message);
     }
 
     // Flush remaining `fmt`
