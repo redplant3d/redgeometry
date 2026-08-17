@@ -12,11 +12,17 @@ export class WorldDataStorage {
         this.dataEntries = new Map();
     }
 
+    public get<T extends WorldData>(dataId: WorldDataIdOf<T>): T {
+        const data = this.dataEntries.get(dataId);
+        assert(data !== undefined, "World data '{}' is not available", dataId);
+
+        return data as T;
+    }
+
     public register(dataId: WorldDataId, moduleId: WorldModuleId): void {
         assert(
             !this.dataEntries.has(dataId),
-            "World data id '{}' is registered in world module id '{}' " +
-                "but has already been registered in a world module",
+            "World data '{}' is registered in world module '{}' but has already been registered",
             dataId,
             moduleId,
         );
@@ -27,7 +33,7 @@ export class WorldDataStorage {
     public require(dataId: WorldDataId, moduleId: WorldModuleId): void {
         assert(
             this.dataEntries.has(dataId),
-            "World data id '{}' is required in world module id '{}' " + "but has not been registered in a world module",
+            "World data '{}' is required in world module '{}' but has not been registered",
             dataId,
             moduleId,
         );
@@ -36,17 +42,10 @@ export class WorldDataStorage {
     public set<T extends WorldData>(data: T): void {
         assert(
             this.dataEntries.has(data.dataId),
-            "World data id '{}' has not been registered in a world module",
+            "World data '{}' has not been registered in a world module",
             data.dataId,
         );
 
         this.dataEntries.set(data.dataId, data);
-    }
-
-    public get<T extends WorldData>(dataId: WorldDataIdOf<T>): T {
-        const data = this.dataEntries.get(dataId);
-        assert(data !== undefined, "World data id '{}' is not available", dataId);
-
-        return data as T;
     }
 }

@@ -12,11 +12,17 @@ export class WorldPluginStorage {
         this.pluginEntries = new Map();
     }
 
+    public get<T extends WorldPlugin>(pluginId: WorldPluginIdOf<T>): T {
+        const plugin = this.pluginEntries.get(pluginId);
+        assert(plugin !== undefined, "World plugin '{}' is not available", pluginId);
+
+        return plugin as T;
+    }
+
     public register(pluginId: WorldPluginId, moduleId: WorldModuleId): void {
         assert(
             !this.pluginEntries.has(pluginId),
-            "World plugin id '{}' is registered in world module id '{}' " +
-                "but has already been registered in a world module",
+            "World plugin '{}' is registered in world module '{}' but has already been registered",
             pluginId,
             moduleId,
         );
@@ -27,8 +33,7 @@ export class WorldPluginStorage {
     public require(pluginId: WorldPluginId, moduleId: WorldModuleId): void {
         assert(
             this.pluginEntries.has(pluginId),
-            "World plugin id '{}' is required in world module id '{}' " +
-                "but has not been registered in a world module",
+            "World plugin '{}' is required in world module '{}' but has not been registered",
             pluginId,
             moduleId,
         );
@@ -37,17 +42,10 @@ export class WorldPluginStorage {
     public set<T extends WorldPlugin>(plugin: T): void {
         assert(
             this.pluginEntries.has(plugin.pluginId),
-            "World plugin id '{}' has not been registered in a world module",
+            "World plugin '{}' has not been registered in a world module",
             plugin.pluginId,
         );
 
         this.pluginEntries.set(plugin.pluginId, plugin);
-    }
-
-    public get<T extends WorldPlugin>(pluginId: WorldPluginIdOf<T>): T {
-        const plugin = this.pluginEntries.get(pluginId);
-        assert(plugin !== undefined, "World plugin id '{}' is not available", pluginId);
-
-        return plugin as T;
     }
 }

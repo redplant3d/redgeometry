@@ -419,11 +419,11 @@ export class EntityComponentStorage {
         switch (type) {
             case ComponentTransitionType.ADD: {
                 if (hasFlags(entState.flags, EntityFlags.DESTROYED)) {
-                    throwError("Unable to add component id '{}' because entity has been destroyed", componentId);
+                    throwError("Unable to add component '{}' because entity has been destroyed", componentId);
                 }
 
                 if (hasFlagsAny(nextCompState.flags, compFlagMask)) {
-                    throwError("Unable to add component id '{}' because it already exists on entity", componentId);
+                    throwError("Unable to add component '{}' because it already exists on entity", componentId);
                 } else {
                     // Set `Added | Updated`
                     nextCompState.flags |= ComponentFlags.ADDED | ComponentFlags.UPDATED;
@@ -433,7 +433,7 @@ export class EntityComponentStorage {
             }
             case ComponentTransitionType.UPDATE: {
                 if (hasFlags(entState.flags, EntityFlags.DESTROYED)) {
-                    throwError("Unable to update component id '{}' because entity has been destroyed", componentId);
+                    throwError("Unable to update component '{}' because entity has been destroyed", componentId);
                 }
 
                 if (hasFlagsAny(nextCompState.flags, compFlagMask)) {
@@ -441,14 +441,14 @@ export class EntityComponentStorage {
                     nextCompState.flags |= ComponentFlags.UPDATED;
                     nextCompState.flags &= ~ComponentFlags.DEFAULT;
                 } else {
-                    throwError("Unable to update component id '{}'", componentId);
+                    throwError("Unable to update component '{}'", componentId);
                 }
 
                 break;
             }
             case ComponentTransitionType.SET: {
                 if (hasFlags(entState.flags, EntityFlags.DESTROYED)) {
-                    throwError("Unable to set component id '{}' because entity has been destroyed", componentId);
+                    throwError("Unable to set component '{}' because entity has been destroyed", componentId);
                 }
 
                 if (hasFlagsAny(nextCompState.flags, compFlagMask)) {
@@ -464,7 +464,7 @@ export class EntityComponentStorage {
             }
             case ComponentTransitionType.DELETE: {
                 if (hasFlags(entState.flags, EntityFlags.DESTROYED)) {
-                    throwError("Unable to delete component id '{}' because entity has been destroyed", componentId);
+                    throwError("Unable to delete component '{}' because entity has been destroyed", componentId);
                 }
 
                 // Deleting an already deleted component is silent
@@ -812,7 +812,7 @@ export class Entities {
         const version = entityId & Entities.VERSION_MASK;
 
         if (ref >= this.capacity || version !== this.versions[ref]) {
-            log.error("Entity id '{}' not found", entityId);
+            log.error("Entity '{}' not found", entityId);
             return -1;
         }
 
@@ -824,7 +824,7 @@ export class Entities {
         const version = entityId & Entities.VERSION_MASK;
 
         if (ref >= this.capacity || version !== this.versions[ref]) {
-            throwError("Entity id '{}' not found", entityId);
+            throwError("Entity '{}' not found", entityId);
         }
 
         return ref;
@@ -857,7 +857,7 @@ export class Entities {
     }
 
     private invalidateId(entityRef: EntityRef): EntityId {
-        // Reuse entity id with updated version
+        // Reuse entity with updated version
         let nextVersion = (this.versions[entityRef] + 1) & Entities.VERSION_MASK;
 
         if (nextVersion === 0) {
@@ -1260,7 +1260,7 @@ export class EntityComponentIterator<T extends Component> implements EntityCompo
         const comps = this.currComponents.get(componentId);
 
         if (comps === undefined) {
-            throwError("Component id '{}' not found", componentId);
+            throwError("Component '{}' not found", componentId);
         }
 
         const comp = comps[this.currStorageEntryRef];

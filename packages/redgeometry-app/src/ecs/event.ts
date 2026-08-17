@@ -18,11 +18,7 @@ export class WorldEventStorage {
 
     public add<T extends WorldEvent>(event: T): void {
         const eventEntry = this.eventEntries.get(event.eventId);
-        assert(
-            eventEntry !== undefined,
-            "World event id '{}' has not been registered in a world module",
-            event.eventId,
-        );
+        assert(eventEntry !== undefined, "World event '{}' has not been registered in a world module", event.eventId);
 
         eventEntry.events.push(event);
     }
@@ -36,10 +32,10 @@ export class WorldEventStorage {
         const eventId = eventArray[0].eventId;
 
         const eventEntry = this.eventEntries.get(eventId);
-        assert(eventEntry !== undefined, "World event id '{}' has not been registered in a world module", eventId);
+        assert(eventEntry !== undefined, "World event '{}' has not been registered in a world module", eventId);
 
         for (const event of eventArray) {
-            assert(event.eventId === eventId, "World event id '{}' does not match '{}'", event.eventId, eventId);
+            assert(event.eventId === eventId, "World event '{}' does not match '{}'", event.eventId, eventId);
 
             eventEntry.events.push(event);
         }
@@ -47,7 +43,7 @@ export class WorldEventStorage {
 
     public findLast<T extends WorldEvent>(eventId: WorldEventIdOf<T>): T | undefined {
         const eventEntry = this.eventEntries.get(eventId);
-        assert(eventEntry !== undefined, "World event id '{}' is not available", eventId);
+        assert(eventEntry !== undefined, "World event '{}' is not available", eventId);
 
         const events = eventEntry.events;
         const len = events.length;
@@ -61,7 +57,7 @@ export class WorldEventStorage {
 
     public get<T extends WorldEvent>(eventId: WorldEventIdOf<T>): WorldEventIterator<T> {
         const eventEntry = this.eventEntries.get(eventId);
-        assert(eventEntry !== undefined, "World event id '{}' is not available", eventId);
+        assert(eventEntry !== undefined, "World event '{}' is not available", eventId);
 
         const events = eventEntry.events as T[];
 
@@ -71,8 +67,7 @@ export class WorldEventStorage {
     public register(eventId: WorldEventId, moduleId: WorldModuleId): void {
         assert(
             !this.eventEntries.has(eventId),
-            "World event id '{}' is registered in world module id '{}' " +
-                "but has already been registered in a world module",
+            "World event '{}' is registered in world module '{}' but has already been registered",
             eventId,
             moduleId,
         );
@@ -83,8 +78,7 @@ export class WorldEventStorage {
     public require(eventId: WorldEventId, moduleId: WorldModuleId): void {
         assert(
             this.eventEntries.has(eventId),
-            "World event id '{}' is required in world module id '{}' " +
-                "but has not been registered in a world module",
+            "World event '{}' is required in world module '{}' but has not been registered",
             eventId,
             moduleId,
         );

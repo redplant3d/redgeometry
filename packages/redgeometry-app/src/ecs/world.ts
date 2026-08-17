@@ -301,7 +301,7 @@ export class WorldStorage {
 
     public add(worldId: WorldId, options: WorldModuleOptions): World {
         const hasWorld = this.worlds.has(worldId);
-        assert(!hasWorld, "World id '{}' already exists", worldId);
+        assert(!hasWorld, "World '{}' already exists", worldId);
 
         const world = this.createWorld({ type: "register-module", options });
         this.worlds.set(worldId, world);
@@ -311,15 +311,15 @@ export class WorldStorage {
 
     public get(worldId: WorldId): World {
         const world = this.worlds.get(worldId);
-        assert(world !== undefined, "World id '{}' not found", worldId);
+        assert(world !== undefined, "World '{}' not found", worldId);
 
         return world;
     }
 
-    private createWorld(entry: WorldContextRegisterModuleEntry): World {
+    private createWorld(moduleEntry: WorldContextRegisterModuleEntry): World {
         const modules = new Map<WorldModuleId, WorldContextEntry[]>();
 
-        this.iterateEntry(entry, modules);
+        this.iterateEntry(moduleEntry, modules);
 
         const entityComponentStorage = new EntityComponentStorage();
         const systemScheduleStorage = new SystemScheduleStorage();
@@ -385,14 +385,14 @@ export class WorldStorage {
     }
 
     private iterateEntry(
-        entry: WorldContextRegisterModuleEntry,
+        moduleEntry: WorldContextRegisterModuleEntry,
         outModules: Map<WorldModuleId, WorldContextEntry[]>,
     ): void {
         const subEntries: WorldContextEntry[] = [];
         const ctx = new WorldContext(subEntries);
 
-        entry.options.fn(ctx);
-        outModules.set(entry.options.id, subEntries);
+        moduleEntry.options.fn(ctx);
+        outModules.set(moduleEntry.options.id, subEntries);
 
         for (const subEntry of subEntries) {
             if (subEntry.type !== "register-module") {
@@ -400,7 +400,11 @@ export class WorldStorage {
             }
 
             if (outModules.has(subEntry.options.id)) {
-                log.warn("Ignoring duplicate app module '{}' (addded in '{}')", subEntry.options.id, entry.options.id);
+                log.warn(
+                    "Ignoring duplicate world module '{}' (addded in '{}')",
+                    subEntry.options.id,
+                    moduleEntry.options.id,
+                );
                 continue;
             }
 
