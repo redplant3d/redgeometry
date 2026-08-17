@@ -27,56 +27,56 @@ export type MaybeValue<T> = T | null;
 
 export type MeshVerticesLike<V, P> = {
     readonly data: MaybeValue<V>[];
-    readonly firstLink: MaybeMeshLinkIdx[];
-    readonly free: MeshVertexIdx[];
+    readonly firstLink: number[];
+    readonly free: number[];
     readonly length: number;
     readonly pos: MaybeValue<P>[];
 };
 
 export type MeshEdgesLike<E> = {
     readonly data: MaybeValue<E>[];
-    readonly free: MeshEdgeIdx[];
+    readonly free: number[];
     readonly length: number;
-    readonly link: MaybeMeshLinkIdx[];
+    readonly link: number[];
 };
 
 export type MeshFacesLike<F> = {
     readonly data: MaybeValue<F>[];
-    readonly firstLoop: MaybeMeshLoopIdx[];
-    readonly free: MeshFaceIdx[];
+    readonly firstLoop: number[];
+    readonly free: number[];
     readonly length: number;
-    readonly next: MaybeMeshFaceIdx[];
-    readonly prev: MaybeMeshFaceIdx[];
-    readonly shell: MaybeMeshShellIdx[];
+    readonly next: number[];
+    readonly prev: number[];
+    readonly shell: number[];
 };
 
 export type MeshLinksLike = {
-    readonly edge: MaybeMeshEdgeIdx[];
-    readonly free: MeshLinkIdx[];
+    readonly edge: number[];
+    readonly free: number[];
     readonly length: number;
-    readonly lnext: MaybeMeshLinkIdx[];
-    readonly loop: MaybeMeshLoopIdx[];
-    readonly onext: MaybeMeshLinkIdx[];
-    readonly sym: MaybeMeshLinkIdx[];
-    readonly vertex: MaybeMeshVertexIdx[];
+    readonly lnext: number[];
+    readonly loop: number[];
+    readonly onext: number[];
+    readonly sym: number[];
+    readonly vertex: number[];
 };
 
 export type MeshLoopsLike = {
-    readonly face: MaybeMeshFaceIdx[];
-    readonly firstLink: MaybeMeshLinkIdx[];
-    readonly free: MeshLoopIdx[];
+    readonly face: number[];
+    readonly firstLink: number[];
+    readonly free: number[];
     readonly length: number;
-    readonly next: MaybeMeshLoopIdx[];
-    readonly prev: MaybeMeshLoopIdx[];
+    readonly next: number[];
+    readonly prev: number[];
 };
 
 export type MeshShellsLike<S> = {
     readonly data: MaybeValue<S>[];
-    readonly firstFace: MaybeMeshFaceIdx[];
-    readonly free: MeshShellIdx[];
+    readonly firstFace: number[];
+    readonly free: number[];
     readonly length: number;
-    readonly next: MaybeMeshShellIdx[];
-    readonly prev: MaybeMeshShellIdx[];
+    readonly next: number[];
+    readonly prev: number[];
 };
 
 export type MeshLike<S, F, E, V, P> = {
@@ -118,8 +118,8 @@ export class MeshVertices<T, U> {
     public static fromObject<T, U>(obj: MeshVerticesLike<T, U>): MeshVertices<T, U> {
         const data = obj.data.slice();
         const pos = obj.pos.slice();
-        const firstLink = obj.firstLink.slice();
-        const free = obj.free.slice();
+        const firstLink = obj.firstLink.slice() as MaybeMeshLinkIdx[];
+        const free = obj.free.slice() as MeshVertexIdx[];
         const length = obj.length;
 
         return new MeshVertices(data, pos, firstLink, free, length);
@@ -253,8 +253,8 @@ export class MeshEdges<T> {
 
     public static fromObject<T>(obj: MeshEdgesLike<T>): MeshEdges<T> {
         const data = obj.data.slice();
-        const link = obj.link.slice();
-        const free = obj.free.slice();
+        const link = obj.link.slice() as MaybeMeshLinkIdx[];
+        const free = obj.free.slice() as MeshEdgeIdx[];
         const length = obj.length;
 
         return new MeshEdges(data, link, free, length);
@@ -386,11 +386,11 @@ export class MeshFaces<T> {
 
     public static fromObject<T>(obj: MeshFacesLike<T>): MeshFaces<T> {
         const data = obj.data.slice();
-        const shell = obj.shell.slice();
-        const firstLoop = obj.firstLoop.slice();
-        const free = obj.free.slice();
-        const next = obj.next.slice();
-        const prev = obj.prev.slice();
+        const shell = obj.shell.slice() as MaybeMeshShellIdx[];
+        const firstLoop = obj.firstLoop.slice() as MaybeMeshLoopIdx[];
+        const free = obj.free.slice() as MeshFaceIdx[];
+        const next = obj.next.slice() as MaybeMeshFaceIdx[];
+        const prev = obj.prev.slice() as MaybeMeshFaceIdx[];
         const length = obj.length;
 
         return new MeshFaces(data, shell, firstLoop, next, prev, free, length);
@@ -605,13 +605,13 @@ export class MeshLinks {
     }
 
     public static fromObject(obj: MeshLinksLike): MeshLinks {
-        const edge = obj.edge.slice();
-        const loop = obj.loop.slice();
-        const lnext = obj.lnext.slice();
-        const onext = obj.onext.slice();
-        const vertex = obj.vertex.slice();
-        const sym = obj.sym.slice();
-        const free = obj.free.slice();
+        const edge = obj.edge.slice() as MaybeMeshEdgeIdx[];
+        const loop = obj.loop.slice() as MaybeMeshLoopIdx[];
+        const lnext = obj.lnext.slice() as MaybeMeshLinkIdx[];
+        const onext = obj.onext.slice() as MaybeMeshLinkIdx[];
+        const vertex = obj.vertex.slice() as MaybeMeshVertexIdx[];
+        const sym = obj.sym.slice() as MaybeMeshLinkIdx[];
+        const free = obj.free.slice() as MeshLinkIdx[];
         const length = obj.length;
 
         return new MeshLinks(edge, loop, lnext, onext, vertex, sym, free, length);
@@ -899,11 +899,11 @@ export class MeshLoops {
     }
 
     public static fromObject(obj: MeshLoopsLike): MeshLoops {
-        const face = obj.face.slice();
-        const firstLink = obj.firstLink.slice();
-        const next = obj.next.slice();
-        const prev = obj.prev.slice();
-        const free = obj.free.slice();
+        const face = obj.face.slice() as MaybeMeshFaceIdx[];
+        const firstLink = obj.firstLink.slice() as MaybeMeshLinkIdx[];
+        const next = obj.next.slice() as MaybeMeshLoopIdx[];
+        const prev = obj.prev.slice() as MaybeMeshLoopIdx[];
+        const free = obj.free.slice() as MeshLoopIdx[];
         const length = obj.length;
 
         return new MeshLoops(face, firstLink, next, prev, free, length);
@@ -1115,10 +1115,10 @@ export class MeshShells<T> {
 
     public static fromObject<T>(obj: MeshShellsLike<T>): MeshShells<T> {
         const data = obj.data.slice();
-        const firstFace = obj.firstFace.slice();
-        const next = obj.next.slice();
-        const prev = obj.prev.slice();
-        const free = obj.free.slice();
+        const firstFace = obj.firstFace.slice() as MaybeMeshFaceIdx[];
+        const next = obj.next.slice() as MaybeMeshShellIdx[];
+        const prev = obj.prev.slice() as MaybeMeshShellIdx[];
+        const free = obj.free.slice() as MeshShellIdx[];
         const length = obj.length;
 
         return new MeshShells(data, firstFace, next, prev, free, length);
@@ -1965,7 +1965,7 @@ export class MeshPrimitiveNextIterator<T extends number> {
     }
 }
 
-class ValidationHelper {
+export class ValidationHelper {
     public errors: string[];
 
     public constructor() {
