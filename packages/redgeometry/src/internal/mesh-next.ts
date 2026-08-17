@@ -1,12 +1,13 @@
 import type { Path2 } from "../core/path.ts";
 import { isWindingInside, WindingOperator, type CustomWindingOperator } from "../core/winding.ts";
-import { assert, throwError, ValidationHelper } from "../internal/debug.ts";
+import { assert, throwError } from "../internal/debug.ts";
 import { log } from "../internal/log.ts";
 import { Bezier1Curve2 } from "../primitives/bezier.ts";
 import { MinMaxBox2 } from "../primitives/box.ts";
 import { Edge2 } from "../primitives/edge.ts";
 import { Vector2, type ReadonlyVector2 } from "../primitives/vector.ts";
 import type { Nominal } from "../utility/types.ts";
+import { formatString, type FormatParameters } from "./string.js";
 
 export type MeshVertexIdx = Nominal<number, "MeshVertexIdx">;
 export type MeshEdgeIdx = Nominal<number, "MeshEdgeIdx">;
@@ -1961,6 +1962,60 @@ export class MeshPrimitiveNextIterator<T extends number> {
         this.firstRef = firstRef;
         this.idxNext = firstRef;
         this.idxCurr = -1;
+    }
+}
+
+class ValidationHelper {
+    public errors: string[];
+
+    public constructor() {
+        this.errors = [];
+    }
+
+    public clear(): void {
+        this.errors = [];
+    }
+
+    public equal<T>(valueA: T, valueB: T, fmt: string, ...params: FormatParameters): void {
+        if (valueA !== valueB) {
+            const fmtStr = formatString(fmt, ...params);
+            this.errors.push(fmtStr + ": '" + valueA + "' expected to be EQUAL to '" + valueB + "'");
+        }
+    }
+
+    public greaterThan<T>(valueA: T, valueB: T, fmt: string, ...params: FormatParameters): void {
+        if (valueA <= valueB) {
+            const fmtStr = formatString(fmt, ...params);
+            this.errors.push(fmtStr + ": '" + valueA + "' expected to be GREATER THAN '" + valueB + "'");
+        }
+    }
+
+    public greaterThanOrEqual<T>(valueA: T, valueB: T, fmt: string, ...params: FormatParameters): void {
+        if (valueA < valueB) {
+            const fmtStr = formatString(fmt, ...params);
+            this.errors.push(fmtStr + ": " + valueA + " expected to be GREATER THAN OR EQUAL to'" + valueB + "'");
+        }
+    }
+
+    public lessThan<T>(valueA: T, valueB: T, fmt: string, ...params: FormatParameters): void {
+        if (valueA >= valueB) {
+            const fmtStr = formatString(fmt, ...params);
+            this.errors.push(fmtStr + ": '" + valueA + "' expected to be LESS THAN '" + valueB + "'");
+        }
+    }
+
+    public lessThanOrEqual<T>(valueA: T, valueB: T, fmt: string, ...params: FormatParameters): void {
+        if (valueA > valueB) {
+            const fmtStr = formatString(fmt, ...params);
+            this.errors.push(fmtStr + ": '" + valueA + "' expected to be LESS THAN OR EQUAL to '" + valueB + "'");
+        }
+    }
+
+    public notEqual<T>(valueA: T, valueB: T, fmt: string, ...params: FormatParameters): void {
+        if (valueA === valueB) {
+            const fmtStr = formatString(fmt, ...params);
+            this.errors.push(fmtStr + ": '" + valueA + "' expected to be NOT EQUAL to '" + valueB + "'");
+        }
     }
 }
 
