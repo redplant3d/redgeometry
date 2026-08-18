@@ -41,10 +41,7 @@ export type BezierRCurve2Like = {
 export type BezierCurve2 = Bezier1Curve2 | Bezier2Curve2 | Bezier3Curve2 | BezierRCurve2;
 
 export type ReadonlyBezierCurve2 =
-    | ReadonlyBezier1Curve2
-    | ReadonlyBezier2Curve2
-    | ReadonlyBezier3Curve2
-    | ReadonlyBezierRCurve2;
+    ReadonlyBezier1Curve2 | ReadonlyBezier2Curve2 | ReadonlyBezier3Curve2 | ReadonlyBezierRCurve2;
 
 export interface ReadonlyBezier1Curve2 {
     readonly p0: ReadonlyVector2;

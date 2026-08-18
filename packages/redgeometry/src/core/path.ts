@@ -68,12 +68,7 @@ export type PathCommandConic = { type: typeof PathCommandType.CONIC; w: number }
 export type PathCommandClose = { type: typeof PathCommandType.CLOSE };
 
 export type PathCommand =
-    | PathCommandMove
-    | PathCommandLine
-    | PathCommandQuad
-    | PathCommandCubic
-    | PathCommandConic
-    | PathCommandClose;
+    PathCommandMove | PathCommandLine | PathCommandQuad | PathCommandCubic | PathCommandConic | PathCommandClose;
 
 export class Path2 implements PathSink2 {
     private commands: PathCommand[];
