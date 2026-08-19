@@ -12,11 +12,11 @@ export class WorldPluginStorage {
         this.pluginEntries = new Map();
     }
 
-    public get<T extends WorldPlugin>(pluginId: WorldPluginIdOf<T>): T {
+    public get(pluginId: WorldPluginId): WorldPlugin {
         const plugin = this.pluginEntries.get(pluginId);
         assert(plugin !== undefined, "World plugin '{}' is not available", pluginId);
 
-        return plugin as T;
+        return plugin;
     }
 
     public register(pluginId: WorldPluginId, moduleId: WorldModuleId): void {
@@ -39,7 +39,7 @@ export class WorldPluginStorage {
         );
     }
 
-    public set<T extends WorldPlugin>(plugin: T): void {
+    public set(plugin: WorldPlugin): void {
         assert(
             this.pluginEntries.has(plugin.pluginId),
             "World plugin '{}' has not been registered in a world module",

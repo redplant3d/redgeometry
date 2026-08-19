@@ -12,11 +12,11 @@ export class WorldDataStorage {
         this.dataEntries = new Map();
     }
 
-    public get<T extends WorldData>(dataId: WorldDataIdOf<T>): T {
+    public get(dataId: WorldDataId): WorldData {
         const data = this.dataEntries.get(dataId);
         assert(data !== undefined, "World data '{}' is not available", dataId);
 
-        return data as T;
+        return data;
     }
 
     public register(dataId: WorldDataId, moduleId: WorldModuleId): void {
@@ -39,7 +39,7 @@ export class WorldDataStorage {
         );
     }
 
-    public set<T extends WorldData>(data: T): void {
+    public set(data: WorldData): void {
         assert(
             this.dataEntries.has(data.dataId),
             "World data '{}' has not been registered in a world module",

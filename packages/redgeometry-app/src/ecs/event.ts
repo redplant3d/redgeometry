@@ -16,32 +16,32 @@ export class WorldEventStorage {
         this.eventEntries = new Map();
     }
 
-    public add<T extends WorldEvent>(event: T): void {
+    public add(event: WorldEvent): void {
         const eventEntry = this.eventEntries.get(event.eventId);
         assert(eventEntry !== undefined, "World event '{}' has not been registered in a world module", event.eventId);
 
         eventEntry.events.push(event);
     }
 
-    public addArray<T extends WorldEvent[]>(eventArray: T): void {
-        if (eventArray.length === 0) {
+    public addArray(events: WorldEvent[]): void {
+        if (events.length === 0) {
             // Nothing to do
             return;
         }
 
-        const eventId = eventArray[0].eventId;
+        const eventId = events[0].eventId;
 
         const eventEntry = this.eventEntries.get(eventId);
         assert(eventEntry !== undefined, "World event '{}' has not been registered in a world module", eventId);
 
-        for (const event of eventArray) {
+        for (const event of events) {
             assert(event.eventId === eventId, "World event '{}' does not match '{}'", event.eventId, eventId);
 
             eventEntry.events.push(event);
         }
     }
 
-    public findLast<T extends WorldEvent>(eventId: WorldEventIdOf<T>): T | undefined {
+    public findLast(eventId: WorldEventId): WorldEvent | undefined {
         const eventEntry = this.eventEntries.get(eventId);
         assert(eventEntry !== undefined, "World event '{}' is not available", eventId);
 
@@ -52,16 +52,14 @@ export class WorldEventStorage {
             return undefined;
         }
 
-        return events[len - 1] as T;
+        return events[len - 1];
     }
 
-    public get<T extends WorldEvent>(eventId: WorldEventIdOf<T>): WorldEventIterator<T> {
+    public get(eventId: WorldEventId): WorldEventIterator<WorldEvent> {
         const eventEntry = this.eventEntries.get(eventId);
         assert(eventEntry !== undefined, "World event '{}' is not available", eventId);
 
-        const events = eventEntry.events as T[];
-
-        return new WorldEventIterator(events);
+        return new WorldEventIterator(eventEntry.events);
     }
 
     public register(eventId: WorldEventId, moduleId: WorldModuleId): void {

@@ -41,14 +41,14 @@ export type ComponentTransition = {
     setState: EntityComponentSetState;
 };
 
-export interface EntityComponentQueryValue<U extends Component> {
+export interface EntityComponentQueryValue<T extends Component> {
     /**
      * Equivalent to `hasComponentFlagsAny(componentId,
      * ComponentFlags.Default | ComponentFlags.Added | ComponentFlags.Updated)`
      */
-    hasComponent<T extends U>(componentId: ComponentIdOf<T>): boolean;
-    hasComponentFlags<T extends U>(componentId: ComponentIdOf<T>, flagMask: ComponentFlags): boolean;
-    hasComponentFlagsAny<T extends U>(componentId: ComponentIdOf<T>, flagMask: ComponentFlags): boolean;
+    hasComponent<U extends T>(componentId: ComponentIdOf<U>): boolean;
+    hasComponentFlags<U extends T>(componentId: ComponentIdOf<U>, flagMask: ComponentFlags): boolean;
+    hasComponentFlagsAny<U extends T>(componentId: ComponentIdOf<U>, flagMask: ComponentFlags): boolean;
     hasEntityFlags(flagMask: EntityFlags): boolean;
     hasEntityFlagsAny(flagMask: EntityFlags): boolean;
     /**
@@ -95,7 +95,7 @@ export class EntityComponentStorage {
         this.sets = [];
     }
 
-    public addComponent<T extends Component>(entityId: EntityId, component: T): void {
+    public addComponent(entityId: EntityId, component: Component): void {
         const entityRef = this.entities.getRefOrThrow(entityId);
         const currSet = this.getComponentSet(entityRef);
         const nextState = this.makeComponentTransition(
@@ -129,7 +129,7 @@ export class EntityComponentStorage {
         return entityId;
     }
 
-    public deleteComponent<T extends Component>(entityId: EntityId, componentId: ComponentIdOf<T>): void {
+    public deleteComponent(entityId: EntityId, componentId: ComponentId): void {
         const entityRef = this.entities.getRefOrThrow(entityId);
         const currSet = this.getComponentSet(entityRef);
         const nextState = this.makeComponentTransition(currSet.state, componentId, ComponentTransitionType.DELETE);
@@ -147,7 +147,7 @@ export class EntityComponentStorage {
         this.moveSetEntryDestroyEntity(entityId, entityRef, currSet, nextState, nextSet);
     }
 
-    public findComponent<T extends Component>(entityId: EntityId, componentId: ComponentIdOf<T>): T | undefined {
+    public findComponent(entityId: EntityId, componentId: ComponentId): Component | undefined {
         const entityRef = this.entities.getRefOrError(entityId);
 
         if (entityRef < 0) {
@@ -160,7 +160,7 @@ export class EntityComponentStorage {
         return currSet.findComponent(componentId, setEntryRef);
     }
 
-    public getComponentFlags<T extends Component>(entityId: EntityId, componentId: ComponentIdOf<T>): ComponentFlags {
+    public getComponentFlags(entityId: EntityId, componentId: ComponentId): ComponentFlags {
         const entityRef = this.entities.getRefOrError(entityId);
 
         if (entityRef < 0) {
@@ -197,7 +197,7 @@ export class EntityComponentStorage {
         return currSet.state.getEntityFlags();
     }
 
-    public hasComponent<T extends Component>(entityId: EntityId, componentId: ComponentIdOf<T>): boolean {
+    public hasComponent(entityId: EntityId, componentId: ComponentId): boolean {
         const entityRef = this.entities.getRefOrError(entityId);
 
         if (entityRef < 0) {
@@ -209,20 +209,12 @@ export class EntityComponentStorage {
         return currSet.state.hasComponent(componentId);
     }
 
-    public hasComponentFlags<T extends Component>(
-        entityId: EntityId,
-        componentId: ComponentIdOf<T>,
-        flagMask: ComponentFlags,
-    ): boolean {
+    public hasComponentFlags(entityId: EntityId, componentId: ComponentId, flagMask: ComponentFlags): boolean {
         const flags = this.getComponentFlags(entityId, componentId);
         return hasFlags(flags, flagMask);
     }
 
-    public hasComponentFlagsAny<T extends Component>(
-        entityId: EntityId,
-        componentId: ComponentIdOf<T>,
-        flagMask: ComponentFlags,
-    ): boolean {
+    public hasComponentFlagsAny(entityId: EntityId, componentId: ComponentId, flagMask: ComponentFlags): boolean {
         const flags = this.getComponentFlags(entityId, componentId);
         return hasFlagsAny(flags, flagMask);
     }
@@ -259,9 +251,9 @@ export class EntityComponentStorage {
     /**
      * Returns an iterator over the entities filtered by `predicate`.
      */
-    public queryEntities<T extends Component, U extends T>(
-        predicate: (q: EntityComponentQueryValue<T>) => boolean,
-    ): EntityComponentIterator<U> {
+    public queryEntities(
+        predicate: (q: EntityComponentQueryValue<Component>) => boolean,
+    ): EntityComponentIterator<Component> {
         const querySets: EntityComponentQuerySet[] = [];
 
         for (const componentSet of this.sets) {
@@ -290,7 +282,7 @@ export class EntityComponentStorage {
         }
     }
 
-    public setComponent<T extends Component>(entityId: EntityId, component: T): void {
+    public setComponent(entityId: EntityId, component: Component): void {
         const entityRef = this.entities.getRefOrThrow(entityId);
         const currSet = this.getComponentSet(entityRef);
         const nextState = this.makeComponentTransition(
@@ -304,7 +296,7 @@ export class EntityComponentStorage {
         nextSet.storage.setComponent(storageEntryRef, component);
     }
 
-    public updateComponent<T extends Component>(entityId: EntityId, componentId: ComponentIdOf<T>): void {
+    public updateComponent(entityId: EntityId, componentId: ComponentId): void {
         const entityRef = this.entities.getRefOrThrow(entityId);
         const currSet = this.getComponentSet(entityRef);
         const nextState = this.makeComponentTransition(currSet.state, componentId, ComponentTransitionType.UPDATE);
@@ -1052,10 +1044,10 @@ export class EntityComponentSet {
         this.freeRefs.push(setEntryRef);
     }
 
-    public findComponent<T extends Component>(
-        componentId: ComponentIdOf<T>,
+    public findComponent(
+        componentId: ComponentId,
         componentSetEntryRef: EntityComponentSetEntryRef,
-    ): T | undefined {
+    ): Component | undefined {
         const comps = this.storage.components.get(componentId);
 
         if (comps === undefined) {
@@ -1069,7 +1061,7 @@ export class EntityComponentSet {
             throwError("Invalid storage ref '{}'", ref);
         }
 
-        return comp as T;
+        return comp;
     }
 
     public getComponents(componentSetEntryRef: EntityComponentSetEntryRef): Component[] {
@@ -1214,7 +1206,7 @@ export class EntityComponentSetStorage {
     }
 }
 
-export class EntityComponentIterator<T extends Component> implements EntityComponentIterator<T> {
+export class EntityComponentIterator<T extends Component> {
     private currComponentStates: ComponentStates;
     private currComponents: ReadonlyMap<ComponentId, ComponentContainer>;
     private currEntityFlags: EntityFlags;

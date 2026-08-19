@@ -153,11 +153,11 @@ export class World {
     }
 
     public findComponent<T extends Component>(entity: EntityId, componentId: ComponentIdOf<T>): T | undefined {
-        return this.entityComponentStorage.findComponent(entity, componentId);
+        return this.entityComponentStorage.findComponent(entity, componentId) as T | undefined;
     }
 
     public findLastEvent<T extends WorldEvent>(eventId: WorldEventIdOf<T>): T | undefined {
-        return this.eventStorage.findLast(eventId);
+        return this.eventStorage.findLast(eventId) as T | undefined;
     }
 
     public getComponentFlags<T extends Component>(entityId: EntityId, componentId: ComponentIdOf<T>): ComponentFlags {
@@ -165,7 +165,7 @@ export class World {
     }
 
     public getData<T extends WorldData>(dataId: WorldDataIdOf<T>): T {
-        return this.dataStorage.get(dataId);
+        return this.dataStorage.get(dataId) as T;
     }
 
     public getEntityFlags(entityId: EntityId): EntityFlags {
@@ -173,11 +173,11 @@ export class World {
     }
 
     public getEvents<T extends WorldEvent>(eventId: WorldEventIdOf<T>): WorldEventIterator<T> {
-        return this.eventStorage.get(eventId);
+        return this.eventStorage.get(eventId) as WorldEventIterator<T>;
     }
 
     public getPlugin<T extends WorldPlugin>(pluginId: WorldPluginIdOf<T>): T {
-        return this.pluginStorage.get(pluginId);
+        return this.pluginStorage.get(pluginId) as T;
     }
 
     public hasComponent<T extends Component>(entityId: EntityId, componentId: ComponentIdOf<T>): boolean {
@@ -212,7 +212,7 @@ export class World {
         return this.entityComponentStorage.isEntityAlive(entityId);
     }
 
-    public queryEntities<T extends Component = Component>(
+    public queryEntities<T extends Component>(
         predicate: (q: EntityComponentQueryValue<T>) => boolean,
     ): EntityComponentIterator<T> {
         return this.entityComponentStorage.queryEntities(predicate);
