@@ -104,7 +104,7 @@ export class SystemScheduleStorage {
     public registerSchedule(scheduleId: SystemScheduleId, moduleId: WorldModuleId): void {
         assert(
             !this.schedules.has(scheduleId),
-            "System schedule '{}' is registered in world module '{}' but has already been registered",
+            "System schedule '{}' is registered from world module '{}' but has already been registered",
             scheduleId,
             moduleId,
         );
@@ -115,15 +115,16 @@ export class SystemScheduleStorage {
     public registerSystem(options: SystemOptions, moduleId: WorldModuleId): void {
         assert(
             this.schedules.has(options.scheduleId),
-            "System schedule '{}' is required for system '{}' in world module '{}' but has not been registered",
+            "System schedule '{}' is required for system '{}' by world module '{}' but has not been registered",
             options.scheduleId,
             options.id,
             moduleId,
         );
         assert(
             !this.options.some((o) => o.id === options.id && o.scheduleId === options.scheduleId),
-            "System '{}' is registered in world module '{}' but has already been registered",
+            "System '{}' in system schedule '{}' is registered from world module '{}' but has already been registered",
             options.id,
+            options.scheduleId,
             moduleId,
         );
 
@@ -133,7 +134,7 @@ export class SystemScheduleStorage {
     public registerSystemDependency(options: SystemDependencyOptions, moduleId: WorldModuleId): void {
         assert(
             this.schedules.has(options.scheduleId),
-            "System schedule '{}' is required for a system dependency in world module '{}' but has not been registered",
+            "System schedule '{}' is required for a system dependency by world module '{}' but has not been registered",
             options.scheduleId,
             moduleId,
         );
@@ -143,7 +144,7 @@ export class SystemScheduleStorage {
 
     public async runSchedule(id: SystemScheduleId, world: World): Promise<void> {
         const schedule = this.schedules.get(id);
-        assert(schedule !== undefined, "System schedule '{}' has not been registered in a world module", id);
+        assert(schedule !== undefined, "System schedule '{}' is not available", id);
 
         for (const entry of schedule.entries) {
             // Wait for incoming dependencies

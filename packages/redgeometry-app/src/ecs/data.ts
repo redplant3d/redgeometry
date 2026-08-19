@@ -22,7 +22,7 @@ export class WorldDataStorage {
     public register(dataId: WorldDataId, moduleId: WorldModuleId): void {
         assert(
             !this.dataEntries.has(dataId),
-            "World data '{}' is registered in world module '{}' but has already been registered",
+            "World data '{}' is registered from world module '{}' but has already been registered",
             dataId,
             moduleId,
         );
@@ -33,7 +33,7 @@ export class WorldDataStorage {
     public require(dataId: WorldDataId, moduleId: WorldModuleId): void {
         assert(
             this.dataEntries.has(dataId),
-            "World data '{}' is required in world module '{}' but has not been registered",
+            "World data '{}' is required by world module '{}' but has not been registered",
             dataId,
             moduleId,
         );

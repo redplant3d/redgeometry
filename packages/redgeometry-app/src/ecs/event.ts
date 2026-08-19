@@ -65,7 +65,7 @@ export class WorldEventStorage {
     public register(eventId: WorldEventId, moduleId: WorldModuleId): void {
         assert(
             !this.eventEntries.has(eventId),
-            "World event '{}' is registered in world module '{}' but has already been registered",
+            "World event '{}' is registered from world module '{}' but has already been registered",
             eventId,
             moduleId,
         );
@@ -76,7 +76,7 @@ export class WorldEventStorage {
     public require(eventId: WorldEventId, moduleId: WorldModuleId): void {
         assert(
             this.eventEntries.has(eventId),
-            "World event '{}' is required in world module '{}' but has not been registered",
+            "World event '{}' is required by world module '{}' but has not been registered",
             eventId,
             moduleId,
         );

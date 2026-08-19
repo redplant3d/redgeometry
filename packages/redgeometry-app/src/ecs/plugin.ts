@@ -22,7 +22,7 @@ export class WorldPluginStorage {
     public register(pluginId: WorldPluginId, moduleId: WorldModuleId): void {
         assert(
             !this.pluginEntries.has(pluginId),
-            "World plugin '{}' is registered in world module '{}' but has already been registered",
+            "World plugin '{}' is registered from world module '{}' but has already been registered",
             pluginId,
             moduleId,
         );
@@ -33,7 +33,7 @@ export class WorldPluginStorage {
     public require(pluginId: WorldPluginId, moduleId: WorldModuleId): void {
         assert(
             this.pluginEntries.has(pluginId),
-            "World plugin '{}' is required in world module '{}' but has not been registered",
+            "World plugin '{}' is required by world module '{}' but has not been registered",
             pluginId,
             moduleId,
         );
