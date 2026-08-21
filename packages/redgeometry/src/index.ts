@@ -20,6 +20,7 @@ export * from "./primitives/matrix.ts";
 export * from "./primitives/plane.ts";
 export * from "./primitives/quaternion.ts";
 export * from "./primitives/ray.ts";
+export * from "./primitives/triangle.ts";
 export * from "./primitives/vector.ts";
 export * from "./utility/array.ts";
 export * from "./utility/float128.ts";

@@ -261,34 +261,6 @@ export class Vector2 implements ReadonlyVector2 {
         }
     }
 
-    /**
-     * Returns whether `p` is inside the triangle `p0`, `p1` and `p2`.
-     *
-     * References:
-     * - *Triangle Interior*.
-     *   https://mathworld.wolfram.com/TriangleInterior.html
-     */
-    public static isPointInTriangle(
-        p0: ReadonlyVector2,
-        p1: ReadonlyVector2,
-        p2: ReadonlyVector2,
-        p: ReadonlyVector2,
-    ): boolean {
-        const v = p.sub(p0);
-        const v1 = p1.sub(p0);
-        const v2 = p2.sub(p0);
-
-        const r = v.cross(v2);
-        const s = v1.cross(v);
-        const d = v1.cross(v2);
-
-        if (d > 0) {
-            return r > 0 && s > 0 && r + s < d;
-        } else {
-            return r < 0 && s < 0 && r + s > d;
-        }
-    }
-
     public static signedArea(p0: ReadonlyVector2, p1: ReadonlyVector2, p: ReadonlyVector2): number {
         // `result < 0` -> `p` is below `(p0, p1)`
         // `result > 0` -> `p` is above `(p0, p1)`
