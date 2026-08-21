@@ -42,11 +42,11 @@ export interface ReadonlyMatrix3A {
     readonly type: "affine";
 
     clone(): Matrix3A;
+    decomposeSRT(): { s: Vector2; r: Complex; t: Vector2 };
     determinant(): number;
     eq(mat: ReadonlyMatrix3A): boolean;
     eqApproxAbs(mat: ReadonlyMatrix3A, eps: number): boolean;
     eqApproxRel(mat: ReadonlyMatrix3A, eps: number): boolean;
-    extractSRT(): { s: Vector2; r: Complex; t: Vector2 };
     mul(mat: ReadonlyMatrix3A): Matrix3A;
     mulV(v: ReadonlyVector3): Vector3;
     toArray(): MatrixElements3A;
@@ -62,11 +62,11 @@ export interface ReadonlyMatrix3 {
 
     add(mat: ReadonlyMatrix3): Matrix3;
     clone(): Matrix3;
+    decomposeSRT(): { s: Vector2; r: Complex; t: Vector2 };
     determinant(): number;
     eq(mat: ReadonlyMatrix3): boolean;
     eqApproxAbs(mat: ReadonlyMatrix3, eps: number): boolean;
     eqApproxRel(mat: ReadonlyMatrix3, eps: number): boolean;
-    extractSRT(): { s: Vector2; r: Complex; t: Vector2 };
     mul(mat: ReadonlyMatrix3): Matrix3;
     mulV(v: ReadonlyVector3): Vector3;
     toArray(): MatrixElements3;
@@ -82,11 +82,11 @@ export interface ReadonlyMatrix4A {
     readonly type: "affine";
 
     clone(): Matrix4A;
+    decomposeSRT(): { s: Vector3; r: Quaternion; t: Vector3 };
     determinant(): number;
     eq(mat: ReadonlyMatrix4A): boolean;
     eqApproxAbs(mat: ReadonlyMatrix4A, eps: number): boolean;
     eqApproxRel(mat: ReadonlyMatrix4A, eps: number): boolean;
-    extractSRT(): { s: Vector3; r: Quaternion; t: Vector3 };
     mul(mat: ReadonlyMatrix4A): Matrix4A;
     mulV(v: ReadonlyVector4): Vector4;
     toArray(): MatrixElements4A;
@@ -102,11 +102,11 @@ export interface ReadonlyMatrix4 {
 
     add(mat: ReadonlyMatrix4): Matrix4;
     clone(): Matrix4;
+    decomposeSRT(): { s: Vector3; r: Quaternion; t: Vector3 };
     determinant(): number;
     eq(mat: ReadonlyMatrix4): boolean;
     eqApproxAbs(mat: ReadonlyMatrix4, eps: number): boolean;
     eqApproxRel(mat: ReadonlyMatrix4, eps: number): boolean;
-    extractSRT(): { s: Vector3; r: Quaternion; t: Vector3 };
     mul(mat: ReadonlyMatrix4): Matrix4;
     mulV(v: ReadonlyVector4): Vector4;
     sub(mat: ReadonlyMatrix4): Matrix4;
@@ -303,6 +303,25 @@ export class Matrix3A implements ReadonlyMatrix3A {
         return new Matrix3A([...this.elements]);
     }
 
+    public decomposeSRT(): { s: Vector2; r: Complex; t: Vector2 } {
+        const e = this.elements;
+
+        let sx = Math.sqrt(e[0] * e[0] + e[1] * e[1]);
+        const sy = Math.sqrt(e[2] * e[2] + e[3] * e[3]);
+
+        if (this.determinant() < 0) {
+            sx = -sx;
+        }
+
+        const fx = 1 / sx;
+
+        const s = new Vector2(sx, sy);
+        const r = Complex.fromRotationMatrix(fx * e[0], fx * e[1]);
+        const t = new Vector2(e[4], e[5]);
+
+        return { s, r, t };
+    }
+
     /**
      * Returns the determinant of the matrix.
      */
@@ -351,25 +370,6 @@ export class Matrix3A implements ReadonlyMatrix3A {
             eqApproxRel(ea[4], eb[4], eps) &&
             eqApproxRel(ea[5], eb[5], eps)
         );
-    }
-
-    public extractSRT(): { s: Vector2; r: Complex; t: Vector2 } {
-        const e = this.elements;
-
-        let sx = Math.sqrt(e[0] * e[0] + e[1] * e[1]);
-        const sy = Math.sqrt(e[2] * e[2] + e[3] * e[3]);
-
-        if (this.determinant() < 0) {
-            sx = -sx;
-        }
-
-        const fx = 1 / sx;
-
-        const s = new Vector2(sx, sy);
-        const r = Complex.fromRotationMatrix(fx * e[0], fx * e[1]);
-        const t = new Vector2(e[4], e[5]);
-
-        return { s, r, t };
     }
 
     /**
@@ -1051,6 +1051,25 @@ export class Matrix3 implements ReadonlyMatrix3 {
         return new Matrix3([...this.elements]);
     }
 
+    public decomposeSRT(): { s: Vector2; r: Complex; t: Vector2 } {
+        const e = this.elements;
+
+        let sx = Math.sqrt(e[0] * e[0] + e[1] * e[1] + e[2] * e[2]);
+        const sy = Math.sqrt(e[3] * e[3] + e[4] * e[4] + e[5] * e[5]);
+
+        if (this.determinant() < 0) {
+            sx = -sx;
+        }
+
+        const fx = 1 / sx;
+
+        const s = new Vector2(sx, sy);
+        const r = Complex.fromRotationMatrix(fx * e[0], fx * e[1]);
+        const t = new Vector2(e[6], e[7]);
+
+        return { s, r, t };
+    }
+
     /**
      * Returns the determinant of the matrix.
      */
@@ -1113,25 +1132,6 @@ export class Matrix3 implements ReadonlyMatrix3 {
             eqApproxRel(ea[7], eb[7], eps) &&
             eqApproxRel(ea[8], eb[8], eps)
         );
-    }
-
-    public extractSRT(): { s: Vector2; r: Complex; t: Vector2 } {
-        const e = this.elements;
-
-        let sx = Math.sqrt(e[0] * e[0] + e[1] * e[1] + e[2] * e[2]);
-        const sy = Math.sqrt(e[3] * e[3] + e[4] * e[4] + e[5] * e[5]);
-
-        if (this.determinant() < 0) {
-            sx = -sx;
-        }
-
-        const fx = 1 / sx;
-
-        const s = new Vector2(sx, sy);
-        const r = Complex.fromRotationMatrix(fx * e[0], fx * e[1]);
-        const t = new Vector2(e[6], e[7]);
-
-        return { s, r, t };
     }
 
     /**
@@ -2037,6 +2037,38 @@ export class Matrix4A implements ReadonlyMatrix4A {
         return new Matrix4A([...this.elements]);
     }
 
+    public decomposeSRT(): { s: Vector3; r: Quaternion; t: Vector3 } {
+        const e = this.elements;
+
+        let sx = Math.sqrt(e[0] * e[0] + e[1] * e[1] + e[2] * e[2]);
+        const sy = Math.sqrt(e[3] * e[3] + e[4] * e[4] + e[5] * e[5]);
+        const sz = Math.sqrt(e[6] * e[6] + e[7] * e[7] + e[8] * e[8]);
+
+        if (this.determinant() < 0) {
+            sx = -sx;
+        }
+
+        const fx = 1 / sx;
+        const fy = 1 / sy;
+        const fz = 1 / sz;
+
+        const s = new Vector3(sx, sy, sz);
+        const r = Quaternion.fromRotationMatrix(
+            fx * e[0],
+            fx * e[1],
+            fx * e[2],
+            fy * e[3],
+            fy * e[4],
+            fy * e[5],
+            fz * e[6],
+            fz * e[7],
+            fz * e[8],
+        );
+        const t = new Vector3(e[9], e[10], e[11]);
+
+        return { s, r, t };
+    }
+
     /**
      * Returns the determinant of the matrix.
      */
@@ -2108,38 +2140,6 @@ export class Matrix4A implements ReadonlyMatrix4A {
             eqApproxRel(ea[10], eb[10], eps) &&
             eqApproxRel(ea[11], eb[11], eps)
         );
-    }
-
-    public extractSRT(): { s: Vector3; r: Quaternion; t: Vector3 } {
-        const e = this.elements;
-
-        let sx = Math.sqrt(e[0] * e[0] + e[1] * e[1] + e[2] * e[2]);
-        const sy = Math.sqrt(e[3] * e[3] + e[4] * e[4] + e[5] * e[5]);
-        const sz = Math.sqrt(e[6] * e[6] + e[7] * e[7] + e[8] * e[8]);
-
-        if (this.determinant() < 0) {
-            sx = -sx;
-        }
-
-        const fx = 1 / sx;
-        const fy = 1 / sy;
-        const fz = 1 / sz;
-
-        const s = new Vector3(sx, sy, sz);
-        const r = Quaternion.fromRotationMatrix(
-            fx * e[0],
-            fx * e[1],
-            fx * e[2],
-            fy * e[3],
-            fy * e[4],
-            fy * e[5],
-            fz * e[6],
-            fz * e[7],
-            fz * e[8],
-        );
-        const t = new Vector3(e[9], e[10], e[11]);
-
-        return { s, r, t };
     }
 
     /**
@@ -3223,6 +3223,38 @@ export class Matrix4 implements ReadonlyMatrix4 {
         return new Matrix4([...this.elements]);
     }
 
+    public decomposeSRT(): { s: Vector3; r: Quaternion; t: Vector3 } {
+        const e = this.elements;
+
+        let sx = Math.sqrt(e[0] * e[0] + e[1] * e[1] + e[2] * e[2] + e[3] * e[3]);
+        const sy = Math.sqrt(e[4] * e[4] + e[5] * e[5] + e[6] * e[6] + e[7] * e[7]);
+        const sz = Math.sqrt(e[8] * e[8] + e[9] * e[9] + e[10] * e[10] + e[11] * e[11]);
+
+        if (this.determinant() < 0) {
+            sx = -sx;
+        }
+
+        const fx = 1 / sx;
+        const fy = 1 / sy;
+        const fz = 1 / sz;
+
+        const s = new Vector3(sx, sy, sz);
+        const r = Quaternion.fromRotationMatrix(
+            fx * e[0],
+            fx * e[1],
+            fx * e[2],
+            fy * e[4],
+            fy * e[5],
+            fy * e[6],
+            fz * e[8],
+            fz * e[9],
+            fz * e[10],
+        );
+        const t = new Vector3(e[12], e[13], e[14]);
+
+        return { s, r, t };
+    }
+
     /**
      * Returns the determinant of the matrix.
      */
@@ -3322,38 +3354,6 @@ export class Matrix4 implements ReadonlyMatrix4 {
             eqApproxRel(ea[14], eb[14], eps) &&
             eqApproxRel(ea[15], eb[15], eps)
         );
-    }
-
-    public extractSRT(): { s: Vector3; r: Quaternion; t: Vector3 } {
-        const e = this.elements;
-
-        let sx = Math.sqrt(e[0] * e[0] + e[1] * e[1] + e[2] * e[2] + e[3] * e[3]);
-        const sy = Math.sqrt(e[4] * e[4] + e[5] * e[5] + e[6] * e[6] + e[7] * e[7]);
-        const sz = Math.sqrt(e[8] * e[8] + e[9] * e[9] + e[10] * e[10] + e[11] * e[11]);
-
-        if (this.determinant() < 0) {
-            sx = -sx;
-        }
-
-        const fx = 1 / sx;
-        const fy = 1 / sy;
-        const fz = 1 / sz;
-
-        const s = new Vector3(sx, sy, sz);
-        const r = Quaternion.fromRotationMatrix(
-            fx * e[0],
-            fx * e[1],
-            fx * e[2],
-            fy * e[4],
-            fy * e[5],
-            fy * e[6],
-            fz * e[8],
-            fz * e[9],
-            fz * e[10],
-        );
-        const t = new Vector3(e[12], e[13], e[14]);
-
-        return { s, r, t };
     }
 
     /**

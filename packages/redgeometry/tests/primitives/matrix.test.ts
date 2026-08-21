@@ -10,7 +10,7 @@ import {
     expectToBeCloseVector3,
 } from "../expect.ts";
 
-test("Matrix3A - extract", () => {
+test("Matrix3A - decomposeSRT", () => {
     const s = new Vector2(1, 2);
     const r = Complex.fromRotationAngle(3);
     const t = new Vector2(4, 5);
@@ -20,11 +20,11 @@ test("Matrix3A - extract", () => {
     mat1.setRotate(mat1, r.a, r.b);
     mat1.setTranslate(mat1, t.x, t.y);
 
-    const result = mat1.extractSRT();
+    const srt = mat1.decomposeSRT();
 
-    expectToBeCloseVector2(result.s, s);
-    expectToBeCloseComplex(result.r, r);
-    expectToBeCloseVector2(result.t, t);
+    expectToBeCloseVector2(srt.s, s);
+    expectToBeCloseComplex(srt.r, r);
+    expectToBeCloseVector2(srt.t, t);
 });
 
 test("Matrix3A - inverse", () => {
@@ -138,7 +138,7 @@ test("Matrix3A - transform", () => {
     expect(transformVector).toEqual(v);
 });
 
-test("Matrix3 - extract", () => {
+test("Matrix3 - decomposeSRT", () => {
     const s = new Vector2(1, 2);
     const r = Complex.fromRotationAngle(3);
     const t = new Vector2(4, 5);
@@ -148,11 +148,11 @@ test("Matrix3 - extract", () => {
     mat.setRotate(mat, r.a, r.b);
     mat.setTranslate(mat, t.x, t.y);
 
-    const result = mat.extractSRT();
+    const srt = mat.decomposeSRT();
 
-    expectToBeCloseVector2(result.s, s);
-    expectToBeCloseComplex(result.r, r);
-    expectToBeCloseVector2(result.t, t);
+    expectToBeCloseVector2(srt.s, s);
+    expectToBeCloseComplex(srt.r, r);
+    expectToBeCloseVector2(srt.t, t);
 });
 
 test("Matrix3 - inverse", () => {
@@ -268,7 +268,7 @@ test("Matrix3 - transform", () => {
     expect(transformVectorAffine).toEqual(v);
 });
 
-test("Matrix4A - extract", () => {
+test("Matrix4A - decomposeSRT", () => {
     const s = new Vector3(1, 2, 3);
     const r = Quaternion.fromRotationEuler(4, 5, 6, RotationOrder.XYZ);
     const t = new Vector3(7, 8, 9);
@@ -278,11 +278,11 @@ test("Matrix4A - extract", () => {
     mat.setRotate(mat, r.a, r.b, r.c, r.d);
     mat.setTranslate(mat, t.x, t.y, t.z);
 
-    const result = mat.extractSRT();
+    const srt = mat.decomposeSRT();
 
-    expectToBeCloseVector3(result.s, s);
-    expectToBeCloseQuaternion(result.r, r);
-    expectToBeCloseVector3(result.t, t);
+    expectToBeCloseVector3(srt.s, s);
+    expectToBeCloseQuaternion(srt.r, r);
+    expectToBeCloseVector3(srt.t, t);
 });
 
 test("Matrix4A - inverse", () => {
@@ -434,7 +434,7 @@ test("Matrix4A - transform", () => {
     expect(transformVector).toEqual(v);
 });
 
-test("Matrix4 - extract", () => {
+test("Matrix4 - decomposeSRT", () => {
     const s = new Vector3(1, 2, 3);
     const r = Quaternion.fromRotationEuler(4, 5, 6, RotationOrder.XYZ);
     const t = new Vector3(7, 8, 9);
@@ -444,11 +444,11 @@ test("Matrix4 - extract", () => {
     mat.setRotate(mat, r.a, r.b, r.c, r.d);
     mat.setTranslate(mat, t.x, t.y, t.z);
 
-    const result = mat.extractSRT();
+    const srt = mat.decomposeSRT();
 
-    expectToBeCloseVector3(result.s, s);
-    expectToBeCloseQuaternion(result.r, r);
-    expectToBeCloseVector3(result.t, t);
+    expectToBeCloseVector3(srt.s, s);
+    expectToBeCloseQuaternion(srt.r, r);
+    expectToBeCloseVector3(srt.t, t);
 });
 
 test("Matrix4 - inverse", () => {
