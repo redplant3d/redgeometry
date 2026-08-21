@@ -630,6 +630,14 @@ export class Vector2 implements ReadonlyVector2 {
         this.y = v1.y * s + v2.y;
     }
 
+    public setPerpCCW(v: ReadonlyVector2): void {
+        this.set(-v.y, v.x);
+    }
+
+    public setPerpCW(v: ReadonlyVector2): void {
+        this.set(v.y, -v.x);
+    }
+
     public setSub(v1: ReadonlyVector2, v2: ReadonlyVector2): void {
         this.x = v1.x - v2.x;
         this.y = v1.y - v2.y;
