@@ -8,15 +8,15 @@ test("isBetweenCcw", () => {
     const v1 = new Vector2(1, 1);
     const v2 = new Vector2(-1, -1);
 
-    expect(Vector2.isBetweenCcw(v1, vx, vy)).toEqual(true);
-    expect(Vector2.isBetweenCcw(v1, vy, vx)).toEqual(false);
+    expect(v1.isBetweenCcw(vx, vy)).toEqual(true);
+    expect(v1.isBetweenCcw(vy, vx)).toEqual(false);
 
-    expect(Vector2.isBetweenCcw(v2, vx, vy)).toEqual(false);
-    expect(Vector2.isBetweenCcw(v2, vy, vx)).toEqual(true);
+    expect(v2.isBetweenCcw(vx, vy)).toEqual(false);
+    expect(v2.isBetweenCcw(vy, vx)).toEqual(true);
 
-    expect(Vector2.isBetweenCcw(vx, vx, vy)).toEqual(false);
-    expect(Vector2.isBetweenCcw(vx, vy, vx)).toEqual(false);
+    expect(vx.isBetweenCcw(vx, vy)).toEqual(false);
+    expect(vx.isBetweenCcw(vy, vx)).toEqual(false);
 
-    expect(Vector2.isBetweenCcw(vy, vx, vy)).toEqual(false);
-    expect(Vector2.isBetweenCcw(vy, vy, vx)).toEqual(false);
+    expect(vy.isBetweenCcw(vx, vy)).toEqual(false);
+    expect(vy.isBetweenCcw(vy, vx)).toEqual(false);
 });
