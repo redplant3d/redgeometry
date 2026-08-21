@@ -2698,7 +2698,7 @@ export function mesh2GetConnectingLink<S, F, E, V>(
         const p2 = mesh.vertices.getPos(linkNextVtxSym);
         const v2 = p2.sub(p0);
 
-        if (direction.isBetweenCcw(v1, v2)) {
+        if (direction.isBetweenCCW(v1, v2)) {
             return linkCurr;
         }
 
@@ -2882,7 +2882,7 @@ export function mesh2IsValidLinkOrientation<S, F, E, V>(mesh: Mesh2<S, F, E, V>,
         const v1 = posSym.sub(posCurr);
         const v2 = posSymNextNext.sub(posCurr);
 
-        if (!v.isBetweenCcw(v1, v2)) {
+        if (!v.isBetweenCCW(v1, v2)) {
             // Wrong orientation
             return false;
         }

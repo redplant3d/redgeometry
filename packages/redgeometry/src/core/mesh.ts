@@ -968,7 +968,7 @@ export class MeshEdge2 {
         do {
             const next = curr.onext;
 
-            if (v.isBetweenCcw(curr.vector(), next.vector())) {
+            if (v.isBetweenCCW(curr.vector(), next.vector())) {
                 return curr;
             }
 
@@ -1167,7 +1167,7 @@ export class MeshEdge2 {
 
             if (prev !== next) {
                 success &&= curr.p0.eq(prev.p0) && curr.p0.eq(next.p0);
-                success &&= curr.vector().isBetweenCcw(prev.vector(), next.vector());
+                success &&= curr.vector().isBetweenCCW(prev.vector(), next.vector());
             }
 
             curr = curr.onext;

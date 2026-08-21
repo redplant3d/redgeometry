@@ -44,7 +44,7 @@ export interface ReadonlyVector2 {
     extendZ(z: number): Vector3;
     extendZW(z: number, w: number): Vector4;
     floor(): Vector2;
-    isBetweenCcw(v1: ReadonlyVector2, v2: ReadonlyVector2): boolean;
+    isBetweenCCW(v1: ReadonlyVector2, v2: ReadonlyVector2): boolean;
     isFinite(): boolean;
     isOne(): boolean;
     isUnitApprox(eps: number): boolean;
@@ -406,7 +406,7 @@ export class Vector2 implements ReadonlyVector2 {
     /**
      * Checks if `v` is clockwise between `v1` and `v2`.
      */
-    public isBetweenCcw(v1: ReadonlyVector2, v2: ReadonlyVector2): boolean {
+    public isBetweenCCW(v1: ReadonlyVector2, v2: ReadonlyVector2): boolean {
         if (v1.cross(v2) > 0) {
             // `v2` is clockwise to `v1`
             return v1.cross(this) > 0 && v2.cross(this) < 0;
