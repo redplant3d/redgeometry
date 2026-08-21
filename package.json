@@ -12,12 +12,12 @@
         "eslint": "10.8.1",
         "prettier": "3.9.6",
         "prettier-plugin-organize-imports": "4.3.0",
-        "rolldown": "1.2.4",
+        "rolldown": "1.2.5",
         "rolldown-plugin-dts": "0.26.0",
         "typescript": "6.0.3",
         "typescript-eslint": "8.67.0",
-        "vite": "8.2.1",
-        "vitest": "4.1.10"
+        "vite": "8.2.2",
+        "vitest": "4.1.11"
     },
     "scripts": {
         "init": "pnpm install",
