@@ -260,6 +260,25 @@ export class Matrix3A implements ReadonlyMatrix3A {
 
     /**
      * ```
+     * | 1  0  tx |   | z0  z2  0 |   | sx   0  0 |
+     * | 0  1  ty | * | z1  z3  0 | * |  0  sy  0 |
+     * | 0  0   1 |   |  0   0  1 |   |  0   0  1 |
+     * ```
+     */
+    public static fromSRT(sx: number, sy: number, za: number, zb: number, tx: number, ty: number): Matrix3A {
+        const zaa = za * za;
+        const zbb = zb * zb;
+        const zab = za * zb;
+        const z0 = zaa - zbb;
+        const z1 = zab + zab;
+        const z2 = -z1;
+        const z3 = z0;
+
+        return new Matrix3A([sx * z0, sx * z1, sy * z2, sy * z3, tx, ty]);
+    }
+
+    /**
+     * ```
      * | sx   0  0 |
      * |  0  sy  0 |
      * |  0   0  1 |
@@ -521,6 +540,25 @@ export class Matrix3A implements ReadonlyMatrix3A {
         const z3 = z0;
 
         this.set(z0, z1, z2, z3, 0, 0);
+    }
+
+    /**
+     * ```
+     * | 1  0  tx |   | z0  z2  0 |   | sx   0  0 |
+     * | 0  1  ty | * | z1  z3  0 | * |  0  sy  0 |
+     * | 0  0   1 |   |  0   0  1 |   |  0   0  1 |
+     * ```
+     */
+    public setFromSRT(sx: number, sy: number, za: number, zb: number, tx: number, ty: number): void {
+        const zaa = za * za;
+        const zbb = zb * zb;
+        const zab = za * zb;
+        const z0 = zaa - zbb;
+        const z1 = zab + zab;
+        const z2 = -z1;
+        const z3 = z0;
+
+        this.set(sx * z0, sx * z1, sy * z2, sy * z3, tx, ty);
     }
 
     /**
@@ -946,6 +984,25 @@ export class Matrix3 implements ReadonlyMatrix3 {
 
     /**
      * ```
+     * | 1  0  tx |   | z0  z2  0 |   | sx   0  0 |
+     * | 0  1  ty | * | z1  z3  0 | * |  0  sy  0 |
+     * | 0  0   1 |   |  0   0  1 |   |  0   0  1 |
+     * ```
+     */
+    public static fromSRT(sx: number, sy: number, za: number, zb: number, tx: number, ty: number): Matrix3 {
+        const zaa = za * za;
+        const zbb = zb * zb;
+        const zab = za * zb;
+        const z0 = zaa - zbb;
+        const z1 = zab + zab;
+        const z2 = -z1;
+        const z3 = z0;
+
+        return new Matrix3([sx * z0, sx * z1, 0, sy * z2, sy * z3, 0, tx, ty, 0]);
+    }
+
+    /**
+     * ```
      * | sx   0  0 |
      * |  0  sy  0 |
      * |  0   0  1 |
@@ -1297,6 +1354,25 @@ export class Matrix3 implements ReadonlyMatrix3 {
         const z3 = z0;
 
         this.set(z0, z1, 0, z2, z3, 0, 0, 0, 1);
+    }
+
+    /**
+     * ```
+     * | 1  0  tx |   | z0  z2  0 |   | sx   0  0 |
+     * | 0  1  ty | * | z1  z3  0 | * |  0  sy  0 |
+     * | 0  0   1 |   |  0   0  1 |   |  0   0  1 |
+     * ```
+     */
+    public setFromSRT(sx: number, sy: number, za: number, zb: number, tx: number, ty: number): void {
+        const zaa = za * za;
+        const zbb = zb * zb;
+        const zab = za * zb;
+        const z0 = zaa - zbb;
+        const z1 = zab + zab;
+        const z2 = -z1;
+        const z3 = z0;
+
+        this.set(sx * z0, sx * z1, 0, sy * z2, sy * z3, 0, tx, ty, 0);
     }
 
     /**
@@ -1876,6 +1952,65 @@ export class Matrix4A implements ReadonlyMatrix4A {
 
     /**
      * ```
+     * | 1  0  0  tx |   | q0  q3  q6  0 |   | sx   0   0  0 |
+     * | 0  1  0  ty | * | q1  q4  q7  0 | * |  0  sy   0  0 |
+     * | 0  0  1  tz |   | q2  q5  q8  0 |   |  0   0  sz  0 |
+     * | 0  0  0   1 |   |  0   0   0  1 |   |  0   0   0  1 |
+     * ```
+     */
+    public static fromSRT(
+        sx: number,
+        sy: number,
+        sz: number,
+        qa: number,
+        qb: number,
+        qc: number,
+        qd: number,
+        tx: number,
+        ty: number,
+        tz: number,
+    ): Matrix4A {
+        const qaa = qa * qa;
+        const qbb = qb * qb;
+        const qcc = qc * qc;
+        const qdd = qd * qd;
+        const q0 = qaa + qbb - qcc - qdd;
+        const q4 = qaa - qbb + qcc - qdd;
+        const q8 = qaa - qbb - qcc + qdd;
+
+        const qbc = qb * qc;
+        const qad = qa * qd;
+        const q1 = qbc + qbc + qad + qad;
+        const q3 = qbc + qbc - qad - qad;
+
+        const qbd = qb * qd;
+        const qac = qa * qc;
+        const q2 = qbd + qbd - qac - qac;
+        const q6 = qbd + qbd + qac + qac;
+
+        const qcd = qc * qd;
+        const qab = qa * qb;
+        const q5 = qcd + qcd + qab + qab;
+        const q7 = qcd + qcd - qab - qab;
+
+        return new Matrix4A([
+            sx * q0,
+            sx * q1,
+            sx * q2,
+            sy * q3,
+            sy * q4,
+            sy * q5,
+            sz * q6,
+            sz * q7,
+            sz * q8,
+            tx,
+            ty,
+            tz,
+        ]);
+    }
+
+    /**
+     * ```
      * | sx   0   0  0 |
      * |  0  sy   0  0 |
      * |  0   0  sz  0 |
@@ -2305,6 +2440,52 @@ export class Matrix4A implements ReadonlyMatrix4A {
         const q7 = qcd + qcd - qab - qab;
 
         this.set(q0, q1, q2, q3, q4, q5, q6, q7, q8, 0, 0, 0);
+    }
+
+    /**
+     * ```
+     * | 1  0  0  tx |   | q0  q3  q6  0 |   | sx   0   0  0 |
+     * | 0  1  0  ty | * | q1  q4  q7  0 | * |  0  sy   0  0 |
+     * | 0  0  1  tz |   | q2  q5  q8  0 |   |  0   0  sz  0 |
+     * | 0  0  0   1 |   |  0   0   0  1 |   |  0   0   0  1 |
+     * ```
+     */
+    public setFromSRT(
+        sx: number,
+        sy: number,
+        sz: number,
+        qa: number,
+        qb: number,
+        qc: number,
+        qd: number,
+        tx: number,
+        ty: number,
+        tz: number,
+    ): void {
+        const qaa = qa * qa;
+        const qbb = qb * qb;
+        const qcc = qc * qc;
+        const qdd = qd * qd;
+        const q0 = qaa + qbb - qcc - qdd;
+        const q4 = qaa - qbb + qcc - qdd;
+        const q8 = qaa - qbb - qcc + qdd;
+
+        const qbc = qb * qc;
+        const qad = qa * qd;
+        const q1 = qbc + qbc + qad + qad;
+        const q3 = qbc + qbc - qad - qad;
+
+        const qbd = qb * qd;
+        const qac = qa * qc;
+        const q2 = qbd + qbd - qac - qac;
+        const q6 = qbd + qbd + qac + qac;
+
+        const qcd = qc * qd;
+        const qab = qa * qb;
+        const q5 = qcd + qcd + qab + qab;
+        const q7 = qcd + qcd - qab - qab;
+
+        this.set(sx * q0, sx * q1, sx * q2, sy * q3, sy * q4, sy * q5, sz * q6, sz * q7, sz * q8, tx, ty, tz);
     }
 
     /**
@@ -2917,6 +3098,69 @@ export class Matrix4 implements ReadonlyMatrix4 {
         const q7 = qcd + qcd - qab - qab;
 
         return new Matrix4([q0, q1, q2, 0, q3, q4, q5, 0, q6, q7, q8, 0, 0, 0, 0, 1]);
+    }
+
+    /**
+     * ```
+     * | 1  0  0  tx |   | q0  q3  q6  0 |   | sx   0   0  0 |
+     * | 0  1  0  ty | * | q1  q4  q7  0 | * |  0  sy   0  0 |
+     * | 0  0  1  tz |   | q2  q5  q8  0 |   |  0   0  sz  0 |
+     * | 0  0  0   1 |   |  0   0   0  1 |   |  0   0   0  1 |
+     * ```
+     */
+    public static fromSRT(
+        sx: number,
+        sy: number,
+        sz: number,
+        qa: number,
+        qb: number,
+        qc: number,
+        qd: number,
+        tx: number,
+        ty: number,
+        tz: number,
+    ): Matrix4 {
+        const qaa = qa * qa;
+        const qbb = qb * qb;
+        const qcc = qc * qc;
+        const qdd = qd * qd;
+        const q0 = qaa + qbb - qcc - qdd;
+        const q4 = qaa - qbb + qcc - qdd;
+        const q8 = qaa - qbb - qcc + qdd;
+
+        const qbc = qb * qc;
+        const qad = qa * qd;
+        const q1 = qbc + qbc + qad + qad;
+        const q3 = qbc + qbc - qad - qad;
+
+        const qbd = qb * qd;
+        const qac = qa * qc;
+        const q2 = qbd + qbd - qac - qac;
+        const q6 = qbd + qbd + qac + qac;
+
+        const qcd = qc * qd;
+        const qab = qa * qb;
+        const q5 = qcd + qcd + qab + qab;
+        const q7 = qcd + qcd - qab - qab;
+
+        return new Matrix4([
+            sx * q0,
+            sx * q1,
+            sx * q2,
+            0,
+            sy * q3,
+            sy * q4,
+            sy * q5,
+            0,
+            sz * q6,
+            sz * q7,
+            sz * q8,
+            0,
+            tx,
+            ty,
+            tz,
+            1,
+        ]);
     }
 
     /**
@@ -3564,6 +3808,69 @@ export class Matrix4 implements ReadonlyMatrix4 {
         const q7 = qcd + qcd - qab - qab;
 
         this.set(q0, q1, q2, 0, q3, q4, q5, 0, q6, q7, q8, 0, 0, 0, 0, 1);
+    }
+
+    /**
+     * ```
+     * | 1  0  0  tx |   | q0  q3  q6  0 |   | sx   0   0  0 |
+     * | 0  1  0  ty | * | q1  q4  q7  0 | * |  0  sy   0  0 |
+     * | 0  0  1  tz |   | q2  q5  q8  0 |   |  0   0  sz  0 |
+     * | 0  0  0   1 |   |  0   0   0  1 |   |  0   0   0  1 |
+     * ```
+     */
+    public setFromSRT(
+        sx: number,
+        sy: number,
+        sz: number,
+        qa: number,
+        qb: number,
+        qc: number,
+        qd: number,
+        tx: number,
+        ty: number,
+        tz: number,
+    ): void {
+        const qaa = qa * qa;
+        const qbb = qb * qb;
+        const qcc = qc * qc;
+        const qdd = qd * qd;
+        const q0 = qaa + qbb - qcc - qdd;
+        const q4 = qaa - qbb + qcc - qdd;
+        const q8 = qaa - qbb - qcc + qdd;
+
+        const qbc = qb * qc;
+        const qad = qa * qd;
+        const q1 = qbc + qbc + qad + qad;
+        const q3 = qbc + qbc - qad - qad;
+
+        const qbd = qb * qd;
+        const qac = qa * qc;
+        const q2 = qbd + qbd - qac - qac;
+        const q6 = qbd + qbd + qac + qac;
+
+        const qcd = qc * qd;
+        const qab = qa * qb;
+        const q5 = qcd + qcd + qab + qab;
+        const q7 = qcd + qcd - qab - qab;
+
+        this.set(
+            sx * q0,
+            sx * q1,
+            sx * q2,
+            0,
+            sy * q3,
+            sy * q4,
+            sy * q5,
+            0,
+            sz * q6,
+            sz * q7,
+            sz * q8,
+            0,
+            tx,
+            ty,
+            tz,
+            1,
+        );
     }
 
     /**
