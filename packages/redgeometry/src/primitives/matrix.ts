@@ -998,7 +998,7 @@ export class Matrix3 implements ReadonlyMatrix3 {
         const z2 = -z1;
         const z3 = z0;
 
-        return new Matrix3([sx * z0, sx * z1, 0, sy * z2, sy * z3, 0, tx, ty, 0]);
+        return new Matrix3([sx * z0, sx * z1, 0, sy * z2, sy * z3, 0, tx, ty, 1]);
     }
 
     /**
@@ -1372,7 +1372,7 @@ export class Matrix3 implements ReadonlyMatrix3 {
         const z2 = -z1;
         const z3 = z0;
 
-        this.set(sx * z0, sx * z1, 0, sy * z2, sy * z3, 0, tx, ty, 0);
+        this.set(sx * z0, sx * z1, 0, sy * z2, sy * z3, 0, tx, ty, 1);
     }
 
     /**
