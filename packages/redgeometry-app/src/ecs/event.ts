@@ -10,17 +10,17 @@ type WorldEventEntry = {
 };
 
 export class WorldEventStorage {
-    public eventEntries: Map<WorldEventId, WorldEventEntry>;
+    public entries: Map<WorldEventId, WorldEventEntry>;
 
     public constructor() {
-        this.eventEntries = new Map();
+        this.entries = new Map();
     }
 
     public add(event: WorldEvent): void {
-        const eventEntry = this.eventEntries.get(event.eventId);
-        assert(eventEntry !== undefined, "World event '{}' has not been registered in a world module", event.eventId);
+        const entry = this.entries.get(event.eventId);
+        assert(entry !== undefined, "World event '{}' has not been registered in a world module", event.eventId);
 
-        eventEntry.events.push(event);
+        entry.events.push(event);
     }
 
     public addArray(events: WorldEvent[]): void {
@@ -31,21 +31,21 @@ export class WorldEventStorage {
 
         const eventId = events[0].eventId;
 
-        const eventEntry = this.eventEntries.get(eventId);
-        assert(eventEntry !== undefined, "World event '{}' has not been registered in a world module", eventId);
+        const entry = this.entries.get(eventId);
+        assert(entry !== undefined, "World event '{}' has not been registered in a world module", eventId);
 
         for (const event of events) {
             assert(event.eventId === eventId, "World event '{}' does not match '{}'", event.eventId, eventId);
 
-            eventEntry.events.push(event);
+            entry.events.push(event);
         }
     }
 
     public findLast(eventId: WorldEventId): WorldEvent | undefined {
-        const eventEntry = this.eventEntries.get(eventId);
-        assert(eventEntry !== undefined, "World event '{}' is not available", eventId);
+        const entry = this.entries.get(eventId);
+        assert(entry !== undefined, "World event '{}' is not available", eventId);
 
-        const events = eventEntry.events;
+        const events = entry.events;
         const len = events.length;
 
         if (len === 0) {
@@ -56,26 +56,26 @@ export class WorldEventStorage {
     }
 
     public get(eventId: WorldEventId): WorldEventIterator<WorldEvent> {
-        const eventEntry = this.eventEntries.get(eventId);
-        assert(eventEntry !== undefined, "World event '{}' is not available", eventId);
+        const entry = this.entries.get(eventId);
+        assert(entry !== undefined, "World event '{}' is not available", eventId);
 
-        return new WorldEventIterator(eventEntry.events);
+        return new WorldEventIterator(entry.events);
     }
 
     public register(eventId: WorldEventId, moduleId: WorldModuleId): void {
         assert(
-            !this.eventEntries.has(eventId),
+            !this.entries.has(eventId),
             "World event '{}' is registered from world module '{}' but has already been registered",
             eventId,
             moduleId,
         );
 
-        this.eventEntries.set(eventId, { events: [] });
+        this.entries.set(eventId, { events: [] });
     }
 
     public require(eventId: WorldEventId, moduleId: WorldModuleId): void {
         assert(
-            this.eventEntries.has(eventId),
+            this.entries.has(eventId),
             "World event '{}' is required by world module '{}' but has not been registered",
             eventId,
             moduleId,
@@ -83,9 +83,9 @@ export class WorldEventStorage {
     }
 
     public reset(): void {
-        for (const entries of this.eventEntries.values()) {
-            if (entries.events.length > 0) {
-                entries.events = [];
+        for (const entry of this.entries.values()) {
+            if (entry.events.length > 0) {
+                entry.events = [];
             }
         }
     }

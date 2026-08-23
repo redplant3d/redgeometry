@@ -5,34 +5,41 @@ export type WorldDataId = string;
 export type WorldData = { readonly dataId: WorldDataId };
 export type WorldDataIdOf<T extends WorldData> = T["dataId"];
 
+type WorldDataEntry = {
+    data: WorldData | undefined;
+};
+
 export class WorldDataStorage {
-    public dataEntries: Map<WorldDataId, WorldData | undefined>;
+    public entries: Map<WorldDataId, WorldDataEntry>;
 
     constructor() {
-        this.dataEntries = new Map();
+        this.entries = new Map();
     }
 
     public get(dataId: WorldDataId): WorldData {
-        const data = this.dataEntries.get(dataId);
-        assert(data !== undefined, "World data '{}' is not available", dataId);
+        const entry = this.entries.get(dataId);
+        assert(entry !== undefined, "World data '{}' is not registered", dataId);
+        assert(entry.data !== undefined, "World data '{}' is not initialized", dataId);
 
-        return data;
+        return entry.data;
     }
 
     public register(dataId: WorldDataId, moduleId: WorldModuleId): void {
         assert(
-            !this.dataEntries.has(dataId),
+            !this.entries.has(dataId),
             "World data '{}' is registered from world module '{}' but has already been registered",
             dataId,
             moduleId,
         );
 
-        this.dataEntries.set(dataId, undefined);
+        this.entries.set(dataId, {
+            data: undefined,
+        });
     }
 
     public require(dataId: WorldDataId, moduleId: WorldModuleId): void {
         assert(
-            this.dataEntries.has(dataId),
+            this.entries.has(dataId),
             "World data '{}' is required by world module '{}' but has not been registered",
             dataId,
             moduleId,
@@ -40,12 +47,9 @@ export class WorldDataStorage {
     }
 
     public set(data: WorldData): void {
-        assert(
-            this.dataEntries.has(data.dataId),
-            "World data '{}' has not been registered in a world module",
-            data.dataId,
-        );
+        const entry = this.entries.get(data.dataId);
+        assert(entry !== undefined, "World data '{}' has not been registered in a world module", data.dataId);
 
-        this.dataEntries.set(data.dataId, data);
+        entry.data = data;
     }
 }
