@@ -3,6 +3,7 @@ import { log } from "redgeometry/src/internal/log";
 import type { World, WorldModuleId } from "./world.ts";
 
 export type SystemId = string;
+export type SystemGroupId = string;
 export type SystemScheduleId = string;
 
 export type SystemOptionsSync = {
@@ -24,6 +25,11 @@ export type SystemDependencyOptions = {
     scheduleId: SystemScheduleId;
 };
 
+export type SystemGroupOptions = {
+    groupId: SystemGroupId;
+    scheduleId: SystemScheduleId;
+};
+
 type SystemScheduleEntry = {
     depsAsync: SystemScheduleEntry[];
     options: SystemOptions;
@@ -42,18 +48,21 @@ type SystemSchedule = {
 };
 
 export class SystemScheduleStorage {
-    public options: SystemOptions[];
     public dependencyOptions: SystemDependencyOptions[];
+    public groupOptions: SystemGroupOptions[];
+    public options: SystemOptions[];
     public schedules: Map<SystemScheduleId, SystemSchedule | undefined>;
 
     constructor() {
         this.dependencyOptions = [];
+        this.groupOptions = [];
         this.options = [];
         this.schedules = new Map();
     }
 
     public clear(): void {
         this.dependencyOptions = [];
+        this.groupOptions = [];
         this.options = [];
         this.schedules = new Map();
     }
@@ -140,6 +149,17 @@ export class SystemScheduleStorage {
         );
 
         this.dependencyOptions.push(options);
+    }
+
+    public registerSystemGroup(options: SystemGroupOptions, moduleId: WorldModuleId): void {
+        assert(
+            this.schedules.has(options.scheduleId),
+            "System schedule '{}' is required for a system group by world module '{}' but has not been registered",
+            options.scheduleId,
+            moduleId,
+        );
+
+        this.groupOptions.push(options);
     }
 
     public async runSchedule(id: SystemScheduleId, world: World): Promise<void> {

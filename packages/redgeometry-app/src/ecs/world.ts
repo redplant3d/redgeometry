@@ -20,6 +20,7 @@ import { WorldPluginStorage, type WorldPlugin, type WorldPluginId, type WorldPlu
 import {
     SystemScheduleStorage,
     type SystemDependencyOptions,
+    type SystemGroupOptions,
     type SystemOptions,
     type SystemScheduleId,
 } from "./system-schedule.js";
@@ -52,13 +53,17 @@ export type WorldContextRegisterScheduleEntry = {
     type: "register-schedule";
     scheduleId: SystemScheduleId;
 };
+export type WorldContextRegisterSystemDependencyEntry = {
+    type: "register-system-dependency";
+    options: SystemDependencyOptions;
+};
 export type WorldContextRegisterSystemEntry = {
     type: "register-system";
     options: SystemOptions;
 };
-export type WorldContextRegisterSystemDependencyEntry = {
-    type: "register-system-dependency";
-    options: SystemDependencyOptions;
+export type WorldContextRegisterSystemGroupEntry = {
+    type: "register-system-set";
+    options: SystemGroupOptions;
 };
 export type WorldContextRequireDataEntry = {
     type: "require-data";
@@ -78,8 +83,9 @@ export type WorldContextEntry =
     | WorldContextRegisterModuleEntry
     | WorldContextRegisterPluginEntry
     | WorldContextRegisterScheduleEntry
-    | WorldContextRegisterSystemEntry
     | WorldContextRegisterSystemDependencyEntry
+    | WorldContextRegisterSystemEntry
+    | WorldContextRegisterSystemGroupEntry
     | WorldContextRequireDataEntry
     | WorldContextRequireEventEntry
     | WorldContextRequirePluginEntry;
@@ -275,6 +281,10 @@ export class WorldContext {
         this.entries.push({ type: "register-system", options });
     }
 
+    public addSystemGroup(options: SystemGroupOptions): void {
+        this.entries.push({ type: "register-system-set", options });
+    }
+
     public addSystemDepedency(options: SystemDependencyOptions): void {
         this.entries.push({ type: "register-system-dependency", options });
     }
@@ -373,6 +383,10 @@ export class WorldStorage {
                     }
                     case "register-system-dependency": {
                         systemScheduleStorage.registerSystemDependency(entry.options, moduleId);
+                        break;
+                    }
+                    case "register-system-set": {
+                        systemScheduleStorage.registerSystemGroup(entry.options, moduleId);
                         break;
                     }
                 }
