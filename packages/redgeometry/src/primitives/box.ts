@@ -1,7 +1,7 @@
-import { eqApproxAbs, eqApproxRel, lerp } from "../utility/scalar.ts";
+import { eqApproxAbs, eqApproxRel } from "../utility/scalar.ts";
 import type { FixedSizeArray } from "../utility/types.ts";
 import { Complex, type ComplexLike, type ReadonlyComplex } from "./complex.ts";
-import type { ReadonlyMatrix3, ReadonlyMatrix3A, ReadonlyMatrix4, ReadonlyMatrix4A } from "./matrix.ts";
+import type { ReadonlyMatrix3A, ReadonlyMatrix4A } from "./matrix.ts";
 import { Quaternion, type QuaternionLike, type ReadonlyQuaternion } from "./quaternion.ts";
 import type { ReadonlyRay2, ReadonlyRay3 } from "./ray.ts";
 import {
@@ -80,7 +80,6 @@ export interface ReadonlyMinMaxBox2 {
     toAxisAlignedBox(): AxisAlignedBox2;
     toOrientedBox(): OrientedBox2;
     toString(): string;
-    transform(mat: ReadonlyMatrix3 | ReadonlyMatrix3A): MinMaxBox2;
 }
 
 export interface ReadonlyMinMaxBox3 {
@@ -116,7 +115,6 @@ export interface ReadonlyMinMaxBox3 {
     toAxisAlignedBox(): AxisAlignedBox3;
     toOrientedBox(): OrientedBox3;
     toString(): string;
-    transform(mat: ReadonlyMatrix4 | ReadonlyMatrix4A): MinMaxBox3;
 }
 
 export interface ReadonlyAxisAlignedBox2 {
@@ -312,8 +310,8 @@ export class MinMaxBox2 implements ReadonlyMinMaxBox2 {
     }
 
     public center(): Vector2 {
-        const x = lerp(this.minX, this.maxX, 0.5);
-        const y = lerp(this.minY, this.maxY, 0.5);
+        const x = 0.5 * (this.maxX + this.minX);
+        const y = 0.5 * (this.maxY + this.minY);
 
         return new Vector2(x, y);
     }
@@ -378,8 +376,8 @@ export class MinMaxBox2 implements ReadonlyMinMaxBox2 {
     }
 
     public extents(): Vector2 {
-        const x = 0.5 * this.sizeX();
-        const y = 0.5 * this.sizeY();
+        const x = 0.5 * (this.maxX - this.minX);
+        const y = 0.5 * (this.maxY - this.minY);
 
         return new Vector2(x, y);
     }
@@ -447,20 +445,36 @@ export class MinMaxBox2 implements ReadonlyMinMaxBox2 {
         this.maxY = Math.max(box.maxY, p.y);
     }
 
-    public setEnclosePointTransform(
-        box: ReadonlyMinMaxBox2,
-        p: ReadonlyVector2,
-        mat: ReadonlyMatrix3 | ReadonlyMatrix3A,
-    ): void {
-        const pp = mat.transformPoint(p);
-        this.setEnclosePoint(box, pp);
-    }
-
     public setFrom(box: ReadonlyMinMaxBox2): void {
         this.minX = box.minX;
         this.minY = box.minY;
         this.maxX = box.maxX;
         this.maxY = box.maxY;
+    }
+
+    public setTransform(mat: ReadonlyMatrix3A): void {
+        const e = mat.elements;
+
+        // Inlined from `MinMaxBox2.center()`
+        const cx = 0.5 * (this.maxX + this.minX);
+        const cy = 0.5 * (this.maxY + this.minY);
+
+        // Inlined from `Matrix3A.transformPoint()`
+        const ccx = e[0] * cx + e[2] * cy + e[4];
+        const ccy = e[1] * cx + e[3] * cy + e[5];
+
+        // Inlined from `MinMaxBox2.extents()`
+        const ex = 0.5 * (this.maxX - this.minX);
+        const ey = 0.5 * (this.maxY - this.minY);
+
+        // Inlined from `Matrix3A.transformVector()` (absolute elements)
+        const eex = Math.abs(e[0]) * ex + Math.abs(e[2]) * ey;
+        const eey = Math.abs(e[1]) * ex + Math.abs(e[3]) * ey;
+
+        this.minX = ccx - eex;
+        this.minY = ccy - eey;
+        this.maxX = ccx + eex;
+        this.maxY = ccy + eey;
     }
 
     public setUnion(box1: ReadonlyMinMaxBox2, box2: ReadonlyMinMaxBox2): void {
@@ -494,16 +508,6 @@ export class MinMaxBox2 implements ReadonlyMinMaxBox2 {
         return (
             "{minX: " + this.minX + ", minY: " + this.minY + "," + " maxX: " + this.maxX + ", maxY: " + this.maxY + "}"
         );
-    }
-
-    public transform(mat: ReadonlyMatrix3 | ReadonlyMatrix3A): MinMaxBox2 {
-        const box = MinMaxBox2.createEmpty();
-        box.setEnclosePointTransform(box, new Vector2(this.minX, this.minY), mat);
-        box.setEnclosePointTransform(box, new Vector2(this.minX, this.maxY), mat);
-        box.setEnclosePointTransform(box, new Vector2(this.maxX, this.minY), mat);
-        box.setEnclosePointTransform(box, new Vector2(this.maxX, this.maxY), mat);
-
-        return box;
     }
 }
 
@@ -601,9 +605,9 @@ export class MinMaxBox3 implements ReadonlyMinMaxBox3 {
     }
 
     public center(): Vector3 {
-        const x = lerp(this.minX, this.maxX, 0.5);
-        const y = lerp(this.minY, this.maxY, 0.5);
-        const z = lerp(this.minZ, this.maxZ, 0.5);
+        const x = 0.5 * (this.maxX + this.minX);
+        const y = 0.5 * (this.maxY + this.minY);
+        const z = 0.5 * (this.maxZ + this.minZ);
 
         return new Vector3(x, y, z);
     }
@@ -691,9 +695,9 @@ export class MinMaxBox3 implements ReadonlyMinMaxBox3 {
     }
 
     public extents(): Vector3 {
-        const x = 0.5 * this.sizeX();
-        const y = 0.5 * this.sizeY();
-        const z = 0.5 * this.sizeZ();
+        const x = 0.5 * (this.maxX - this.minX);
+        const y = 0.5 * (this.maxY - this.minY);
+        const z = 0.5 * (this.maxZ - this.minZ);
 
         return new Vector3(x, y, z);
     }
@@ -782,15 +786,6 @@ export class MinMaxBox3 implements ReadonlyMinMaxBox3 {
         this.maxZ = Math.max(box.maxZ, p.z);
     }
 
-    public setEnclosePointTransform(
-        box: ReadonlyMinMaxBox3,
-        p: ReadonlyVector3,
-        mat: ReadonlyMatrix4 | ReadonlyMatrix4A,
-    ): void {
-        const pp = mat.transformPoint(p);
-        this.setEnclosePoint(box, pp);
-    }
-
     public setFrom(box: ReadonlyMinMaxBox3): void {
         this.minX = box.minX;
         this.minY = box.minY;
@@ -798,6 +793,37 @@ export class MinMaxBox3 implements ReadonlyMinMaxBox3 {
         this.maxX = box.maxX;
         this.maxY = box.maxY;
         this.maxZ = box.maxZ;
+    }
+
+    public setTransform(mat: ReadonlyMatrix4A): void {
+        const e = mat.elements;
+
+        // Inlined from `MinMaxBox3.center()`
+        const cx = 0.5 * (this.maxX + this.minX);
+        const cy = 0.5 * (this.maxY + this.minY);
+        const cz = 0.5 * (this.maxZ + this.minZ);
+
+        // Inlined from `Matrix4A.transformPoint()`
+        const ccx = e[0] * cx + e[3] * cy + e[6] * cz + e[9];
+        const ccy = e[1] * cx + e[4] * cy + e[7] * cz + e[10];
+        const ccz = e[2] * cx + e[5] * cy + e[8] * cz + e[11];
+
+        // Inlined from `MinMaxBox3.extents()`
+        const ex = 0.5 * (this.maxX - this.minX);
+        const ey = 0.5 * (this.maxY - this.minY);
+        const ez = 0.5 * (this.maxZ - this.minZ);
+
+        // Inlined from `Matrix4A.transformVector()` (absolute elements)
+        const eex = Math.abs(e[0]) * ex + Math.abs(e[3]) * ey + Math.abs(e[6]) * ez;
+        const eey = Math.abs(e[1]) * ex + Math.abs(e[4]) * ey + Math.abs(e[7]) * ez;
+        const eez = Math.abs(e[2]) * ex + Math.abs(e[5]) * ey + Math.abs(e[8]) * ez;
+
+        this.minX = ccx - eex;
+        this.minY = ccy - eey;
+        this.minZ = ccz - eez;
+        this.maxX = ccx + eex;
+        this.maxY = ccy + eey;
+        this.maxZ = ccz + eez;
     }
 
     public setUnion(box1: ReadonlyMinMaxBox3, box2: ReadonlyMinMaxBox3): void {
@@ -850,21 +876,6 @@ export class MinMaxBox3 implements ReadonlyMinMaxBox3 {
             this.maxZ +
             "}"
         );
-    }
-
-    public transform(mat: ReadonlyMatrix4 | ReadonlyMatrix4A): MinMaxBox3 {
-        const box = MinMaxBox3.createEmpty();
-
-        box.setEnclosePointTransform(box, new Vector3(this.minX, this.minY, this.minZ), mat);
-        box.setEnclosePointTransform(box, new Vector3(this.minX, this.minY, this.maxZ), mat);
-        box.setEnclosePointTransform(box, new Vector3(this.minX, this.maxY, this.minZ), mat);
-        box.setEnclosePointTransform(box, new Vector3(this.minX, this.maxY, this.maxZ), mat);
-        box.setEnclosePointTransform(box, new Vector3(this.maxX, this.minY, this.minZ), mat);
-        box.setEnclosePointTransform(box, new Vector3(this.maxX, this.minY, this.maxZ), mat);
-        box.setEnclosePointTransform(box, new Vector3(this.maxX, this.maxY, this.minZ), mat);
-        box.setEnclosePointTransform(box, new Vector3(this.maxX, this.maxY, this.maxZ), mat);
-
-        return box;
     }
 }
 
@@ -1060,6 +1071,27 @@ export class AxisAlignedBox2 implements ReadonlyAxisAlignedBox2 {
     public setFromXYWH(x: number, y: number, w: number, h: number): void {
         this.center = new Vector2(x, y);
         this.extents = new Vector2(0.5 * w, 0.5 * h);
+    }
+
+    public setTransform(mat: ReadonlyMatrix3A): void {
+        const e = mat.elements;
+
+        const cx = this.center.x;
+        const cy = this.center.y;
+
+        // Inlined from `Matrix3A.transformPoint()`
+        const ccx = e[0] * cx + e[2] * cy + e[4];
+        const ccy = e[1] * cx + e[3] * cy + e[5];
+
+        const ex = this.extents.x;
+        const ey = this.extents.y;
+
+        // Inlined from `Matrix3A.transformVector()` (absolute elements)
+        const eex = Math.abs(e[0]) * ex + Math.abs(e[2]) * ey;
+        const eey = Math.abs(e[1]) * ex + Math.abs(e[3]) * ey;
+
+        this.center = new Vector2(ccx, ccy);
+        this.extents = new Vector2(eex, eey);
     }
 
     public setUnion(box1: ReadonlyAxisAlignedBox2, box2: ReadonlyAxisAlignedBox2): void {
@@ -1321,6 +1353,31 @@ export class AxisAlignedBox3 implements ReadonlyAxisAlignedBox3 {
     public setFromXYZWHD(x: number, y: number, z: number, w: number, h: number, d: number): void {
         this.center = new Vector3(x, y, z);
         this.extents = new Vector3(0.5 * w, 0.5 * h, 0.5 * d);
+    }
+
+    public setTransform(mat: ReadonlyMatrix4A): void {
+        const e = mat.elements;
+
+        const cx = this.center.x;
+        const cy = this.center.y;
+        const cz = this.center.z;
+
+        // Inlined from `Matrix4A.transformPoint()`
+        const ccx = e[0] * cx + e[3] * cy + e[6] * cz + e[9];
+        const ccy = e[1] * cx + e[4] * cy + e[7] * cz + e[10];
+        const ccz = e[2] * cx + e[5] * cy + e[8] * cz + e[11];
+
+        const ex = this.extents.x;
+        const ey = this.extents.y;
+        const ez = this.extents.z;
+
+        // Inlined from `Matrix4A.transformVector()` (absolute elements)
+        const eex = Math.abs(e[0]) * ex + Math.abs(e[3]) * ey + Math.abs(e[6]) * ez;
+        const eey = Math.abs(e[1]) * ex + Math.abs(e[4]) * ey + Math.abs(e[7]) * ez;
+        const eez = Math.abs(e[2]) * ex + Math.abs(e[5]) * ey + Math.abs(e[8]) * ez;
+
+        this.center = new Vector3(ccx, ccy, ccz);
+        this.extents = new Vector3(eex, eey, eez);
     }
 
     public setUnion(box1: ReadonlyAxisAlignedBox3, box2: ReadonlyAxisAlignedBox3): void {
