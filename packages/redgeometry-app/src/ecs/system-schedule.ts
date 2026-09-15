@@ -5,6 +5,7 @@ import type { World, WorldModuleId } from "./world.ts";
 export type SystemId = string;
 export type SystemGroupId = string;
 export type SystemScheduleId = string;
+export type SystemDependencyId = string;
 
 export type SystemOptionsSync = {
     id: SystemId;
@@ -20,10 +21,13 @@ export type SystemOptionsAsync = {
 };
 export type SystemOptions = SystemOptionsSync | SystemOptionsAsync;
 
-export type SystemDependencyOptions = {
-    seq: [SystemId, ...SystemId[]];
+export type SystemDependencyOptionsSequence = {
+    type: "sequence";
+    seq: [SystemDependencyId, ...SystemDependencyId[]];
     scheduleId: SystemScheduleId;
 };
+
+export type SystemDependencyOptions = SystemDependencyOptionsSequence;
 
 export type SystemGroupOptions = {
     groupId: SystemGroupId;
@@ -251,6 +255,10 @@ export class SystemScheduleStorage {
             let depErrorCount = 0;
 
             const seqNodes: SystemNode[] = [];
+
+            // if (options.type !== "sequence") {
+            //     continue;
+            // }
 
             // Iterate seqeuence and collect errors
             for (const id of options.seq) {

@@ -146,11 +146,13 @@ export function straightSkeletonAppPartModule(context: WorldContext): void {
     });
 
     context.addSystemDepedency({
+        type: "sequence",
         seq: [APP_START_SYSTEM_ID, STRAIGHT_SKELETON_START_SYSTEM_ID, APP_INPUT_START_SYSTEM_ID],
         scheduleId: START_SCHEDULE_ID,
     });
 
     context.addSystemDepedency({
+        type: "sequence",
         seq: [APP_UPDATE_SYSTEM_ID, STRAIGHT_SKELETON_UPDATE_SYSTEM_ID, STRAIGHT_SKELETON_RENDER_SYSTEM_ID],
         scheduleId: UPDATE_SCHEDULE_ID,
     });

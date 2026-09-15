@@ -129,11 +129,13 @@ export function pathAreaAppPartModule(context: WorldContext): void {
     });
 
     context.addSystemDepedency({
+        type: "sequence",
         seq: [APP_START_SYSTEM_ID, PATH_AREA_START_SYSTEM_ID, APP_INPUT_START_SYSTEM_ID],
         scheduleId: START_SCHEDULE_ID,
     });
 
     context.addSystemDepedency({
+        type: "sequence",
         seq: [APP_UPDATE_SYSTEM_ID, PATH_AREA_UPDATE_SYSTEM_ID, PATH_AREA_RENDER_SYSTEM_ID],
         scheduleId: UPDATE_SCHEDULE_ID,
     });

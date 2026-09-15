@@ -242,6 +242,7 @@ export function appModule(context: WorldContext): void {
     });
 
     context.addSystemDepedency({
+        type: "sequence",
         scheduleId: START_SCHEDULE_ID,
         seq: [
             APP_PRE_START_SYSTEM_ID,
@@ -253,6 +254,7 @@ export function appModule(context: WorldContext): void {
     });
 
     context.addSystemDepedency({
+        type: "sequence",
         scheduleId: UPDATE_SCHEDULE_ID,
         seq: [INPUT_UPDATE_SYSTEM_ID, TIME_UPDATE_SYSTEM_ID, APP_UPDATE_SYSTEM_ID],
     });
