@@ -615,6 +615,11 @@ export class Vector2 implements ReadonlyVector2 {
         this.y = v.y;
     }
 
+    public setFromXYW(x: number, y: number, w: number): void {
+        this.x = x / w;
+        this.y = y / w;
+    }
+
     public setMul(v1: ReadonlyVector2, v2: ReadonlyVector2): void {
         this.x = v1.x * v2.x;
         this.y = v1.y * v2.y;
@@ -1215,6 +1220,12 @@ export class Vector3 implements ReadonlyVector3 {
         this.x = v.x;
         this.y = v.y;
         this.z = v.z;
+    }
+
+    public setFromXYZW(x: number, y: number, z: number, w: number): void {
+        this.x = x / w;
+        this.y = y / w;
+        this.z = z / w;
     }
 
     public setMul(v1: ReadonlyVector3, v2: ReadonlyVector3): void {
