@@ -552,7 +552,7 @@ test("Matrix4 - fromScale", () => {
     expect(mat3).toEqual(mat4);
 });
 
-test("Matrix4A - fromSRT", () => {
+test("Matrix4 - fromSRT", () => {
     const s = new Vector3(1, 2, 3);
     const r = Quaternion.fromRotationEuler(4, 5, 6, RotationOrder.XYZ);
     const t = new Vector3(7, 8, 9);
