@@ -19,13 +19,14 @@ jobs:
                   node-version: 24.19.0
             - name: Install
               run: pnpm install --frozen-lockfile
-            - name: Run check, lint and test
+            - name: Run check and lint
               run: |
                   pnpm run check
                   pnpm run lint
-                  pnpm run test
-            - name: Build
-              run: pnpm --filter redgeometry-app run build
+            - name: Run test and build
+              run: |
+                  pnpm --filter redgeometry run test
+                  pnpm --filter redgeometry-app run build
             - name: Deploy
               uses: JamesIves/github-pages-deploy-action@v4
               with:

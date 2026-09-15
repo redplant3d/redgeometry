@@ -22,7 +22,6 @@
     "scripts": {
         "init": "pnpm install",
         "check": "tsc",
-        "lint": "eslint ./",
-        "test": "vitest run"
+        "lint": "eslint ./"
     }
 }
