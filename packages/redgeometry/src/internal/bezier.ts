@@ -312,8 +312,8 @@ function sampleArcLengthConic(
     qqb: ReadonlyVector3,
     qqc: ReadonlyVector3,
 ): number {
-    const vv = qqa.mulSAdd(xz, qqb);
-    vv.mulSAdd(xz, qqc);
-    const v = Vector2.fromXYW(vv.x, vv.y, vv.z * vv.z);
-    return wz * v.length();
+    const v3 = qqa.mulSAdd(xz, qqb);
+    v3.setMulSAdd(v3, xz, qqc);
+    const v2 = Vector2.fromXYW(v3.x, v3.y, v3.z * v3.z);
+    return wz * v2.length();
 }
