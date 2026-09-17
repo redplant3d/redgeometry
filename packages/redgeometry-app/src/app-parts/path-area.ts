@@ -68,9 +68,9 @@ function pathAreaUpdateSystem(world: World): void {
     const mouse = world.getPlugin<MousePlugin>("mouse-plugin");
 
     const random = RandomXSR128.fromSeedLcg(seed);
-    const [canvasWidth, canvasHeight] = ctx.getSize(false);
+    const bounds = ctx.getBounds(false);
 
-    const path = createRandomPath(random, generator, count, canvasWidth, canvasHeight);
+    const path = createRandomPath(random, generator, count, bounds);
     path.close();
 
     const p = Vector2.fromObject(mouse.getCursorPosition());

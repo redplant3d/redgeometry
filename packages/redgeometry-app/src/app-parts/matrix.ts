@@ -68,7 +68,7 @@ function matrixUpdateSystem(world: World): void {
 
     const ctx = world.getPlugin<AppContextPlugin>("app-context-plugin");
 
-    const [canvasWidth, canvasHeight] = ctx.getSize(true);
+    const bounds = ctx.getBounds(true);
 
     const edges = createCube();
 
@@ -82,9 +82,9 @@ function matrixUpdateSystem(world: World): void {
     }
 
     // NDC to screen
-    const w = 0.5 * canvasWidth;
-    const h = 0.5 * canvasHeight;
-    const s = 0.5 * Math.min(canvasWidth, canvasHeight);
+    const w = 0.5 * bounds.sizeX();
+    const h = 0.5 * bounds.sizeY();
+    const s = Math.min(w, h);
 
     matProj.setScale(matProj, s, s, s);
     matProj.setTranslate(matProj, w, h, 0);

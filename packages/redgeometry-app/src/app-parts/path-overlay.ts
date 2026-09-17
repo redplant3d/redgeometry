@@ -84,9 +84,9 @@ function pathOverlayUpdateSystem(world: World): void {
     const offset = 2 * (parameter - 100);
 
     const random = RandomXSR128.fromSeedLcg(seed);
-    const [width, height] = ctx.getSize(false);
+    const bounds = ctx.getBounds(false);
 
-    const [polygonA, polygonB] = createRandomPolygonPair(random, generator, offset, width, height);
+    const [polygonA, polygonB] = createRandomPolygonPair(random, generator, offset, bounds);
 
     const clip = new PathOverlay2(PATH_QUALITY_OPTIONS_DEFAULT);
 

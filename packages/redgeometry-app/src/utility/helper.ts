@@ -21,14 +21,8 @@ export function createRandomEdge(random: Random, box: ReadonlyMinMaxBox2): Edge2
     return new Edge2(p0, p1);
 }
 
-export function createRandomMesh(
-    random: Random,
-    generator: number,
-    offset: number,
-    width: number,
-    height: number,
-): Mesh2 {
-    const [polygonA, polygonB] = createRandomPolygonPair(random, generator, offset, width, height);
+export function createRandomMesh(random: Random, generator: number, offset: number, bounds: ReadonlyMinMaxBox2): Mesh2 {
+    const [polygonA, polygonB] = createRandomPolygonPair(random, generator, offset, bounds);
 
     const clip = new PathClip2(PATH_QUALITY_OPTIONS_DEFAULT);
 
@@ -50,47 +44,43 @@ export function createRandomMesh(
     return mesh;
 }
 
-export function createRandomPath(
-    random: Random,
-    generator: number,
-    count: number,
-    width: number,
-    height: number,
-): Path2 {
+export function createRandomPath(random: Random, generator: number, count: number, bounds: ReadonlyMinMaxBox2): Path2 {
     const path = Path2.createEmpty();
 
-    path.moveTo(new Vector2(width * random.nextFloat(), height * random.nextFloat()));
+    const p0 = createRandomPoint(random, bounds);
+    path.moveTo(p0);
 
     switch (generator) {
         case 0: {
             for (let i = 0; i < count; i++) {
-                const p1 = new Vector2(width * random.nextFloat(), height * random.nextFloat());
+                const p1 = createRandomPoint(random, bounds);
                 path.lineTo(p1);
             }
             break;
         }
         case 1: {
             for (let i = 0; i < count; i++) {
-                const p1 = new Vector2(width * random.nextFloat(), height * random.nextFloat());
-                const p2 = new Vector2(width * random.nextFloat(), height * random.nextFloat());
+                const p1 = createRandomPoint(random, bounds);
+                const p2 = createRandomPoint(random, bounds);
                 path.quadTo(p1, p2);
             }
             break;
         }
         case 2: {
             for (let i = 0; i < count; i++) {
-                const p1 = new Vector2(width * random.nextFloat(), height * random.nextFloat());
-                const p2 = new Vector2(width * random.nextFloat(), height * random.nextFloat());
-                const p3 = new Vector2(width * random.nextFloat(), height * random.nextFloat());
+                const p1 = createRandomPoint(random, bounds);
+                const p2 = createRandomPoint(random, bounds);
+                const p3 = createRandomPoint(random, bounds);
                 path.cubicTo(p1, p2, p3);
             }
             break;
         }
         case 3: {
             for (let i = 0; i < count; i++) {
-                const p1 = new Vector2(width * random.nextFloat(), height * random.nextFloat());
-                const p2 = new Vector2(width * random.nextFloat(), height * random.nextFloat());
-                path.conicTo(p1, p2, 4 * random.nextFloat());
+                const p1 = createRandomPoint(random, bounds);
+                const p2 = createRandomPoint(random, bounds);
+                const w = random.nextFloatBetween(0, 4);
+                path.conicTo(p1, p2, w);
             }
             break;
         }
@@ -99,9 +89,9 @@ export function createRandomPath(
     return path;
 }
 
-export function createRandomPoint(random: Random, box: ReadonlyMinMaxBox2): Vector2 {
-    const x = random.nextFloatBetween(box.minX, box.maxX);
-    const y = random.nextFloatBetween(box.minY, box.maxY);
+export function createRandomPoint(random: Random, bounds: ReadonlyMinMaxBox2): Vector2 {
+    const x = random.nextFloatBetween(bounds.minX, bounds.maxX);
+    const y = random.nextFloatBetween(bounds.minY, bounds.maxY);
 
     return new Vector2(x, y);
 }
@@ -110,8 +100,7 @@ export function createRandomPolygonPair(
     random: Random,
     generator: number,
     offset: number,
-    width: number,
-    height: number,
+    bounds: ReadonlyMinMaxBox2,
 ): [Polygon2, Polygon2] {
     const polygonA = Polygon2.createEmpty();
     const polygonB = Polygon2.createEmpty();
@@ -126,11 +115,13 @@ export function createRandomPolygonPair(
             const count2 = random.nextIntBetween(from, to);
 
             for (let i = 0; i < count1; i++) {
-                polygonA.addXY(width * random.nextFloat(), height * random.nextFloat());
+                const p = createRandomPoint(random, bounds);
+                polygonA.add(p);
             }
 
             for (let i = 0; i < count2; i++) {
-                polygonB.addXY(width * random.nextFloat() + offset, height * random.nextFloat());
+                const p = createRandomPoint(random, bounds);
+                polygonB.add(p);
             }
 
             break;

@@ -91,9 +91,9 @@ function pathOperationUpdateSystem(world: World): void {
     const ctx = world.getPlugin<AppContextPlugin>("app-context-plugin");
 
     const random = RandomXSR128.fromSeedLcg(seed);
-    const [canvasWidth, canvasHeight] = ctx.getSize(false);
+    const bounds = ctx.getBounds(false);
 
-    const path = createRandomPath(random, generator, count, canvasWidth, canvasHeight);
+    const path = createRandomPath(random, generator, count, bounds);
     // path.close();
 
     let output: Path2 | undefined;

@@ -18,6 +18,7 @@ import {
     type AppMainInputData,
 } from "../ecs-modules/app.ts";
 import { WorldContext, type World } from "../ecs/world.ts";
+import { createRandomPoint } from "../utility/helper.ts";
 import { RangeInputElement } from "../utility/html-element.ts";
 
 type SnapRoundingInputData = {
@@ -78,9 +79,9 @@ function snapRoundingUpdateSystem(world: World): void {
     const snapRound = new SnapRound2();
     snapRound.precision = precision;
 
-    const [width, height] = ctx.getSize(false);
+    const bounds = ctx.getBounds(false);
 
-    fillEdges(generator, seed, snapRound, precision, width, height);
+    fillEdges(generator, seed, snapRound, precision, bounds);
 
     const start = performance.now();
     snapRound.process();
@@ -144,14 +145,7 @@ function addEdges(snapRound: SnapRound2, edges: Edge2[]): void {
     }
 }
 
-function fillEdges(
-    generator: number,
-    seed: number,
-    snapRound: SnapRound2,
-    k: number,
-    width: number,
-    height: number,
-): void {
+function fillEdges(generator: number, seed: number, snapRound: SnapRound2, k: number, bounds: MinMaxBox2): void {
     const random = RandomXSR128.fromSeedLcg(seed);
 
     switch (generator) {
@@ -164,8 +158,8 @@ function fillEdges(
             const count = random.nextIntBetween(from, to);
 
             for (let i = 0; i < count; i++) {
-                let p0 = new Vector2(width * random.nextFloat(), height * random.nextFloat());
-                let p1 = new Vector2(width * random.nextFloat(), height * random.nextFloat());
+                let p0 = createRandomPoint(random, bounds);
+                let p1 = createRandomPoint(random, bounds);
 
                 if (random.nextFloat() < pinProbability) {
                     p0 = p0.roundToPrecision(k);
@@ -203,8 +197,8 @@ function fillEdges(
             break;
         }
         case 3: {
-            const p0 = new Vector2(width * random.nextFloat(), height * random.nextFloat());
-            const p1 = new Vector2(width * random.nextFloat(), height * random.nextFloat());
+            const p0 = createRandomPoint(random, bounds);
+            const p1 = createRandomPoint(random, bounds);
 
             const t0 = random.nextFloatBetween(0, 0.5);
             const t1 = random.nextFloatBetween(0.5, 1);

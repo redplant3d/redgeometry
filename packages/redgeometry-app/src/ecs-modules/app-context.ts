@@ -3,7 +3,7 @@ import { Path2 } from "redgeometry/src/core/path";
 import { Polygon2 } from "redgeometry/src/core/polygon";
 import { assertUnreachable, throwError } from "redgeometry/src/internal/debug";
 import type { Mesh2 as Mesh2Next, MeshFaceIdx as MeshNextFaceIdx } from "redgeometry/src/internal/mesh-next";
-import type { ReadonlyMinMaxBox2 } from "redgeometry/src/primitives/box";
+import { MinMaxBox2, type ReadonlyMinMaxBox2 } from "redgeometry/src/primitives/box";
 import type { Edge2, ReadonlyEdge2 } from "redgeometry/src/primitives/edge";
 import type { ReadonlyMatrix3A } from "redgeometry/src/primitives/matrix";
 import type { ReadonlyRay2 } from "redgeometry/src/primitives/ray";
@@ -509,13 +509,14 @@ export class AppContextPlugin {
         ctx.restore();
     }
 
-    public getSize(dynamic: boolean): [number, number] {
-        const canvas = this.context.canvas;
+    public getBounds(dynamic: boolean): MinMaxBox2 {
+        const ctx = this.context;
+
         if (dynamic) {
-            return [canvas.width, canvas.height];
+            return new MinMaxBox2(0, 0, ctx.canvas.width, ctx.canvas.height);
         } else {
             // Static size for reproducible data
-            return [1400, 700];
+            return new MinMaxBox2(0, 0, 1400, 700);
         }
     }
 

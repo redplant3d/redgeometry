@@ -1,6 +1,5 @@
 import { Mesh2 } from "redgeometry/src/core/mesh";
 import { WindingOperator } from "redgeometry/src/core/winding";
-import { MinMaxBox2 } from "redgeometry/src/primitives/box";
 import { RandomXSR128 } from "redgeometry/src/utility/random";
 import type { AppContextPlugin } from "../ecs-modules/app-context.ts";
 import { APP_INPUT_START_SYSTEM_ID } from "../ecs-modules/app-input.ts";
@@ -66,14 +65,13 @@ function straightSkeletonUpdateSystem(world: World): void {
     const ctx = world.getPlugin<AppContextPlugin>("app-context-plugin");
 
     const random = RandomXSR128.fromSeedLcg(seed);
-    const [canvasWidth, canvasHeight] = ctx.getSize(false);
-    const box = new MinMaxBox2(0, 0, canvasWidth, canvasHeight);
+    const bounds = ctx.getBounds(false);
 
     const tmax = time;
 
-    // const path = createRandomPolygonSimple(random, box, generator, 0.5, 0.25).toPath();
-    const path = createRandomPolygonSimple(random, box, generator, 1, 0).toPath();
-    // const path = createRandomPolygonSimple(random, box, generator, 0.05, 0.95).toPath();
+    // const path = createRandomPolygonSimple(random, bounds, generator, 0.5, 0.25).toPath();
+    const path = createRandomPolygonSimple(random, bounds, generator, 1, 0).toPath();
+    // const path = createRandomPolygonSimple(random, bounds, generator, 0.05, 0.95).toPath();
 
     // path.clear();
     // path.moveToXY(100, 100);

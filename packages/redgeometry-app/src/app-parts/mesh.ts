@@ -3,7 +3,6 @@ import { Path2 } from "redgeometry/src/core/path";
 import { PathClip2 } from "redgeometry/src/core/path-clip";
 import { PATH_CLIP_OPTIONS_DEFAULT, PATH_QUALITY_OPTIONS_DEFAULT } from "redgeometry/src/core/path-options";
 import { assert } from "redgeometry/src/internal/debug";
-import { MinMaxBox2 } from "redgeometry/src/primitives/box";
 import type { ReadonlyVector2 } from "redgeometry/src/primitives/vector";
 import { RandomXSR128 } from "redgeometry/src/utility/random";
 import type { AppContextPlugin } from "../ecs-modules/app-context.ts";
@@ -66,12 +65,11 @@ function meshUpdateSystem(world: World): void {
     const ctx = world.getPlugin<AppContextPlugin>("app-context-plugin");
 
     const random = RandomXSR128.fromSeedLcg(seed);
-    const [canvasWidth, canvasHeight] = ctx.getSize(false);
-    const box = new MinMaxBox2(0, 0, canvasWidth, canvasHeight);
+    const bounds = ctx.getBounds(false);
 
-    const p0 = createRandomPoint(random, box);
-    const p1 = createRandomPoint(random, box);
-    const p2 = createRandomPoint(random, box);
+    const p0 = createRandomPoint(random, bounds);
+    const p1 = createRandomPoint(random, bounds);
+    const p2 = createRandomPoint(random, bounds);
 
     const points: ReadonlyVector2[] = [];
 
