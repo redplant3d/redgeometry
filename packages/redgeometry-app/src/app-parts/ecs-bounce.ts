@@ -112,7 +112,7 @@ function ecsBounceSpawnSystem(world: World): void {
             });
         }
     } else {
-        const query = world.queryEntities<ObjectComponent>((q) => q.hasComponent("object-component"));
+        const query = world.queryEntities((q) => q.hasComponent<ObjectComponent>("object-component"));
 
         let i = nextCount;
 
@@ -136,7 +136,7 @@ function ecsBounceMovementSystem(world: World): void {
 
     const { width, height } = ctx.canvas;
 
-    const query = world.queryEntities<ObjectComponent>((q) => q.hasComponent("object-component"));
+    const query = world.queryEntities((q) => q.hasComponent<ObjectComponent>("object-component"));
 
     while (query.next()) {
         const entityId = query.getEntityId();
@@ -183,7 +183,7 @@ function ecsBounceClearRenderSystem(world: World): void {
 function ecsBounceCircleRenderSystem(world: World): void {
     const ctx = world.getPlugin<AppContextPlugin>("app-context-plugin");
 
-    const query = world.queryEntities<CircleComponent | ObjectComponent>(
+    const query = world.queryEntities(
         (q) =>
             q.hasComponent<CircleComponent>("circle-component") && q.hasComponent<ObjectComponent>("object-component"),
     );
@@ -212,7 +212,7 @@ function ecsBounceCircleRenderSystem(world: World): void {
 function ecsBounceRectangleRenderSystem(world: World): void {
     const ctx = world.getPlugin<AppContextPlugin>("app-context-plugin");
 
-    const query = world.queryEntities<RectangleComponent | ObjectComponent>(
+    const query = world.queryEntities(
         (q) =>
             q.hasComponent<RectangleComponent>("rectangle-component") &&
             q.hasComponent<ObjectComponent>("object-component"),

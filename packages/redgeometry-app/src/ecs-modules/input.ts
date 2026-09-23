@@ -286,10 +286,10 @@ export function inputUpdateSystem(world: World): void {
     const captureData = world.getData<InputCaptureData>("input-capture-data");
 
     // Write events
-    world.addEventArray(captureData.keyboardButtonEvents);
-    world.addEventArray(captureData.mouseButtonEvents);
-    world.addEventArray(captureData.mouseMotionEvents);
-    world.addEventArray(captureData.mouseWheelEvents);
+    world.addEventArray<InputKeyboardButtonEvent>(captureData.keyboardButtonEvents);
+    world.addEventArray<InputMouseButtonEvent>(captureData.mouseButtonEvents);
+    world.addEventArray<InputMouseMotionEvent>(captureData.mouseMotionEvents);
+    world.addEventArray<InputMouseWheelEvent>(captureData.mouseWheelEvents);
 
     // Reset event capture data
     captureData.keyboardButtonEvents.length = 0;

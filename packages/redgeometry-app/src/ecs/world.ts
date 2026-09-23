@@ -130,15 +130,15 @@ export class World {
         this.pluginStorage = pluginStorage;
     }
 
-    public addComponent<T extends Component>(entityId: EntityId, component: T): void {
+    public addComponent<T extends Component = never>(entityId: EntityId, component: NoInfer<T>): void {
         this.entityComponentStorage.addComponent(entityId, component);
     }
 
-    public addEvent<T extends WorldEvent>(event: T): void {
+    public addEvent<T extends WorldEvent = never>(event: NoInfer<T>): void {
         this.eventStorage.add(event);
     }
 
-    public addEventArray<T extends WorldEvent>(events: T[]): void {
+    public addEventArray<T extends WorldEvent = never>(events: NoInfer<T>[]): void {
         this.eventStorage.addArray(events);
     }
 
@@ -150,7 +150,7 @@ export class World {
         return this.entityComponentStorage.createEntity();
     }
 
-    public deleteComponent<T extends Component>(entity: EntityId, componentId: ComponentIdOf<T>): void {
+    public deleteComponent<T extends Component = never>(entity: EntityId, componentId: ComponentIdOf<T>): void {
         this.entityComponentStorage.deleteComponent(entity, componentId);
     }
 
@@ -158,19 +158,22 @@ export class World {
         this.entityComponentStorage.destroyEntity(entity);
     }
 
-    public findComponent<T extends Component>(entity: EntityId, componentId: ComponentIdOf<T>): T | undefined {
+    public findComponent<T extends Component = never>(entity: EntityId, componentId: ComponentIdOf<T>): T | undefined {
         return this.entityComponentStorage.findComponent(entity, componentId) as T | undefined;
     }
 
-    public findLastEvent<T extends WorldEvent>(eventId: WorldEventIdOf<T>): T | undefined {
+    public findLastEvent<T extends WorldEvent = never>(eventId: WorldEventIdOf<T>): T | undefined {
         return this.eventStorage.findLast(eventId) as T | undefined;
     }
 
-    public getComponentFlags<T extends Component>(entityId: EntityId, componentId: ComponentIdOf<T>): ComponentFlags {
+    public getComponentFlags<T extends Component = never>(
+        entityId: EntityId,
+        componentId: ComponentIdOf<T>,
+    ): ComponentFlags {
         return this.entityComponentStorage.getComponentFlags(entityId, componentId);
     }
 
-    public getData<T extends WorldData>(dataId: WorldDataIdOf<T>): T {
+    public getData<T extends WorldData = never>(dataId: WorldDataIdOf<T>): T {
         return this.dataStorage.get(dataId) as T;
     }
 
@@ -178,11 +181,11 @@ export class World {
         return this.entityComponentStorage.getEntityFlags(entityId);
     }
 
-    public getEvents<T extends WorldEvent>(eventId: WorldEventIdOf<T>): WorldEventIterator<T> {
+    public getEvents<T extends WorldEvent = never>(eventId: WorldEventIdOf<T>): WorldEventIterator<T> {
         return this.eventStorage.get(eventId) as WorldEventIterator<T>;
     }
 
-    public getPlugin<T extends WorldPlugin>(pluginId: WorldPluginIdOf<T>): T {
+    public getPlugin<T extends WorldPlugin = never>(pluginId: WorldPluginIdOf<T>): T {
         return this.pluginStorage.get(pluginId) as T;
     }
 
@@ -190,7 +193,7 @@ export class World {
         return this.entityComponentStorage.hasComponent(entityId, componentId);
     }
 
-    public hasComponentFlags<T extends Component>(
+    public hasComponentFlags<T extends Component = never>(
         entityId: EntityId,
         componentId: ComponentIdOf<T>,
         flagMask: ComponentFlags,
@@ -198,7 +201,7 @@ export class World {
         return this.entityComponentStorage.hasComponentFlags(entityId, componentId, flagMask);
     }
 
-    public hasComponentFlagsAny<T extends Component>(
+    public hasComponentFlagsAny<T extends Component = never>(
         entityId: EntityId,
         componentId: ComponentIdOf<T>,
         flagMask: ComponentFlags,
@@ -218,9 +221,7 @@ export class World {
         return this.entityComponentStorage.isEntityAlive(entityId);
     }
 
-    public queryEntities<T extends Component>(
-        predicate: (q: EntityComponentQueryValue<T>) => boolean,
-    ): EntityComponentIterator<T> {
+    public queryEntities(predicate: (q: EntityComponentQueryValue) => boolean): EntityComponentIterator {
         return this.entityComponentStorage.queryEntities(predicate);
     }
 
@@ -233,19 +234,19 @@ export class World {
         return this.systemScheduleStorage.runSchedule(scheduleId, this);
     }
 
-    public setComponent<T extends Component>(entityId: EntityId, component: T): void {
+    public setComponent<T extends Component = never>(entityId: EntityId, component: NoInfer<T>): void {
         this.entityComponentStorage.setComponent(entityId, component);
     }
 
-    public setData<T extends WorldData>(data: T): void {
+    public setData<T extends WorldData = never>(data: NoInfer<T>): void {
         this.dataStorage.set(data);
     }
 
-    public setPlugin<T extends WorldPlugin>(plugin: T): void {
+    public setPlugin<T extends WorldPlugin = never>(plugin: NoInfer<T>): void {
         this.pluginStorage.set(plugin);
     }
 
-    public updateComponent<T extends Component>(entityId: EntityId, componentId: ComponentIdOf<T>): void {
+    public updateComponent<T extends Component = never>(entityId: EntityId, componentId: ComponentIdOf<T>): void {
         this.entityComponentStorage.updateComponent(entityId, componentId);
     }
 }

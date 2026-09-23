@@ -41,14 +41,14 @@ export type ComponentTransition = {
     setState: EntityComponentSetState;
 };
 
-export interface EntityComponentQueryValue<T extends Component> {
+export interface EntityComponentQueryValue {
     /**
      * Equivalent to `hasComponentFlagsAny(componentId,
      * ComponentFlags.Default | ComponentFlags.Added | ComponentFlags.Updated)`
      */
-    hasComponent<U extends T>(componentId: ComponentIdOf<U>): boolean;
-    hasComponentFlags<U extends T>(componentId: ComponentIdOf<U>, flagMask: ComponentFlags): boolean;
-    hasComponentFlagsAny<U extends T>(componentId: ComponentIdOf<U>, flagMask: ComponentFlags): boolean;
+    hasComponent<T extends Component = never>(componentId: ComponentIdOf<T>): boolean;
+    hasComponentFlags<T extends Component = never>(componentId: ComponentIdOf<T>, flagMask: ComponentFlags): boolean;
+    hasComponentFlagsAny<T extends Component = never>(componentId: ComponentIdOf<T>, flagMask: ComponentFlags): boolean;
     hasEntityFlags(flagMask: EntityFlags): boolean;
     hasEntityFlagsAny(flagMask: EntityFlags): boolean;
     /**
@@ -251,9 +251,7 @@ export class EntityComponentStorage {
     /**
      * Returns an iterator over the entities filtered by `predicate`.
      */
-    public queryEntities(
-        predicate: (q: EntityComponentQueryValue<Component>) => boolean,
-    ): EntityComponentIterator<Component> {
+    public queryEntities(predicate: (q: EntityComponentQueryValue) => boolean): EntityComponentIterator {
         const querySets: EntityComponentQuerySet[] = [];
 
         for (const componentSet of this.sets) {
@@ -863,7 +861,7 @@ export class Entities {
     }
 }
 
-export class EntityComponentSetState implements EntityComponentQueryValue<Component> {
+export class EntityComponentSetState implements EntityComponentQueryValue {
     public componentStates: ComponentStates;
     public componentTransitions: ComponentTransition[];
     public entityState: EntityState;
@@ -1206,7 +1204,7 @@ export class EntityComponentSetStorage {
     }
 }
 
-export class EntityComponentIterator<T extends Component> {
+export class EntityComponentIterator {
     private currComponentStates: ComponentStates;
     private currComponents: ReadonlyMap<ComponentId, ComponentContainer>;
     private currEntityFlags: EntityFlags;
@@ -1232,7 +1230,7 @@ export class EntityComponentIterator<T extends Component> {
         this.currStorageEntryRefs = EMPTY_ARRAY;
     }
 
-    public findComponent<U extends Component>(componentId: ComponentIdOf<U>): U | undefined {
+    public findComponent<T extends Component = never>(componentId: ComponentIdOf<T>): T | undefined {
         const comps = this.currComponents.get(componentId);
 
         if (comps === undefined) {
@@ -1245,10 +1243,10 @@ export class EntityComponentIterator<T extends Component> {
             return undefined;
         }
 
-        return comp as U;
+        return comp as T;
     }
 
-    public getComponent<U extends T>(componentId: ComponentIdOf<U>): U {
+    public getComponent<T extends Component = never>(componentId: ComponentIdOf<T>): T {
         const comps = this.currComponents.get(componentId);
 
         if (comps === undefined) {
@@ -1261,10 +1259,10 @@ export class EntityComponentIterator<T extends Component> {
             throwError("Invalid storage ref '{}'", this.currStorageEntryRef);
         }
 
-        return comp as U;
+        return comp as T;
     }
 
-    public getComponentFlags<U extends Component>(componentId: ComponentIdOf<U>): ComponentFlags {
+    public getComponentFlags<T extends Component = never>(componentId: ComponentIdOf<T>): ComponentFlags {
         const compState = this.currComponentStates.get(componentId);
 
         if (compState === undefined) {
@@ -1288,17 +1286,23 @@ export class EntityComponentIterator<T extends Component> {
         return id;
     }
 
-    public hasComponent<U extends Component>(componentId: ComponentIdOf<U>): boolean {
+    public hasComponent<T extends Component = never>(componentId: ComponentIdOf<T>): boolean {
         const flags = this.getComponentFlags(componentId);
         return hasFlagsAny(flags, ComponentFlags.DEFAULT | ComponentFlags.ADDED | ComponentFlags.UPDATED);
     }
 
-    public hasComponentFlags<U extends Component>(componentId: ComponentIdOf<U>, flagMask: ComponentFlags): boolean {
+    public hasComponentFlags<T extends Component = never>(
+        componentId: ComponentIdOf<T>,
+        flagMask: ComponentFlags,
+    ): boolean {
         const flags = this.getComponentFlags(componentId);
         return hasFlags(flags, flagMask);
     }
 
-    public hasComponentFlagsAny<U extends Component>(componentId: ComponentIdOf<U>, flagMask: ComponentFlags): boolean {
+    public hasComponentFlagsAny<T extends Component = never>(
+        componentId: ComponentIdOf<T>,
+        flagMask: ComponentFlags,
+    ): boolean {
         const flags = this.getComponentFlags(componentId);
         return hasFlagsAny(flags, flagMask);
     }
