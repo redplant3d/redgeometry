@@ -121,6 +121,7 @@ export function createRandomPolygonPair(
 
             for (let i = 0; i < count2; i++) {
                 const p = createRandomPoint(random, bounds);
+                p.set(p.x + offset, p.y);
                 polygonB.add(p);
             }
 
