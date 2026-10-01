@@ -23,25 +23,22 @@ export function appInputStopSystem(world: World): void {
 export const APP_INPUT_MODULE_ID = "app-input-module";
 
 export function appInputModule(context: WorldContext): void {
-    context.addSystem({
+    context.addSystem(START_SCHEDULE_ID, {
+        type: "sync",
         id: APP_INPUT_START_SYSTEM_ID,
         fn: appInputStartSystem,
-        mode: "sync",
-        scheduleId: START_SCHEDULE_ID,
     });
 
-    context.addSystem({
+    context.addSystem(STOP_SCHEDULE_ID, {
+        type: "sync",
         id: APP_INPUT_STOP_SYSTEM_ID,
         fn: appInputStopSystem,
-        mode: "sync",
-        scheduleId: STOP_SCHEDULE_ID,
     });
 
-    context.addSystemDepedency({
-        type: "sequence",
-        seq: [APP_START_SYSTEM_ID, APP_INPUT_START_SYSTEM_ID],
-        scheduleId: START_SCHEDULE_ID,
-    });
+    context.addSystemDepedency(START_SCHEDULE_ID, [
+        { type: "system", id: APP_START_SYSTEM_ID },
+        { type: "system", id: APP_INPUT_START_SYSTEM_ID },
+    ]);
 
     context.requireData<AppInputData>("app-input-data");
 }

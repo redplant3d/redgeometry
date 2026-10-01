@@ -92,35 +92,32 @@ export function pathIntersectionAppPartModule(context: WorldContext): void {
     context.addData<PathIntersectionInputData>("path-intersection-input-data");
     context.addData<PathIntersectionStateData>("path-intersection-state-data");
 
-    context.addSystem({
+    context.addSystem(START_SCHEDULE_ID, {
+        type: "sync",
         id: PATH_INTERSECTION_START_SYSTEM_ID,
         fn: pathIntersectionStartSystem,
-        mode: "sync",
-        scheduleId: START_SCHEDULE_ID,
     });
 
-    context.addSystem({
+    context.addSystem(UPDATE_SCHEDULE_ID, {
+        type: "sync",
         id: PATH_INTERSECTION_UPDATE_SYSTEM_ID,
         fn: pathIntersectionUpdateSystem,
-        mode: "sync",
-        scheduleId: UPDATE_SCHEDULE_ID,
     });
-    context.addSystem({
+    context.addSystem(UPDATE_SCHEDULE_ID, {
+        type: "sync",
         id: PATH_INTERSECTION_RENDER_SYSTEM_ID,
         fn: pathIntersectionRenderSystem,
-        mode: "sync",
-        scheduleId: UPDATE_SCHEDULE_ID,
     });
 
-    context.addSystemDepedency({
-        type: "sequence",
-        seq: [APP_START_SYSTEM_ID, PATH_INTERSECTION_START_SYSTEM_ID, APP_INPUT_START_SYSTEM_ID],
-        scheduleId: START_SCHEDULE_ID,
-    });
+    context.addSystemDepedency(START_SCHEDULE_ID, [
+        { type: "system", id: APP_START_SYSTEM_ID },
+        { type: "system", id: PATH_INTERSECTION_START_SYSTEM_ID },
+        { type: "system", id: APP_INPUT_START_SYSTEM_ID },
+    ]);
 
-    context.addSystemDepedency({
-        type: "sequence",
-        seq: [APP_UPDATE_SYSTEM_ID, PATH_INTERSECTION_UPDATE_SYSTEM_ID, PATH_INTERSECTION_RENDER_SYSTEM_ID],
-        scheduleId: UPDATE_SCHEDULE_ID,
-    });
+    context.addSystemDepedency(UPDATE_SCHEDULE_ID, [
+        { type: "system", id: APP_UPDATE_SYSTEM_ID },
+        { type: "system", id: PATH_INTERSECTION_UPDATE_SYSTEM_ID },
+        { type: "system", id: PATH_INTERSECTION_RENDER_SYSTEM_ID },
+    ]);
 }

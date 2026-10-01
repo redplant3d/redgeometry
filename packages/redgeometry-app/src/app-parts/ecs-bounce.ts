@@ -281,78 +281,65 @@ export function ecsBounceAppPartModule(context: WorldContext): void {
     context.addData<EcsBounceInputData>("ecs-bounce-input-data");
     context.addData<EcsBounceStateData>("ecs-bounce-state-data");
 
-    context.addSystem({
+    context.addSystem(START_SCHEDULE_ID, {
+        type: "sync",
         id: ECS_BOUNCE_START_SYSTEM_ID,
         fn: ecsBounceStartSystem,
-        mode: "sync",
-        scheduleId: START_SCHEDULE_ID,
     });
 
-    context.addSystem({
+    context.addSystem(UPDATE_SCHEDULE_ID, {
+        type: "sync",
         id: ECS_BOUNCE_SPAWN_SYSTEM_ID,
         fn: ecsBounceSpawnSystem,
-        mode: "sync",
-        scheduleId: UPDATE_SCHEDULE_ID,
     });
-    context.addSystem({
+    context.addSystem(UPDATE_SCHEDULE_ID, {
+        type: "sync",
         id: ECS_BOUNCE_MOVEMENT_SYSTEM_ID,
         fn: ecsBounceMovementSystem,
-        mode: "sync",
-        scheduleId: UPDATE_SCHEDULE_ID,
     });
-    context.addSystem({
+    context.addSystem(UPDATE_SCHEDULE_ID, {
+        type: "sync",
         id: ECS_BOUNCE_CLEAR_RENDER_SYSTEM_ID,
         fn: ecsBounceClearRenderSystem,
-        mode: "sync",
-        scheduleId: UPDATE_SCHEDULE_ID,
     });
-    context.addSystem({
+    context.addSystem(UPDATE_SCHEDULE_ID, {
+        type: "sync",
         id: ECS_BOUNCE_CIRCLE_RENDER_SYSTEM_ID,
         fn: ecsBounceCircleRenderSystem,
-        mode: "sync",
-        scheduleId: UPDATE_SCHEDULE_ID,
     });
-    context.addSystem({
+    context.addSystem(UPDATE_SCHEDULE_ID, {
+        type: "sync",
         id: ECS_BOUNCE_RECTANGLE_RENDER_SYSTEM_ID,
         fn: ecsBounceRectangleRenderSystem,
-        mode: "sync",
-        scheduleId: UPDATE_SCHEDULE_ID,
     });
-    context.addSystem({
+    context.addSystem(UPDATE_SCHEDULE_ID, {
+        type: "sync",
         id: ECS_BOUNCE_NOTIFICATION_SYSTEM_ID,
         fn: ecsBounceNotificationSystem,
-        mode: "sync",
-        scheduleId: UPDATE_SCHEDULE_ID,
     });
 
-    context.addSystemDepedency({
-        type: "sequence",
-        seq: [APP_START_SYSTEM_ID, ECS_BOUNCE_START_SYSTEM_ID, APP_INPUT_START_SYSTEM_ID],
-        scheduleId: START_SCHEDULE_ID,
-    });
+    context.addSystemDepedency(START_SCHEDULE_ID, [
+        { type: "system", id: APP_START_SYSTEM_ID },
+        { type: "system", id: ECS_BOUNCE_START_SYSTEM_ID },
+        { type: "system", id: APP_INPUT_START_SYSTEM_ID },
+    ]);
 
-    context.addSystemDepedency({
-        type: "sequence",
-        seq: [APP_UPDATE_SYSTEM_ID, ECS_BOUNCE_SPAWN_SYSTEM_ID],
-        scheduleId: UPDATE_SCHEDULE_ID,
-    });
-    context.addSystemDepedency({
-        type: "sequence",
-        seq: [ECS_BOUNCE_SPAWN_SYSTEM_ID, ECS_BOUNCE_MOVEMENT_SYSTEM_ID, ECS_BOUNCE_CLEAR_RENDER_SYSTEM_ID],
-        scheduleId: UPDATE_SCHEDULE_ID,
-    });
-    context.addSystemDepedency({
-        type: "sequence",
-        seq: [
-            ECS_BOUNCE_CLEAR_RENDER_SYSTEM_ID,
-            ECS_BOUNCE_RECTANGLE_RENDER_SYSTEM_ID,
-            ECS_BOUNCE_CIRCLE_RENDER_SYSTEM_ID,
-        ],
-        scheduleId: UPDATE_SCHEDULE_ID,
-    });
-    context.addSystemDepedency({
-        type: "sequence",
-        seq: [ECS_BOUNCE_SPAWN_SYSTEM_ID, ECS_BOUNCE_NOTIFICATION_SYSTEM_ID],
-        scheduleId: UPDATE_SCHEDULE_ID,
-    });
+    context.addSystemDepedency(UPDATE_SCHEDULE_ID, [
+        { type: "system", id: APP_UPDATE_SYSTEM_ID },
+        { type: "system", id: ECS_BOUNCE_SPAWN_SYSTEM_ID },
+    ]);
+    context.addSystemDepedency(UPDATE_SCHEDULE_ID, [
+        { type: "system", id: ECS_BOUNCE_SPAWN_SYSTEM_ID },
+        { type: "system", id: ECS_BOUNCE_MOVEMENT_SYSTEM_ID },
+        { type: "system", id: ECS_BOUNCE_CLEAR_RENDER_SYSTEM_ID },
+    ]);
+    context.addSystemDepedency(UPDATE_SCHEDULE_ID, [
+        { type: "system", id: ECS_BOUNCE_CLEAR_RENDER_SYSTEM_ID },
+        { type: "system", id: ECS_BOUNCE_RECTANGLE_RENDER_SYSTEM_ID },
+        { type: "system", id: ECS_BOUNCE_CIRCLE_RENDER_SYSTEM_ID },
+    ]);
+    context.addSystemDepedency(UPDATE_SCHEDULE_ID, [
+        { type: "system", id: ECS_BOUNCE_SPAWN_SYSTEM_ID },
+        { type: "system", id: ECS_BOUNCE_NOTIFICATION_SYSTEM_ID },
+    ]);
 }

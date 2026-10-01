@@ -40,7 +40,7 @@ const PATH_CLIP_START_SYSTEM_ID = "path-clip-start-system";
 const PATH_CLIP_UPDATE_SYSTEM_ID = "path-clip-update-system";
 const PATH_CLIP_RENDER_SYSTEM_ID = "path-clip-render-system";
 
-function appPartStartSystem(world: World): void {
+function pathClipStartSystem(world: World): void {
     const { inputElements } = world.getData<AppInputData>("app-input-data");
 
     const inputParameter = new RangeInputElement("parameter", "0", "200", "100");
@@ -76,7 +76,7 @@ function appPartStartSystem(world: World): void {
     });
 }
 
-function appPartUpdateSystem(world: World): void {
+function pathClipUpdateSystem(world: World): void {
     const { inputParameter, inputBoolOp, inputWindA, inputWindB } =
         world.getData<PathClipInputData>("path-clip-input-data");
     const parameter = inputParameter.getInt();
@@ -123,7 +123,7 @@ function appPartUpdateSystem(world: World): void {
     });
 }
 
-function appPartRenderSystem(world: World): void {
+function pathClipRenderSystem(world: World): void {
     const { polygonA, polygonB, chains, faces } = world.getData<PathClipStateData>("path-clip-state-data");
 
     const ctx = world.getPlugin<AppContextPlugin>("app-context-plugin");
@@ -150,35 +150,32 @@ export function pathClipAppPartModule(context: WorldContext): void {
     context.addData<PathClipInputData>("path-clip-input-data");
     context.addData<PathClipStateData>("path-clip-state-data");
 
-    context.addSystem({
+    context.addSystem(START_SCHEDULE_ID, {
+        type: "sync",
         id: PATH_CLIP_START_SYSTEM_ID,
-        fn: appPartStartSystem,
-        mode: "sync",
-        scheduleId: START_SCHEDULE_ID,
+        fn: pathClipStartSystem,
     });
 
-    context.addSystem({
+    context.addSystem(UPDATE_SCHEDULE_ID, {
+        type: "sync",
         id: PATH_CLIP_UPDATE_SYSTEM_ID,
-        fn: appPartUpdateSystem,
-        mode: "sync",
-        scheduleId: UPDATE_SCHEDULE_ID,
+        fn: pathClipUpdateSystem,
     });
-    context.addSystem({
+    context.addSystem(UPDATE_SCHEDULE_ID, {
+        type: "sync",
         id: PATH_CLIP_RENDER_SYSTEM_ID,
-        fn: appPartRenderSystem,
-        mode: "sync",
-        scheduleId: UPDATE_SCHEDULE_ID,
+        fn: pathClipRenderSystem,
     });
 
-    context.addSystemDepedency({
-        type: "sequence",
-        seq: [APP_START_SYSTEM_ID, PATH_CLIP_START_SYSTEM_ID, APP_INPUT_START_SYSTEM_ID],
-        scheduleId: START_SCHEDULE_ID,
-    });
+    context.addSystemDepedency(START_SCHEDULE_ID, [
+        { type: "system", id: APP_START_SYSTEM_ID },
+        { type: "system", id: PATH_CLIP_START_SYSTEM_ID },
+        { type: "system", id: APP_INPUT_START_SYSTEM_ID },
+    ]);
 
-    context.addSystemDepedency({
-        type: "sequence",
-        seq: [APP_UPDATE_SYSTEM_ID, PATH_CLIP_UPDATE_SYSTEM_ID, PATH_CLIP_RENDER_SYSTEM_ID],
-        scheduleId: UPDATE_SCHEDULE_ID,
-    });
+    context.addSystemDepedency(UPDATE_SCHEDULE_ID, [
+        { type: "system", id: APP_UPDATE_SYSTEM_ID },
+        { type: "system", id: PATH_CLIP_UPDATE_SYSTEM_ID },
+        { type: "system", id: PATH_CLIP_RENDER_SYSTEM_ID },
+    ]);
 }

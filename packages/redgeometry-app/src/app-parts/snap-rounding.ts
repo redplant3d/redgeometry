@@ -264,35 +264,32 @@ export function snapRoundingAppPartModule(context: WorldContext): void {
     context.addData<SnapRoundingInputData>("snap-rounding-input-data");
     context.addData<SnapRoundingStateData>("snap-rounding-state-data");
 
-    context.addSystem({
+    context.addSystem(START_SCHEDULE_ID, {
+        type: "sync",
         id: SNAP_ROUNDING_START_SYSTEM_ID,
         fn: snapRoundingStartSystem,
-        mode: "sync",
-        scheduleId: START_SCHEDULE_ID,
     });
 
-    context.addSystem({
+    context.addSystem(UPDATE_SCHEDULE_ID, {
+        type: "sync",
         id: SNAP_ROUNDING_UPDATE_SYSTEM_ID,
         fn: snapRoundingUpdateSystem,
-        mode: "sync",
-        scheduleId: UPDATE_SCHEDULE_ID,
     });
-    context.addSystem({
+    context.addSystem(UPDATE_SCHEDULE_ID, {
+        type: "sync",
         id: SNAP_ROUNDING_RENDER_SYSTEM_ID,
         fn: snapRoundingRenderSystem,
-        mode: "sync",
-        scheduleId: UPDATE_SCHEDULE_ID,
     });
 
-    context.addSystemDepedency({
-        type: "sequence",
-        seq: [APP_START_SYSTEM_ID, SNAP_ROUNDING_START_SYSTEM_ID, APP_INPUT_START_SYSTEM_ID],
-        scheduleId: START_SCHEDULE_ID,
-    });
+    context.addSystemDepedency(START_SCHEDULE_ID, [
+        { type: "system", id: APP_START_SYSTEM_ID },
+        { type: "system", id: SNAP_ROUNDING_START_SYSTEM_ID },
+        { type: "system", id: APP_INPUT_START_SYSTEM_ID },
+    ]);
 
-    context.addSystemDepedency({
-        type: "sequence",
-        seq: [APP_UPDATE_SYSTEM_ID, SNAP_ROUNDING_UPDATE_SYSTEM_ID, SNAP_ROUNDING_RENDER_SYSTEM_ID],
-        scheduleId: UPDATE_SCHEDULE_ID,
-    });
+    context.addSystemDepedency(UPDATE_SCHEDULE_ID, [
+        { type: "system", id: APP_UPDATE_SYSTEM_ID },
+        { type: "system", id: SNAP_ROUNDING_UPDATE_SYSTEM_ID },
+        { type: "system", id: SNAP_ROUNDING_RENDER_SYSTEM_ID },
+    ]);
 }

@@ -1,6 +1,13 @@
 import { assert, throwError } from "redgeometry/src/internal/debug";
 import { log } from "redgeometry/src/internal/log";
-import type { World, WorldModuleId } from "./world.ts";
+import type {
+    World,
+    WorldContextRegisterScheduleEntry,
+    WorldContextRegisterSystemDependencyEntry,
+    WorldContextRegisterSystemEntry,
+    WorldContextRegisterSystemGroupEntry,
+    WorldModuleId,
+} from "./world.ts";
 
 export type SystemId = string;
 export type SystemGroupId = string;
@@ -8,30 +15,42 @@ export type SystemScheduleId = string;
 export type SystemDependencyId = string;
 
 export type SystemOptionsSync = {
+    type: "sync";
     id: SystemId;
     fn: (world: World) => void;
-    mode: "sync";
-    scheduleId: SystemScheduleId;
+    groupId?: SystemGroupId;
 };
 export type SystemOptionsAsync = {
+    type: "async";
     id: SystemId;
     fn: (world: World) => Promise<void>;
-    mode: "async";
-    scheduleId: SystemScheduleId;
+    groupId?: SystemGroupId;
 };
 export type SystemOptions = SystemOptionsSync | SystemOptionsAsync;
 
-export type SystemDependencyOptionsSequence = {
-    type: "sequence";
-    seq: [SystemDependencyId, ...SystemDependencyId[]];
-    scheduleId: SystemScheduleId;
+export type SystemDependencyArray<T> = [T, T, ...T[]];
+
+export type SystemDependencyElementSystem = {
+    type: "system";
+    id: SystemId;
+};
+export type SystemDependencyElementSystemGroup = {
+    type: "system-group";
+    id: SystemGroupId;
 };
 
-export type SystemDependencyOptions = SystemDependencyOptionsSequence;
+export type SystemDependencyElementCollection = SystemDependencyArray<
+    SystemDependencyElementSystem | SystemDependencyElementSystemGroup
+>;
+
+export type SystemDependencyElement =
+    SystemDependencyElementSystem | SystemDependencyElementSystemGroup | SystemDependencyElementCollection;
+
+export type SystemDependencyOptions = SystemDependencyArray<SystemDependencyElement>;
 
 export type SystemGroupOptions = {
-    groupId: SystemGroupId;
-    scheduleId: SystemScheduleId;
+    id: SystemGroupId;
+    parentId?: SystemGroupId;
 };
 
 type SystemScheduleEntry = {
@@ -45,6 +64,7 @@ type SystemNode = {
     depsIn: Set<SystemNode>;
     depsOut: Set<SystemNode>;
     options: SystemOptions;
+    scheduleId: SystemScheduleId;
 };
 
 type SystemSchedule = {
@@ -52,23 +72,23 @@ type SystemSchedule = {
 };
 
 export class SystemScheduleStorage {
-    public dependencyOptions: SystemDependencyOptions[];
-    public groupOptions: SystemGroupOptions[];
-    public options: SystemOptions[];
     public schedules: Map<SystemScheduleId, SystemSchedule | undefined>;
+    public systemDependencyEntries: WorldContextRegisterSystemDependencyEntry[];
+    public systemEntries: WorldContextRegisterSystemEntry[];
+    public systemGroupEntries: WorldContextRegisterSystemGroupEntry[];
 
     constructor() {
-        this.dependencyOptions = [];
-        this.groupOptions = [];
-        this.options = [];
         this.schedules = new Map();
+        this.systemDependencyEntries = [];
+        this.systemEntries = [];
+        this.systemGroupEntries = [];
     }
 
     public clear(): void {
-        this.dependencyOptions = [];
-        this.groupOptions = [];
-        this.options = [];
         this.schedules = new Map();
+        this.systemDependencyEntries = [];
+        this.systemEntries = [];
+        this.systemGroupEntries = [];
     }
 
     public hasSchedule(scheduleId: SystemScheduleId): boolean {
@@ -98,10 +118,10 @@ export class SystemScheduleStorage {
 
             for (let i = 0; i < schedule.entries.length; i++) {
                 const entry = schedule.entries[i];
-                const mode = entry.options.mode;
+                const type = entry.options.type;
                 const id = entry.options.id;
 
-                str += "#" + i + " " + id + " (" + mode + ")\n";
+                str += "#" + i + " " + id + " (" + type + ")\n";
 
                 for (const dep of entry.depsAsync) {
                     str += "  ^ " + dep.options.id + "\n";
@@ -114,56 +134,56 @@ export class SystemScheduleStorage {
         return str;
     }
 
-    public registerSchedule(scheduleId: SystemScheduleId, moduleId: WorldModuleId): void {
+    public registerSchedule(entry: WorldContextRegisterScheduleEntry, moduleId: WorldModuleId): void {
         assert(
-            !this.schedules.has(scheduleId),
+            !this.schedules.has(entry.scheduleId),
             "System schedule '{}' is registered from world module '{}' but has already been registered",
-            scheduleId,
+            entry.scheduleId,
             moduleId,
         );
 
-        this.schedules.set(scheduleId, undefined);
+        this.schedules.set(entry.scheduleId, undefined);
     }
 
-    public registerSystem(options: SystemOptions, moduleId: WorldModuleId): void {
+    public registerSystem(entry: WorldContextRegisterSystemEntry, moduleId: WorldModuleId): void {
         assert(
-            this.schedules.has(options.scheduleId),
+            this.schedules.has(entry.scheduleId),
             "System schedule '{}' is required for system '{}' by world module '{}' but has not been registered",
-            options.scheduleId,
-            options.id,
+            entry.scheduleId,
+            entry.options.id,
             moduleId,
         );
         assert(
-            !this.options.some((o) => o.id === options.id && o.scheduleId === options.scheduleId),
+            !this.systemEntries.some((e) => e.options.id === entry.options.id && e.scheduleId === entry.scheduleId),
             "System '{}' in system schedule '{}' is registered from world module '{}' but has already been registered",
-            options.id,
-            options.scheduleId,
+            entry.options.id,
+            entry.scheduleId,
             moduleId,
         );
 
-        this.options.push(options);
+        this.systemEntries.push(entry);
     }
 
-    public registerSystemDependency(options: SystemDependencyOptions, moduleId: WorldModuleId): void {
+    public registerSystemDependency(entry: WorldContextRegisterSystemDependencyEntry, moduleId: WorldModuleId): void {
         assert(
-            this.schedules.has(options.scheduleId),
+            this.schedules.has(entry.scheduleId),
             "System schedule '{}' is required for a system dependency by world module '{}' but has not been registered",
-            options.scheduleId,
+            entry.scheduleId,
             moduleId,
         );
 
-        this.dependencyOptions.push(options);
+        this.systemDependencyEntries.push(entry);
     }
 
-    public registerSystemGroup(options: SystemGroupOptions, moduleId: WorldModuleId): void {
+    public registerSystemGroup(entry: WorldContextRegisterSystemGroupEntry, moduleId: WorldModuleId): void {
         assert(
-            this.schedules.has(options.scheduleId),
+            this.schedules.has(entry.scheduleId),
             "System schedule '{}' is required for a system group by world module '{}' but has not been registered",
-            options.scheduleId,
+            entry.scheduleId,
             moduleId,
         );
 
-        this.groupOptions.push(options);
+        this.systemGroupEntries.push(entry);
     }
 
     public async runSchedule(id: SystemScheduleId, world: World): Promise<void> {
@@ -180,7 +200,7 @@ export class SystemScheduleStorage {
             }
 
             // Call system
-            if (entry.options.mode === "async") {
+            if (entry.options.type === "async") {
                 entry.promise = entry.options.fn(world);
             } else {
                 entry.options.fn(world);
@@ -214,7 +234,7 @@ export class SystemScheduleStorage {
                 node.depsOut.delete(nodeDep);
                 nodeDep.depsIn.delete(node);
 
-                if (node.options.mode === "async") {
+                if (node.options.type === "async") {
                     nodeDep.depsAsync.push(entry);
                 }
 
@@ -234,69 +254,85 @@ export class SystemScheduleStorage {
     private createNodes(scheduleId: SystemScheduleId): SystemNode[] {
         const nodes: SystemNode[] = [];
 
-        for (const options of this.options) {
-            if (options.scheduleId !== scheduleId) {
+        for (const entry of this.systemEntries) {
+            if (entry.scheduleId !== scheduleId) {
                 continue;
             }
 
             nodes.push({
-                options,
+                depsAsync: [],
                 depsIn: new Set(),
                 depsOut: new Set(),
-                depsAsync: [],
+                options: entry.options,
+                scheduleId: entry.scheduleId,
             });
         }
 
-        for (const options of this.dependencyOptions) {
-            if (options.scheduleId !== scheduleId) {
+        for (const entry of this.systemDependencyEntries) {
+            if (entry.scheduleId !== scheduleId) {
                 continue;
             }
 
-            let depErrorCount = 0;
+            for (let i = 1; i < entry.options.length; i++) {
+                const elementsA = entry.options[i - 1];
+                const elementsB = entry.options[i];
 
-            const seqNodes: SystemNode[] = [];
-
-            // if (options.type !== "sequence") {
-            //     continue;
-            // }
-
-            // Iterate seqeuence and collect errors
-            for (const id of options.seq) {
-                let foundNodeDep = undefined;
-                let foundCount = 0;
-
-                for (const nodeDep of nodes) {
-                    if (nodeDep.options.id === id) {
-                        foundNodeDep = nodeDep;
-                        foundCount += 1;
-                    }
-                }
-
-                if (foundNodeDep !== undefined && foundCount === 1) {
-                    seqNodes.push(foundNodeDep);
-                } else if (foundCount > 1) {
-                    log.error("Ambiguous system dependency '{}' found", id);
-                    depErrorCount += 1;
-                } else {
-                    log.error("Missing system dependency '{}' ", id);
-                    depErrorCount += 1;
-                }
-            }
-
-            if (depErrorCount > 0) {
-                continue;
-            }
-
-            // Connect nodes
-            for (let i = 1; i < seqNodes.length; i++) {
-                const node0 = seqNodes[i - 1];
-                const node1 = seqNodes[i - 0];
-                node0.depsOut.add(node1);
-                node1.depsIn.add(node0);
+                this.linkDependencyElements(nodes, elementsA, elementsB);
             }
         }
 
         return nodes;
+    }
+
+    private findNode(nodes: SystemNode[], dep: SystemDependencyElementSystem): SystemNode | undefined {
+        let foundNodeDep = undefined;
+        let foundCount = 0;
+
+        // Find all nodes with the id
+        for (const nodeDep of nodes) {
+            if (nodeDep.options.id === dep.id) {
+                foundNodeDep = nodeDep;
+                foundCount += 1;
+            }
+        }
+
+        if (foundNodeDep !== undefined && foundCount === 1) {
+            return foundNodeDep;
+        } else if (foundCount > 1) {
+            log.error("Ambiguous system dependency '{}' found", dep);
+            return undefined;
+        } else {
+            log.error("Missing system dependency '{}' ", dep);
+            return undefined;
+        }
+    }
+
+    private linkDependencyElements(
+        nodes: SystemNode[],
+        elementsA: SystemDependencyElement,
+        elementsB: SystemDependencyElement,
+    ) {
+        // Flatten
+        const depsA = Array.isArray(elementsA) ? elementsA : [elementsA];
+        const depsB = Array.isArray(elementsB) ? elementsB : [elementsB];
+
+        for (let i = 0; i < depsA.length; i++) {
+            for (let j = 0; j < depsB.length; j++) {
+                const depA = depsA[i];
+                const depB = depsB[j];
+
+                // TODO: Find common parent node to allow system groups
+                assert(depA.type === "system" && depB.type === "system");
+
+                const node0 = this.findNode(nodes, depA);
+                const node1 = this.findNode(nodes, depB);
+
+                if (node0 !== undefined && node1 !== undefined) {
+                    node0.depsOut.add(node1);
+                    node1.depsIn.add(node0);
+                }
+            }
+        }
     }
 
     private validateNodes(scheduleId: SystemScheduleId, nodes: SystemNode[]) {

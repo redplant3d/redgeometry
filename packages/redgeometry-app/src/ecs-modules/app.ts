@@ -220,42 +220,35 @@ export function appModule(context: WorldContext): void {
     context.addSchedule(UPDATE_SCHEDULE_ID);
     context.addSchedule(STOP_SCHEDULE_ID);
 
-    context.addSystem({
+    context.addSystem(START_SCHEDULE_ID, {
+        type: "sync",
         id: APP_PRE_START_SYSTEM_ID,
         fn: appMainPreStartSystem,
-        mode: "sync",
-        scheduleId: START_SCHEDULE_ID,
     });
 
-    context.addSystem({
+    context.addSystem(START_SCHEDULE_ID, {
+        type: "sync",
         id: APP_START_SYSTEM_ID,
         fn: appMainStartSystem,
-        mode: "sync",
-        scheduleId: START_SCHEDULE_ID,
     });
 
-    context.addSystem({
+    context.addSystem(UPDATE_SCHEDULE_ID, {
+        type: "sync",
         id: APP_UPDATE_SYSTEM_ID,
         fn: appUpdateSystem,
-        mode: "sync",
-        scheduleId: UPDATE_SCHEDULE_ID,
     });
 
-    context.addSystemDepedency({
-        type: "sequence",
-        scheduleId: START_SCHEDULE_ID,
-        seq: [
-            APP_PRE_START_SYSTEM_ID,
-            APP_CONTEXT_START_SYSTEM_ID,
-            INPUT_START_SYSTEM_ID,
-            TIME_START_SYSTEM_ID,
-            APP_START_SYSTEM_ID,
-        ],
-    });
+    context.addSystemDepedency(START_SCHEDULE_ID, [
+        { type: "system", id: APP_PRE_START_SYSTEM_ID },
+        { type: "system", id: APP_CONTEXT_START_SYSTEM_ID },
+        { type: "system", id: INPUT_START_SYSTEM_ID },
+        { type: "system", id: TIME_START_SYSTEM_ID },
+        { type: "system", id: APP_START_SYSTEM_ID },
+    ]);
 
-    context.addSystemDepedency({
-        type: "sequence",
-        scheduleId: UPDATE_SCHEDULE_ID,
-        seq: [INPUT_UPDATE_SYSTEM_ID, TIME_UPDATE_SYSTEM_ID, APP_UPDATE_SYSTEM_ID],
-    });
+    context.addSystemDepedency(UPDATE_SCHEDULE_ID, [
+        { type: "system", id: INPUT_UPDATE_SYSTEM_ID },
+        { type: "system", id: TIME_UPDATE_SYSTEM_ID },
+        { type: "system", id: APP_UPDATE_SYSTEM_ID },
+    ]);
 }

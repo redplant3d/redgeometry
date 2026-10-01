@@ -1,5 +1,5 @@
 import { assert } from "redgeometry/src/internal/debug";
-import type { WorldModuleId } from "./world.ts";
+import type { WorldContextRegisterPluginEntry, WorldContextRequirePluginEntry, WorldModuleId } from "./world.ts";
 
 export type WorldPluginId = string;
 export type WorldPlugin = { readonly pluginId: WorldPluginId };
@@ -24,24 +24,24 @@ export class WorldPluginStorage {
         return entry.plugin;
     }
 
-    public register(pluginId: WorldPluginId, moduleId: WorldModuleId): void {
+    public register(entry: WorldContextRegisterPluginEntry, moduleId: WorldModuleId): void {
         assert(
-            !this.entries.has(pluginId),
+            !this.entries.has(entry.pluginId),
             "World plugin '{}' is registered from world module '{}' but has already been registered",
-            pluginId,
+            entry.pluginId,
             moduleId,
         );
 
-        this.entries.set(pluginId, {
+        this.entries.set(entry.pluginId, {
             plugin: undefined,
         });
     }
 
-    public require(pluginId: WorldPluginId, moduleId: WorldModuleId): void {
+    public require(entry: WorldContextRequirePluginEntry, moduleId: WorldModuleId): void {
         assert(
-            this.entries.has(pluginId),
+            this.entries.has(entry.pluginId),
             "World plugin '{}' is required by world module '{}' but has not been registered",
-            pluginId,
+            entry.pluginId,
             moduleId,
         );
     }

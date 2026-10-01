@@ -108,35 +108,32 @@ export function pathAreaAppPartModule(context: WorldContext): void {
     context.addData<PathAreaInputData>("path-area-input-data");
     context.addData<PathAreaStateData>("path-area-state-data");
 
-    context.addSystem({
+    context.addSystem(START_SCHEDULE_ID, {
+        type: "sync",
         id: PATH_AREA_START_SYSTEM_ID,
         fn: pathAreaStartSystem,
-        mode: "sync",
-        scheduleId: START_SCHEDULE_ID,
     });
 
-    context.addSystem({
+    context.addSystem(UPDATE_SCHEDULE_ID, {
+        type: "sync",
         id: PATH_AREA_UPDATE_SYSTEM_ID,
         fn: pathAreaUpdateSystem,
-        mode: "sync",
-        scheduleId: UPDATE_SCHEDULE_ID,
     });
-    context.addSystem({
+    context.addSystem(UPDATE_SCHEDULE_ID, {
+        type: "sync",
         id: PATH_AREA_RENDER_SYSTEM_ID,
         fn: pathAreaRenderSystem,
-        mode: "sync",
-        scheduleId: UPDATE_SCHEDULE_ID,
     });
 
-    context.addSystemDepedency({
-        type: "sequence",
-        seq: [APP_START_SYSTEM_ID, PATH_AREA_START_SYSTEM_ID, APP_INPUT_START_SYSTEM_ID],
-        scheduleId: START_SCHEDULE_ID,
-    });
+    context.addSystemDepedency(START_SCHEDULE_ID, [
+        { type: "system", id: APP_START_SYSTEM_ID },
+        { type: "system", id: PATH_AREA_START_SYSTEM_ID },
+        { type: "system", id: APP_INPUT_START_SYSTEM_ID },
+    ]);
 
-    context.addSystemDepedency({
-        type: "sequence",
-        seq: [APP_UPDATE_SYSTEM_ID, PATH_AREA_UPDATE_SYSTEM_ID, PATH_AREA_RENDER_SYSTEM_ID],
-        scheduleId: UPDATE_SCHEDULE_ID,
-    });
+    context.addSystemDepedency(UPDATE_SCHEDULE_ID, [
+        { type: "system", id: APP_UPDATE_SYSTEM_ID },
+        { type: "system", id: PATH_AREA_UPDATE_SYSTEM_ID },
+        { type: "system", id: PATH_AREA_RENDER_SYSTEM_ID },
+    ]);
 }

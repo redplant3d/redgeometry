@@ -46,17 +46,15 @@ export function timeModule(context: WorldContext): void {
 
     context.addEvent<AnimationFrameEvent>("animation-frame-event");
 
-    context.addSystem({
+    context.addSystem(START_SCHEDULE_ID, {
         id: TIME_START_SYSTEM_ID,
         fn: timeStartSystem,
-        mode: "sync",
-        scheduleId: START_SCHEDULE_ID,
+        type: "sync",
     });
 
-    context.addSystem({
+    context.addSystem(UPDATE_SCHEDULE_ID, {
         id: TIME_UPDATE_SYSTEM_ID,
         fn: timeappPartUpdateSystem,
-        mode: "sync",
-        scheduleId: UPDATE_SCHEDULE_ID,
+        type: "sync",
     });
 }

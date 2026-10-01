@@ -85,35 +85,32 @@ export function playgroundAppPartModule(context: WorldContext): void {
     context.addData<PlaygroundInputData>("playground-input-data");
     context.addData<PlaygroundStateData>("playground-state-data");
 
-    context.addSystem({
+    context.addSystem(START_SCHEDULE_ID, {
+        type: "sync",
         id: PLAYGROUND_START_SYSTEM_ID,
         fn: playgroundStartSystem,
-        mode: "sync",
-        scheduleId: START_SCHEDULE_ID,
     });
 
-    context.addSystem({
+    context.addSystem(UPDATE_SCHEDULE_ID, {
+        type: "sync",
         id: PLAYGROUND_UPDATE_SYSTEM_ID,
         fn: playgroundUpdateSystem,
-        mode: "sync",
-        scheduleId: UPDATE_SCHEDULE_ID,
     });
-    context.addSystem({
+    context.addSystem(UPDATE_SCHEDULE_ID, {
+        type: "sync",
         id: PLAYGROUND_RENDER_SYSTEM_ID,
         fn: playgroundRenderSystem,
-        mode: "sync",
-        scheduleId: UPDATE_SCHEDULE_ID,
     });
 
-    context.addSystemDepedency({
-        type: "sequence",
-        seq: [APP_START_SYSTEM_ID, PLAYGROUND_START_SYSTEM_ID, APP_INPUT_START_SYSTEM_ID],
-        scheduleId: START_SCHEDULE_ID,
-    });
+    context.addSystemDepedency(START_SCHEDULE_ID, [
+        { type: "system", id: APP_START_SYSTEM_ID },
+        { type: "system", id: PLAYGROUND_START_SYSTEM_ID },
+        { type: "system", id: APP_INPUT_START_SYSTEM_ID },
+    ]);
 
-    context.addSystemDepedency({
-        type: "sequence",
-        seq: [APP_UPDATE_SYSTEM_ID, PLAYGROUND_UPDATE_SYSTEM_ID, PLAYGROUND_RENDER_SYSTEM_ID],
-        scheduleId: UPDATE_SCHEDULE_ID,
-    });
+    context.addSystemDepedency(UPDATE_SCHEDULE_ID, [
+        { type: "system", id: APP_UPDATE_SYSTEM_ID },
+        { type: "system", id: PLAYGROUND_UPDATE_SYSTEM_ID },
+        { type: "system", id: PLAYGROUND_RENDER_SYSTEM_ID },
+    ]);
 }

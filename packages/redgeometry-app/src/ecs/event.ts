@@ -1,5 +1,5 @@
 import { assert, throwError } from "redgeometry/src/internal/debug";
-import type { WorldModuleId } from "./world.ts";
+import type { WorldContextRegisterEventEntry, WorldContextRequireEventEntry, WorldModuleId } from "./world.ts";
 
 export type WorldEventId = string;
 export type WorldEvent = { readonly eventId: WorldEventId };
@@ -62,22 +62,22 @@ export class WorldEventStorage {
         return new WorldEventIterator(entry.events);
     }
 
-    public register(eventId: WorldEventId, moduleId: WorldModuleId): void {
+    public register(entry: WorldContextRegisterEventEntry, moduleId: WorldModuleId): void {
         assert(
-            !this.entries.has(eventId),
+            !this.entries.has(entry.eventId),
             "World event '{}' is registered from world module '{}' but has already been registered",
-            eventId,
+            entry.eventId,
             moduleId,
         );
 
-        this.entries.set(eventId, { events: [] });
+        this.entries.set(entry.eventId, { events: [] });
     }
 
-    public require(eventId: WorldEventId, moduleId: WorldModuleId): void {
+    public require(entry: WorldContextRequireEventEntry, moduleId: WorldModuleId): void {
         assert(
-            this.entries.has(eventId),
+            this.entries.has(entry.eventId),
             "World event '{}' is required by world module '{}' but has not been registered",
-            eventId,
+            entry.eventId,
             moduleId,
         );
     }

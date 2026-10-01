@@ -516,17 +516,15 @@ export function inputModule(context: WorldContext): void {
     context.addPlugin<MousePlugin>("mouse-plugin");
     context.addPlugin<KeyboardPlugin>("keyboard-plugin");
 
-    context.addSystem({
+    context.addSystem(START_SCHEDULE_ID, {
+        type: "sync",
         id: INPUT_START_SYSTEM_ID,
         fn: inputStartSystem,
-        mode: "sync",
-        scheduleId: START_SCHEDULE_ID,
     });
 
-    context.addSystem({
+    context.addSystem(UPDATE_SCHEDULE_ID, {
+        type: "sync",
         id: INPUT_UPDATE_SYSTEM_ID,
         fn: inputUpdateSystem,
-        mode: "sync",
-        scheduleId: UPDATE_SCHEDULE_ID,
     });
 }

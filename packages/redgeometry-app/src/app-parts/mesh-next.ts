@@ -248,7 +248,7 @@ function meshNextUpdateSystem(world: World): void {
     }
 }
 
-function commandEventSystem(world: World): void {
+function meshNextCommandEventSystem(world: World): void {
     const commandEvents = world.getEvents<MeshNextCommandEvent>("mesh-next-command-event");
     const StateData = world.getData<MeshNextStateData>("mesh-next-state-data");
 
@@ -330,41 +330,37 @@ export function meshNextAppPartModule(context: WorldContext): void {
 
     context.addEvent<MeshNextCommandEvent>("mesh-next-command-event");
 
-    context.addSystem({
+    context.addSystem(START_SCHEDULE_ID, {
+        type: "sync",
         id: MESH_NEXT_START_SYSTEM_ID,
         fn: meshNextStartSystem,
-        mode: "sync",
-        scheduleId: START_SCHEDULE_ID,
     });
 
-    context.addSystem({
+    context.addSystem(UPDATE_SCHEDULE_ID, {
+        type: "sync",
         id: MESH_NEXT_UPDATE_SYSTEM_ID,
         fn: meshNextUpdateSystem,
-        mode: "sync",
-        scheduleId: UPDATE_SCHEDULE_ID,
     });
-    context.addSystem({
+    context.addSystem(UPDATE_SCHEDULE_ID, {
+        type: "sync",
         id: MESH_NEXT_COMMAND_SYSTEM_ID,
-        fn: commandEventSystem,
-        mode: "sync",
-        scheduleId: UPDATE_SCHEDULE_ID,
+        fn: meshNextCommandEventSystem,
     });
-    context.addSystem({
+    context.addSystem(UPDATE_SCHEDULE_ID, {
+        type: "sync",
         id: MESH_NEXT_RENDER_SYSTEM_ID,
         fn: meshNextRenderSystem,
-        mode: "sync",
-        scheduleId: UPDATE_SCHEDULE_ID,
     });
 
-    context.addSystemDepedency({
-        type: "sequence",
-        seq: [APP_START_SYSTEM_ID, MESH_NEXT_START_SYSTEM_ID, APP_INPUT_START_SYSTEM_ID],
-        scheduleId: START_SCHEDULE_ID,
-    });
+    context.addSystemDepedency(START_SCHEDULE_ID, [
+        { type: "system", id: APP_START_SYSTEM_ID },
+        { type: "system", id: MESH_NEXT_START_SYSTEM_ID },
+        { type: "system", id: APP_INPUT_START_SYSTEM_ID },
+    ]);
 
-    context.addSystemDepedency({
-        type: "sequence",
-        seq: [APP_UPDATE_SYSTEM_ID, MESH_NEXT_UPDATE_SYSTEM_ID, MESH_NEXT_RENDER_SYSTEM_ID],
-        scheduleId: UPDATE_SCHEDULE_ID,
-    });
+    context.addSystemDepedency(UPDATE_SCHEDULE_ID, [
+        { type: "system", id: APP_UPDATE_SYSTEM_ID },
+        { type: "system", id: MESH_NEXT_UPDATE_SYSTEM_ID },
+        { type: "system", id: MESH_NEXT_RENDER_SYSTEM_ID },
+    ]);
 }

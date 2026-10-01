@@ -1,5 +1,5 @@
 import { assert } from "redgeometry/src/internal/debug";
-import type { WorldModuleId } from "./world.ts";
+import type { WorldContextRegisterDataEntry, WorldContextRequireDataEntry, WorldModuleId } from "./world.ts";
 
 export type WorldDataId = string;
 export type WorldData = { readonly dataId: WorldDataId };
@@ -24,24 +24,24 @@ export class WorldDataStorage {
         return entry.data;
     }
 
-    public register(dataId: WorldDataId, moduleId: WorldModuleId): void {
+    public register(entry: WorldContextRegisterDataEntry, moduleId: WorldModuleId): void {
         assert(
-            !this.entries.has(dataId),
+            !this.entries.has(entry.dataId),
             "World data '{}' is registered from world module '{}' but has already been registered",
-            dataId,
+            entry.dataId,
             moduleId,
         );
 
-        this.entries.set(dataId, {
+        this.entries.set(entry.dataId, {
             data: undefined,
         });
     }
 
-    public require(dataId: WorldDataId, moduleId: WorldModuleId): void {
+    public require(entry: WorldContextRequireDataEntry, moduleId: WorldModuleId): void {
         assert(
-            this.entries.has(dataId),
+            this.entries.has(entry.dataId),
             "World data '{}' is required by world module '{}' but has not been registered",
-            dataId,
+            entry.dataId,
             moduleId,
         );
     }

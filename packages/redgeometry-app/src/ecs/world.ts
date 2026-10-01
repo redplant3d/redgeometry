@@ -55,14 +55,17 @@ export type WorldContextRegisterScheduleEntry = {
 };
 export type WorldContextRegisterSystemDependencyEntry = {
     type: "register-system-dependency";
+    scheduleId: SystemScheduleId;
     options: SystemDependencyOptions;
 };
 export type WorldContextRegisterSystemEntry = {
     type: "register-system";
+    scheduleId: SystemScheduleId;
     options: SystemOptions;
 };
 export type WorldContextRegisterSystemGroupEntry = {
-    type: "register-system-set";
+    type: "register-system-group";
+    scheduleId: SystemScheduleId;
     options: SystemGroupOptions;
 };
 export type WorldContextRequireDataEntry = {
@@ -278,16 +281,16 @@ export class WorldContext {
         this.entries.push({ type: "register-schedule", scheduleId });
     }
 
-    public addSystem(options: SystemOptions): void {
-        this.entries.push({ type: "register-system", options });
+    public addSystem(scheduleId: SystemScheduleId, options: SystemOptions): void {
+        this.entries.push({ type: "register-system", scheduleId, options });
     }
 
-    public addSystemGroup(options: SystemGroupOptions): void {
-        this.entries.push({ type: "register-system-set", options });
+    public addSystemDepedency(scheduleId: SystemScheduleId, options: SystemDependencyOptions): void {
+        this.entries.push({ type: "register-system-dependency", scheduleId, options });
     }
 
-    public addSystemDepedency(options: SystemDependencyOptions): void {
-        this.entries.push({ type: "register-system-dependency", options });
+    public addSystemGroup(scheduleId: SystemScheduleId, options: SystemGroupOptions): void {
+        this.entries.push({ type: "register-system-group", scheduleId, options });
     }
 
     public requireData<T extends WorldData>(dataId: WorldDataIdOf<T>): void {
@@ -343,19 +346,19 @@ export class WorldStorage {
             for (const entry of entries) {
                 switch (entry.type) {
                     case "register-data": {
-                        dataStorage.register(entry.dataId, moduleId);
+                        dataStorage.register(entry, moduleId);
                         break;
                     }
                     case "register-event": {
-                        eventStorage.register(entry.eventId, moduleId);
+                        eventStorage.register(entry, moduleId);
                         break;
                     }
                     case "register-plugin": {
-                        pluginStorage.register(entry.pluginId, moduleId);
+                        pluginStorage.register(entry, moduleId);
                         break;
                     }
                     case "register-schedule": {
-                        systemScheduleStorage.registerSchedule(entry.scheduleId, moduleId);
+                        systemScheduleStorage.registerSchedule(entry, moduleId);
                         break;
                     }
                 }
@@ -367,27 +370,27 @@ export class WorldStorage {
             for (const entry of entries) {
                 switch (entry.type) {
                     case "require-data": {
-                        dataStorage.require(entry.dataId, moduleId);
+                        dataStorage.require(entry, moduleId);
                         break;
                     }
                     case "require-event": {
-                        eventStorage.require(entry.eventId, moduleId);
+                        eventStorage.require(entry, moduleId);
                         break;
                     }
                     case "require-plugin": {
-                        pluginStorage.require(entry.pluginId, moduleId);
+                        pluginStorage.require(entry, moduleId);
                         break;
                     }
                     case "register-system": {
-                        systemScheduleStorage.registerSystem(entry.options, moduleId);
+                        systemScheduleStorage.registerSystem(entry, moduleId);
                         break;
                     }
                     case "register-system-dependency": {
-                        systemScheduleStorage.registerSystemDependency(entry.options, moduleId);
+                        systemScheduleStorage.registerSystemDependency(entry, moduleId);
                         break;
                     }
-                    case "register-system-set": {
-                        systemScheduleStorage.registerSystemGroup(entry.options, moduleId);
+                    case "register-system-group": {
+                        systemScheduleStorage.registerSystemGroup(entry, moduleId);
                         break;
                     }
                 }

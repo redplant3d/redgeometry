@@ -654,11 +654,10 @@ export const APP_CONTEXT_MODULE_ID = "app-context-module";
 export function appContextModule(context: WorldContext): void {
     context.addPlugin<AppContextPlugin>("app-context-plugin");
 
-    context.addSystem({
+    context.addSystem(START_SCHEDULE_ID, {
+        type: "sync",
         id: APP_CONTEXT_START_SYSTEM_ID,
         fn: appContextStartSystem,
-        mode: "sync",
-        scheduleId: START_SCHEDULE_ID,
     });
 
     context.requireData<AppCanvasData>("app-canvas-data");
