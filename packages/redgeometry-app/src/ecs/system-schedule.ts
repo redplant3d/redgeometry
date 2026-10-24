@@ -1,5 +1,4 @@
-import { assert, throwError } from "redgeometry/src/internal/debug";
-import { log } from "redgeometry/src/internal/log";
+import { assert, assertUnreachable, throwError } from "redgeometry/src/internal/debug";
 import type {
     World,
     WorldContextRegisterScheduleEntry,
@@ -59,13 +58,24 @@ type SystemScheduleEntry = {
     promise: Promise<void> | undefined;
 };
 
-type SystemNode = {
-    depsAsync: SystemScheduleEntry[];
+type SystemEntryNode = {
+    type: "system-entry";
+    id: SystemId;
     depsIn: Set<SystemNode>;
     depsOut: Set<SystemNode>;
-    options: SystemOptions;
-    scheduleId: SystemScheduleId;
+    parentGroupId: SystemGroupId | undefined;
+    scheduleEntry: SystemScheduleEntry;
 };
+type SystemGroupEntryNode = {
+    type: "system-group-entry";
+    id: SystemGroupId | undefined;
+    depsIn: Set<SystemNode>;
+    depsOut: Set<SystemNode>;
+    parentGroupId: SystemGroupId | undefined;
+    subNodes: SystemNode[];
+};
+
+type SystemNode = SystemEntryNode | SystemGroupEntryNode;
 
 type SystemSchedule = {
     entries: SystemScheduleEntry[];
@@ -97,10 +107,24 @@ export class SystemScheduleStorage {
 
     public initialize(): void {
         for (const scheduleId of this.schedules.keys()) {
-            const nodes = this.createNodes(scheduleId);
-            const entries = this.createEntries(nodes);
+            const rootGroupEntryNode: SystemGroupEntryNode = {
+                type: "system-group-entry",
+                id: undefined,
+                depsIn: new Set(),
+                depsOut: new Set(),
+                parentGroupId: undefined,
+                subNodes: [],
+            };
 
-            this.validateNodes(scheduleId, nodes);
+            const groupEntryNodes = this.createGroupEntryNodes(scheduleId, rootGroupEntryNode);
+            const entryNodes = this.createEntryNodes(scheduleId, groupEntryNodes);
+
+            this.addNodeDepedencies(scheduleId, groupEntryNodes, entryNodes);
+            this.sortGroupEntryNodes(scheduleId, groupEntryNodes);
+
+            const entries: SystemScheduleEntry[] = [];
+
+            this.addScheduleEntries(rootGroupEntryNode, entries);
 
             this.schedules.set(scheduleId, { entries });
         }
@@ -208,134 +232,207 @@ export class SystemScheduleStorage {
         }
     }
 
-    private createEntries(nodes: SystemNode[]): SystemScheduleEntry[] {
-        // Kahn's algorithm: We need to sort the nodes topologically to create the schedule
-        const entries: SystemScheduleEntry[] = [];
-
-        // Create a queue and initialize it with nodes that have no incoming dependencies
-        const queue: SystemNode[] = [];
-
-        for (const node of nodes) {
-            if (node.depsIn.size === 0) {
-                queue.push(node);
-            }
-        }
-
-        let node = queue.shift();
-
-        while (node !== undefined) {
-            const entry: SystemScheduleEntry = {
-                depsAsync: node.depsAsync,
-                options: node.options,
-                promise: undefined,
-            };
-
-            for (const nodeDep of node.depsOut) {
-                node.depsOut.delete(nodeDep);
-                nodeDep.depsIn.delete(node);
-
-                if (node.options.type === "async") {
-                    nodeDep.depsAsync.push(entry);
-                }
-
-                if (nodeDep.depsIn.size === 0) {
-                    queue.push(nodeDep);
-                }
+    private addNodeDepedencies(
+        scheduleId: SystemScheduleId,
+        groupEntryNodes: Map<SystemGroupId | undefined, SystemGroupEntryNode>,
+        entryNodes: Map<SystemId | undefined, SystemEntryNode>,
+    ) {
+        // Add dependencies between nodes
+        for (const dependencyEntry of this.systemDependencyEntries) {
+            if (dependencyEntry.scheduleId !== scheduleId) {
+                continue;
             }
 
-            entries.push(entry);
+            for (let i = 1; i < dependencyEntry.options.length; i++) {
+                const elementsA = dependencyEntry.options[i - 1];
+                const elementsB = dependencyEntry.options[i];
 
-            node = queue.shift();
+                // Flatten
+                const elementsArrayA = Array.isArray(elementsA) ? elementsA : [elementsA];
+                const elementsArrayB = Array.isArray(elementsB) ? elementsB : [elementsB];
+
+                for (let i = 0; i < elementsArrayA.length; i++) {
+                    for (let j = 0; j < elementsArrayB.length; j++) {
+                        const nodeA = this.findNode(groupEntryNodes, entryNodes, elementsArrayA[i]);
+                        const nodeB = this.findNode(groupEntryNodes, entryNodes, elementsArrayB[j]);
+
+                        // TODO: Implement LCA algorithm
+                        assert(
+                            nodeA.parentGroupId === nodeB.parentGroupId,
+                            "System dependencies must be defined within the same group",
+                        );
+
+                        if (
+                            nodeA.type === "system-entry" &&
+                            nodeB.type === "system-entry" &&
+                            nodeA.scheduleEntry.options.type === "async"
+                        ) {
+                            nodeB.scheduleEntry.depsAsync.push(nodeA.scheduleEntry);
+                        }
+
+                        nodeA.depsOut.add(nodeB);
+                        nodeB.depsIn.add(nodeA);
+                    }
+                }
+            }
         }
-
-        return entries;
     }
 
-    private createNodes(scheduleId: SystemScheduleId): SystemNode[] {
-        const nodes: SystemNode[] = [];
+    private addScheduleEntries(groupEntryNode: SystemGroupEntryNode, outScheduleEntries: SystemScheduleEntry[]): void {
+        for (const node of groupEntryNode.subNodes) {
+            switch (node.type) {
+                case "system-entry": {
+                    outScheduleEntries.push(node.scheduleEntry);
+                    break;
+                }
+                case "system-group-entry": {
+                    this.addScheduleEntries(node, outScheduleEntries);
+                    break;
+                }
+                default: {
+                    assertUnreachable(node);
+                }
+            }
+        }
+    }
 
+    private createEntryNodes(
+        scheduleId: SystemScheduleId,
+        groupEntryNodes: Map<SystemGroupId | undefined, SystemGroupEntryNode>,
+    ): Map<SystemId, SystemEntryNode> {
+        const entryNodes = new Map<SystemId, SystemEntryNode>();
+
+        // Add system dependency nodes to parent group nodes
         for (const entry of this.systemEntries) {
             if (entry.scheduleId !== scheduleId) {
                 continue;
             }
 
-            nodes.push({
-                depsAsync: [],
+            const groupEntryNode = groupEntryNodes.get(entry.options.groupId);
+            assert(groupEntryNode !== undefined);
+
+            const entryNode: SystemEntryNode = {
+                type: "system-entry",
+                id: entry.options.id,
                 depsIn: new Set(),
                 depsOut: new Set(),
-                options: entry.options,
-                scheduleId: entry.scheduleId,
-            });
+                scheduleEntry: {
+                    depsAsync: [],
+                    options: entry.options,
+                    promise: undefined,
+                },
+                parentGroupId: entry.options.groupId,
+            };
+            entryNodes.set(entry.options.id, entryNode);
+            groupEntryNode.subNodes.push(entryNode);
         }
 
-        for (const entry of this.systemDependencyEntries) {
-            if (entry.scheduleId !== scheduleId) {
+        return entryNodes;
+    }
+
+    private createGroupEntryNodes(
+        scheduleId: SystemScheduleId,
+        rootGroupEntryNode: SystemGroupEntryNode,
+    ): Map<SystemGroupId | undefined, SystemGroupEntryNode> {
+        const groupEntryNodes = new Map<SystemGroupId | undefined, SystemGroupEntryNode>();
+        groupEntryNodes.set(undefined, rootGroupEntryNode);
+
+        for (const groupEntry of this.systemGroupEntries) {
+            if (groupEntry.scheduleId !== scheduleId) {
                 continue;
             }
 
-            for (let i = 1; i < entry.options.length; i++) {
-                const elementsA = entry.options[i - 1];
-                const elementsB = entry.options[i];
-
-                this.linkDependencyElements(nodes, elementsA, elementsB);
-            }
+            const groupEntryNode: SystemGroupEntryNode = {
+                type: "system-group-entry",
+                id: groupEntry.options.id,
+                depsIn: new Set(),
+                depsOut: new Set(),
+                parentGroupId: groupEntry.options.parentId,
+                subNodes: [],
+            };
+            groupEntryNodes.set(groupEntry.options.id, groupEntryNode);
         }
 
-        return nodes;
+        for (const groupEntry of this.systemGroupEntries) {
+            if (groupEntry.scheduleId !== scheduleId) {
+                continue;
+            }
+
+            const groupEntryNode = groupEntryNodes.get(groupEntry.options.parentId);
+            const groupEntrySubNode = groupEntryNodes.get(groupEntry.options.id);
+            assert(groupEntryNode !== undefined && groupEntrySubNode !== undefined);
+
+            groupEntryNode.subNodes.push(groupEntrySubNode);
+        }
+
+        return groupEntryNodes;
     }
 
-    private findNode(nodes: SystemNode[], dep: SystemDependencyElementSystem): SystemNode | undefined {
-        let foundNodeDep = undefined;
-        let foundCount = 0;
+    private findNode(
+        groupEntryNodes: Map<SystemGroupId | undefined, SystemGroupEntryNode>,
+        entryNodes: Map<SystemId | undefined, SystemEntryNode>,
+        element: SystemDependencyElementSystem | SystemDependencyElementSystemGroup,
+    ): SystemNode {
+        switch (element.type) {
+            case "system": {
+                const node = entryNodes.get(element.id);
+                assert(node !== undefined, "System '{}' required as a dependency but is missing", element.id);
 
-        // Find all nodes with the id
-        for (const nodeDep of nodes) {
-            if (nodeDep.options.id === dep.id) {
-                foundNodeDep = nodeDep;
-                foundCount += 1;
+                return node;
             }
-        }
+            case "system-group": {
+                const node = groupEntryNodes.get(element.id);
+                assert(node !== undefined, "System group '{}' required as a dependency but is missing", element.id);
 
-        if (foundNodeDep !== undefined && foundCount === 1) {
-            return foundNodeDep;
-        } else if (foundCount > 1) {
-            log.error("Ambiguous system dependency '{}' found", dep);
-            return undefined;
-        } else {
-            log.error("Missing system dependency '{}' ", dep);
-            return undefined;
+                return node;
+            }
+            default: {
+                assertUnreachable(element);
+            }
         }
     }
 
-    private linkDependencyElements(
-        nodes: SystemNode[],
-        elementsA: SystemDependencyElement,
-        elementsB: SystemDependencyElement,
-    ) {
-        // Flatten
-        const depsA = Array.isArray(elementsA) ? elementsA : [elementsA];
-        const depsB = Array.isArray(elementsB) ? elementsB : [elementsB];
+    private sortGroupEntryNodes(
+        scheduleId: SystemScheduleId,
+        groupEntryNodes: Map<SystemGroupId | undefined, SystemGroupEntryNode>,
+    ): void {
+        for (const groupEntryNode of groupEntryNodes.values()) {
+            // Kahn's algorithm: We need to sort the nodes topologically to create the schedule
+            const subNodesSorted: SystemNode[] = [];
 
-        for (let i = 0; i < depsA.length; i++) {
-            for (let j = 0; j < depsB.length; j++) {
-                const depA = depsA[i];
-                const depB = depsB[j];
+            // Create a queue and initialize it with nodes that have no incoming dependencies
+            const nodeQueue: SystemNode[] = [];
 
-                // TODO: Find common parent node to allow system groups
-                assert(depA.type === "system" && depB.type === "system");
-
-                const node0 = this.findNode(nodes, depA);
-                const node1 = this.findNode(nodes, depB);
-
-                if (node0 !== undefined && node1 !== undefined) {
-                    node0.depsOut.add(node1);
-                    node1.depsIn.add(node0);
+            for (const node of groupEntryNode.subNodes) {
+                if (node.depsIn.size === 0) {
+                    nodeQueue.push(node);
                 }
             }
+
+            let node = nodeQueue.shift();
+
+            while (node !== undefined) {
+                for (const nodeDep of node.depsOut) {
+                    node.depsOut.delete(nodeDep);
+                    nodeDep.depsIn.delete(node);
+
+                    if (nodeDep.depsIn.size === 0) {
+                        nodeQueue.push(nodeDep);
+                    }
+                }
+
+                subNodesSorted.push(node);
+
+                node = nodeQueue.shift();
+            }
+
+            this.validateNodes(scheduleId, subNodesSorted);
+
+            groupEntryNode.subNodes = subNodesSorted;
         }
     }
 
-    private validateNodes(scheduleId: SystemScheduleId, nodes: SystemNode[]) {
+    private validateNodes(scheduleId: SystemScheduleId, nodes: SystemNode[]): void {
         let foundCycle = false;
 
         for (const node of nodes) {
@@ -354,7 +451,7 @@ export class SystemScheduleStorage {
         for (const node of nodes) {
             // We don't need to go over both `depsOut` and `depsIn` (otherwise every dependency would be duplicate)
             for (const nodeDep of node.depsOut) {
-                nodeDepsStr += "\n  " + node.options.id + " -> " + nodeDep.options.id;
+                nodeDepsStr += "\n  " + node.id + " -> " + nodeDep.id;
             }
         }
 
