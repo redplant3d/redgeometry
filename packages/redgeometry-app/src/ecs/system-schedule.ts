@@ -426,7 +426,7 @@ export class SystemScheduleStorage {
                 node = nodeQueue.shift();
             }
 
-            this.validateNodes(scheduleId, subNodesSorted);
+            this.validateNodes(scheduleId, groupEntryNode.subNodes);
 
             groupEntryNode.subNodes = subNodesSorted;
         }
