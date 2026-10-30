@@ -198,13 +198,13 @@ export function pathOperationAppPartModule(context: WorldContext): void {
         fn: pathOperationRenderSystem,
     });
 
-    context.addSystemDepedency(START_SCHEDULE_ID, [
+    context.addSystemDependency(START_SCHEDULE_ID, [
         { type: "system", id: APP_START_SYSTEM_ID },
         { type: "system", id: PATH_OPERATION_START_SYSTEM_ID },
         { type: "system", id: APP_INPUT_START_SYSTEM_ID },
     ]);
 
-    context.addSystemDepedency(UPDATE_SCHEDULE_ID, [
+    context.addSystemDependency(UPDATE_SCHEDULE_ID, [
         { type: "system", id: APP_UPDATE_SYSTEM_ID },
         { type: "system", id: PATH_OPERATION_UPDATE_SYSTEM_ID },
         { type: "system", id: PATH_OPERATION_RENDER_SYSTEM_ID },

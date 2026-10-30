@@ -285,7 +285,7 @@ export class WorldContext {
         this.entries.push({ type: "register-system", scheduleId, options });
     }
 
-    public addSystemDepedency(scheduleId: SystemScheduleId, options: SystemDependencyOptions): void {
+    public addSystemDependency(scheduleId: SystemScheduleId, options: SystemDependencyOptions): void {
         this.entries.push({ type: "register-system-dependency", scheduleId, options });
     }
 
@@ -419,7 +419,7 @@ export class WorldStorage {
 
             if (outModules.has(subEntry.options.id)) {
                 log.warn(
-                    "Ignoring duplicate world module '{}' (addded in '{}')",
+                    "Ignoring duplicate world module '{}' (added in '{}')",
                     subEntry.options.id,
                     moduleEntry.options.id,
                 );

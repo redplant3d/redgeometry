@@ -35,7 +35,7 @@ export function appInputModule(context: WorldContext): void {
         fn: appInputStopSystem,
     });
 
-    context.addSystemDepedency(START_SCHEDULE_ID, [
+    context.addSystemDependency(START_SCHEDULE_ID, [
         { type: "system", id: APP_START_SYSTEM_ID },
         { type: "system", id: APP_INPUT_START_SYSTEM_ID },
     ]);

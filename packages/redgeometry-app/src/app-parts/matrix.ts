@@ -187,13 +187,13 @@ export function matrixAppPartModule(context: WorldContext): void {
         fn: matrixRenderSystem,
     });
 
-    context.addSystemDepedency(START_SCHEDULE_ID, [
+    context.addSystemDependency(START_SCHEDULE_ID, [
         { type: "system", id: APP_START_SYSTEM_ID },
         { type: "system", id: MATRIX_START_SYSTEM_ID },
         { type: "system", id: APP_INPUT_START_SYSTEM_ID },
     ]);
 
-    context.addSystemDepedency(UPDATE_SCHEDULE_ID, [
+    context.addSystemDependency(UPDATE_SCHEDULE_ID, [
         { type: "system", id: APP_UPDATE_SYSTEM_ID },
         { type: "system", id: MATRIX_UPDATE_SYSTEM_ID },
         { type: "system", id: MATRIX_RENDER_SYSTEM_ID },

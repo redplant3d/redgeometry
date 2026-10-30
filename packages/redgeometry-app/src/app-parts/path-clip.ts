@@ -167,13 +167,13 @@ export function pathClipAppPartModule(context: WorldContext): void {
         fn: pathClipRenderSystem,
     });
 
-    context.addSystemDepedency(START_SCHEDULE_ID, [
+    context.addSystemDependency(START_SCHEDULE_ID, [
         { type: "system", id: APP_START_SYSTEM_ID },
         { type: "system", id: PATH_CLIP_START_SYSTEM_ID },
         { type: "system", id: APP_INPUT_START_SYSTEM_ID },
     ]);
 
-    context.addSystemDepedency(UPDATE_SCHEDULE_ID, [
+    context.addSystemDependency(UPDATE_SCHEDULE_ID, [
         { type: "system", id: APP_UPDATE_SYSTEM_ID },
         { type: "system", id: PATH_CLIP_UPDATE_SYSTEM_ID },
         { type: "system", id: PATH_CLIP_RENDER_SYSTEM_ID },

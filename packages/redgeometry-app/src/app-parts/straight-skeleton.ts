@@ -140,13 +140,13 @@ export function straightSkeletonAppPartModule(context: WorldContext): void {
         fn: straightSkeletonRenderSystem,
     });
 
-    context.addSystemDepedency(START_SCHEDULE_ID, [
+    context.addSystemDependency(START_SCHEDULE_ID, [
         { type: "system", id: APP_START_SYSTEM_ID },
         { type: "system", id: STRAIGHT_SKELETON_START_SYSTEM_ID },
         { type: "system", id: APP_INPUT_START_SYSTEM_ID },
     ]);
 
-    context.addSystemDepedency(UPDATE_SCHEDULE_ID, [
+    context.addSystemDependency(UPDATE_SCHEDULE_ID, [
         { type: "system", id: APP_UPDATE_SYSTEM_ID },
         { type: "system", id: STRAIGHT_SKELETON_UPDATE_SYSTEM_ID },
         { type: "system", id: STRAIGHT_SKELETON_RENDER_SYSTEM_ID },

@@ -238,7 +238,7 @@ export function appModule(context: WorldContext): void {
         fn: appUpdateSystem,
     });
 
-    context.addSystemDepedency(START_SCHEDULE_ID, [
+    context.addSystemDependency(START_SCHEDULE_ID, [
         { type: "system", id: APP_PRE_START_SYSTEM_ID },
         { type: "system", id: APP_CONTEXT_START_SYSTEM_ID },
         { type: "system", id: INPUT_START_SYSTEM_ID },
@@ -246,7 +246,7 @@ export function appModule(context: WorldContext): void {
         { type: "system", id: APP_START_SYSTEM_ID },
     ]);
 
-    context.addSystemDepedency(UPDATE_SCHEDULE_ID, [
+    context.addSystemDependency(UPDATE_SCHEDULE_ID, [
         { type: "system", id: INPUT_UPDATE_SYSTEM_ID },
         { type: "system", id: TIME_UPDATE_SYSTEM_ID },
         { type: "system", id: APP_UPDATE_SYSTEM_ID },

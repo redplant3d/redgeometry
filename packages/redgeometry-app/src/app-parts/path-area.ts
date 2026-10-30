@@ -125,13 +125,13 @@ export function pathAreaAppPartModule(context: WorldContext): void {
         fn: pathAreaRenderSystem,
     });
 
-    context.addSystemDepedency(START_SCHEDULE_ID, [
+    context.addSystemDependency(START_SCHEDULE_ID, [
         { type: "system", id: APP_START_SYSTEM_ID },
         { type: "system", id: PATH_AREA_START_SYSTEM_ID },
         { type: "system", id: APP_INPUT_START_SYSTEM_ID },
     ]);
 
-    context.addSystemDepedency(UPDATE_SCHEDULE_ID, [
+    context.addSystemDependency(UPDATE_SCHEDULE_ID, [
         { type: "system", id: APP_UPDATE_SYSTEM_ID },
         { type: "system", id: PATH_AREA_UPDATE_SYSTEM_ID },
         { type: "system", id: PATH_AREA_RENDER_SYSTEM_ID },

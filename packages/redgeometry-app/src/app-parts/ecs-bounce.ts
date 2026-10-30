@@ -318,27 +318,27 @@ export function ecsBounceAppPartModule(context: WorldContext): void {
         fn: ecsBounceNotificationSystem,
     });
 
-    context.addSystemDepedency(START_SCHEDULE_ID, [
+    context.addSystemDependency(START_SCHEDULE_ID, [
         { type: "system", id: APP_START_SYSTEM_ID },
         { type: "system", id: ECS_BOUNCE_START_SYSTEM_ID },
         { type: "system", id: APP_INPUT_START_SYSTEM_ID },
     ]);
 
-    context.addSystemDepedency(UPDATE_SCHEDULE_ID, [
+    context.addSystemDependency(UPDATE_SCHEDULE_ID, [
         { type: "system", id: APP_UPDATE_SYSTEM_ID },
         { type: "system", id: ECS_BOUNCE_SPAWN_SYSTEM_ID },
     ]);
-    context.addSystemDepedency(UPDATE_SCHEDULE_ID, [
+    context.addSystemDependency(UPDATE_SCHEDULE_ID, [
         { type: "system", id: ECS_BOUNCE_SPAWN_SYSTEM_ID },
         { type: "system", id: ECS_BOUNCE_MOVEMENT_SYSTEM_ID },
         { type: "system", id: ECS_BOUNCE_CLEAR_RENDER_SYSTEM_ID },
     ]);
-    context.addSystemDepedency(UPDATE_SCHEDULE_ID, [
+    context.addSystemDependency(UPDATE_SCHEDULE_ID, [
         { type: "system", id: ECS_BOUNCE_CLEAR_RENDER_SYSTEM_ID },
         { type: "system", id: ECS_BOUNCE_RECTANGLE_RENDER_SYSTEM_ID },
         { type: "system", id: ECS_BOUNCE_CIRCLE_RENDER_SYSTEM_ID },
     ]);
-    context.addSystemDepedency(UPDATE_SCHEDULE_ID, [
+    context.addSystemDependency(UPDATE_SCHEDULE_ID, [
         { type: "system", id: ECS_BOUNCE_SPAWN_SYSTEM_ID },
         { type: "system", id: ECS_BOUNCE_NOTIFICATION_SYSTEM_ID },
     ]);

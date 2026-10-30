@@ -121,7 +121,7 @@ export class SystemScheduleStorage {
             const groupEntryNodes = this.createGroupEntryNodes(scheduleId, rootGroupEntryNode);
             const entryNodes = this.createEntryNodes(scheduleId, groupEntryNodes);
 
-            this.addNodeDepedencies(scheduleId, groupEntryNodes, entryNodes);
+            this.addNodeDependencies(scheduleId, groupEntryNodes, entryNodes);
             this.sortGroupEntryNodes(scheduleId, groupEntryNodes);
 
             const danglingEntries = this.collectDanglingEntries(entryNodes);
@@ -243,7 +243,7 @@ export class SystemScheduleStorage {
         }
     }
 
-    private addNodeDepedencies(
+    private addNodeDependencies(
         scheduleId: SystemScheduleId,
         groupEntryNodes: Map<SystemGroupId | undefined, SystemGroupEntryNode>,
         entryNodes: Map<SystemId | undefined, SystemEntryNode>,
