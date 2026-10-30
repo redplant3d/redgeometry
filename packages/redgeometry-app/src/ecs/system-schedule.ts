@@ -63,6 +63,7 @@ type SystemEntryNode = {
     id: SystemId;
     depsIn: Set<SystemNode>;
     depsOut: Set<SystemNode>;
+    isAwaited: boolean;
     parentGroupId: SystemGroupId | undefined;
     scheduleEntry: SystemScheduleEntry;
 };
@@ -78,6 +79,7 @@ type SystemGroupEntryNode = {
 type SystemNode = SystemEntryNode | SystemGroupEntryNode;
 
 type SystemSchedule = {
+    danglingEntries: SystemScheduleEntry[];
     entries: SystemScheduleEntry[];
 };
 
@@ -122,11 +124,12 @@ export class SystemScheduleStorage {
             this.addNodeDepedencies(scheduleId, groupEntryNodes, entryNodes);
             this.sortGroupEntryNodes(scheduleId, groupEntryNodes);
 
+            const danglingEntries = this.collectDanglingEntries(entryNodes);
             const entries: SystemScheduleEntry[] = [];
 
             this.addScheduleEntries(rootGroupEntryNode, entries);
 
-            this.schedules.set(scheduleId, { entries });
+            this.schedules.set(scheduleId, { danglingEntries, entries });
         }
     }
 
@@ -215,11 +218,11 @@ export class SystemScheduleStorage {
         assert(schedule !== undefined, "System schedule '{}' is not available", id);
 
         for (const entry of schedule.entries) {
-            // Wait for incoming dependencies
-            for (const dep of entry.depsAsync) {
-                if (dep.promise !== undefined) {
-                    await dep.promise;
-                    dep.promise = undefined;
+            // Wait for async system
+            for (const depEntry of entry.depsAsync) {
+                if (depEntry.promise !== undefined) {
+                    await depEntry.promise;
+                    depEntry.promise = undefined;
                 }
             }
 
@@ -228,6 +231,14 @@ export class SystemScheduleStorage {
                 entry.promise = entry.options.fn(world);
             } else {
                 entry.options.fn(world);
+            }
+        }
+
+        // Wait for dangling async systems
+        for (const danglingEntry of schedule.danglingEntries) {
+            if (danglingEntry.promise !== undefined) {
+                await danglingEntry.promise;
+                danglingEntry.promise = undefined;
             }
         }
     }
@@ -268,10 +279,11 @@ export class SystemScheduleStorage {
                             nodeA.scheduleEntry.options.type === "async"
                         ) {
                             nodeB.scheduleEntry.depsAsync.push(nodeA.scheduleEntry);
+                            nodeA.isAwaited = true;
                         }
 
-                        nodeA.depsOut.add(nodeB);
                         nodeB.depsIn.add(nodeA);
+                        nodeA.depsOut.add(nodeB);
                     }
                 }
             }
@@ -316,6 +328,7 @@ export class SystemScheduleStorage {
                 id: entry.options.id,
                 depsIn: new Set(),
                 depsOut: new Set(),
+                isAwaited: false,
                 scheduleEntry: {
                     depsAsync: [],
                     options: entry.options,
@@ -366,6 +379,18 @@ export class SystemScheduleStorage {
         }
 
         return groupEntryNodes;
+    }
+
+    private collectDanglingEntries(entryNodes: Map<SystemId, SystemEntryNode>): SystemScheduleEntry[] {
+        const danglingEntries: SystemScheduleEntry[] = [];
+
+        for (const node of entryNodes.values()) {
+            if (!node.isAwaited && node.scheduleEntry.options.type === "async") {
+                danglingEntries.push(node.scheduleEntry);
+            }
+        }
+
+        return danglingEntries;
     }
 
     private findNode(
