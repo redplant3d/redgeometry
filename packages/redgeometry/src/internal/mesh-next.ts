@@ -7,7 +7,7 @@ import { MinMaxBox2 } from "../primitives/box.ts";
 import { Edge2 } from "../primitives/edge.ts";
 import { Vector2, type ReadonlyVector2 } from "../primitives/vector.ts";
 import type { Nominal } from "../utility/types.ts";
-import { formatString, type FormatParameters } from "./string.js";
+import { formatString, type FormatParameters } from "./string.ts";
 
 export type MeshVertexIdx = Nominal<number, "MeshVertexIdx">;
 export type MeshEdgeIdx = Nominal<number, "MeshEdgeIdx">;
@@ -341,7 +341,7 @@ export class MeshEdges<T> {
         this.data[idx] = data;
     }
 
-    public setLink(idx: MaybeMeshEdgeIdx, link: MeshLinkIdx): void {
+    public setLink(idx: MeshEdgeIdx, link: MeshLinkIdx): void {
         this.link[idx] = link;
     }
 
@@ -777,11 +777,6 @@ export class MeshLinks {
         this.edge[idx] = edge;
     }
 
-    public setEdgeSym(idx: MeshLinkIdx, edge: MeshEdgeIdx): void {
-        const sym = this.sym[idx];
-        this.edge[sym] = edge;
-    }
-
     public setLnext(idx: MeshLinkIdx, lnext: MeshLinkIdx): void {
         this.lnext[idx] = lnext;
     }
@@ -790,23 +785,8 @@ export class MeshLinks {
         this.loop[idx] = loop;
     }
 
-    public setLoopSym(idx: MeshLinkIdx, loop: MeshLoopIdx): void {
-        const sym = this.sym[idx];
-        this.loop[sym] = loop;
-    }
-
-    public setLprev(idx: MeshLinkIdx, lprev: MeshLinkIdx): void {
-        const onext = this.onext[idx];
-        this.sym[onext] = lprev;
-    }
-
     public setOnext(idx: MeshLinkIdx, onext: MeshLinkIdx): void {
         this.onext[idx] = onext;
-    }
-
-    public setOprev(idx: MeshLinkIdx, oprev: MeshLinkIdx): void {
-        const sym = this.sym[idx];
-        this.lnext[sym] = oprev;
     }
 
     public setSym(idx: MeshLinkIdx, sym: MeshLinkIdx): void {
@@ -815,11 +795,6 @@ export class MeshLinks {
 
     public setVertex(idx: MeshLinkIdx, vertex: MeshVertexIdx): void {
         this.vertex[idx] = vertex;
-    }
-
-    public setVertexSym(idx: MeshLinkIdx, vertex: MeshVertexIdx): void {
-        const sym = this.sym[idx];
-        this.vertex[sym] = vertex;
     }
 
     /**
@@ -1124,13 +1099,13 @@ export class MeshShells<T> {
         return new MeshShells(data, firstFace, next, prev, free, length);
     }
 
-    public static toObject<T>(loops: MeshShells<T>): MeshShellsLike<T> {
-        const data = loops.data.slice();
-        const firstFace = loops.firstFace.slice();
-        const next = loops.next.slice();
-        const prev = loops.prev.slice();
-        const free = loops.free.slice();
-        const length = loops.length;
+    public static toObject<T>(shells: MeshShells<T>): MeshShellsLike<T> {
+        const data = shells.data.slice();
+        const firstFace = shells.firstFace.slice();
+        const next = shells.next.slice();
+        const prev = shells.prev.slice();
+        const free = shells.free.slice();
+        const length = shells.length;
 
         return { data, firstFace, next, prev, free, length };
     }
@@ -1175,6 +1150,8 @@ export class MeshShells<T> {
             this.next.push(-1);
             this.prev.push(-1);
             this.length = idx + 1;
+        } else {
+            this.data[idx] = data;
         }
 
         return idx;
@@ -1401,7 +1378,7 @@ export class Mesh<S, F, E, V, P> {
     }
 
     /**
-     * Euler operator: Adds and edge and a face to the mesh.
+     * Euler operator: Removes an edge and a face from the mesh.
      *
      * Note: Deletes loop of `oldEdge1` or `link2`
      *
@@ -1848,7 +1825,7 @@ export class Mesh<S, F, E, V, P> {
         this.links.setSym(sym, linkDest);
 
         // Update edge
-        if (edge >= 0) {
+        if (edge !== -1) {
             this.edges.setLink(edge, linkDest);
         }
 
@@ -1993,7 +1970,7 @@ export class ValidationHelper {
     public greaterThanOrEqual<T>(valueA: T, valueB: T, fmt: string, ...params: FormatParameters): void {
         if (valueA < valueB) {
             const fmtStr = formatString(fmt, ...params);
-            this.errors.push(fmtStr + ": " + valueA + " expected to be GREATER THAN OR EQUAL to'" + valueB + "'");
+            this.errors.push(fmtStr + ": '" + valueA + "' expected to be GREATER THAN OR EQUAL to '" + valueB + "'");
         }
     }
 
